@@ -63,7 +63,11 @@ def main(pressure, experiment_type):
     inputs_tensor = []
     outputs_tensor = []
     for f in file_names:
-        sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
+        try:
+            sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
+        except IOError:
+            print('IOError', f, pressure)
+            continue
         # test if sequence is of full length
         test_features = sim_features[output_keys[0]]
         if len(test_features) == SEQUENCE_LENGTH:
@@ -90,6 +94,6 @@ def main(pressure, experiment_type):
 
 if __name__ == '__main__':
     for pressure in ['0.2e6', '0.5e6', '1.0e6']:
-        for experiment_type in ['drained']:  # there is a problem with undrained
+        for experiment_type in ['drained', 'undrained']:  # there is a problem with undrained
             main(pressure, experiment_type)
 
