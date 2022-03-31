@@ -115,3 +115,37 @@ if not os.path.exists('plots'):
     os.makedirs('plots')
 fig.savefig('plots/' + f'loss_{pressure}_{experiment_type}.png')
 
+def predict(inputs, model, window_size):
+    """
+    Take a batch of sequences, iterate over windows making predictions.
+    """
+    predictions = []
+
+    start, end = 0, window_size
+    while end < sequence_length:
+        predictions.append(model(inputs[:, start:end]))
+        start += 1
+        end += 1
+
+    predictions = np.array(predictions)
+    predictions = np.transpose(predictions, (1, 0, 2))
+
+    return predictions
+
+test_inputs = split_data['test'][0][:32]
+test_outputs = split_data['test'][1][:32]
+test_predictions = predict(test_inputs, model, window_size)
+
+steps = np.array(list(range(sequence_length)))
+steps_predicted = np.array(list(range(window_size, sequence_length)))
+
+fig, ax = plt.subplots(3, 3)
+for feature_idx in range(test_outputs.shape[2]):
+    i = feature_idx % 3
+    j = feature_idx // 3
+    ax[i, j].plot(steps, test_outputs[0, :, feature_idx], label='truth')
+    ax[i, j].plot(steps_predicted, test_predictions[0, :, feature_idx], label='predictions')
+    ax[i, j].set_title(datafile.attrs['outputs'][feature_idx])
+fig.legend()
+fig.savefig('plots/' + f'test_predictions.png')
+
