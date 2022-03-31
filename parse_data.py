@@ -86,14 +86,20 @@ def main(pressure, experiment_type):
     print(f'Created tensor of {outputs_tensor.shape[0]} samples,')
 
     with h5py.File(TARGET_DIR + 'rnn_data.hdf5', 'a') as f:
-        grp = f.create_group(f'{pressure}/{experiment_type}')
+        grp = f.require_group(f'{pressure}/{experiment_type}')
         grp['contact_params'] = contact_tensor
         grp['inputs'] = inputs_tensor
         grp['outputs'] = outputs_tensor
+
+        f.attrs['inputs'] = input_keys
+        f.attrs['outputs'] = output_keys
+        f.attrs['contact_params'] = contact_keys
+        f.attrs['unused_keys_sequence'] = unused_keys_sequence
+        f.attrs['unused_keys_constant'] = unused_keys_constant
     print(f"Added data to {TARGET_DIR + 'rnn_data.h5py'}")
 
 if __name__ == '__main__':
     for pressure in ['0.2e6', '0.5e6', '1.0e6']:
-        for experiment_type in ['drained', 'undrained']:  # there is a problem with undrained
+        for experiment_type in ['drained', 'undrained']:
             main(pressure, experiment_type)
 
