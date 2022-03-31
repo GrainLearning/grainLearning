@@ -85,7 +85,7 @@ def main(pressure, experiment_type):
 
     print(f'Created tensor of {outputs_tensor.shape[0]} samples,')
 
-    with h5py.File(TARGET_DIR + 'rnn_data.h5py', 'a') as f:
+    with h5py.File(TARGET_DIR + 'rnn_data.hdf5', 'a') as f:
         grp = f.create_group(f'{pressure}/{experiment_type}')
         grp['contact_params'] = contact_tensor
         grp['inputs'] = inputs_tensor
