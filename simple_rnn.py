@@ -4,7 +4,7 @@ Model itself based on Ma's.
 Data just picking a single pressure and type.
 Contact parameters handled by just concatenating to the sequence data.
 No additional hand-engineered features (like Ma's chi).
-No rescaling. (do need this for sensible results)
+Do rescale input data.
 """
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
@@ -47,6 +47,34 @@ def make_splits(inputs, outputs, fracs):
 
 split_fracs = {'train': 0.7, 'val': 0.15, 'test': 0.15}
 split_data = make_splits(total_inputs, outputs, split_fracs)
+
+def standardize_splits(split_data):
+    """
+    Standardize all 3 splits, using the mean and std of the training data.
+    Do this for the input features and the output labels.
+    """
+    X_mean = split_data['train'][0].mean(axis=(0, 1)),
+    y_mean = split_data['train'][1].mean(axis=(0, 1)),
+    train_stats = {
+        'X_mean': X_mean,
+        'X_std': (split_data['train'][0] - X_mean).std(axis=(0, 1)),
+        'y_mean': y_mean,
+        'y_std': (split_data['train'][1] - y_mean).std(axis=(0, 1)),
+        }
+
+    standardized_splits = dict()
+    for split in ['train', 'val', 'test']:
+        standardized_splits[split] = standardize(split_data[split], train_stats)
+
+
+    return train_stats, standardized_splits
+
+def standardize(data, stats):
+    X, y = data
+    return ((X - stats['X_mean']) / stats['X_std'],
+                (y - stats['y_mean']) / stats['y_std'])
+
+train_stats, split_data = standardize_splits(split_data)
 
 def sliding_windows(data, window_size: int, window_step: int):
     """
@@ -93,7 +121,7 @@ model = Sequential([
 optimizer = keras.optimizers.Adam(lr=1e-3)
 model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
 
-epochs = 10  # Ma: 2_000
+epochs = 100  # Ma: 2_000
 batch_size = 256
 history = model.fit(
         *windows['train'],
@@ -101,6 +129,10 @@ history = model.fit(
         validation_data=windows['val'],
         batch_size=batch_size,
         )
+
+model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}'
+model.save(model_directory)
+np.save(model_directory + '/train_stats.npy', train_stats)
 
 loss = {
         'train': history.history['loss'],
@@ -149,3 +181,4 @@ for feature_idx in range(test_outputs.shape[2]):
 fig.legend()
 fig.savefig('plots/' + f'test_predictions.png')
 
+import IPython ; IPython.embed() ; exit(1)
