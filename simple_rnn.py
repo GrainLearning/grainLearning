@@ -70,13 +70,18 @@ model = Sequential([
 optimizer = keras.optimizers.Adam(lr=1e-3)
 model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
 
-epochs = 4  # Ma: 2_000
+epochs = 1_000  # Ma: 2_000
 batch_size = 256
+
+early_stopping = keras.callbacks.EarlyStopping(
+    monitor='val_loss', patience=10, restore_best_weights=True)
+
 history = model.fit(
         *windows['train'],
         epochs=epochs,
         validation_data=windows['val'],
         batch_size=batch_size,
+        callbacks=[early_stopping],
         )
 
 model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}'
@@ -88,8 +93,10 @@ loss = {
         'val': history.history['val_loss']
         }
 fig, ax = plt.subplots()
+epoch_list = list(range(len(loss['train'])))
+
 for split in ['train', 'val']:
-    ax.plot(list(range(epochs)), loss[split], label=split + 'loss')
+    ax.plot(epoch_list, loss[split], label=split + 'loss')
 fig.legend()
 
 if not os.path.exists('plots'):
