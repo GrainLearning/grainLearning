@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 import os
 
 from preprocessing import prepare_datasets
+from models import baseline_model
 
 pressure = 'All'  # '0.2e6'
 experiment_type = 'All'  # 'drained'
@@ -22,7 +23,7 @@ split_data, train_stats = prepare_datasets(
         experiment_type=experiment_type,
         )
 
-def sliding_windows(data, window_size: int, window_step: int):
+def sliding_windows(data, window_size: int, window_step: int, seed: int = 42):
     """
     Take a dataset of sequences of shape N, S, L and output another dataset
     of shorter sequences of size `window_size`, taken at intervals `window_step`
@@ -47,9 +48,10 @@ def sliding_windows(data, window_size: int, window_step: int):
     Xs = np.reshape(Xs, (num_indep_samples,) + Xs.shape[2:])
     ys = np.reshape(ys, (num_indep_samples,) + ys.shape[2:])
 
-    return shuffle(Xs, ys)
+    return shuffle(Xs, ys, seed)
 
-def shuffle(Xs, ys):
+def shuffle(Xs, ys, seed):
+    np.random.seed(seed)
     inds = np.random.permutation(len(Xs))
     return Xs[inds], ys[inds]
 
@@ -61,16 +63,12 @@ _, sequence_length, num_features = split_data['train'][0].shape
 num_labels = windows['train'][1].shape[-1]
 
 # this is close to Ma's model (apart from the LSTM modification) 
-model = Sequential([
-        layers.Input(shape=(None, num_features)),
-        layers.LSTM(50),
-        layers.Dense(20, activation='relu'),
-        layers.Dense(num_labels),
-        ])
+model =  baseline_model(num_features, num_labels)
+
 optimizer = keras.optimizers.Adam(lr=1e-3)
 model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
 
-epochs = 1_000  # Ma: 2_000
+epochs = 3  # Ma: 2_000
 batch_size = 256
 
 early_stopping = keras.callbacks.EarlyStopping(
@@ -84,7 +82,7 @@ history = model.fit(
         callbacks=[early_stopping],
         )
 
-model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}'
+model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}_tmp'
 model.save(model_directory)
 np.save(model_directory + '/train_stats.npy', train_stats)
 
