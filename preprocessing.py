@@ -13,6 +13,7 @@ def prepare_datasets(
         experiment_type: str = 'drained',
         train_frac: float = 0.7,
         val_frac: float = 0.15,
+        seed: int = 42,
         ):
 
     datafile = h5py.File(raw_data, 'r')
@@ -25,7 +26,7 @@ def prepare_datasets(
     else:
         data_used = (inputs, outputs, contacts)
 
-    split_data = _make_splits(data_used, train_frac, val_frac)
+    split_data = _make_splits(data_used, train_frac, val_frac, seed)
 
     if standardize:
         split_data, train_stats = _standardize_outputs(split_data)
@@ -89,18 +90,22 @@ def _concatenate_constants(inputs, contacts):
     total_inputs = np.concatenate([inputs, contacts_sequence], axis=2)
     return total_inputs
 
-def _make_splits(data, train_frac, val_frac):
+def _make_splits(data, train_frac, val_frac, seed):
     """
     Split data into train, val, test sets,  based on samples,
     not within a sequence.
+    data is a tuple of arrays.
     """
     n_tot = data[0].shape[0]
     n_train = int(train_frac * n_tot)
     n_val = int(val_frac * n_tot)
+
+    np.random.seed(seed)
+    inds = np.random.permutation(n_tot)
     split_data = {
-            'train': tuple(d[:n_train] for d in data),
-            'val': tuple(d[n_train:n_train + n_val] for d in data),
-            'test': tuple(d[n_train + n_val:] for d in data),
+            'train': tuple(d[inds[:n_train]] for d in data),
+            'val': tuple(d[inds[n_train:n_train + n_val]] for d in data),
+            'test': tuple(d[inds[n_train + n_val:]] for d in data),
             }
     return split_data
 
