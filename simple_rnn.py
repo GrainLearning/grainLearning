@@ -14,6 +14,7 @@ import os
 
 from preprocessing import prepare_datasets
 from models import baseline_model
+from windows import sliding_windows, predict_over_windows
 
 pressure = 'All'  # '0.2e6'
 experiment_type = 'All'  # 'drained'
@@ -23,40 +24,9 @@ split_data, train_stats = prepare_datasets(
         experiment_type=experiment_type,
         )
 
-def sliding_windows(data, window_size: int, window_step: int, seed: int = 42):
-    """
-    Take a dataset of sequences of shape N, S, L and output another dataset
-    of shorter sequences of size `window_size`, taken at intervals `window_step`
-    so of shape M, window_size, L, with M >> N.
-    Also shuffle the data.
-    """
-    inputs, outputs = data
-    num_samples, sequence_length, num_labels = outputs.shape
-    Xs, ys = [], []
-    start, end = 0, window_size
-    while end < sequence_length:
-        Xs.append(inputs[:, start:end])
-        ys.append(outputs[:, end + 1])
-        start += window_step
-        end += window_step
-
-    Xs = np.array(Xs)
-    ys = np.array(ys)
-    # now we have the first dimension for samples and the second for windows,
-    # we want to merge those to treat them as independent samples
-    num_indep_samples = Xs.shape[0] * Xs.shape[1]
-    Xs = np.reshape(Xs, (num_indep_samples,) + Xs.shape[2:])
-    ys = np.reshape(ys, (num_indep_samples,) + ys.shape[2:])
-
-    return shuffle(Xs, ys, seed)
-
-def shuffle(Xs, ys, seed):
-    np.random.seed(seed)
-    inds = np.random.permutation(len(Xs))
-    return Xs[inds], ys[inds]
-
 window_size, window_step = 20, 5
-windows = {split: sliding_windows(split_data[split], window_size, window_step)
+windows = {split: sliding_windows(
+             split_data[split], window_size, window_step)
             for split in ['train', 'val', 'test']}
 
 _, sequence_length, num_features = split_data['train'][0].shape
@@ -101,26 +71,10 @@ if not os.path.exists('plots'):
     os.makedirs('plots')
 fig.savefig('plots/' + f'loss_{pressure}_{experiment_type}.png')
 
-def predict(inputs, model, window_size):
-    """
-    Take a batch of sequences, iterate over windows making predictions.
-    """
-    predictions = []
-
-    start, end = 0, window_size
-    while end < sequence_length:
-        predictions.append(model(inputs[:, start:end]))
-        start += 1
-        end += 1
-
-    predictions = np.array(predictions)
-    predictions = np.transpose(predictions, (1, 0, 2))
-
-    return predictions
-
 test_inputs = split_data['test'][0][:32]
 test_outputs = split_data['test'][1][:32]
-test_predictions = predict(test_inputs, model, window_size)
+test_predictions = predict_over_windows(
+        test_inputs, model, window_size, sequence_length)
 
 steps = np.array(list(range(sequence_length)))
 steps_predicted = np.array(list(range(window_size, sequence_length)))
