@@ -103,15 +103,12 @@ def main(pressure, experiment_type,numParticles):
         ## particle shape info
         for shapeKey in output_keys[0]:
             outputs_tensor.append([np.array(eval('b.'+shapeKey)) for b in O.bodies])
-            print(outputs_tensor[-1][0])
         ## particle motion info
         for motionKey in output_keys[1]:
             outputs_tensor.append([np.array(eval('b.'+motionKey)) for b in O.bodies])
-            print(outputs_tensor[-1][0])
         ## interaction info
         for interKey in output_keys[2]:
             outputs_tensor.append([np.array(eval('i.'+interKey)) for i in O.interactions])
-            print(outputs_tensor[-1][0])
 
     # ~ # keras requires (batch, sequence_length, features) shape, so transpose axes (TODO)
     # ~ inputs_tensor = np.transpose(inputs_tensor, (0, 2, 1))
@@ -120,7 +117,7 @@ def main(pressure, experiment_type,numParticles):
     # ~ print(f'Created tensor of {outputs_tensor.shape[0]} samples,')
 
     with h5py.File(TARGET_DIR + 'gnn_data.hdf5', 'a') as f:
-        grp = f.require_group(f'{pressure}/{experiment_type}')
+        grp = f.require_group(f'{pressure}/{experiment_type}/{numParticles}')
         grp['contact_params'] = contact_tensor
         grp['inputs'] = inputs_tensor
         grp['outputs'] = outputs_tensor
