@@ -1,12 +1,11 @@
 import numpy as np
 import h5py
 
-DATA_PATH = 'data/rnn_data.hdf5'
 PRESSURES = [0.2, 0.5, 1.0]
 EXPERIMENT_TYPES = ['drained', 'undrained']
 
 def prepare_datasets(
-        raw_data: str = DATA_PATH,
+        raw_data: str,
         standardize: bool = True,
         concatenate_constants: bool = True,
         pressure: str = '0.2e6',
@@ -131,11 +130,4 @@ def _standardize(data, stats):
     data[1] = (data[1] - stats['y_mean']) / stats['y_std']
     data = tuple(data)
     return data
-
-def main():
-    prepare_datasets(pressure='All', experiment_type='All')
-
-
-if __name__ == '__main__':
-    main()
 
