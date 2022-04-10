@@ -12,6 +12,7 @@ def prepare_datasets(
         experiment_type: str = 'drained',
         train_frac: float = 0.7,
         val_frac: float = 0.15,
+        pad_length: int = 0,
         seed: int = 42,
         ):
 
@@ -30,6 +31,8 @@ def prepare_datasets(
     if standardize:
         split_data, train_stats = _standardize_outputs(split_data)
 
+    if pad_length:
+        split_data = _pad_initial(split_data, pad_length)
     return split_data, train_stats
 
 def _merge_datasets(datafile, pressure, experiment_type):
@@ -130,4 +133,26 @@ def _standardize(data, stats):
     data[1] = (data[1] - stats['y_mean']) / stats['y_std']
     data = tuple(data)
     return data
+
+def _pad_initial(split_data, pad_length):
+    """
+    Add `pad_length` copies of the initial step in the sequence.
+    NOTE: needs fixing if contact parameters included separately.
+    """
+    for split in ['train', 'val', 'test']:
+        X, y = split_data[split]
+        X_padded = _pad_array(X, pad_length)
+        y_padded = _pad_array(y, pad_length)
+        split_data[split] = X_padded, y_padded
+
+    return split_data
+
+def _pad_array(array, pad_length, axis=1):
+    starts = array[:, :1, :]
+    padding = np.repeat(starts, pad_length, axis=axis)
+    padded_array = np.concatenate([padding, array], axis=axis)
+    return padded_array
+
+
+
 

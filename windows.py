@@ -40,7 +40,8 @@ def predict_over_windows(
         inputs,
         model,
         window_size: int,
-        sequence_length: int):
+        sequence_length: int,
+        ):
     """
     Take a batch of sequences, iterate over windows making predictions.
     """
