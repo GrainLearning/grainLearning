@@ -21,42 +21,66 @@ input_keys = [
         'num',  # number of particles
 ]
 
-output_keys = [
-        ## particle shape info (in b.shape)
-        [
+output_keys_bodies = [
+        ## particle info (in b.shape and b.state)
         'shape.radius',
-        ],
-        ## particle motion info (in b.state)
-        [
-        'state.vel',
+        'state.vel[0]',
+        'state.vel[1]',
+        'state.vel[2]',
         'state.mass',
-        'state.angVel',
-        'state.angMom',
-        'state.inertia',
-        'state.refPos',
-        'state.refOri',
-        ],
+        'state.angVel[0]',
+        'state.angVel[1]',
+        'state.angVel[2]',
+        'state.angMom[0]',
+        'state.angMom[1]',
+        'state.angMom[2]',
+        'state.inertia[0]',
+        'state.inertia[1]',
+        'state.inertia[2]',
+        'state.refPos[0]',
+        'state.refPos[1]',
+        'state.refPos[2]',
+        'state.refOri[0]',
+        'state.refOri[1]',
+        'state.refOri[2]',
+        'state.refOri[3]',
+        ]
+output_keys_inters = [
         ## interaction connectivity info (in inter)
-        [
         'id1',
         'id2',
         ## interaction geometry info (in inter.geom)
         'geom.penetrationDepth',
-        'geom.shearInc',  # shear increment between particles
-        'geom.normal',  # contact normal
-        'geom.contactPoint',
+        'geom.shearInc[0]',  # shear increment x between particles
+        'geom.shearInc[1]',  # shear increment y between particles
+        'geom.shearInc[2]',  # shear increment z between particles
+        'geom.normal[0]',  # contact normal x
+        'geom.normal[1]',  # contact normal y
+        'geom.normal[2]',  # contact normal z
+        'geom.contactPoint[0]',
+        'geom.contactPoint[1]',
+        'geom.contactPoint[2]',
         'geom.refR1',
         'geom.refR2',
         ## interaction physics info (in inter.phys)
-        'phys.shearElastic',  # elastic component of the shear (tangential) force
-        'phys.usElastic',  # elastic component of the shear displacement
-        'phys.usTotal',  # total shear displacement
+        'phys.shearElastic[0]',  # elastic component of the shear (tangential) force x
+        'phys.shearElastic[1]',  # elastic component of the shear (tangential) force y
+        'phys.shearElastic[2]',  # elastic component of the shear (tangential) force z
+        'phys.usElastic[0]',  # elastic component of the shear displacement x
+        'phys.usElastic[1]',  # elastic component of the shear displacement y
+        'phys.usElastic[2]',  # elastic component of the shear displacement z
+        'phys.usTotal[0]',  # total shear displacement x
+        'phys.usTotal[1]',  # total shear displacement y
+        'phys.usTotal[2]',  # total shear displacement z
         'phys.ks',  # tangential stiffness
-        'phys.shearForce',  # shear foce
+        'phys.shearForce[0]',  # shear foce x
+        'phys.shearForce[1]',  # shear foce y
+        'phys.shearForce[2]',  # shear foce z
         'phys.kn',  # normal stiffness
-        'phys.normalForce',  # normal force
-        ],
-]
+        'phys.normalForce[0]',  # normal force x
+        'phys.normalForce[1]',  # normal force y
+        'phys.normalForce[2]',  # normal force z
+        ]
 
 unused_keys_sequence = [
 ]
@@ -76,12 +100,13 @@ def main(pressure, experiment_type,numParticles):
         return
 
     file_names = [fn for fn in os.listdir(data_dir) if fn.endswith('_0.yade.gz')]
-    file_names = file_names[:2]
+    file_names = file_names[:1]
     print(file_names)
 
     contact_tensor = []
     inputs_tensor = []
-    outputs_tensor = []
+    outputs_tensor_bodies = []
+    outputs_tensor_inters = []
     for f in file_names:
         try:
             O.load(data_dir + f); O.step()
@@ -100,31 +125,42 @@ def main(pressure, experiment_type,numParticles):
             getStress().trace()/3,
             len(O.bodies)])
         ### output data
-        ## particle shape info
-        for shapeKey in output_keys[0]:
-            outputs_tensor.append([np.array(eval('b.'+shapeKey)) for b in O.bodies])
-        ## particle motion info
-        for motionKey in output_keys[1]:
-            outputs_tensor.append([np.array(eval('b.'+motionKey)) for b in O.bodies])
+        ## particle info
+        bodies_data = []
+        for bodyKey in output_keys_bodies:
+            bodies_data.append([float(eval('b.'+bodyKey)) for b in O.bodies])
+        outputs_tensor_bodies.append(bodies_data)
         ## interaction info
-        for interKey in output_keys[2]:
-            outputs_tensor.append([np.array(eval('i.'+interKey)) for i in O.interactions])
+        inters_data = []
+        for interKey in output_keys_inters:
+            inters_data.append([float(eval('i.'+interKey)) for i in O.interactions if i.isReal])
+        outputs_tensor_inters.append(inters_data)
 
-    # ~ # keras requires (batch, sequence_length, features) shape, so transpose axes (TODO)
-    # ~ inputs_tensor = np.transpose(inputs_tensor, (0, 2, 1))
-    # ~ outputs_tensor = np.transpose(outputs_tensor, (0, 2, 1))
+    # keras requires (batch, sequence_length, features) shape, so transpose axes (TODO, originally by Aron)
+    numData = len(outputs_tensor_bodies)
+    numNodes = len(O.bodies)
+    numEdges = O.interactions.countReal()
+    outputs_tensor_bodies = np.array(outputs_tensor_bodies)
+    print(outputs_tensor_bodies.shape,numNodes)
+    outputs_tensor_inters = np.array(outputs_tensor_inters)
+    print(outputs_tensor_inters.shape,numEdges)
 
-    # ~ print(f'Created tensor of {outputs_tensor.shape[0]} samples,')
+    print(f'Created tensor of {len(outputs_tensor_bodies)} samples,')
+    print(f'Created tensor of {len(outputs_tensor_inters)} samples,')
+    print(f'Created tensor of {len(contact_tensor)} samples,')
+    print(f'Created tensor of {len(inputs_tensor)} samples,')
 
     with h5py.File(TARGET_DIR + 'gnn_data.hdf5', 'a') as f:
         grp = f.require_group(f'{pressure}/{experiment_type}/{numParticles}')
         grp['contact_params'] = contact_tensor
         grp['inputs'] = inputs_tensor
-        grp['outputs'] = outputs_tensor
+        grp['outputs_bodies'] = outputs_tensor_bodies
+        grp['outputs_inters'] = outputs_tensor_inters
 
-        f.attrs['inputs'] = input_keys
-        f.attrs['outputs'] = output_keys
         f.attrs['contact_params'] = contact_keys
+        f.attrs['inputs'] = input_keys
+        f.attrs['outputs_bodies'] = output_keys_bodies
+        f.attrs['outputs_inters'] = output_keys_inters
         f.attrs['unused_keys_sequence'] = unused_keys_sequence
         f.attrs['unused_keys_constant'] = unused_keys_constant
     print(f"Added data to {TARGET_DIR + 'gnn_data.h5py'}")
