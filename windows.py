@@ -15,9 +15,9 @@ def sliding_windows(
     num_samples, sequence_length, num_labels = outputs.shape
     Xs, ys = [], []
     start, end = 0, window_size
-    while end + 1 < sequence_length:
+    while end <= sequence_length:
         Xs.append(inputs[:, start:end])
-        ys.append(outputs[:, end + 1])
+        ys.append(outputs[:, end - 1])
         start += window_step
         end += window_step
 
