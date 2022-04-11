@@ -21,14 +21,18 @@ experiment_type = 'All'  # 'drained'
 use_windows = True
 window_size, window_step = 20, 1
 
-split_data, train_stats = prepare_datasets(
+split_data = prepare_datasets(
         raw_data='data/sequences.hdf5',
         pressure=pressure,
         experiment_type=experiment_type,
         pad_length=window_size if use_windows else 0,
         )
-_, sequence_length, num_features = split_data['train'][0].shape
-num_labels = split_data['train'][1].shape[-1]
+
+train_sample = next(iter(split_data['train']))
+sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
+num_contact_params = train_sample[0]['contact_parameters'].shape[0]
+num_labels = train_sample[1].shape[-1]
+train_stats = dict()
 
 if not use_windows:
     final_data = split_data
@@ -44,26 +48,28 @@ else:
     final_data = windows
 
 
-model =  baseline_model(num_features, num_labels)
+model =  baseline_model(num_load_features, num_contact_params, num_labels, window_size)
 
 optimizer = keras.optimizers.Adam(learning_rate=1e-3)
 model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
 
-epochs = 2_000 # Ma: 2_000
+epochs = 2 # Ma: 2_000
 batch_size = 256
 
 early_stopping = keras.callbacks.EarlyStopping(
     monitor='val_loss', patience=50, restore_best_weights=True)
 
+for split in ['train', 'val', 'test']:
+    final_data[split] = final_data[split].batch(batch_size)
+
 history = model.fit(
-        *final_data['train'],
+        final_data['train'],
         epochs=epochs,
         validation_data=final_data['val'],
-        batch_size=batch_size,
         callbacks=[early_stopping],
         )
 
-model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}_3'
+model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}_4'
 model.save(model_directory)
 np.save(model_directory + '/train_stats.npy', train_stats)
 
