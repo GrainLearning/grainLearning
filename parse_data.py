@@ -47,7 +47,7 @@ unused_keys_constant = [
         'num',  # number of particles (always 10_000)
 ]
 SEQUENCE_LENGTH = 200
-TARGET_DIR = 'data/'
+TARGET_FILE = 'data/sequences.hdf5'
 DATA_DIR = '/Users/aronjansen/Documents/grainsData/TriaxialCompression/'
 
 
@@ -62,6 +62,7 @@ def main(pressure, experiment_type):
     contact_tensor = []
     inputs_tensor = []
     outputs_tensor = []
+    other_lengths = []
     for f in file_names:
         try:
             sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
@@ -71,9 +72,19 @@ def main(pressure, experiment_type):
         # test if sequence is of full length
         test_features = sim_features[output_keys[0]]
         if len(test_features) == SEQUENCE_LENGTH:
-            contact_tensor.append([sim_params[key] for key in contact_keys])
+            contact_params = [sim_params[key] for key in contact_keys]
+            e_0 = sim_features['e'][0]
+            contact_params.append(e_0)
+            contact_tensor.append(contact_params)
             inputs_tensor.append([sim_features[key] for key in input_keys])
             outputs_tensor.append([sim_features[key] for key in output_keys])
+        else:
+            other_lengths.append(len(test_features))
+
+    print(f'At confining pressure {pressure}, for the {experiment_type} case, '
+          f'there are {len(other_lengths)} samples with a different sequence length.')
+    print(f'lengths: ')
+    print(other_lengths)
 
     contact_tensor = np.array(contact_tensor)
     inputs_tensor = np.array(inputs_tensor)
@@ -85,7 +96,7 @@ def main(pressure, experiment_type):
 
     print(f'Created tensor of {outputs_tensor.shape[0]} samples,')
 
-    with h5py.File(TARGET_DIR + 'rnn_data.hdf5', 'a') as f:
+    with h5py.File(TARGET_FILE, 'a') as f:
         grp = f.require_group(f'{pressure}/{experiment_type}')
         grp['contact_params'] = contact_tensor
         grp['inputs'] = inputs_tensor
@@ -93,12 +104,14 @@ def main(pressure, experiment_type):
 
         f.attrs['inputs'] = input_keys
         f.attrs['outputs'] = output_keys
-        f.attrs['contact_params'] = contact_keys
+        f.attrs['contact_params'] = contact_keys + ['e_0']
         f.attrs['unused_keys_sequence'] = unused_keys_sequence
         f.attrs['unused_keys_constant'] = unused_keys_constant
-    print(f"Added data to {TARGET_DIR + 'rnn_data.h5py'}")
+    print(f"Added data to {TARGET_FILE}")
 
 if __name__ == '__main__':
+    if os.path.exists(TARGET_FILE):
+        os.remove(TARGET_FILE)
     for pressure in ['0.2e6', '0.5e6', '1.0e6']:
         for experiment_type in ['drained', 'undrained']:
             main(pressure, experiment_type)

@@ -1,18 +1,18 @@
 import numpy as np
 import h5py
 
-DATA_PATH = 'data/rnn_data.hdf5'
 PRESSURES = [0.2, 0.5, 1.0]
 EXPERIMENT_TYPES = ['drained', 'undrained']
 
 def prepare_datasets(
-        raw_data: str = DATA_PATH,
+        raw_data: str,
         standardize: bool = True,
         concatenate_constants: bool = True,
         pressure: str = '0.2e6',
         experiment_type: str = 'drained',
         train_frac: float = 0.7,
         val_frac: float = 0.15,
+        pad_length: int = 0,
         seed: int = 42,
         ):
 
@@ -31,6 +31,8 @@ def prepare_datasets(
     if standardize:
         split_data, train_stats = _standardize_outputs(split_data)
 
+    if pad_length:
+        split_data = _pad_initial(split_data, pad_length)
     return split_data, train_stats
 
 def _merge_datasets(datafile, pressure, experiment_type):
@@ -132,10 +134,25 @@ def _standardize(data, stats):
     data = tuple(data)
     return data
 
-def main():
-    prepare_datasets(pressure='All', experiment_type='All')
+def _pad_initial(split_data, pad_length):
+    """
+    Add `pad_length` copies of the initial step in the sequence.
+    NOTE: needs fixing if contact parameters included separately.
+    """
+    for split in ['train', 'val', 'test']:
+        X, y = split_data[split]
+        X_padded = _pad_array(X, pad_length)
+        y_padded = _pad_array(y, pad_length)
+        split_data[split] = X_padded, y_padded
+
+    return split_data
+
+def _pad_array(array, pad_length, axis=1):
+    starts = array[:, :1, :]
+    padding = np.repeat(starts, pad_length, axis=axis)
+    padded_array = np.concatenate([padding, array], axis=axis)
+    return padded_array
 
 
-if __name__ == '__main__':
-    main()
+
 
