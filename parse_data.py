@@ -59,6 +59,9 @@ def main(pressure, experiment_type):
 
     file_names = [fn for fn in os.listdir(data_dir) if fn.endswith('.npy')]
 
+    scalings = {key: 1. for key in output_keys}
+    scalings['p'] = scalings['q'] = 1.e6
+
     contact_tensor = []
     inputs_tensor = []
     outputs_tensor = []
@@ -77,7 +80,7 @@ def main(pressure, experiment_type):
             contact_params.append(e_0)
             contact_tensor.append(contact_params)
             inputs_tensor.append([sim_features[key] for key in input_keys])
-            outputs_tensor.append([sim_features[key] for key in output_keys])
+            outputs_tensor.append([np.array(sim_features[key]) / scalings[key] for key in output_keys])
         else:
             other_lengths.append(len(test_features))
 
