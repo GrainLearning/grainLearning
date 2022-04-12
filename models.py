@@ -52,25 +52,30 @@ def baseline_model_seq(num_load_features: int, num_labels: int,
 
     return model
 
-def conditional(num_load_features: int, num_params: int, num_labels: int,
-        lstm_units: int = 50, dense_units: int = 20, seed: int = 42,
+def conditional(
+        num_load_features: int,
+        num_contact_params: int,
+        num_labels: int,
+        window_size: int,
+        lstm_units: int = 50,
+        dense_units: int = 20,
+        seed: int = 42,
         ):
 
     tf.random.set_seed(seed)
 
-    input_sequences = layers.Input(shape=(200, num_load_features))
-    input_params = layers.Input(shape=(num_params))
+    load_sequence = layers.Input(shape=(window_size, num_load_features), name='load_sequence')
+    contact_params = layers.Input(shape=(num_contact_params,), name='contact_parameters')
 
-    hidden_state = layers.Dense(2 * lstm_units, activation='relu')(input_params)
-    hidden_state = layers.Dense(2 * lstm_units, activation='relu')(hidden_state)
-    state_h, state_c = layers.Lambda(split)(hidden_state)
+    hidden_state = layers.Dense(dense_units, activation='relu')(contact_params)
+    state_h = layers.Dense(lstm_units, activation='tanh')(hidden_state)
+    state_c = layers.Dense(lstm_units, activation='tanh')(hidden_state)
 
-    # line below complaining None type is not subscriptable..
-    outputs = layers.LSTM(lstm_units)(input_sequences, initial_state=[state_h, state_c])
-    outputs = layers.Dense(dense_units, activation='relu')
-    outputs = layers.Dense(num_labels)
+    X = layers.LSTM(lstm_units)(load_sequence, initial_state=[state_h, state_c])
+    X = layers.Dense(dense_units, activation='relu')(X)
+    outputs = layers.Dense(num_labels)(X)
 
-    model = keras.Model(inputs=[input_sequences, input_params], outputs=outputs)
+    model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
 
     return model
 
@@ -85,7 +90,14 @@ def main():
     num_load_features = 3
     num_params = 6
     num_labels = 10
-    model = conditional(num_load_features, num_params, num_labels)
+    window_size = 20
+    model = conditional(num_load_features, num_params, num_labels, window_size)
+    model.summary()
+    tst_params = tf.random.normal((32, num_params))
+    tst_load = tf.random.normal((32, window_size, num_load_features))
+    out = model({'load_sequence': tst_load, 'contact_parameters': tst_params})
+    print(out.shape)
+
 
 
 if __name__ == '__main__':
