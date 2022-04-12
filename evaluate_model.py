@@ -45,6 +45,10 @@ def plot_predictions(split_data, model, train_stats):
     else:
         predictions = model.predict(test_inputs)
 
+    # un-standardize
+    predictions = train_stats['std'] * predictions + train_stats['mean']
+    labels = train_stats['std'] * labels + train_stats['mean']
+
     steps = np.array(list(range(sequence_length)))
     num_predicted = predictions.shape[1]
     steps_predicted = list(range(sequence_length - num_predicted, sequence_length))
@@ -148,12 +152,12 @@ def main():
     datafile = h5py.File(DATA_DIR, 'r')
     output_labels = datafile.attrs['outputs']
 
-    model_directory = f'trained_models/{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_4'
+    model_directory = f'trained_models/{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_5'
     model = keras.models.load_model(model_directory)
     train_stats = np.load(model_directory + '/train_stats.npy', allow_pickle=True).item()
     losses = np.load(model_directory + '/losses.npy', allow_pickle=True).item()
 
-    split_data = prepare_datasets(
+    split_data, _ = prepare_datasets(
             raw_data=DATA_DIR,
             pressure=PRESSURE,
             experiment_type=EXPERIMENT_TYPE,

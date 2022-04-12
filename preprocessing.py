@@ -12,6 +12,7 @@ def prepare_datasets(
         train_frac: float = 0.7,
         val_frac: float = 0.15,
         pad_length: int = 0,
+        standardize_outputs: bool = True,
         seed: int = 42,
         ):
 
@@ -25,7 +26,12 @@ def prepare_datasets(
 
     split_data = _make_splits(dataset, train_frac, val_frac, seed)
 
-    return split_data
+    if standardize_outputs:
+        split_data, train_stats = _standardize_outputs(split_data)
+    else:
+        train_stats = dict()
+
+    return split_data, train_stats
 
 def _merge_datasets(datafile, pressure, experiment_type):
     """
@@ -111,24 +117,25 @@ def _standardize_outputs(split_data):
     """
     Standardize outputs, using the mean and std of the training data.
     """
-    # NOTE: relies on outputs being at index 1!
-    y_mean = split_data['train'][1].mean(axis=(0, 1)),
-    train_stats = {
-        'y_mean': y_mean,
-        'y_std': (split_data['train'][1] - y_mean).std(axis=(0, 1)),
-        }
+    def get_means(inputs, outputs):
+        return tf.reduce_mean(outputs, axis=(0,1))
+    def get_stds(inputs, outputs):
+        return tf.math.reduce_std(outputs, axis=(0,1))
+    means = split_data['train'].map(get_means)
+    mean = means.reduce(np.float64(0.), lambda x, y: x + y) / len(split_data['train'])
+    stds = split_data['train'].map(get_stds)
+    std = stds.reduce(np.float64(0.), lambda x, y: x + y) / len(split_data['train'])
+
+    train_stats = {'mean': mean, 'std': std}
+
+    def _standardize(inputs, outputs):
+        return inputs, (outputs - mean) / std
 
     standardized_splits = dict()
     for split in ['train', 'val', 'test']:
-        standardized_splits[split] = _standardize(split_data[split], train_stats)
+        standardized_splits[split] = split_data[split].map(_standardize)
 
     return standardized_splits, train_stats
-
-def _standardize(data, stats):
-    data = list(data)
-    data[1] = (data[1] - stats['y_mean']) / stats['y_std']
-    data = tuple(data)
-    return data
 
 def _pad_initial(dataset, pad_length):
     """
