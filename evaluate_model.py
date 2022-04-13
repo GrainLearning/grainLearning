@@ -18,6 +18,7 @@ MODEL_NAME = 'simple_rnn'
 PLOT_DIR = 'plots/'
 DATA_DIR = 'data/sequences.hdf5'
 
+SAVED_MODEL_NAME = f'{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_conditional'
 use_windows = True
 
 def plot_losses(losses):
@@ -29,7 +30,7 @@ def plot_losses(losses):
     ax.set_yscale('log')
     fig.legend()
 
-    fig.savefig(PLOT_DIR + f'loss_{PRESSURE}_{EXPERIMENT_TYPE}.png')
+    fig.savefig(PLOT_DIR + SAVED_MODEL_NAME)
 
 def plot_predictions(split_data, model, train_stats):
     test_inputs, labels = next(iter(split_data['test'].batch(256)))
@@ -108,7 +109,7 @@ def plot_predictions(split_data, model, train_stats):
                 ylim=ylim)
 
     fig.suptitle(f'pressure {PRESSURE}, type {EXPERIMENT_TYPE}')
-    fig.savefig(PLOT_DIR + f'predictions_{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}.png')
+    fig.savefig(PLOT_DIR + f'predictions_{SAVED_MODEL_NAME}.png')
 
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
         title='', x_label='', y_label='', color='blue', ylim=None):
@@ -152,7 +153,7 @@ def main():
     datafile = h5py.File(DATA_DIR, 'r')
     output_labels = datafile.attrs['outputs']
 
-    model_directory = f'trained_models/{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_5'
+    model_directory = f'trained_models' + '/' + SAVED_MODEL_NAME
     model = keras.models.load_model(model_directory)
     train_stats = np.load(model_directory + '/train_stats.npy', allow_pickle=True).item()
     losses = np.load(model_directory + '/losses.npy', allow_pickle=True).item()

@@ -12,8 +12,10 @@ def prepare_datasets(
         train_frac: float = 0.7,
         val_frac: float = 0.15,
         pad_length: int = 0,
+        use_windows: bool = True,
         standardize_outputs: bool = True,
         seed: int = 42,
+        **kwargs,
         ):
 
     datafile = h5py.File(raw_data, 'r')
@@ -21,7 +23,7 @@ def prepare_datasets(
     inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type)
     dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': inputs, 'contact_parameters': contacts}, outputs))
 
-    if pad_length:
+    if use_windows and pad_length:
         dataset = _pad_initial(dataset, pad_length)
 
     split_data = _make_splits(dataset, train_frac, val_frac, seed)
@@ -155,4 +157,11 @@ def _pad_array(array, pad_length, axis=0):
     padding = tf.repeat(starts, pad_length, axis=axis)
     padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
+
+def get_dimensions(data):
+        train_sample = next(iter(data))
+        sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
+        num_contact_params = train_sample[0]['contact_parameters'].shape[0]
+        num_labels = train_sample[1].shape[-1]
+        return sequence_length, num_load_features, num_contact_params, num_labels
 

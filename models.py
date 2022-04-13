@@ -60,6 +60,7 @@ def conditional(
         lstm_units: int = 50,
         dense_units: int = 20,
         seed: int = 42,
+        **kwargs,
         ):
 
     tf.random.set_seed(seed)
@@ -92,7 +93,9 @@ def main():
     num_labels = 10
     window_size = 20
     model = conditional(num_load_features, num_params, num_labels, window_size)
+    model_concat = baseline_model(num_load_features, num_params, num_labels, window_size)
     model.summary()
+    model_concat.summary()
     tst_params = tf.random.normal((32, num_params))
     tst_load = tf.random.normal((32, window_size, num_load_features))
     out = model({'load_sequence': tst_load, 'contact_parameters': tst_params})

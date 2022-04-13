@@ -78,3 +78,17 @@ def extract_tensors(data):
 
     return np.array(inputs), np.array(contacts), np.array(outputs)
 
+def windowize(split_data, train_stats, sequence_length,
+        use_windows, window_size, window_step, **kwargs):
+    if not use_windows:
+        return split_data
+
+    windows = {split: sliding_windows( split_data[split], window_size, window_step)
+                for split in ['train', 'val', 'test']}
+
+    train_stats['window_size'] = window_size
+    train_stats['window_step'] = window_step
+    train_stats['sequence_length'] = sequence_length
+
+    return windows
+
