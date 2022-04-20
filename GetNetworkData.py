@@ -150,7 +150,7 @@ def main(pressure, experiment_type,numParticles):
     print(f'Created tensor of {len(contact_tensor)} samples,')
     print(f'Created tensor of {len(inputs_tensor)} samples,')
 
-    with h5py.File(TARGET_DIR + 'gnn_data.hdf5', 'a') as f:
+    with h5py.File(TARGET_DIR + 'tmp/gnn_data.hdf5', 'a') as f:
         grp = f.require_group(f'{pressure}/{experiment_type}/{numParticles}')
         grp['contact_params'] = contact_tensor
         grp['inputs'] = inputs_tensor
