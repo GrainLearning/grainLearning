@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 def sliding_windows(
         data,
@@ -11,30 +12,39 @@ def sliding_windows(
     so of shape M, window_size, L, with M >> N.
     Also shuffle the data.
     """
-    inputs, outputs = data
-    num_samples, sequence_length, num_labels = outputs.shape
-    Xs, ys = [], []
+    num_samples = len(data)
+    sample = next(iter(data))
+    sequence_length, num_labels = sample[1].shape
+    Xs, cs, ys = [], [], []
     start, end = 0, window_size
-    while end + 1 < sequence_length:
+
+    inputs, contacts, outputs = extract_tensors(data)
+
+    while end <= sequence_length:
         Xs.append(inputs[:, start:end])
-        ys.append(outputs[:, end + 1])
+        cs.append(contacts)
+        ys.append(outputs[:, end - 1])
         start += window_step
         end += window_step
 
     Xs = np.array(Xs)
+    cs = np.array(cs)
     ys = np.array(ys)
     # now we have the first dimension for samples and the second for windows,
     # we want to merge those to treat them as independent samples
     num_indep_samples = Xs.shape[0] * Xs.shape[1]
     Xs = np.reshape(Xs, (num_indep_samples,) + Xs.shape[2:])
+    cs = np.reshape(cs, (num_indep_samples,) + cs.shape[2:])
     ys = np.reshape(ys, (num_indep_samples,) + ys.shape[2:])
 
-    return _shuffle(Xs, ys, seed)
+    Xs, cs, ys =  _shuffle(Xs, cs, ys, seed)
+    dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': Xs, 'contact_parameters': cs}, ys))
+    return dataset
 
-def _shuffle(Xs, ys, seed):
+def _shuffle(Xs, cs, ys, seed):
     np.random.seed(seed)
     inds = np.random.permutation(len(Xs))
-    return Xs[inds], ys[inds]
+    return Xs[inds], cs[inds], ys[inds]
 
 def predict_over_windows(
         inputs,
@@ -49,7 +59,8 @@ def predict_over_windows(
 
     start, end = 0, window_size
     while end < sequence_length:
-        predictions.append(model(inputs[:, start:end]))
+        prediction = model([inputs['load_sequence'][:, start:end], inputs['contact_parameters']])
+        predictions.append(prediction)
         start += 1
         end += 1
 
@@ -57,4 +68,27 @@ def predict_over_windows(
     predictions = np.transpose(predictions, (1, 0, 2))
 
     return predictions
+
+def extract_tensors(data):
+    inputs, contacts, outputs = [], [], []
+    for _inputs, _outputs in iter(data):
+        inputs.append(_inputs['load_sequence'])
+        contacts.append(_inputs['contact_parameters'])
+        outputs.append(_outputs)
+
+    return np.array(inputs), np.array(contacts), np.array(outputs)
+
+def windowize(split_data, train_stats, sequence_length,
+        use_windows, window_size, window_step, **kwargs):
+    if not use_windows:
+        return split_data
+
+    windows = {split: sliding_windows( split_data[split], window_size, window_step)
+                for split in ['train', 'val', 'test']}
+
+    train_stats['window_size'] = window_size
+    train_stats['window_step'] = window_step
+    train_stats['sequence_length'] = sequence_length
+
+    return windows
 

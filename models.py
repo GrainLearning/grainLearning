@@ -1,10 +1,16 @@
-from tensorflow.keras import layers, Sequential
+from tensorflow.keras import layers, Model
 import tensorflow as tf
 
 
-def baseline_model(num_features: int, num_labels: int,
-        lstm_units: int = 50, dense_units: int = 20,
-        seed: int = 42):
+def baseline_model(
+        num_load_features: int,
+        num_contact_params: int,
+        num_labels: int,
+        window_size: int,
+        lstm_units: int = 50,
+        dense_units: int = 20,
+        seed: int = 42,
+        ):
     """
     Baseline model based on Ma et al., meant to work on data where contact
     parameters are simply concatenated on to the sequence data.
@@ -13,17 +19,20 @@ def baseline_model(num_features: int, num_labels: int,
 
     tf.random.set_seed(seed)
 
-    model = Sequential([
-        layers.Input(shape=(None, num_features)),
-        layers.LSTM(lstm_units),
-        layers.Dense(dense_units, activation='relu'),
-        layers.Dense(num_labels),
-        ])
+    load_sequence = layers.Input(shape=(window_size, num_load_features), name='load_sequence')
+    contact_params = layers.Input(shape=(num_contact_params,), name='contact_parameters')
+    contact_params_repeated = layers.RepeatVector(window_size)(contact_params)
+    X = layers.Concatenate()([load_sequence, contact_params_repeated])
+
+    X = layers.LSTM(lstm_units)(X)
+    X = layers.Dense(dense_units, activation='relu')(X)
+    outputs = layers.Dense(num_labels)(X)
+
+    model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
 
     return model
 
-
-def baseline_model_seq(num_features: int, num_labels: int,
+def baseline_model_seq(num_load_features: int, num_labels: int,
         lstm_units: int = 50, dense_units: int = 20,
         seed: int = 42):
     """
@@ -35,7 +44,7 @@ def baseline_model_seq(num_features: int, num_labels: int,
     tf.random.set_seed(seed)
 
     model = Sequential([
-        layers.Input(shape=(None, num_features)),
+        layers.Input(shape=(None, num_load_features)),
         layers.LSTM(lstm_units, return_sequences=True),
         layers.Dense(dense_units, activation='relu'),
         layers.Dense(num_labels),
@@ -43,28 +52,33 @@ def baseline_model_seq(num_features: int, num_labels: int,
 
     return model
 
-def conditional(num_features: int, num_params: int, num_labels: int,
-        lstm_units: int = 50, dense_units: int = 20, seed: int = 42,
+def conditional(
+        num_load_features: int,
+        num_contact_params: int,
+        num_labels: int,
+        window_size: int,
+        lstm_units: int = 50,
+        dense_units: int = 20,
+        seed: int = 42,
+        **kwargs,
         ):
 
     tf.random.set_seed(seed)
 
-    input_sequences = layers.Input(shape=(200, num_features))
-    input_params = layers.Input(shape=(num_params))
+    load_sequence = layers.Input(shape=(window_size, num_load_features), name='load_sequence')
+    contact_params = layers.Input(shape=(num_contact_params,), name='contact_parameters')
 
-    hidden_state = layers.Dense(2 * lstm_units, activation='relu')(input_params)
-    hidden_state = layers.Dense(2 * lstm_units, activation='relu')(hidden_state)
-    state_h, state_c = layers.Lambda(split)(hidden_state)
+    hidden_state = layers.Dense(dense_units, activation='relu')(contact_params)
+    state_h = layers.Dense(lstm_units, activation='tanh')(hidden_state)
+    state_c = layers.Dense(lstm_units, activation='tanh')(hidden_state)
 
-    # line below complaining None type is not subscriptable..
-    outputs = layers.LSTM(lstm_units)(input_sequences, initial_state=[state_h, state_c])
-    outputs = layers.Dense(dense_units, activation='relu')
-    outputs = layers.Dense(num_labels)
+    X = layers.LSTM(lstm_units)(load_sequence, initial_state=[state_h, state_c])
+    X = layers.Dense(dense_units, activation='relu')(X)
+    outputs = layers.Dense(num_labels)(X)
 
-    model = keras.Model(inputs=[input_sequences, input_params], outputs=outputs)
+    model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
 
     return model
-
 
 def split(tensor):
     tensor = tf.reshape(tensor, (-1, 2, tensor.shape[1] // 2))
@@ -74,10 +88,19 @@ def split(tensor):
     return [a, b]
 
 def main():
-    num_features = 3
+    num_load_features = 3
     num_params = 6
     num_labels = 10
-    model = conditional(num_features, num_params, num_labels)
+    window_size = 20
+    model = conditional(num_load_features, num_params, num_labels, window_size)
+    model_concat = baseline_model(num_load_features, num_params, num_labels, window_size)
+    model.summary()
+    model_concat.summary()
+    tst_params = tf.random.normal((32, num_params))
+    tst_load = tf.random.normal((32, window_size, num_load_features))
+    out = model({'load_sequence': tst_load, 'contact_parameters': tst_params})
+    print(out.shape)
+
 
 
 if __name__ == '__main__':

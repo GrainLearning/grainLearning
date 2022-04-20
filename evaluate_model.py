@@ -18,6 +18,7 @@ MODEL_NAME = 'simple_rnn'
 PLOT_DIR = 'plots/'
 DATA_DIR = 'data/sequences.hdf5'
 
+SAVED_MODEL_NAME = f'{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_conditional'
 use_windows = True
 
 def plot_losses(losses):
@@ -29,11 +30,10 @@ def plot_losses(losses):
     ax.set_yscale('log')
     fig.legend()
 
-    fig.savefig(PLOT_DIR + f'loss_{PRESSURE}_{EXPERIMENT_TYPE}.png')
+    fig.savefig(PLOT_DIR + SAVED_MODEL_NAME)
 
 def plot_predictions(split_data, model, train_stats):
-    test_inputs = split_data['test'][0][:32]
-    labels = split_data['test'][1][:32]
+    test_inputs, labels = next(iter(split_data['test'].batch(256)))
 
     window_size = train_stats['window_size']
     raw_sequence_length = train_stats['sequence_length']
@@ -42,10 +42,13 @@ def plot_predictions(split_data, model, train_stats):
     labels = labels[:, -sequence_length:]
     if use_windows:
         predictions = predict_over_windows(
-                test_inputs, model, window_size, raw_sequence_length,
-                predict_initial=False)
+                test_inputs, model, window_size, raw_sequence_length)
     else:
         predictions = model.predict(test_inputs)
+
+    # un-standardize
+    predictions = train_stats['std'] * predictions + train_stats['mean']
+    labels = train_stats['std'] * labels + train_stats['mean']
 
     steps = np.array(list(range(sequence_length)))
     num_predicted = predictions.shape[1]
@@ -53,9 +56,8 @@ def plot_predictions(split_data, model, train_stats):
     steps_predicted = steps
 
     fig, ax = plt.subplots(3, 3, figsize=(20, 20))
-    # e, f_0, a_c, a_n, a_t
     ids = {'e': 0, 'f_0': 3, 'a_c': 4, 'a_n': 5, 'a_t': 6, 'p': 1, 'q': 2}
-    representative_idxs = _find_representatives(split_data)
+    representative_idxs = _find_representatives(test_inputs)
 
     def _plot_sequence(i, j, y_key, i_s=0, x_key='steps', color='blue'):
         if x_key == 'steps':
@@ -107,7 +109,7 @@ def plot_predictions(split_data, model, train_stats):
                 ylim=ylim)
 
     fig.suptitle(f'pressure {PRESSURE}, type {EXPERIMENT_TYPE}')
-    fig.savefig(PLOT_DIR + f'predictions_{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}.png')
+    fig.savefig(PLOT_DIR + f'predictions_{SAVED_MODEL_NAME}.png')
 
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
         title='', x_label='', y_label='', color='blue', ylim=None):
@@ -126,21 +128,22 @@ def _plot_features(ax, steps, steps_predicted, labels, test_predictions,
         ax_i, ax_j, i_f_x, i_f_y):
     ax[ax_i, ax_j].plot(steps, label='truth')
 
-def _find_representatives(data):
+def _find_representatives(input_data):
     """
     returns a list of indices indicating samples each combination of pressure
     and experiment type.
     """
     representatives = []
+    contact_params = input_data['contact_parameters']
     for pressure in PRESSURES:
         for experiment_type in EXPERIMENT_TYPES:
             p = float(pressure[:3])
             e = 1 if experiment_type == 'drained' else 0
             i = 0
-            sample = data['test'][0][i:i+1]
-            while not (sample[0, 0, P_INDEX] == p and sample[0, 0, E_INDEX] == e):
+            sample = contact_params[i]
+            while not (sample[P_INDEX] == p and sample[E_INDEX] == e):
                 i += 1
-                sample = data['test'][0][i:i+1]
+                sample = contact_params[i + 1]
             representatives.append(i)
 
     return representatives
@@ -150,7 +153,7 @@ def main():
     datafile = h5py.File(DATA_DIR, 'r')
     output_labels = datafile.attrs['outputs']
 
-    model_directory = f'trained_models/{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_3'
+    model_directory = f'trained_models' + '/' + SAVED_MODEL_NAME
     model = keras.models.load_model(model_directory)
     train_stats = np.load(model_directory + '/train_stats.npy', allow_pickle=True).item()
     losses = np.load(model_directory + '/losses.npy', allow_pickle=True).item()

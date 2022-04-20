@@ -1,38 +1,38 @@
 import numpy as np
 import h5py
+import tensorflow as tf
 
 PRESSURES = [0.2, 0.5, 1.0]
 EXPERIMENT_TYPES = ['drained', 'undrained']
 
 def prepare_datasets(
         raw_data: str,
-        standardize: bool = True,
-        concatenate_constants: bool = True,
         pressure: str = '0.2e6',
         experiment_type: str = 'drained',
         train_frac: float = 0.7,
         val_frac: float = 0.15,
         pad_length: int = 0,
+        use_windows: bool = True,
+        standardize_outputs: bool = True,
         seed: int = 42,
+        **kwargs,
         ):
 
     datafile = h5py.File(raw_data, 'r')
 
     inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type)
+    dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': inputs, 'contact_parameters': contacts}, outputs))
 
-    if concatenate_constants:
-        inputs = _concatenate_constants(inputs, contacts)
-        data_used = (inputs, outputs)
-    else:
-        data_used = (inputs, outputs, contacts)
+    if use_windows and pad_length:
+        dataset = _pad_initial(dataset, pad_length)
 
-    split_data = _make_splits(data_used, train_frac, val_frac, seed)
+    split_data = _make_splits(dataset, train_frac, val_frac, seed)
 
-    if standardize:
+    if standardize_outputs:
         split_data, train_stats = _standardize_outputs(split_data)
+    else:
+        train_stats = dict()
 
-    if pad_length:
-        split_data = _pad_initial(split_data, pad_length)
     return split_data, train_stats
 
 def _merge_datasets(datafile, pressure, experiment_type):
@@ -92,22 +92,26 @@ def _concatenate_constants(inputs, contacts):
     total_inputs = np.concatenate([inputs, contacts_sequence], axis=2)
     return total_inputs
 
-def _make_splits(data, train_frac, val_frac, seed):
+def _make_splits(dataset, train_frac, val_frac, seed):
     """
     Split data into train, val, test sets,  based on samples,
     not within a sequence.
     data is a tuple of arrays.
     """
-    n_tot = data[0].shape[0]
+    n_tot = len(dataset)
     n_train = int(train_frac * n_tot)
     n_val = int(val_frac * n_tot)
 
-    np.random.seed(seed)
-    inds = np.random.permutation(n_tot)
+    dataset = dataset.shuffle(n_tot, seed=seed)
+    train = dataset.take(n_train)
+    remaining = dataset.skip(n_train)
+    val = remaining.take(n_val)
+    test = remaining.skip(n_val)
+
     split_data = {
-            'train': tuple(d[inds[:n_train]] for d in data),
-            'val': tuple(d[inds[n_train:n_train + n_val]] for d in data),
-            'test': tuple(d[inds[n_train + n_val:]] for d in data),
+            'train': train,
+            'val': val,
+            'test': test,
             }
     return split_data
 
@@ -115,44 +119,49 @@ def _standardize_outputs(split_data):
     """
     Standardize outputs, using the mean and std of the training data.
     """
-    # NOTE: relies on outputs being at index 1!
-    y_mean = split_data['train'][1].mean(axis=(0, 1)),
-    train_stats = {
-        'y_mean': y_mean,
-        'y_std': (split_data['train'][1] - y_mean).std(axis=(0, 1)),
-        }
+    def get_means(inputs, outputs):
+        return tf.reduce_mean(outputs, axis=(0,1))
+    def get_stds(inputs, outputs):
+        return tf.math.reduce_std(outputs, axis=(0,1))
+    means = split_data['train'].map(get_means)
+    mean = means.reduce(np.float64(0.), lambda x, y: x + y) / len(split_data['train'])
+    stds = split_data['train'].map(get_stds)
+    std = stds.reduce(np.float64(0.), lambda x, y: x + y) / len(split_data['train'])
+
+    train_stats = {'mean': mean, 'std': std}
+
+    def _standardize(inputs, outputs):
+        return inputs, (outputs - mean) / std
 
     standardized_splits = dict()
     for split in ['train', 'val', 'test']:
-        standardized_splits[split] = _standardize(split_data[split], train_stats)
+        standardized_splits[split] = split_data[split].map(_standardize)
 
     return standardized_splits, train_stats
 
-def _standardize(data, stats):
-    data = list(data)
-    data[1] = (data[1] - stats['y_mean']) / stats['y_std']
-    data = tuple(data)
-    return data
-
-def _pad_initial(split_data, pad_length):
+def _pad_initial(dataset, pad_length):
     """
     Add `pad_length` copies of the initial step in the sequence.
-    NOTE: needs fixing if contact parameters included separately.
     """
-    for split in ['train', 'val', 'test']:
-        X, y = split_data[split]
-        X_padded = _pad_array(X, pad_length)
-        y_padded = _pad_array(y, pad_length)
-        split_data[split] = X_padded, y_padded
+    def pad_sequence(inputs, outputs):
+        inputs['load_sequence'] = _pad_array(inputs['load_sequence'], pad_length)
+        outputs = _pad_array(outputs, pad_length)
+        return inputs, outputs
 
-    return split_data
+    dataset = dataset.map(pad_sequence)
+    return dataset
 
-def _pad_array(array, pad_length, axis=1):
-    starts = array[:, :1, :]
-    padding = np.repeat(starts, pad_length, axis=axis)
-    padded_array = np.concatenate([padding, array], axis=axis)
+def _pad_array(array, pad_length, axis=0):
+    """Applied to samples without a batch dimension!"""
+    starts = array[:1, :]
+    padding = tf.repeat(starts, pad_length, axis=axis)
+    padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
 
-
-
+def get_dimensions(data):
+        train_sample = next(iter(data))
+        sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
+        num_contact_params = train_sample[0]['contact_parameters'].shape[0]
+        num_labels = train_sample[1].shape[-1]
+        return sequence_length, num_load_features, num_contact_params, num_labels
 
