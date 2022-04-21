@@ -31,16 +31,16 @@ output_keys_bodies = [
         'state.angVel[0]',
         'state.angVel[1]',
         'state.angVel[2]',
-        'state.angMom[0]',
+        'state.angMom[0]', # redundant
         'state.angMom[1]',
         'state.angMom[2]',
-        'state.inertia[0]',
+        'state.inertia[0]', # redundant
         'state.inertia[1]',
         'state.inertia[2]',
-        'state.refPos[0]',
+        'state.refPos[0]', # position at t=0, with respect to the origin
         'state.refPos[1]',
         'state.refPos[2]',
-        'state.refOri[0]',
+        'state.refOri[0]', # orientation, redundant for spheres
         'state.refOri[1]',
         'state.refOri[2]',
         'state.refOri[3]',
@@ -50,20 +50,20 @@ output_keys_inters = [
         'id1',
         'id2',
         ## interaction geometry info (in inter.geom)
-        'geom.penetrationDepth',
+        'geom.penetrationDepth', # overlap between spheres
         'geom.shearInc[0]',  # shear increment x between particles
         'geom.shearInc[1]',  # shear increment y between particles
         'geom.shearInc[2]',  # shear increment z between particles
-        'geom.normal[0]',  # contact normal x
+        'geom.normal[0]',  # contact normal x, can get rid of and just keep normal force
         'geom.normal[1]',  # contact normal y
         'geom.normal[2]',  # contact normal z
-        'geom.contactPoint[0]',
+        'geom.contactPoint[0]', # x, y, z, in the cross section of the overlap
         'geom.contactPoint[1]',
         'geom.contactPoint[2]',
-        'geom.refR1',
-        'geom.refR2',
+        'geom.refR1', # radius particle 1, redundant because already in node
+        'geom.refR2', # as above
         ## interaction physics info (in inter.phys)
-        'phys.shearElastic[0]',  # elastic component of the shear (tangential) force x
+        'phys.shearElastic[0]',  # elastic component of the shear (tangential) force x, redundant equal to shearForce
         'phys.shearElastic[1]',  # elastic component of the shear (tangential) force y
         'phys.shearElastic[2]',  # elastic component of the shear (tangential) force z
         'phys.usElastic[0]',  # elastic component of the shear displacement x
