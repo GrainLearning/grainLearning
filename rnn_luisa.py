@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 import wandb
 import IPython
 
+"-------- DATA Pre-Processing ---------"
 def load_data():
 	"""
 	Loads the data from hdf5 file only for the 'drained' case.
@@ -17,13 +18,11 @@ def load_data():
 	          11 variables: 3 inputs, 7 outputs and the confinment (float) in that order.
 	 contact_params: contact parameters of each sample (for the 3 different confinements)
 	"""
-	f = h5py.File('sequences.hdf5', 'r') #binary file containing the consolidating data by Aron
+	f = h5py.File('rnn_data.hdf5', 'r') #binary file containing the consolidating data by Aron
 	conf = np.array(list(f.keys()),dtype='float64') #Vector of confinement pressures
 	
 	contact_params,outputs = ([] for i in range(0,2))
 	for k in f.keys(): #Adding info a different confinment pressures to the same list
-		#for i in range(0,len(f[k]['drained']['contact_params'])): #adding the confinment to the contact params
-		#	contact_params.append(np.append(f[k]['drained']['contact_params'][i],float(k)))
 		outputs_i=[]
 		for i in range(0,len(f[k]['drained']['outputs'])): #adding the confinment to the outputs
 			output_i = f[k]['drained']['outputs'][i]
@@ -31,18 +30,33 @@ def load_data():
 			outputs_i.append(np.column_stack((output_i,conf_array)))
 		outputs.extend(np.concatenate((f[k]['drained']['inputs'],outputs_i),axis=2))
 		contact_params.extend(f[k]['drained']['contact_params'])
-	return np.array(outputs),np.array(contact_params)
 
-def load_data_conf(conf):
+	if(np.isnan(np.array(contact_params)).any()): print("Nans in contact_params")
+	if(np.isnan(np.array(outputs)).any()): print("Nans in inputs_outputs")
+	contact_params=standardize_labels(np.array(contact_params))
+	outputs=standardize_features(np.array(outputs))
+	
+	return np.asarray(outputs),np.asarray(contact_params)
+
+def standardize_labels(contact_params):
 	"""
-	Loads the data from hdf5 file for a single confinment pressure conf and puts it together in lists
-	Depreceated. I ca now use load_data() that takes ALL confinement pressures
+	Normalize the labels (contact_params) as: x-mu(x) /sigma(x)
 	"""
-	f = h5py.File('rnn_data.hdf5', 'r') #binary file containing the consolidating data by Aron
-	inputs=np.array(f[conf]['drained']['inputs'])
-	outputs=np.array(f[conf]['drained']['outputs'])
-	contact_params=np.array(f[conf]['drained']['contact_params'])
-	return np.concatenate([inputs, outputs], axis=2),contact_params
+	means = np.mean(contact_params,axis=0)
+	stds  = np.std(contact_params,axis=0)
+	for i in range(0,np.shape(contact_params)[1]):
+		contact_params[:,i]=(contact_params[:,i]-means[i])/stds[i]
+	return contact_params
+
+def standardize_features(inputs_outputs):
+	"""
+	Normalize the features (inputs and outputs) as: x-mu(x) /sigma(x)
+	"""
+	means = np.mean(inputs_outputs,axis=(0,1))
+	stds  = np.std(inputs_outputs,axis=(0,1))
+	for i in range(0,np.shape(inputs_outputs)[2]): #This should be ok, I've checked
+		inputs_outputs[:,:,i]=(inputs_outputs[:,:,i]-means[i])/stds[i]
+	return inputs_outputs
 
 def split_data(inputs_outputs,contact_params,):
 	"""
@@ -59,12 +73,13 @@ def split_data(inputs_outputs,contact_params,):
 		'test':(puts_test,contact_test)
 		}
 
-def create_MPL_backwards(conf,config_wandb=None):
+"----------- MODELS -----------"
+def mlp(config_wandb=None):
 	"""
 	Creates a Keras model that takes as input the mechanical response and 
 	gives as output the contact parameters.
+	The model is a sequential multi layer perceptron.
 	"""
-	#inputs_outputs,contact_params=load_data_conf(conf)
 	inputs_outputs,contact_params=load_data()
 	splits=split_data(inputs_outputs,contact_params)
 	num_samples, sequence_length, num_features = np.shape(splits['train'][0]) #outputs
@@ -75,55 +90,33 @@ def create_MPL_backwards(conf,config_wandb=None):
 	model = keras.Sequential()
 	model.add(keras.layers.Input(shape=(sequence_length,num_features)))
 	model.add(keras.layers.Flatten(input_shape=(None,sequence_length,n_neurons)))
-	model.add(keras.layers.Normalization(axis=-1, mean=None, variance=None))
+	#model.add(keras.layers.Normalization(axis=-1, mean=None, variance=None)) #not necessary if standardize_labels
 	model.add(keras.layers.Dense(n_neurons*3,activation='sigmoid'))
 	model.add(keras.layers.Dense(n_neurons,activation='relu'))
 	model.add(keras.layers.Dense(num_labels, name='predicted_contact_params'))
 
 	model.summary()
-	model.compile(optimizer='rmsprop',loss='mse', metrics=['mae'])
+	model.compile(optimizer='rmsprop',loss='mse', metrics=['mae',tf.keras.metrics.MeanAbsolutePercentageError()])
 
 	#Training
 	early_stopping_monitor = EarlyStopping(patience=10)
 	model.fit(splits['train'][0],splits['train'][1],
 			   batch_size=32,
                epochs=40,
-               validation_data=(splits['val'][0],splits['val'][1]),
+               validation_data=splits['val'],
                callbacks=[early_stopping_monitor])
 
 	#Testing
 	testing_model(splits['test'][0][0:25],splits['test'][1][0:25],model,'MPL')
 
-def testing_model(outputs, contact_params, model, name_model):
-	"""
-	Calculates the contact_params predicted by the model for a given output
-	"""
-	titles_labels=['E','$\\nu$','kr','$\eta$','$\mu$','$e_0$']
-	fig, ax = plt.subplots(2, 3)
-	contact_params_predicted=[]
-	contact_params_predicted=model.predict(outputs)
-	for i,prediction_i in enumerate(contact_params_predicted):
-		for j in range(len(prediction_i)):
-			x = j % 2
-			y = j // 2
-			ax[x,y].plot(i,prediction_i[j],'r.') #prediction
-			ax[x,y].plot(i,contact_params[i][j],'b.') #truth
-			ax[x,y].set_title(titles_labels[j])
-	ax[1,2].plot(0,0,'r.',label='prediction')
-	ax[1,2].plot(0,0,'b.',label='truth')
-	ax[1,2].legend()
-	plt.tight_layout()
-	fig.savefig(name_model+'.pdf')
-
-def rnn(conf,config_wandb=None):
+def rnn(config_wandb=None):
 	"""
 	Creates an RNN model using Keras LSTM layer.
 	Problem of type from multiple (sequence: outputs) to one (vector: contact_params)
 	Params: 
-		conf: the confinment stress
 		config_wandb: dictionary with model variables. Useful when tracking with wandb
 	"""
-	#inputs_outputs,contact_params=load_data_conf(conf)
+	inputs_outputs,contact_params=load_data()
 	splits=split_data(inputs_outputs,contact_params)
 	num_samples, sequence_length, num_features = np.shape(splits['train'][0]) #outputs
 	num_samples2, num_labels = np.shape(splits['train'][1]) #contact params
@@ -148,6 +141,7 @@ def rnn(conf,config_wandb=None):
 	model_lstm.add(keras.layers.Dense(num_labels, name='predicted_contact_params'))
 
 	model_lstm.summary()
+
 	if config_wandb==None:	
 		model_lstm.compile(optimizer='adam',loss='mse', metrics=['mae'])
 
@@ -171,27 +165,148 @@ def rnn(conf,config_wandb=None):
 		model_lstm.fit(splits['train'][0],splits['train'][1],
 				   batch_size=config_wandb["batch_size"],
 	               epochs=config_wandb["epochs"],
-	               validation_data=(splits['val'][0],splits['val'][1]),
+	               validation_data=(splits['val']),
 	               callbacks=[early_stopping_monitor,wandb_callback])
 
 		#TODO: Try this with pandas
 		#wandb.log({"pr": wandb.plot.pr_curve(splits['test'][2][0:10], model_lstm.predict(splits['test'][1][0:10]))})
 
 	#Testing
-	testing_model(splits['test'][0][0:10],splits['test'][1][0:10],model_lstm,'LSTM')
+	testing_model(splits['test'][0][0:20],splits['test'][1][0:20],model_lstm,'LSTM')
 
-def main_local(conf):
+def cnn(config_wandb=None):
+	inputs_outputs,contact_params=load_data()
+	splits=split_data(inputs_outputs,contact_params)
+	num_samples, sequence_length, num_features = np.shape(splits['train'][0]) #outputs
+	num_samples2, num_labels = np.shape(splits['train'][1]) #contact params
+	
+	units_cnn=100
+	units_dense=200
+	if not config_wandb==None: 
+		units_cnn = config_wandb["units_CNN"] 
+		units_dense=config_wandb["units_dense"] 
+
+	model_cnn = keras.Sequential([
+		keras.layers.Input(shape=(sequence_length,num_features)),
+		keras.layers.Conv1D(units_cnn,2,activation='relu',padding="same"),
+		keras.layers.Conv1D(units_cnn*2,2,activation='relu',padding="same"),
+		keras.layers.AveragePooling1D(pool_size=2),
+		keras.layers.Conv1D(units_cnn*2,2,activation='relu',padding="same"),
+		keras.layers.MaxPooling1D(pool_size=2),
+		keras.layers.Conv1D(units_cnn*2,2,activation='relu',padding="same"),
+		keras.layers.MaxPooling1D(pool_size=2),
+		keras.layers.Conv1D(units_cnn*2,2,activation='relu',padding="same"),
+		#keras.layers.MaxPooling1D(pool_size=2),
+		#keras.layers.Flatten(),
+		keras.layers.GlobalMaxPooling1D(),
+		keras.layers.Dense(units_dense,activation='relu'),
+		keras.layers.Dense(num_labels,name='predicted_contact_params')
+		])
+	
+	if config_wandb==None:
+		model_cnn.compile(optimizer='adam',loss='mse',
+					  metrics=['mae',tf.keras.metrics.MeanAbsolutePercentageError()])
+		#Training
+		early_stopping_monitor = EarlyStopping(patience=10,restore_best_weights=True)
+		training_history=model_cnn.fit(splits['train'][0],splits['train'][1],
+			   batch_size=32,
+               epochs=30,
+               validation_data=splits['val'],
+               callbacks=[early_stopping_monitor])
+	else:
+
+		opt_adam=tf.keras.optimizers.Adam(learning_rate=config_wandb["learning_rate"])
+		model_cnn.compile(optimizer=opt_adam,loss=config_wandb["loss"],
+					  metrics=['mae',tf.keras.metrics.MeanAbsolutePercentageError()])
+		#Training
+		early_stopping_monitor = EarlyStopping(patience=config_wandb["patience"],
+												restore_best_weights=True)
+		wandb_callback = wandb.keras.WandbCallback(
+            monitor='val_root_mean_squared_error', 
+            save_model=(True))	
+		training_history=model_cnn.fit(splits['train'][0],splits['train'][1],
+				   batch_size=config_wandb["batch_size"],
+	               epochs=config_wandb["epochs"],
+	               validation_data=splits['val'],
+	               callbacks=[early_stopping_monitor,wandb_callback])
+	
+	best_score_train_set=min(training_history.history["loss"])
+	best_score_val_set=min(training_history.history["val_loss"])
+	print(f'Best epoch train loss: {best_score_train_set}')
+	print(f'Best epoch val loss: {best_score_val_set}')
+
+	#Testing
+	testing_model(splits['test'][0][0:20],splits['test'][1][0:20],model_cnn,'CNN')
+
+def wavenet():
+	inputs_outputs,contact_params=load_data()
+	splits=split_data(inputs_outputs,contact_params)
+	num_samples, sequence_length, num_features = np.shape(splits['train'][0]) #outputs
+	num_samples2, num_labels = np.shape(splits['train'][1]) #contact params
+
+	model_wavenet = keras.models.Sequential()
+	model_wavenet.add(keras.layers.Input(shape=(sequence_length,num_features)))
+	for rate in (1, 2, 4, 8) * 2:
+   	     model_wavenet.add(keras.layers.Conv1D(filters=20, kernel_size=2, padding="causal",
+                                  activation="relu", dilation_rate=rate))
+	model_wavenet.add(keras.layers.Conv1D(filters=10, kernel_size=1))
+	model_wavenet.add(keras.layers.Flatten())
+	model_wavenet.add(keras.layers.Dense(num_labels, name='predicted_contact_params'))
+	
+	model_wavenet.compile(loss="mse", optimizer="adam", metrics=['mae',tf.keras.metrics.MeanAbsolutePercentageError()])
+
+	#Trainning
+	early_stopping_monitor = EarlyStopping(patience=10,restore_best_weights=True)
+	training_history = model_wavenet.fit(splits['train'][0],splits['train'][1],batch_size=32,
+		epochs=20,validation_data=splits['val'],callbacks=[early_stopping_monitor])
+
+	#Testing
+	testing_model(splits['test'][0][0:20],splits['test'][1][0:20],model_wavenet,'Wavenet')
+
+"----------- Model EVALUATION -----------"
+def testing_model(outputs, contact_params, model, name_model):
+	"""
+	Calculates the contact_params predicted by the model for a given output
+	"""
+	titles_labels=['E','$\\nu$','kr','$\eta$','$\mu$','$e_0$']
+	fig, ax = plt.subplots(2, 3)
+	contact_params_predicted=[]
+	contact_params_predicted=model.predict(outputs)
+	for i,prediction_i in enumerate(contact_params_predicted):
+		for j in range(len(prediction_i)):
+			x = j % 2
+			y = j // 2
+			ax[x,y].plot(i,prediction_i[j],'r.',fillstyle='none') #prediction
+			ax[x,y].plot(i,contact_params[i][j],'b.',fillstyle='none') #truth
+			ax[x,y].set_title(titles_labels[j])
+	ax[1,2].plot(np.nan,np.nan,'r.',fillstyle='none',label='prediction')
+	ax[1,2].plot(np.nan,np.nan,'b.',fillstyle='none',label='truth')
+	ax[1,2].legend()
+	plt.tight_layout()
+	fig.savefig(name_model+'.pdf')
+
+"----------- MAIN -----------"
+def run_local():
 	tf.keras.backend.clear_session()
-	# MPL model
-	create_MPL_backwards(conf)
+	# MLP model
+	#mlp()
 
 	# RNN model
-	#rnn(conf)
+	#rnn()
 
-def experiment_tracking_wandb(conf):
+	#Convolutional 1D
+	cnn()
+
+	#wavenet
+	#wavenet()
+
+def experiment_tracking_wandb():
+	"""
+	Initializing wandb and config dictionary.
+	At the moment only implemented for tracking experiments of the RNN model.
+	"""
 	
-	wandb.init(project="RNN_Luisa_grainLearning", entity="luisaforozco",
-		config = {
+	config_rnn={
 		  "learning_rate": 0.001,
 		  "epochs": 15,
 		  "batch_size": 50,
@@ -204,15 +319,31 @@ def experiment_tracking_wandb(conf):
 		  "activation_LSTM": 'tanh', #must me tanh otherwise 'Layer lstm will not use cuDNN kernels since it doesn't meet the criteria' and runs too slow
 		  "activation_Dense": 'relu',
 		  "normalization_layer": False
-		})
+		}
+
+	config_cnn={
+		  "learning_rate": 1E-4,
+		  "epochs": 150,
+		  "batch_size": 50,
+		  "optimizer": 'adam',
+		  "loss": 'mse',
+		  "patience": 50,
+		  "architecture": '5 conv1D, 3 pool, GlobalMax, 2 dense',
+		  "units_CNN": 100,
+		  "units_dense": 200
+		}
+
+	wandb.init(project="CNN_grainLearning", entity="luisaforozco",
+		config = config_cnn)
 
 	tf.keras.backend.clear_session()
-	rnn(conf, config_wandb=wandb.config)
+
+	#rnn(config_wandb=wandb.config)
+	cnn(config_wandb=wandb.config)
 
 	wandb.finish()
 
 if __name__ == '__main__':
-	main_local()
-	#experiment_tracking_wandb(conf)
-
+	run_local()
+	#experiment_tracking_wandb()
 	
