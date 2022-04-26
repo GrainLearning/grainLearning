@@ -18,6 +18,9 @@ contact_keys = [
 input_keys = [
         'e',  # initial void ratio
         'conf',  # confining pressure (stored as group name already)
+        'e_x',  # radial strain in x
+        'e_y',  # radial strain in y
+        'e_z',  # axial strain in z
         'num',  # number of particles
 ]
 
@@ -123,7 +126,11 @@ def main(pressure, experiment_type,numParticles):
         inputs_tensor = np.array([
             porosity()/(1-porosity()),
             getStress().trace()/3,
-            len(O.bodies)])
+            triax.strain[0],
+            triax.strain[1],
+            triax.strain[2],
+            len(O.bodies)
+            ])
         ### output data
         ## particle info
         bodies_data = []
