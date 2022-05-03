@@ -10,6 +10,7 @@ def baseline_model(
         lstm_units: int = 50,
         dense_units: int = 20,
         seed: int = 42,
+        **kwargs,
         ):
     """
     Baseline model based on Ma et al., meant to work on data where contact
@@ -32,9 +33,14 @@ def baseline_model(
 
     return model
 
-def baseline_model_seq(num_load_features: int, num_labels: int,
-        lstm_units: int = 50, dense_units: int = 20,
-        seed: int = 42):
+def baseline_model_seq(
+        num_load_features: int,
+        num_labels: int,
+        lstm_units: int = 50,
+        dense_units: int = 20,
+        seed: int = 42,
+        **kwargs,
+        ):
     """
     Baseline model based on Ma et al., meant to work on data where contact
     parameters are simply concatenated on to the sequence data.
@@ -68,9 +74,9 @@ def conditional(
     load_sequence = layers.Input(shape=(window_size, num_load_features), name='load_sequence')
     contact_params = layers.Input(shape=(num_contact_params,), name='contact_parameters')
 
-    hidden_state = layers.Dense(dense_units, activation='relu')(contact_params)
-    state_h = layers.Dense(lstm_units, activation='tanh')(hidden_state)
-    state_c = layers.Dense(lstm_units, activation='tanh')(hidden_state)
+    # hidden_state = layers.Dense(dense_units, activation='relu')(contact_params)
+    state_h = layers.Dense(lstm_units, activation='tanh')(contact_params)
+    state_c = layers.Dense(lstm_units, activation='tanh')(contact_params)
 
     X = layers.LSTM(lstm_units)(load_sequence, initial_state=[state_h, state_c])
     X = layers.Dense(dense_units, activation='relu')(X)
@@ -79,13 +85,6 @@ def conditional(
     model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
 
     return model
-
-def split(tensor):
-    tensor = tf.reshape(tensor, (-1, 2, tensor.shape[1] // 2))
-    a, b = tf.split(tensor, 2, axis=1)
-    a = tf.squeeze(a)
-    b = tf.squeeze(b)
-    return [a, b]
 
 def main():
     num_load_features = 3
