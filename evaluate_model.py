@@ -108,8 +108,7 @@ def plot_predictions(split_data, model, train_stats):
                 y_label='vanishing combination', x_label='steps', color=color,
                 ylim=ylim)
 
-    fig.suptitle(f'pressure {PRESSURE}, type {EXPERIMENT_TYPE}')
-    fig.savefig(PLOT_DIR + f'predictions_{SAVED_MODEL_NAME}.png')
+    return fig
 
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
         title='', x_label='', y_label='', color='blue', ylim=None):
