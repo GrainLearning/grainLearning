@@ -25,17 +25,19 @@ def prepare_datasets(
     if add_e0:
         contacts = _add_e0_to_contacts(contacts, inputs)
 
-    dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': inputs, 'contact_parameters': contacts}, outputs))
-
     if use_windows and pad_length:
-        dataset = _pad_initial(dataset, pad_length)
+        inputs = _pad_initial(inputs, pad_length)
+        outputs = _pad_initial(outputs, pad_length)
 
+    dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
     split_data = _make_splits(dataset, train_frac, val_frac, seed)
 
     if standardize_outputs:
         split_data, train_stats = _standardize_outputs(split_data)
     else:
         train_stats = dict()
+
+    split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
     return split_data, train_stats
 
@@ -108,20 +110,24 @@ def _make_splits(dataset, train_frac, val_frac, seed):
     not within a sequence.
     data is a tuple of arrays.
     """
-    n_tot = len(dataset)
+    n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
     n_val = int(val_frac * n_tot)
+    n_test = n_tot - n_train - n_val
 
-    dataset = dataset.shuffle(n_tot, seed=seed)
-    train = dataset.take(n_train)
-    remaining = dataset.skip(n_train)
-    val = remaining.take(n_val)
-    test = remaining.skip(n_val)
+    np.random.seed(seed=seed)
+    inds = np.random.permutation(np.arange(n_tot))
+    i_train, i_val, i_test = inds[:n_train], inds[n_train:n_train + n_val], inds[-n_val:]
+
+    def get_split(dataset, inds):
+        X = {key: val[inds] for key, val in dataset[0].items()}
+        y = dataset[1][inds]
+        return X, y
 
     split_data = {
-            'train': train,
-            'val': val,
-            'test': test,
+            'train': get_split(dataset, i_train),
+            'val': get_split(dataset, i_val),
+            'test': get_split(dataset, i_test),
             }
     return split_data
 
@@ -130,43 +136,22 @@ def _standardize_outputs(split_data):
     Standardize outputs, using the mean and std of the training data,
     taken over both the samples and the timesteps.
     """
-    def get_means(inputs, outputs):
-        return tf.reduce_mean(outputs, axis=(0))  # 0 is the sequence index
-    def get_stds(inputs, outputs):
-        return tf.math.reduce_std(outputs, axis=(0))
-    def mean_over_samples(stats):
-        return stats.reduce(np.float64(0.), lambda x, y: x + y) / len(stats)
-    means = split_data['train'].map(get_means)
-    mean = mean_over_samples(means)
-    stds = split_data['train'].map(get_stds)
-    std = mean_over_samples(stds)
-
+    train_outputs = split_data['train'][1]
+    mean = np.mean(train_outputs, axis=(0, 1))
+    std = np.std(train_outputs, axis=(0, 1))
     train_stats = {'mean': mean, 'std': std}
 
-    def _standardize(inputs, outputs):
-        return inputs, (outputs - mean) / std
+    def _standardize(X, y):
+        return X, (y - mean) / std
 
     standardized_splits = dict()
     for split in ['train', 'val', 'test']:
-        standardized_splits[split] = split_data[split].map(_standardize)
+        standardized_splits[split] = _standardize(*split_data[split])
 
     return standardized_splits, train_stats
 
-def _pad_initial(dataset, pad_length):
-    """
-    Add `pad_length` copies of the initial step in the sequence.
-    """
-    def pad_sequence(inputs, outputs):
-        inputs['load_sequence'] = _pad_array(inputs['load_sequence'], pad_length)
-        outputs = _pad_array(outputs, pad_length)
-        return inputs, outputs
-
-    dataset = dataset.map(pad_sequence)
-    return dataset
-
-def _pad_array(array, pad_length, axis=0):
-    """Applied to samples without a batch dimension!"""
-    starts = array[:1, :]
+def _pad_initial(array, pad_length, axis=1):
+    starts = array[:, :1, :]
     padding = tf.repeat(starts, pad_length, axis=axis)
     padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
