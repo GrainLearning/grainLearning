@@ -76,8 +76,6 @@ def main(pressure, experiment_type):
         test_features = sim_features[output_keys[0]]
         if len(test_features) == SEQUENCE_LENGTH:
             contact_params = [sim_params[key] for key in contact_keys]
-            e_0 = sim_features['e'][0]
-            contact_params.append(e_0)
             contact_tensor.append(contact_params)
             inputs_tensor.append([sim_features[key] for key in input_keys])
             outputs_tensor.append([np.array(sim_features[key]) / scalings[key] for key in output_keys])
