@@ -127,16 +127,19 @@ def _make_splits(dataset, train_frac, val_frac, seed):
 
 def _standardize_outputs(split_data):
     """
-    Standardize outputs, using the mean and std of the training data.
+    Standardize outputs, using the mean and std of the training data,
+    taken over both the samples and the timesteps.
     """
     def get_means(inputs, outputs):
-        return tf.reduce_mean(outputs, axis=(0,1))
+        return tf.reduce_mean(outputs, axis=(0))  # 0 is the sequence index
     def get_stds(inputs, outputs):
-        return tf.math.reduce_std(outputs, axis=(0,1))
+        return tf.math.reduce_std(outputs, axis=(0))
+    def mean_over_samples(stats):
+        return stats.reduce(np.float64(0.), lambda x, y: x + y) / len(stats)
     means = split_data['train'].map(get_means)
-    mean = means.reduce(np.float64(0.), lambda x, y: x + y) / len(split_data['train'])
+    mean = mean_over_samples(means)
     stds = split_data['train'].map(get_stds)
-    std = stds.reduce(np.float64(0.), lambda x, y: x + y) / len(split_data['train'])
+    std = mean_over_samples(stds)
 
     train_stats = {'mean': mean, 'std': std}
 
