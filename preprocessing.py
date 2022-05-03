@@ -14,6 +14,7 @@ def prepare_datasets(
         pad_length: int = 0,
         use_windows: bool = True,
         standardize_outputs: bool = True,
+        add_e0: bool = False,
         seed: int = 42,
         **kwargs,
         ):
@@ -21,6 +22,9 @@ def prepare_datasets(
     datafile = h5py.File(raw_data, 'r')
 
     inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type)
+    if add_e0:
+        contacts = _add_e0_to_contacts(contacts, inputs)
+
     dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': inputs, 'contact_parameters': contacts}, outputs))
 
     if use_windows and pad_length:
@@ -72,6 +76,12 @@ def _merge_datasets(datafile, pressure, experiment_type):
     contact_params = np.concatenate(contact_params, axis=0)
 
     return input_sequences, output_sequences, contact_params
+
+def _add_e0_to_contacts(contacts, inputs):
+    e0s = inputs[:, 0, 0]  # first element in series, 0th feature == e_0
+    e0s = np.expand_dims(e0s, axis=1)
+    contacts = np.concatenate([contacts, e0s], axis=1)
+    return contacts
 
 def _augment_contact_params(
         contact_params, pressure: float, experiment_type: str,
