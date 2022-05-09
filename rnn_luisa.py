@@ -18,7 +18,7 @@ def load_data():
 	          11 variables: 3 inputs, 7 outputs and the confinment (float) in that order.
 	 contact_params: contact parameters of each sample (for the 3 different confinements)
 	"""
-	f = h5py.File('rnn_data.hdf5', 'r') #binary file containing the consolidating data by Aron
+	f = h5py.File('sequences.hdf5', 'r') #binary file containing the consolidating data by Aron
 	conf = np.array(list(f.keys()),dtype='float64') #Vector of confinement pressures
 	
 	contact_params,outputs = ([] for i in range(0,2))
@@ -186,6 +186,7 @@ def cnn(config_wandb=None):
 		units_cnn = config_wandb["units_CNN"] 
 		units_dense=config_wandb["units_dense"] 
 
+	#model that works well including e_0
 	model_cnn = keras.Sequential([
 		keras.layers.Input(shape=(sequence_length,num_features)),
 		keras.layers.Conv1D(units_cnn,2,activation='relu',padding="same"),
@@ -202,6 +203,23 @@ def cnn(config_wandb=None):
 		keras.layers.Dense(units_dense,activation='relu'),
 		keras.layers.Dense(num_labels,name='predicted_contact_params')
 		])
+
+	'''model_cnn = keras.Sequential([
+		keras.layers.Input(shape=(sequence_length,num_features)),
+		keras.layers.Conv1D(units_cnn,2,activation='relu',padding="same"),
+		#keras.layers.Conv1D(units_cnn*2,2,activation='relu',padding="same"),
+		keras.layers.AveragePooling1D(pool_size=2),
+		keras.layers.Conv1D(units_cnn*2,4,activation='relu',padding="same"),
+		keras.layers.MaxPooling1D(pool_size=2),
+		keras.layers.Conv1D(units_cnn*2,8,activation='relu',padding="same"),
+		#keras.layers.MaxPooling1D(pool_size=2),
+		#keras.layers.Conv1D(units_cnn*2,2,activation='relu',padding="same"),
+		#keras.layers.MaxPooling1D(pool_size=2),
+		#keras.layers.Flatten(),
+		keras.layers.GlobalMaxPooling1D(),
+		keras.layers.Dense(units_dense,activation='relu'),
+		keras.layers.Dense(num_labels,name='predicted_contact_params')
+		])'''
 	
 	if config_wandb==None:
 		model_cnn.compile(optimizer='adam',loss='mse',
@@ -276,12 +294,14 @@ def testing_model(outputs, contact_params, model, name_model):
 		for j in range(len(prediction_i)):
 			x = j % 2
 			y = j // 2
-			ax[x,y].plot(i,prediction_i[j],'r.',fillstyle='none') #prediction
-			ax[x,y].plot(i,contact_params[i][j],'b.',fillstyle='none') #truth
+			#ax[x,y].plot(i,prediction_i[j],'r.',fillstyle='none') #prediction
+			#ax[x,y].plot(i,contact_params[i][j],'b.',fillstyle='none') #truth
+			ax[x,y].plot(contact_params[i][j],prediction_i[j],'k.')
 			ax[x,y].set_title(titles_labels[j])
-	ax[1,2].plot(np.nan,np.nan,'r.',fillstyle='none',label='prediction')
-	ax[1,2].plot(np.nan,np.nan,'b.',fillstyle='none',label='truth')
-	ax[1,2].legend()
+			ax[x,y].set_xlabel('truth');ax[x,y].set_ylabel('prediction')
+	#ax[1,2].plot(np.nan,np.nan,'r.',fillstyle='none',label='prediction')
+	#ax[1,2].plot(np.nan,np.nan,'b.',fillstyle='none',label='truth')
+	#ax[1,2].legend()
 	plt.tight_layout()
 	fig.savefig(name_model+'.pdf')
 
