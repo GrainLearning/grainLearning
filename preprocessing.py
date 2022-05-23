@@ -63,6 +63,8 @@ def prepare_datasets(
 
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
+    train_stats.update(_get_dimensions(split_data['train']))
+
     return split_data, train_stats
 
 def _merge_datasets(datafile, pressure, experiment_type):
@@ -173,7 +175,7 @@ def _pad_initial(array, pad_length, axis=1):
     padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
 
-def get_dimensions(data):
+def _get_dimensions(data):
     """
     Extract dimensions of sample from a tensorflow dataset.
 
@@ -181,11 +183,16 @@ def get_dimensions(data):
         data: The dataset to extract from.
 
     Returns:
-        sequence_length, num_load_features, num_contact_params, num_labels
+        Dictionary containing:
+            sequence_length, num_load_features, num_contact_params, num_labels
     """
     train_sample = next(iter(data))
     sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
     num_contact_params = train_sample[0]['contact_parameters'].shape[0]
     num_labels = train_sample[1].shape[-1]
-    return sequence_length, num_load_features, num_contact_params, num_labels
+    return {'sequence_length': sequence_length,
+            'num_load_features': num_load_features,
+            'num_contact_params': num_contact_params,
+            'num_labels': num_labels,
+            }
 

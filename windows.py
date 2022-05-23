@@ -1,7 +1,28 @@
 import numpy as np
 import tensorflow as tf
 
-def sliding_windows(
+
+def windowize_datasets(split_data, train_stats,
+        use_windows, window_size, window_step, **kwargs):
+    """
+    Args:
+        split_data (dict): Dictionary with keys 'train', 'val', 'test' pointing to
+            tensorflow datasets.
+        train_stats (dict): Dictionary storing statistics of the training data.
+    """
+    if not use_windows:
+        return split_data
+
+    windows = {split: _windowize_single_dataset(split_data[split], window_size, window_step)
+                for split in ['train', 'val', 'test']}
+
+    train_stats['window_size'] = window_size
+    train_stats['window_step'] = window_step
+
+    return windows
+
+
+def _windowize_single_dataset(
         data,
         window_size: int,
         window_step: int,
@@ -77,18 +98,4 @@ def extract_tensors(data):
         outputs.append(_outputs)
 
     return np.array(inputs), np.array(contacts), np.array(outputs)
-
-def windowize(split_data, train_stats, sequence_length,
-        use_windows, window_size, window_step, **kwargs):
-    if not use_windows:
-        return split_data
-
-    windows = {split: sliding_windows( split_data[split], window_size, window_step)
-                for split in ['train', 'val', 'test']}
-
-    train_stats['window_size'] = window_size
-    train_stats['window_step'] = window_step
-    train_stats['sequence_length'] = sequence_length
-
-    return windows
 

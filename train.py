@@ -6,23 +6,23 @@ from tensorflow import keras
 import numpy as np
 import wandb
 
-import preprocessing
+from preprocessing import prepare_datasets
 from models import rnn_model
-from windows import windowize
+from windows import windowize_datasets
 from evaluate_model import plot_predictions
 
 def train(config=None):
     with wandb.init(config=config):
         config = wandb.config
 
-        split_data, train_stats = preprocessing.prepare_datasets(**config)
+        split_data, train_stats = prepare_datasets(**config)
 
-        sequence_length, num_load_features, num_contact_params, num_labels = \
-                preprocessing.get_dimensions(split_data['train'])
+        final_data = windowize_datasets(split_data, train_stats, **config)
 
-        final_data = windowize(split_data, train_stats, sequence_length, **config)
-
-        model = rnn_model(num_load_features, num_contact_params, num_labels, **config)
+        model = rnn_model(
+                train_stats['num_load_features'],
+                train_stats['num_contact_params'],
+                train_stats['num_labels'], **config)
 
         optimizer = keras.optimizers.Adam(learning_rate=config.learning_rate)
         model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
