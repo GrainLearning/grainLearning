@@ -7,7 +7,7 @@ import numpy as np
 import wandb
 
 import preprocessing
-from models import baseline_model, baseline_model_seq, conditional
+from models import rnn_model
 from windows import windowize
 from evaluate_model import plot_predictions
 
@@ -22,10 +22,7 @@ def train(config=None):
 
         final_data = windowize(split_data, train_stats, sequence_length, **config)
 
-        if config['model'] == 'conditional':
-            model = conditional(num_load_features, num_contact_params, num_labels, **config)
-        else:
-            model = baseline_model(num_load_features, num_contact_params, num_labels, **config)
+        model = rnn_model(num_load_features, num_contact_params, num_labels, **config)
 
         optimizer = keras.optimizers.Adam(learning_rate=config.learning_rate)
         model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
@@ -52,16 +49,6 @@ def train(config=None):
         val_prediction_samples = plot_predictions(split_data, model, train_stats)
         wandb.log({"predictions": val_prediction_samples})
 
-# model_directory = f'trained_models/simple_rnn_{pressure}_{experiment_type}_conditional'
-# model.save(model_directory)
-# np.save(model_directory + '/train_stats.npy', train_stats)
-# 
-# losses = {
-#         'train': history.history['loss'],
-#         'val': history.history['val_loss']
-#         }
-# np.save(model_directory + '/losses.npy', losses)
-# 
 
 def main(config):
     train(config)
