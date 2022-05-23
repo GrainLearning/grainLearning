@@ -11,6 +11,16 @@ from models import rnn_model
 from evaluate_model import plot_predictions
 
 def train(config=None):
+    """
+    Train a model and report to weights and biases.
+
+    A sweep can be created from the command line using a configuration file,
+    for example `conditional_sweep.yaml`, as:
+        `wandb sweep conditional_sweep.yaml`
+    And run with the line shown subsequently in the terminal.
+
+    The config is loaded from the yaml file.
+    """
     with wandb.init(config=config):
         config = wandb.config
 
