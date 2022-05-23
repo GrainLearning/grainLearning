@@ -18,6 +18,30 @@ def prepare_datasets(
         seed: int = 42,
         **kwargs,
         ):
+    """
+    Read the raw data in a hdf5 file, preprocess it and split it into a
+    training, validation and test set.
+
+    Args:
+        raw_data (str): Path to hdf5 file containing the data.
+        pressure (str): Transverse pressure as a string in format '0.xe6'.
+        experiment_type (str): Either 'drained' or 'undrained'.
+        train_frac (float): Fraction of data used in the training set.
+        val_frac (float): Fraction of the data used in the validation set.
+        pad_length (int): Amount by which to pad the sequences from the start.
+        use_windows (bool): Whether to split up the time series into windows.
+        standardize_outputs (bool): Whether to transform the training set labels
+            to have zero mean and unit variance.
+        add_e0 (bool): Whether to add the initial void ratio as a contact parameter.
+        seed (int): Random seed used to split the datasets.
+
+    Returns:
+        Tuple split_data, train_stats
+        split_data: Dictionary with keys 'train', 'val', 'test', and values the
+            corresponding tensorflow Datasets.
+        train_stats: Dictionary containing the 'mean' and 'std' of the training set,
+            in case `standardize_outputs` is True.
+    """
 
     datafile = h5py.File(raw_data, 'r')
 
@@ -97,13 +121,6 @@ def _augment_contact_params(
 
     return np.concatenate([contact_params, new_info], axis=1)
 
-def _concatenate_constants(inputs, contacts):
-    contacts_sequence = np.expand_dims(contacts, axis=1)
-    sequence_length = inputs.shape[1]
-    contacts_sequence = np.repeat(contacts_sequence, sequence_length, 1)
-    total_inputs = np.concatenate([inputs, contacts_sequence], axis=2)
-    return total_inputs
-
 def _make_splits(dataset, train_frac, val_frac, seed):
     """
     Split data into train, val, test sets,  based on samples,
@@ -157,9 +174,18 @@ def _pad_initial(array, pad_length, axis=1):
     return padded_array
 
 def get_dimensions(data):
-        train_sample = next(iter(data))
-        sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
-        num_contact_params = train_sample[0]['contact_parameters'].shape[0]
-        num_labels = train_sample[1].shape[-1]
-        return sequence_length, num_load_features, num_contact_params, num_labels
+    """
+    Extract dimensions of sample from a tensorflow dataset.
+
+    Args:
+        data: The dataset to extract from.
+
+    Returns:
+        sequence_length, num_load_features, num_contact_params, num_labels
+    """
+    train_sample = next(iter(data))
+    sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
+    num_contact_params = train_sample[0]['contact_parameters'].shape[0]
+    num_labels = train_sample[1].shape[-1]
+    return sequence_length, num_load_features, num_contact_params, num_labels
 
