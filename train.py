@@ -14,28 +14,40 @@ def train(config=None):
     with wandb.init(config=config):
         config = wandb.config
 
+        # preprocess data
         split_data, train_stats = prepare_datasets(**config)
 
+        # set up the model
         model = rnn_model(
                 train_stats['num_load_features'],
                 train_stats['num_contact_params'],
-                train_stats['num_labels'], **config)
-
+                train_stats['num_labels'],
+                **config,
+                )
         optimizer = keras.optimizers.Adam(learning_rate=config.learning_rate)
-        model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
+        model.compile(
+                optimizer=optimizer,
+                loss='mse',
+                metrics=['mae'],
+                )
 
+        # set up training
         early_stopping = keras.callbacks.EarlyStopping(
-            monitor='val_loss', patience=config.patience, restore_best_weights=True)
-
+            monitor='val_loss',
+            patience=config.patience,
+            restore_best_weights=True,
+            )
         wandb_callback = wandb.keras.WandbCallback(
                 monitor='val_root_mean_squared_error',
                 save_model=True,
                 save_weights_only=True,
-            ),
+            )
 
+        # create batches
         for split in ['train', 'val', 'test']:
             split_data[split] = split_data[split].batch(config.batch_size)
 
+        # train
         history = model.fit(
                 split_data['train'],
                 epochs=config.epochs,
@@ -43,6 +55,7 @@ def train(config=None):
                 callbacks=[early_stopping, wandb_callback],
                 )
 
+        # do some predictions on validation data and save plots to wandb.
         val_prediction_samples = plot_predictions(split_data, model, train_stats)
         wandb.log({"predictions": val_prediction_samples})
 
