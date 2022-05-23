@@ -2,6 +2,8 @@ import numpy as np
 import h5py
 import tensorflow as tf
 
+from windows import windowize_datasets
+
 PRESSURES = [0.2, 0.5, 1.0]
 EXPERIMENT_TYPES = ['drained', 'undrained']
 
@@ -13,6 +15,8 @@ def prepare_datasets(
         val_frac: float = 0.15,
         pad_length: int = 0,
         use_windows: bool = True,
+        window_size: int = -1,
+        window_step: int = -1,
         standardize_outputs: bool = True,
         add_e0: bool = False,
         seed: int = 42,
@@ -30,6 +34,8 @@ def prepare_datasets(
         val_frac (float): Fraction of the data used in the validation set.
         pad_length (int): Amount by which to pad the sequences from the start.
         use_windows (bool): Whether to split up the time series into windows.
+        window_size (int): Number of timesteps to include in a window.
+        window_step (int): Offset between subsequent windows.
         standardize_outputs (bool): Whether to transform the training set labels
             to have zero mean and unit variance.
         add_e0 (bool): Whether to add the initial void ratio as a contact parameter.
@@ -39,8 +45,8 @@ def prepare_datasets(
         Tuple split_data, train_stats
         split_data: Dictionary with keys 'train', 'val', 'test', and values the
             corresponding tensorflow Datasets.
-        train_stats: Dictionary containing the 'mean' and 'std' of the training set,
-            in case `standardize_outputs` is True.
+        train_stats: Dictionary containing the shape of the data, and
+            'mean' and 'std' of the training set, in case `standardize_outputs` is True.
     """
 
     datafile = h5py.File(raw_data, 'r')
@@ -64,6 +70,9 @@ def prepare_datasets(
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
     train_stats.update(_get_dimensions(split_data['train']))
+
+    if use_windows:
+        split_data = windowize_datasets(split_data, train_stats, window_size, window_step)
 
     return split_data, train_stats
 

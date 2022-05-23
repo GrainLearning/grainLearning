@@ -8,7 +8,6 @@ import wandb
 
 from preprocessing import prepare_datasets
 from models import rnn_model
-from windows import windowize_datasets
 from evaluate_model import plot_predictions
 
 def train(config=None):
@@ -16,8 +15,6 @@ def train(config=None):
         config = wandb.config
 
         split_data, train_stats = prepare_datasets(**config)
-
-        final_data = windowize_datasets(split_data, train_stats, **config)
 
         model = rnn_model(
                 train_stats['num_load_features'],
@@ -37,12 +34,12 @@ def train(config=None):
             ),
 
         for split in ['train', 'val', 'test']:
-            final_data[split] = final_data[split].batch(config.batch_size)
+            split_data[split] = split_data[split].batch(config.batch_size)
 
         history = model.fit(
-                final_data['train'],
+                split_data['train'],
                 epochs=config.epochs,
-                validation_data=final_data['val'],
+                validation_data=split_data['val'],
                 callbacks=[early_stopping, wandb_callback],
                 )
 
