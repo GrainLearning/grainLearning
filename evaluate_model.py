@@ -21,16 +21,6 @@ DATA_DIR = 'data/sequences.hdf5'
 SAVED_MODEL_NAME = f'{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_conditional'
 use_windows = True
 
-def plot_losses(losses):
-    epoch_list = list(range(len(losses['train'])))
-    fig, ax = plt.subplots()
-
-    for split in ['train', 'val']:
-        ax.plot(epoch_list, losses[split], label=split + 'loss')
-    ax.set_yscale('log')
-    fig.legend()
-
-    fig.savefig(PLOT_DIR + SAVED_MODEL_NAME)
 
 def plot_predictions(split_data, model, train_stats):
     test_inputs, labels = next(iter(split_data['test'].batch(256)))
