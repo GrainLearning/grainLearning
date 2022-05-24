@@ -55,7 +55,7 @@ def prepare_datasets(
     if add_e0:
         contacts = _add_e0_to_contacts(contacts, inputs)
 
-    if use_windows and pad_length:
+    if pad_length:
         inputs = _pad_initial(inputs, pad_length)
         outputs = _pad_initial(outputs, pad_length)
 
