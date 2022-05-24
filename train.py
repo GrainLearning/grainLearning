@@ -28,12 +28,7 @@ def train(config=None):
         split_data, train_stats = prepare_datasets(**config)
 
         # set up the model
-        model = rnn_model(
-                train_stats['num_load_features'],
-                train_stats['num_contact_params'],
-                train_stats['num_labels'],
-                **config,
-            )
+        model = rnn_model(train_stats, **config)
         optimizer = keras.optimizers.Adam(learning_rate=config.learning_rate)
         model.compile(
                 optimizer=optimizer,
@@ -42,7 +37,7 @@ def train(config=None):
             )
 
         # create batches
-        for split in ['train', 'val', 'test']:
+        for split in ['train', 'val']:  # do not batch test set
             split_data[split] = split_data[split].batch(config.batch_size)
 
         # set up training
@@ -68,8 +63,8 @@ def train(config=None):
             )
 
         # do some predictions on validation data and save plots to wandb.
-#         val_prediction_samples = plot_predictions(split_data, model, train_stats)
-#         wandb.log({"predictions": val_prediction_samples})
+        val_prediction_samples = plot_predictions(split_data, model, train_stats)
+        wandb.log({"predictions": val_prediction_samples})
 
 
 def main(config):
@@ -86,7 +81,7 @@ if __name__ == '__main__':
         'window_size': 10,
         'window_step': 1,
         'patience': 50,
-        'epochs': 3,
+        'epochs': 1,
         'learning_rate': 1e-3,
         'batch_size': 256,
         'standardize_outputs': True,

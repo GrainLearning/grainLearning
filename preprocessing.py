@@ -2,7 +2,7 @@ import numpy as np
 import h5py
 import tensorflow as tf
 
-from windows import windowize_datasets
+from windows import windowize_train_val
 
 PRESSURES = [0.2, 0.5, 1.0]
 EXPERIMENT_TYPES = ['drained', 'undrained']
@@ -69,10 +69,10 @@ def prepare_datasets(
 
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
-    train_stats.update(_get_dimensions(split_data['train']))
+    train_stats.update(get_dimensions(split_data['train']))
 
     if use_windows:
-        split_data = windowize_datasets(split_data, train_stats, window_size, window_step)
+        split_data = windowize_train_val(split_data, train_stats, window_size, window_step)
 
     return split_data, train_stats
 
@@ -184,7 +184,7 @@ def _pad_initial(array, pad_length, axis=1):
     padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
 
-def _get_dimensions(data):
+def get_dimensions(data):
     """
     Extract dimensions of sample from a tensorflow dataset.
 

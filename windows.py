@@ -2,17 +2,27 @@ import numpy as np
 import tensorflow as tf
 
 
-def windowize_datasets(split_data, train_stats, window_size, window_step, **kwargs):
+def windowize_train_val(split_data, train_stats, window_size, window_step, **kwargs):
     """
+    Convert sequences into windows of given length. Leave test set untouched.
+
     Args:
         split_data (dict): Dictionary with keys 'train', 'val', 'test' pointing to
             tensorflow datasets.
         train_stats (dict): Dictionary storing statistics of the training data.
         window_size (int): Number of timesteps to include in a window.
         window_step (int): Offset between subsequent windows.
+
+    Returns:
+        windows: Dictionary of dataset splits, where the training split has been
+            modified into windows
+
+    Modifies:
+        train_stats: Adds window_size and window_step to this dictionary.
     """
-    windows = {split: _windowize_single_dataset(split_data[split], window_size, window_step)
-                for split in ['train', 'val', 'test']}
+    windows = split_data
+    windows['train'] = _windowize_single_dataset(split_data['train'], window_size, window_step)
+    windows['val'] = _windowize_single_dataset(split_data['val'], window_size, window_step)
 
     train_stats['window_size'] = window_size
     train_stats['window_step'] = window_step

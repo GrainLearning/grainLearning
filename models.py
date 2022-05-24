@@ -4,9 +4,7 @@ from tensorflow.keras import backend as K
 
 
 def rnn_model(
-        num_load_features: int,
-        num_contact_params: int,
-        num_labels: int,
+        input_shapes: dict,
         window_size: int = 20,
         lstm_units: int = 50,
         dense_units: int = 20,
@@ -24,9 +22,8 @@ def rnn_model(
     In that case, contact parameters are used to intialize the hidden state of the LSTM.
 
     Args:
-        num_load_features (int): Number of input features in the load sequence.
-        num_contact_params (int): number of contact parameters.
-        num_labels (int): Number of labels (per timestep) in the macroscopic responses.
+        input_shapes (dict): Dictionary containing 'num_load_features', 'num_contact_params',
+            'num_labels'.
         window_size (int): Length of time window.
         lstm_units (int): Number of units of the hidden state of the LSTM.
         dense_units (int): Number of units used in the dense layer after the LSTM.
@@ -43,8 +40,9 @@ def rnn_model(
     tf.random.set_seed(seed)
 
     sequence_length = window_size if use_windows else None  # None means variable
-    load_sequence = layers.Input(shape=(sequence_length, num_load_features), name='load_sequence')
-    contact_params = layers.Input(shape=(num_contact_params,), name='contact_parameters')
+    load_sequence = layers.Input(
+            shape=(sequence_length, input_shapes['num_load_features']), name='load_sequence')
+    contact_params = layers.Input(shape=(input_shapes['num_contact_params'],), name='contact_parameters')
 
     if conditional:
         # compute hidden state of LSTM based on contact parameters
@@ -66,7 +64,7 @@ def rnn_model(
             initial_state=initial_state)
 
     X = layers.Dense(dense_units, activation='relu')(X)
-    outputs = layers.Dense(num_labels)(X)
+    outputs = layers.Dense(input_shapes['num_labels'])(X)
 
     model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
 
@@ -88,11 +86,13 @@ def _DynamicRepeatVector(contact_params, num_repeats):
 
 
 def main():
-    num_load_features = 3
-    num_params = 6
-    num_labels = 10
+    input_shapes = {
+            'num_load_features': 3,
+            'num_params': 6,
+            'num_labels': 10,
+        }
     window_size = 20
-    model = rnn_model(num_load_features, num_params, num_labels, window_size, conditional=True)
+    model = rnn_model(input_shapes, window_size, conditional=True)
     model.summary()
     tst_params = tf.random.normal((32, num_params))
     tst_load = tf.random.normal((32, window_size, num_load_features))
