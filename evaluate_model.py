@@ -9,8 +9,8 @@ from windows import predict_over_windows
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
 EXPERIMENT_TYPES = ['drained', 'undrained']
-P_INDEX = -2
-E_INDEX = -1
+P_INDEX = 5
+E_INDEX = 6
 
 PRESSURE = 'All'
 EXPERIMENT_TYPE = 'All'
@@ -150,7 +150,6 @@ def _find_representatives(input_data):
 
 def main():
     datafile = h5py.File(DATA_DIR, 'r')
-    output_labels = datafile.attrs['outputs']
 
     model_directory = f'trained_models' + '/' + SAVED_MODEL_NAME
     model = keras.models.load_model(model_directory)
@@ -161,7 +160,9 @@ def main():
             raw_data=DATA_DIR,
             pressure=PRESSURE,
             experiment_type=EXPERIMENT_TYPE,
-            pad_length=train_stats['window_size']
+            pad_length=train_stats['window_size'],
+            use_windows=False,
+            add_e0=True,  # was used in the model that is tested with
             )
 
     if not os.path.exists(PLOT_DIR):
