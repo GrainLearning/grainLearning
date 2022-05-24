@@ -1,0 +1,37 @@
+program: train.py
+project: grain_sequence
+entity: apjansen
+method: bayes
+metric:
+  goal: minimize
+  name: val_loss
+parameters:
+  use_windows:
+    value: True
+  window_size:
+    values: [5, 10, 20, 30]
+  window_step:
+    value: 1
+  standardize_outputs:
+    value: True
+  add_e0:
+    value: False
+  lstm_units:
+    value: 50
+  dense_units:
+    value: 20
+  conditional:
+    value: True
+  pressure:
+    value: 'All'
+  experiment_type:
+    value: 'All'
+  epochs:
+    value: 2
+  learning_rate:
+    values: [1e-4, 1e-3]
+  batch_size:
+    values: [128, 256, 512]
+  patience:
+    value: 5
+
