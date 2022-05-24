@@ -48,7 +48,6 @@ def train(config=None):
             )
         wandb_callback = wandb.keras.WandbCallback(
                 monitor='val_loss',
-                save_model=True,
                 save_weights_only=True,
                 validation_data=split_data['val'],
             )
