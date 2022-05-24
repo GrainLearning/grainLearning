@@ -148,8 +148,8 @@ def _make_splits(dataset, train_frac, val_frac, seed):
     i_train, i_val, i_test = inds[:n_train], inds[n_train:n_train + n_val], inds[-n_val:]
 
     def get_split(dataset, inds):
-        X = {key: val[inds] for key, val in dataset[0].items()}
-        y = dataset[1][inds]
+        X = {key: tf.gather(val, inds) for key, val in dataset[0].items()}
+        y = tf.gather(dataset[1], inds)
         return X, y
 
     split_data = {
