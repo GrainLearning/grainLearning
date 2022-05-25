@@ -62,7 +62,7 @@ def train(config=None):
             )
 
         # do some predictions on test data and save plots to wandb.
-        val_prediction_samples = plot_predictions(split_data['test'], model, train_stats)
+        val_prediction_samples = plot_predictions(model, split_data['test'], train_stats, config)
         wandb.log({"predictions": val_prediction_samples})
 
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         'window_size': 10,
         'window_step': 1,
         'patience': 50,
-        'epochs': 1,
+        'epochs': 2,
         'learning_rate': 1e-3,
         'batch_size': 256,
         'standardize_outputs': True,

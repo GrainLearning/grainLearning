@@ -5,7 +5,7 @@ from tensorflow import keras
 import numpy as np
 
 from preprocessing import prepare_datasets
-from windows import predict_over_windows
+from predict import predict_macroscopics
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
 EXPERIMENT_TYPES = ['drained', 'undrained']
@@ -22,7 +22,7 @@ SAVED_MODEL_NAME = f'{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_conditional'
 use_windows = True
 
 
-def plot_predictions(data, model, train_stats):
+def plot_predictions(model, data, train_stats, config):
     """
     Take the first sample in the test set for each combination of pressure
     and experiment type, and plot for it the true and predicted macroscopic
@@ -32,10 +32,15 @@ def plot_predictions(data, model, train_stats):
         split_data: Tensorflow dataset to predict on.
         model: Model to perform predictions with.
         train_stats: Dictionary containing training set statistics.
+        config: Dictionary containing the configuration with which the model was trained.
 
     Returns:
         figure
     """
+    predictions = predict_macroscopics(model, data, train_stats, config,
+            batch_size=256, single_batch=True)
+    # extract tensors from dataset
+    predictions = next(iter(predictions))
     test_inputs, labels = next(iter(data.batch(256)))
 
     window_size = train_stats['window_size']
@@ -43,15 +48,6 @@ def plot_predictions(data, model, train_stats):
     sequence_length = raw_sequence_length - window_size
 
     labels = labels[:, -sequence_length:]
-    if use_windows:
-        predictions = predict_over_windows(
-                test_inputs, model, window_size, raw_sequence_length)
-    else:
-        predictions = model.predict(test_inputs)
-
-    # un-standardize
-    predictions = train_stats['std'] * predictions + train_stats['mean']
-    labels = train_stats['std'] * labels + train_stats['mean']
 
     steps = np.array(list(range(sequence_length)))
     num_predicted = predictions.shape[1]
@@ -167,8 +163,9 @@ def main():
     if not os.path.exists(PLOT_DIR):
         os.makedirs(PLOT_DIR)
 
-    plot_losses(losses)
-    plot_predictions(split_data, model, train_stats)
+    config = {'use_windows': True, 'window_size': train_stats['window_size'],
+            'standardize_outputs': True}
+    plot_predictions(model, split_data['test'], train_stats, config)
 
 if __name__ == '__main__':
     main()

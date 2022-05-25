@@ -77,11 +77,10 @@ def _shuffle(Xs, cs, ys, seed):
     return Xs[inds], cs[inds], ys[inds]
 
 def predict_over_windows(
-        inputs,
+        data,
         model,
         window_size: int,
         sequence_length: int,
-        #batch_size: int,
         ):
     """
     Take a batch of full sequences, iterate over windows making predictions.
@@ -93,24 +92,23 @@ def predict_over_windows(
     the input sequence.
 
     Args:
-        inputs (dict): Dictionary of inputs 'load_sequence' and 'contact_parameters'.
+        data (dict): Dictionary of data containing 'load_sequence' and 'contact_parameters'.
         model: The model to predict with.
         window_size (int): Number of timesteps in a single window.
         sequence_length (int): Number of timesteps in a full sequence.
-        batch_size (int): Batch size to do predictions on.
 
     Returns:
         Tensor of predicted sequences.
     """
-    predictions = []
+    def predict_windows(inputs, outputs):
+        predictions = [
+            model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
+            for end in range(window_size, sequence_length)
+            ]
+        predictions = tf.stack(predictions, axis=1)
+        return predictions
 
-    for end in range(window_size, sequence_length):
-        prediction = model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
-        predictions.append(prediction)
-    # concatenate predictions of windows back into a sequence
-    predictions = tf.stack(predictions, axis=1)
-
-    return predictions
+    return data.map(predict_windows)
 
 def extract_tensors(data):
     """
