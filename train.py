@@ -61,8 +61,8 @@ def train(config=None):
                 callbacks=callbacks,
             )
 
-        # do some predictions on validation data and save plots to wandb.
-        val_prediction_samples = plot_predictions(split_data, model, train_stats)
+        # do some predictions on test data and save plots to wandb.
+        val_prediction_samples = plot_predictions(split_data['test'], model, train_stats)
         wandb.log({"predictions": val_prediction_samples})
 
 

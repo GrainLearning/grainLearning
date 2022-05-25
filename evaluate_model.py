@@ -22,8 +22,21 @@ SAVED_MODEL_NAME = f'{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_conditional'
 use_windows = True
 
 
-def plot_predictions(split_data, model, train_stats):
-    test_inputs, labels = next(iter(split_data['test'].batch(256)))
+def plot_predictions(data, model, train_stats):
+    """
+    Take the first sample in the test set for each combination of pressure
+    and experiment type, and plot for it the true and predicted macroscopic
+    features.
+
+    Args:
+        split_data: Tensorflow dataset to predict on.
+        model: Model to perform predictions with.
+        train_stats: Dictionary containing training set statistics.
+
+    Returns:
+        figure
+    """
+    test_inputs, labels = next(iter(data.batch(256)))
 
     window_size = train_stats['window_size']
     raw_sequence_length = train_stats['sequence_length']
@@ -112,10 +125,6 @@ def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
         ax.set_ylabel(y_label)
     if ylim:
         ax.set_ylim(ylim)
-
-def _plot_features(ax, steps, steps_predicted, labels, test_predictions,
-        ax_i, ax_j, i_f_x, i_f_y):
-    ax[ax_i, ax_j].plot(steps, label='truth')
 
 def _find_representatives(input_data):
     """
