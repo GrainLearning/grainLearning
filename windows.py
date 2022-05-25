@@ -41,32 +41,33 @@ def _windowize_single_dataset(
     so of shape M, window_size, L, with M >> N.
     Also shuffle the data.
     """
-    num_samples = len(data)
-    sample = next(iter(data))
-    sequence_length, num_labels = sample[1].shape
-    Xs, cs, ys = [], [], []
+    load_sequences, contact_parameters, outputs = extract_tensors(data)
+    num_samples, sequence_length, num_labels = outputs.shape
     start, end = 0, window_size
 
-    inputs, contacts, outputs = extract_tensors(data)
-
-    while end <= sequence_length:
-        Xs.append(inputs[:, start:end])
-        cs.append(contacts)
-        ys.append(outputs[:, end - 1])
-        start += window_step
-        end += window_step
+    # For brevity denote load_sequence, contacts, outputs as X, c, y
+    Xs, cs, ys = [], [], []
+    for end in range(window_size, sequence_length + 1):
+        input_window = load_sequences[:, end - window_size:end]
+        final_output = outputs[:, end - 1]
+        Xs.append(input_window)
+        ys.append(final_output)
+        cs.append(contact_parameters)
 
     Xs = np.array(Xs)
     cs = np.array(cs)
     ys = np.array(ys)
+
     # now we have the first dimension for samples and the second for windows,
-    # we want to merge those to treat them as independent samples
+    # we want to merge those to treat each window as an independent sample
     num_indep_samples = Xs.shape[0] * Xs.shape[1]
     Xs = np.reshape(Xs, (num_indep_samples,) + Xs.shape[2:])
     cs = np.reshape(cs, (num_indep_samples,) + cs.shape[2:])
     ys = np.reshape(ys, (num_indep_samples,) + ys.shape[2:])
 
+    # finally shuffle the windows
     Xs, cs, ys =  _shuffle(Xs, cs, ys, seed)
+    # and convert back into a tensorflow dataset
     dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': Xs, 'contact_parameters': cs}, ys))
     return dataset
 
@@ -82,7 +83,22 @@ def predict_over_windows(
         sequence_length: int,
         ):
     """
-    Take a batch of sequences, iterate over windows making predictions.
+    Take a batch of full sequences, iterate over windows making predictions.
+
+    It splits up the sequence into windows of given length, each offset by one timestep,
+    uses the model to make predictions on all of those windows,
+    and concatenates the result into a whole sequence again.
+    Note the length of the output sequence will be shorter by the window_size than
+    the input sequence.
+
+    Args:
+        inputs (dict): Dictionary of inputs 'load_sequence' and 'contact_parameters'.
+        model: The model to predict with.
+        window_size (int): Number of timesteps in a single window.
+        sequence_length (int): Number of timesteps in a full sequence.
+
+    Returns:
+        Tensor of predicted sequences.
     """
     predictions = []
 
@@ -94,11 +110,21 @@ def predict_over_windows(
         end += 1
 
     predictions = np.array(predictions)
+    # switch batch and sequence dimension back to their usual order.
     predictions = np.transpose(predictions, (1, 0, 2))
 
     return predictions
 
 def extract_tensors(data):
+    """
+    Given a tensorflow Dataset extract all tensors.
+
+    Args:
+        data: Tensorflow dataset.
+
+    Returns:
+        Tuple of numpy arrays inputs, contacts, outputs.
+    """
     inputs, contacts, outputs = [], [], []
     for _inputs, _outputs in iter(data):
         inputs.append(_inputs['load_sequence'])
