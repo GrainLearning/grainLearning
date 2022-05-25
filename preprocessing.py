@@ -4,7 +4,8 @@ import tensorflow as tf
 
 from windows import windowize_train_val
 
-PRESSURES = [0.2, 0.5, 1.0]
+# full lists of pressures and experiment types
+PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
 EXPERIMENT_TYPES = ['drained', 'undrained']
 
 def prepare_datasets(
@@ -42,7 +43,7 @@ def prepare_datasets(
         seed (int): Random seed used to split the datasets.
 
     Returns:
-        Tuple split_data, train_stats
+        Tuple (split_data, train_stats)
         split_data: Dictionary with keys 'train', 'val', 'test', and values the
             corresponding tensorflow Datasets.
         train_stats: Dictionary containing the shape of the data, and
@@ -85,8 +86,7 @@ def _merge_datasets(datafile, pressure, experiment_type):
     if pressure == 'All':
         pressures = PRESSURES
     else:
-        # NOTE: relies on pressure being of form x.ye6
-        pressures = [float(pressure[:3])]
+        pressures = [pressure]
     if experiment_type == 'All':
         experiment_types = EXPERIMENT_TYPES
     else:
@@ -97,7 +97,7 @@ def _merge_datasets(datafile, pressure, experiment_type):
     contact_params = []
     for pres in pressures:
         for exp_type in experiment_types:
-            data = datafile[f'{pres}e6'][exp_type]
+            data = datafile[pres][exp_type]
             input_sequences.append(data['inputs'][:])
             output_sequences.append(data['outputs'][:])
 
@@ -125,28 +125,49 @@ def _add_e0_to_contacts(contacts, inputs):
     return contacts
 
 def _augment_contact_params(
-        contact_params, pressure: float, experiment_type: str,
+        contact_params, pressure: str, experiment_type: str,
         add_pressure: bool, add_type: bool):
     """
     Add the pressure and the experiment type as contact parameters.
 
     Pressure is divided by 10**6, i.e. '0.3e6' becomes 0.3.
     Experiment type is converted to 1 for drained and 0 for undrained.
+
+    Args:
+        contact_params: Numpy array containing contact parameters for all the
+            samples with the given pressure and experiment type
+        pressure (str): The corresponding pressure.
+        experiment_type (str): The corresponding experiment type, 'drained' or 'undrained'.
+        add_pressure (bool): Whether to add pressure to contact parameters.
+        add_type (bool): Whether to add experiment type to contact parameters.
+
+    Returns:
+        Numpy array containing augmented contact parameters.
     """
     new_info = []
-    if add_pressure: new_info.append(pressure)
+    pres_num = float(pressure) / 10**6
+    if add_pressure: new_info.append(pres_num)
     if add_type: new_info.append(experiment_type == 'drained')
 
+    num_samples = contact_params.shape[0]
     new_info = np.expand_dims(new_info, 0)
-    new_info = np.repeat(new_info, contact_params.shape[0], axis=0)
+    new_info = np.repeat(new_info, num_samples, axis=0)
 
     return np.concatenate([contact_params, new_info], axis=1)
 
 def _make_splits(dataset, train_frac, val_frac, seed):
     """
-    Split data into train, val, test sets,  based on samples,
-    not within a sequence.
-    data is a tuple of arrays.
+    Split data into training, validation, and test sets.
+
+    The split is done on a sample by sample basis, so sequences are not broken up.
+    It is done randomly across all pressures and experiment types present.
+
+    Args:
+        dataset: Full dataset to split on, in form of a tuple (inputs, outputs),
+            where inputs is a dictionary and its keys and the outputs are numpy arrays.
+        train_frac (float): Fraction of data used for training set.
+        val_frac (float): Fraction of data used for validation set.
+        seed (int): Random seed used to make the split.
     """
     n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
