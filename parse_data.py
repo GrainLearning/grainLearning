@@ -9,7 +9,7 @@ import numpy as np
 import os
 import h5py
 
-contact_keys = [
+CONTACT_KEYS = [
         'E', # young's modulus  = 10^E
         'v', # poisson's ratio
         'kr', # rolling stiffness
@@ -17,13 +17,13 @@ contact_keys = [
         'mu', # sliding friction
         ]
 
-input_keys = [
+INPUT_KEYS = [
         'e_v',  # strains in 3 directions
         'e_y',
         'e_z',  # the axial direction
 ]
 
-output_keys = [
+OUTPUT_KEYS = [
         'e',  # void ratio
         'p',  # mean stress
         'q',  # deviatoric stress
@@ -33,7 +33,7 @@ output_keys = [
         'a_t',  # mechanical anisotropy due to tangiential forces
 ]
 
-unused_keys_sequence = [
+UNUSED_KEYS_SEQUENCE = [
         'dt',  # size of timestep taken at this iteration
         'numIter',  # iteration number in the simulation at which equilibrium is 
                     # reached at the current loading
@@ -41,30 +41,90 @@ unused_keys_sequence = [
         'A',  # also mysterious
 ]
 
-unused_keys_constant = [
+UNUSED_KEYS_CONSTANT = [
         'conf',  # confining pressure (stored as group name already)
         'mode',  # drained/undrained (also stored as group name)
         'num',  # number of particles (always 10_000)
 ]
-SEQUENCE_LENGTH = 200
-TARGET_FILE = 'data/sequences.hdf5'
-DATA_DIR = '/Users/aronjansen/Documents/grainsData/TriaxialCompression/'
+
+def convert_all_to_hdf5(
+        pressures: list,
+        experiment_types: list,
+        data_dir: str,
+        target_file: str,
+        sequence_length: int,
+        ):
+    """
+    Merge data of experiments of different pressures and types into a single
+    hdf5 file.
+
+    NOTE: Will remove the target_file if it already existed.
+
+    Args:
+        pressures (list): List of strings of pressures available.
+        experiment_types (list): List of strings of experiment types available.
+        data_dir (str): Root directory containing all the data.
+        target_file (str): Path to hdf5 file to be created.
+        sequence_length (int): Expected number of time steps in sequences.
+    """
+    if os.path.exists(target_file):
+        os.remove(target_file)
+    with h5py.File(target_file, 'a') as f:
+        f.attrs['inputs'] = INPUT_KEYS
+        f.attrs['outputs'] = OUTPUT_KEYS
+        f.attrs['contact_params'] = CONTACT_KEYS + ['e_0']
+        f.attrs['unused_keys_sequence'] = UNUSED_KEYS_SEQUENCE
+        f.attrs['unused_keys_constant'] = UNUSED_KEYS_CONSTANT
+
+        for pressure in pressures:
+            for experiment_type in experiment_types:
+                grp = f.require_group(f'{pressure}/{experiment_type}')
+                inputs_tensor, contact_tensor, outputs_tensor = \
+                        convert_to_arrays(pressure, experiment_type,
+                                sequence_length, data_dir)
+                grp['contact_params'] = contact_tensor
+                grp['inputs'] = inputs_tensor
+                grp['outputs'] = outputs_tensor
+
+    print(f"Added all data to {target_file}")
 
 
-def main(pressure, experiment_type):
-    data_dir = DATA_DIR + f'{pressure}/{experiment_type}/'
+def convert_to_arrays(
+        pressure: str,
+        experiment_type: str,
+        sequence_length: int,
+        data_dir: str,
+        ):
+    """
+    For a given pressure and experiment type, read all the files in the corresponding
+    directory and concatenate those with the expected sequence length together
+    into numpy arrays.
+
+    NOTE: longer and shorter sequences are ignored.
+
+    Args:
+        pressure (str): String indicating the pressure used.
+        experiment_type (str): String indicating the experiment type ('drained', 'undrained')
+        sequence_length (int): Expected number of timesteps in sequence.
+        data_dir (str): The root directory of the data.
+
+    Returns:
+        Tuple of arrays of inputs, contacts, outputs
+    """
+    data_dir = data_dir + f'{pressure}/{experiment_type}/'
     if not os.listdir(data_dir):
         print(f"Directory {data_dir} is empty.")
         return
 
     file_names = [fn for fn in os.listdir(data_dir) if fn.endswith('.npy')]
 
-    scalings = {key: 1. for key in output_keys}
+    # rescale pressures by 10**6 to make it order 1.
+    scalings = {key: 1. for key in OUTPUT_KEYS}
     scalings['p'] = scalings['q'] = 1.e6
 
-    contact_tensor = []
-    inputs_tensor = []
-    outputs_tensor = []
+    contact_list = []
+    inputs_list = []
+    outputs_list = []
     other_lengths = []
     for f in file_names:
         try:
@@ -73,12 +133,12 @@ def main(pressure, experiment_type):
             print('IOError', f, pressure)
             continue
         # test if sequence is of full length
-        test_features = sim_features[output_keys[0]]
-        if len(test_features) == SEQUENCE_LENGTH:
-            contact_params = [sim_params[key] for key in contact_keys]
-            contact_tensor.append(contact_params)
-            inputs_tensor.append([sim_features[key] for key in input_keys])
-            outputs_tensor.append([np.array(sim_features[key]) / scalings[key] for key in output_keys])
+        test_features = sim_features[OUTPUT_KEYS[0]]
+        if len(test_features) == sequence_length:
+            contact_params = [sim_params[key] for key in CONTACT_KEYS]
+            contact_list.append(contact_params)
+            inputs_list.append([sim_features[key] for key in INPUT_KEYS])
+            outputs_list.append([np.array(sim_features[key]) / scalings[key] for key in OUTPUT_KEYS])
         else:
             other_lengths.append(len(test_features))
 
@@ -87,33 +147,25 @@ def main(pressure, experiment_type):
     print(f'lengths: ')
     print(other_lengths)
 
-    contact_tensor = np.array(contact_tensor)
-    inputs_tensor = np.array(inputs_tensor)
-    outputs_tensor = np.array(outputs_tensor)
+    inputs_array = np.array(inputs_list)
+    contact_array = np.array(contact_list)
+    outputs_array = np.array(outputs_list)
 
     # keras requires (batch, sequence_length, features) shape, so transpose axes
-    inputs_tensor = np.transpose(inputs_tensor, (0, 2, 1))
-    outputs_tensor = np.transpose(outputs_tensor, (0, 2, 1))
+    inputs_array = np.transpose(inputs_array, (0, 2, 1))
+    outputs_array = np.transpose(outputs_array, (0, 2, 1))
 
-    print(f'Created tensor of {outputs_tensor.shape[0]} samples,')
+    print(f'Created array of {outputs_array.shape[0]} samples,')
 
-    with h5py.File(TARGET_FILE, 'a') as f:
-        grp = f.require_group(f'{pressure}/{experiment_type}')
-        grp['contact_params'] = contact_tensor
-        grp['inputs'] = inputs_tensor
-        grp['outputs'] = outputs_tensor
+    return inputs_array, contact_array, outputs_array
 
-        f.attrs['inputs'] = input_keys
-        f.attrs['outputs'] = output_keys
-        f.attrs['contact_params'] = contact_keys + ['e_0']
-        f.attrs['unused_keys_sequence'] = unused_keys_sequence
-        f.attrs['unused_keys_constant'] = unused_keys_constant
-    print(f"Added data to {TARGET_FILE}")
 
 if __name__ == '__main__':
-    if os.path.exists(TARGET_FILE):
-        os.remove(TARGET_FILE)
-    for pressure in ['0.2e6', '0.5e6', '1.0e6']:
-        for experiment_type in ['drained', 'undrained']:
-            main(pressure, experiment_type)
+    convert_all_to_hdf5(
+            pressures=['0.2e6', '0.5e6', '1.0e6'],
+            experiment_types=['drained', 'undrained'],
+            data_dir='/Users/aronjansen/Documents/grainsData/TriaxialCompression/',
+            sequence_length=200,
+            target_file='data/sequences.hdf5',
+        )
 
