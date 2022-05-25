@@ -115,6 +115,10 @@ def _merge_datasets(datafile, pressure, experiment_type):
     return input_sequences, output_sequences, contact_params
 
 def _add_e0_to_contacts(contacts, inputs):
+    """
+    Add the initial void ratio e_0 as an extra contact parameter.
+    It is added at the end.
+    """
     e0s = inputs[:, 0, 0]  # first element in series, 0th feature == e_0
     e0s = np.expand_dims(e0s, axis=1)
     contacts = np.concatenate([contacts, e0s], axis=1)
@@ -123,6 +127,12 @@ def _add_e0_to_contacts(contacts, inputs):
 def _augment_contact_params(
         contact_params, pressure: float, experiment_type: str,
         add_pressure: bool, add_type: bool):
+    """
+    Add the pressure and the experiment type as contact parameters.
+
+    Pressure is divided by 10**6, i.e. '0.3e6' becomes 0.3.
+    Experiment type is converted to 1 for drained and 0 for undrained.
+    """
     new_info = []
     if add_pressure: new_info.append(pressure)
     if add_type: new_info.append(experiment_type == 'drained')
@@ -179,6 +189,12 @@ def _standardize_outputs(split_data):
     return standardized_splits, train_stats
 
 def _pad_initial(array, pad_length, axis=1):
+    """
+    Add pad_length copies of the initial state in the sequence to the start.
+
+    This is used to be able to predict also the first timestep from a window
+    of the same size.
+    """
     starts = array[:, :1, :]
     padding = tf.repeat(starts, pad_length, axis=axis)
     padded_array = tf.concat([padding, array], axis=axis)
