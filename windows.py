@@ -81,6 +81,7 @@ def predict_over_windows(
         model,
         window_size: int,
         sequence_length: int,
+        #batch_size: int,
         ):
     """
     Take a batch of full sequences, iterate over windows making predictions.
@@ -96,22 +97,18 @@ def predict_over_windows(
         model: The model to predict with.
         window_size (int): Number of timesteps in a single window.
         sequence_length (int): Number of timesteps in a full sequence.
+        batch_size (int): Batch size to do predictions on.
 
     Returns:
         Tensor of predicted sequences.
     """
     predictions = []
 
-    start, end = 0, window_size
-    while end < sequence_length:
-        prediction = model([inputs['load_sequence'][:, start:end], inputs['contact_parameters']])
+    for end in range(window_size, sequence_length):
+        prediction = model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
         predictions.append(prediction)
-        start += 1
-        end += 1
-
-    predictions = np.array(predictions)
-    # switch batch and sequence dimension back to their usual order.
-    predictions = np.transpose(predictions, (1, 0, 2))
+    # concatenate predictions of windows back into a sequence
+    predictions = tf.stack(predictions, axis=1)
 
     return predictions
 
