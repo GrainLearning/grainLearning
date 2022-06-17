@@ -82,9 +82,6 @@ def _DynamicRepeatVector(contact_params, num_repeats):
         return layers.RepeatVector(num_repeats)(contact_params)
     return layers.Lambda(repeat_vector, output_shape=(None, num_repeats, num_features))
 
-    return model
-
-
 def main():
     input_shapes = {
             'num_load_features': 3,

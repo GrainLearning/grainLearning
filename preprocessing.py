@@ -226,13 +226,13 @@ def get_dimensions(data):
     Extract dimensions of sample from a tensorflow dataset.
 
     Args:
-        data: The dataset to extract from.
+        data (tf.Dataset): The dataset to extract from.
 
     Returns:
         Dictionary containing:
             sequence_length, num_load_features, num_contact_params, num_labels
     """
-    train_sample = next(iter(data))
+    train_sample = next(iter(data))  # just to extract a single batch
     sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
     num_contact_params = train_sample[0]['contact_parameters'].shape[0]
     num_labels = train_sample[1].shape[-1]
