@@ -66,10 +66,6 @@ def predict_macroscopics(
     else:
         raise NotImplementedError()
 
-    if config['standardize_outputs']:
-        mean = tf.cast(train_stats['mean'], tf.float32)
-        std = tf.cast(train_stats['std'], tf.float32)
-        predictions = predictions.map(lambda y: (y + mean) * std)
     return predictions
 
 
@@ -77,6 +73,6 @@ if __name__ == '__main__':
     entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
     model, data, stats, config = get_best_run_from_sweep(entity_project_sweep_id)
     predictions = predict_macroscopics(model, data['test'], stats, config,
-            batch_size=256, single_batch=True)
+            batch_size=256, single_batch=False)
 
 
