@@ -69,7 +69,7 @@ def predict_macroscopics(
     if config['standardize_outputs']:
         mean = tf.cast(train_stats['mean'], tf.float32)
         std = tf.cast(train_stats['std'], tf.float32)
-        predictions = predictions.map(lambda y: (y + mean) * std)
+        predictions = predictions.map(lambda y: std * y + mean)
     return predictions
 
 
