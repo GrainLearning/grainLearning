@@ -55,14 +55,14 @@ First clone the repo on your snellius directory
 ```
 git clone https://github.com/GrainLearning/sequences.git
 ```
-Manually copy the data into `sequences/data/sequences.hdf5`
+Manually copy the data into `sequences/data/sequences.hdf5`, and create a directory `job_output`.
 
 To run the example sweep, run the `run_sweep.sh` job script:
 ```
 sbatch run_sweep.sh example_sweep.yaml
 ```
-This will create a subdirectory `job_output` that contains the slurm logs and the information of the weights and biases sweep,
-and a `wandb` folder containing all the wandb output.
+This will store the slurm logs and the information of the weights and biases sweep,
+and create a `wandb` folder containing all the wandb output.
 
 ## Predicting
 
