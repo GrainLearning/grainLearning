@@ -49,6 +49,23 @@ Running this command will start a training run with hyperparameters chosen accor
 
 Models are saved both locally and also uploaded to wandb.
 
+## Usage on Snellius
+
+First clone the repo on your snellius directory
+```
+git clone https://github.com/GrainLearning/sequences.git
+```
+Manually copy the data into `sequences/data/sequences.hdf5`, and create a directory `job_output`.
+
+To run the example sweep, run the `run_sweep.sh` job script:
+```
+sbatch run_sweep.sh example_sweep.yaml
+```
+This will store the slurm logs and the information of the weights and biases sweep (which includes a link to the sweep page) in the `job_output` directory,
+and creates a `wandb` folder containing all the wandb output.
+
+It will use a quarter of a node in the fat partition, which has 32 cores, and so it will run 32 agents in parallel in the same sweep.
+
 ## Predicting
 
 In `predict.py` a sweep id is used to load the best model found in that sweep, and make predictions on test data.
