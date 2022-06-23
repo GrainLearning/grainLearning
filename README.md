@@ -61,8 +61,8 @@ To run the example sweep, run the `run_sweep.sh` job script:
 ```
 sbatch run_sweep.sh example_sweep.yaml
 ```
-This will store the slurm logs and the information of the weights and biases sweep,
-and create a `wandb` folder containing all the wandb output.
+This will store the slurm logs and the information of the weights and biases sweep (which includes a link to the sweep page) in the `job_output` directory,
+and creates a `wandb` folder containing all the wandb output.
 
 It will use a quarter of a node in the fat partition, which has 32 cores, and so it will run 32 agents in parallel in the same sweep.
 
