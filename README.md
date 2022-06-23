@@ -64,6 +64,8 @@ sbatch run_sweep.sh example_sweep.yaml
 This will store the slurm logs and the information of the weights and biases sweep,
 and create a `wandb` folder containing all the wandb output.
 
+It will use a quarter of a node in the fat partition, which has 32 cores, and so it will run 32 agents in parallel in the same sweep.
+
 ## Predicting
 
 In `predict.py` a sweep id is used to load the best model found in that sweep, and make predictions on test data.
