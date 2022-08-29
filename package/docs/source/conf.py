@@ -6,18 +6,27 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+
+# import module
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath("../../"))
+print(sys.path)
+
+# project information ( you can change this )
+
 project = 'GrainLearning'
-copyright = '2022, Hongyang Cheng'
-author = 'Hongyang Cheng'
+copyright = '2022, Hongyang Cheng, Retief Lubbe'
+author = 'Hongyang Cheng, Retief Lubbe'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage","sphinx_autodoc_typehints"]
 
 templates_path = ['_templates']
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -25,3 +34,10 @@ exclude_patterns = []
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+pygments_style = 'sphinx'
+highlight_language = 'python3'
+autodoc_member_order= 'groupwise'
+
+
+autodoc_typehints="description"
