@@ -41,3 +41,5 @@ autodoc_member_order= 'groupwise'
 
 add_module_names = False
 autodoc_typehints="description"
+
+html_static_path = []
