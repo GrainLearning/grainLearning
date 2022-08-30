@@ -23,7 +23,7 @@ class GaussianMixtureModel:
     max_iter: int = 100000
     expand_weight: int = 10
     seed: int
-    gmm: t.Type["BayesianGaussianMixture"]
+    gmm: Type["BayesianGaussianMixture"]
 
     def __init__(
         self,
