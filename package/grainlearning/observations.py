@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, List
 import numpy as np
 
 
@@ -32,7 +32,7 @@ class Observations:
     data: np.ndarray
 
     #: observation keys
-    names: list[str]
+    names: List[str]
 
     #: Control data
     ctrl = np.ndarray
@@ -41,7 +41,7 @@ class Observations:
     ctrl_name: str
 
     def __init__(
-        self, data: np.array, ctrl: np.array, names: list[str], ctrl_name: str
+        self, data: np.array, ctrl: np.array, names: List[str], ctrl_name: str
     ):
         """Initialize the Ibservations class."""
         self.data = np.array(data, ndmin=2) # ensure data is of shape (num_obs,num_shape).
