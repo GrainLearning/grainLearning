@@ -6,6 +6,12 @@
 version: 2
 
 
+# python:
+#    install:
+#    - requirements: ./package/docs/source/requirements.txt
+
+
 python:
-   install:
-   - requirements: ./package/docs/source/requirements.txt
+  install:
+    - method: pip
+      path: ./package/

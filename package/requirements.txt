@@ -1,6 +1,0 @@
-joblib==1.1.0; python_version >= "3.8"
-numpy==1.23.2; python_version >= "3.8"
-scikit-learn==1.1.2; python_version >= "3.8"
-scipy==1.9.1; python_version >= "3.8" and python_version < "3.12"
-sklearn==0.0
-threadpoolctl==3.1.0; python_version >= "3.8"
