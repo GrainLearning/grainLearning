@@ -1,6 +1,6 @@
 # #%%
 
-import typing as t
+from typing import Tuple, Type
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 
@@ -50,7 +50,7 @@ class GaussianMixtureModel:
             self.prior_weight = prior_weight
 
     @classmethod
-    def from_dict(cls: t.Type["GaussianMixtureModel"], obj: dict):
+    def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
         return cls(
             max_num_components=obj["max_num_components"],
             prior_weight=obj.get("prior_weight", None),
@@ -63,8 +63,8 @@ class GaussianMixtureModel:
         )
 
     def expand_weighted_parameters(
-        self, proposal_weight: np.ndarray, model: t.Type["Model"]
-    ) -> tuple[np.ndarray, np.ndarray]:
+        self, proposal_weight: np.ndarray, model: Type["Model"]
+    ) -> Tuple[np.ndarray, np.ndarray]:
         num_copies = (
             np.floor(
                 self.expand_weight
@@ -86,7 +86,7 @@ class GaussianMixtureModel:
 
 
     def regenerate_params(
-        self, proposal_weight: np.ndarray, simulations: t.Type["Model"]
+        self, proposal_weight: np.ndarray, simulations: Type["Model"]
     ) -> np.ndarray:
         expanded_normalized_params, max_params = self.expand_weighted_parameters(
             proposal_weight, simulations
