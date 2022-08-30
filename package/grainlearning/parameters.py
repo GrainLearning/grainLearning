@@ -39,7 +39,7 @@ class Parameters:
     #: Number of parameters.
     num_params: int
 
-    #: The data (Pandas Dataframes) of the previous calibration iterations.
+    #: The data of the previous calibration iterations.
     data_records: List = []
 
     def __init__(self, names: List[str], mins: List[float], maxs: List[float]):

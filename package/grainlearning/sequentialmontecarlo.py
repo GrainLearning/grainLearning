@@ -2,7 +2,6 @@
 
 from typing import Type, List
 import numpy as np
-import pandas as pd
 
 from .models import Model
 

@@ -63,7 +63,7 @@ class Model:
         pass
     
     # def get_control_data(self)->pd.Series:
-    #     """ Gets a Pandas Series of the control data. 
+    #     """ Gets control data. 
         
     #     This can be used in the simulations.
 
@@ -73,7 +73,7 @@ class Model:
     #     return self.data.loc[:,self.observations.control]
 
     # def get_key_data(self):
-    #     """ Gets a Pandas DataFrame of the key data. 
+    #     """ Gets  the key data. 
 
     #     :return: A Dataframe view containing only the keys
     #     """
