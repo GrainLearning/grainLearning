@@ -1,5 +1,5 @@
 
-from typing import Type
+from typing import Type, List
 import numpy as np
 from .parameters import Parameters
 from .observations import Observations
@@ -53,7 +53,7 @@ class Model:
     data: np.array
     
     #: This is a list of simulation data in the previous iterations
-    data_records: list[list[np.array]] = []
+    data_records: List[np.array] = []
 
     #: Number of samples (usually specified by user)
     num_samples: int = 0

@@ -1,7 +1,6 @@
 #%%
 
-from typing import Type
-import typing as t
+from typing import Type, List
 import numpy as np
 import pandas as pd
 
@@ -40,7 +39,7 @@ class SequentialMonteCarlo:
     ess_target: float
 
     #: Inverse observation weights for the covariance matrix.
-    inv_obs_weight: list[float]
+    inv_obs_weight: List[float]
 
     #: Flag if the covariance matrix should be scaled with the maximum values of the observations
     scale_cov_with_max: bool = True
@@ -70,7 +69,7 @@ class SequentialMonteCarlo:
     def __init__(
         self,
         ess_target: float,
-        inv_obs_weight: list,
+        inv_obs_weight: List,
         scale_cov_with_max: bool = True,
     ):
         """Initialize the Sequential Monte Carlo class
