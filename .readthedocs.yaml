@@ -32,5 +32,6 @@ build:
       - poetry config virtualenvs.create false
     post_install:
       - cd package
+      - pwd
       - poetry install
       - cd ..
