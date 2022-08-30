@@ -42,7 +42,7 @@ class Parameters:
     #: The data (Pandas Dataframes) of the previous calibration iterations.
     data_records: List = []
 
-    def __init__(self, names: list[str], mins: list[float], maxs: list[float]):
+    def __init__(self, names: List[str], mins: List[float], maxs: List[float]):
         """Initialize the Parameters class."""
         self.names = names
         self.mins = mins
