@@ -8,4 +8,4 @@ version: 2
 
 python:
    install:
-   - requirements: docs/requirements.txt
+   - requirements: ./package/docs/source/requirements.txt
