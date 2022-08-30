@@ -1,4 +1,4 @@
-import typing as t
+from typing import List,Type
 import numpy as np
 
 
@@ -28,19 +28,19 @@ class Parameters:
     data: np.array
 
     #: The minimum values of the parameters.
-    mins: list[float] = []
+    mins: List[float] = []
 
     #: The maximum values of the parameters.
-    maxs: list[float] = []
+    maxs: List[float] = []
 
     #: Names of the parameters.
-    names: list[str]
+    names: List[str]
 
     #: Number of parameters.
     num_params: int
 
     #: The data (Pandas Dataframes) of the previous calibration iterations.
-    data_records: list = []
+    data_records: List = []
 
     def __init__(self, names: list[str], mins: list[float], maxs: list[float]):
         """Initialize the Parameters class."""
@@ -50,7 +50,7 @@ class Parameters:
         self.num_params = len(names)
 
     @classmethod
-    def from_dict(cls: t.Type["Parameters"], obj: dict) -> t.Type["Parameters"]:
+    def from_dict(cls: Type["Parameters"], obj: dict) ->Type["Parameters"]:
         """The class can also be initialized using a dictionary style.
 
         :param cls: The Parameters class referenced to itself.
