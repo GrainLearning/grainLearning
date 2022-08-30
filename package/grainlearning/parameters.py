@@ -59,6 +59,7 @@ class Parameters:
 
         Example usage:
 
+        .. highlight:: python
         .. code-block:: python
 
             parameters = Parameters.from_dict({

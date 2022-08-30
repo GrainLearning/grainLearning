@@ -39,5 +39,5 @@ pygments_style = 'sphinx'
 highlight_language = 'python3'
 autodoc_member_order= 'groupwise'
 
-
+add_module_names = False
 autodoc_typehints="description"
