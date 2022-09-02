@@ -86,10 +86,10 @@ class GaussianMixtureModel:
 
 
     def regenerate_params(
-        self, proposal_weight: np.ndarray, model: Type["Model"]
+        self, proposal_weight: np.ndarray, simulations: Type["Model"]
     ) -> np.ndarray:
         expanded_normalized_params, max_params = self.expand_weighted_parameters(
-            proposal_weight, model
+            proposal_weight, simulations
         )
 
         self.gmm = BayesianGaussianMixture(
@@ -102,17 +102,17 @@ class GaussianMixtureModel:
             random_state=self.seed,
         )
         self.gmm.fit(expanded_normalized_params)
-        new_params, _ = self.gmm.sample(model.num_samples)
+        new_params, _ = self.gmm.sample(simulations.num_samples)
         new_params *= max_params
         # resample until all parameters are within min and max bounds, is there a better way to do this?
-        while True:
-            # print("resample")
-            new_params, _ = self.gmm.sample(model.num_samples)
-            new_params *= max_params
+        # while True:
+        #     print("resample")
+        #     new_params, _ = self.gmm.sample(simulations.num_samples)
+        #     new_params *= max_params
 
-            params_above_min = new_params > np.array(model.parameters.mins)
-            params_below_max = new_params < np.array(model.parameters.maxs)
+        #     params_above_min = new_params > np.array(simulations.parameters.mins)
+        #     params_below_max = new_params < np.array(simulations.parameters.maxs)
 
-            if params_above_min.all() & params_below_max.all():
-                break
+        #     if params_above_min.all() & params_below_max.all():
+        #         break
         return new_params

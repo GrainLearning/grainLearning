@@ -157,13 +157,30 @@ class IterativeBayesianFilter:
         # print(self.sigma_min,self.sigma_max,self.proposal_ibf,result.x)
 
 
-    def run_sampling(self, model: Type["Model"]):
-        new_params = self.sampling.regenerate_params(self.proposal_ibf, model)
-        return new_params
 
-    def solve(
-        self, model: Type["Model"]
-    ) -> np.ndarray:
-        self.run_inference(model)
-        new_params = self.run_sampling(model)
-        return new_params
+
+#     def set_sigma_bounds(
+#         self,
+#         observations: Type["Observations"],
+#     ):
+
+#         self.sigma_min = self.check_sigma_bounds(
+#             sigma_adjust=self.sigma_min, observations=observations
+#         )
+
+#         self.sigma_max = self.check_sigma_bounds(
+#             sigma_adjust=self.sigma_max, observations=observations
+#         )
+#         assert self.sigma_min < self.sigma_max
+
+
+#     def run_sampling(self, simulations: Type["Model"]):
+#         new_params = self.sampling.regenerate_params(self.proposal_ibf, simulations)
+#         return new_params
+
+#     def solve(
+#         self, observations: Type["Observations"], simulations: Type["Model"]
+#     ) -> np.ndarray:
+#         self.run_inference(observations=observations, simulations=simulations)
+#         new_params = self.run_sampling(simulations=simulations)
+#         return new_params
