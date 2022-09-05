@@ -32,13 +32,13 @@ class CalibrationToolbox:
             self.sigma_list.append( self.calibration.sigma_max)
 
 
-#     @classmethod
-#     def from_dict(
-#         cls: t.Type["CalibrationToolbox"],
-#         obj: dict,
-#         simulation_model: t.Type["Model"] = Model,
-#         set_sim_obs: bool = True,
-#     ):
+    # @classmethod
+    # def from_dict(
+    #     cls: t.Type["CalibrationToolbox"],
+    #     obj: dict,
+    #     simulation_model: t.Type["Model"] = Model,
+    #     set_sim_obs: bool = True,
+    # ):
 #         simulations = simulation_model.from_dict(obj["simulations"])
 
 #         observations = Observations.from_dict(obj["observations"])

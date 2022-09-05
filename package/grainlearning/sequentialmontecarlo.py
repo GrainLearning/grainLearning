@@ -164,19 +164,6 @@ class SequentialMonteCarlo:
         return likelihoods
 
     def get_posterors(
-        self, model: Type["Model"], likelihoods: np.array, posterior_t0: np.array
-    ) -> np.array:
-
-        posteriors = np.zeros((model.observations.num_steps, model.num_samples))
-
-        posteriors[0, :] = likelihoods[0, :] / posterior_t0
-
-        for stp_id in range(1, model.observations.num_steps):
-            posteriors[0, :] = posteriors[stp_id - 1, :] * likelihoods
-
-        return posteriors
-
-    def get_posterors(
         self, model: Type["Model"], likelihoods: np.array, proposal_prev: np.array
     ) -> np.array:
 
@@ -186,7 +173,7 @@ class SequentialMonteCarlo:
 
         for stp_id in range(1, model.observations.num_steps):
             posteriors[stp_id, :] = posteriors[stp_id - 1, :] * likelihoods[stp_id, :]
-
+            #TODO normalization per step not after
         posteriors = posteriors / posteriors.sum(axis=1)[:, None]
 
         return posteriors
