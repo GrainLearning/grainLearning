@@ -1,12 +1,10 @@
 from typing import List,Type
 import numpy as np
 
-
-# TODO add so that the user can input a dataframe with initial parameters
 class Parameters:
     """This class contains the data and methods related to parameters.
     
-    Initialize the module like this:
+    Init# TODO add so that the user can input a dataframe with initial parametersialize the module like this:
 
     .. highlight:: python
     .. code-block:: python

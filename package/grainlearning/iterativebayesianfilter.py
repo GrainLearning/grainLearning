@@ -10,12 +10,10 @@ from .sequentialmontecarlo import SequentialMonteCarlo
 
 from .gaussianmixturemodel import GaussianMixtureModel
 
-#  TODO add .from_dict class
-
 
 class IterativeBayesianFilter:
     """This class contains the iterative bayesian filter algorithm.
-    
+
     Initialize the module like this:
 
     .. highlight:: python
@@ -27,16 +25,16 @@ class IterativeBayesianFilter:
             ),
             sampling = GaussianMixtureModel(max_num_components=5)
         )
-    
+
         # after initialization we have to configure the algorithm to some model (see :class:`.Parameters`)
         # this will select an appropriate sigma min and sigma max
         ibf.configure(mymodel)
-        
+
         # the data assimilation loop can be run like this
         ibf.run_inference(mymodel)
-        
-        
-    
+
+
+
     :param inference: Sequential Monte Carlo class (SMC)
     :param sampling: Gaussian Mixture Model class (GMM)
     :param sigma_max: Initial sigma max (this value gets automatically adjusted), defaults to 1.0e6
@@ -44,7 +42,6 @@ class IterativeBayesianFilter:
     :param ess_tol: Tolarance for the effective sample size to converge, defaults to 1.0e-2
 
     """
-
 
     #: The inference class is a member variable of the particle filter which is used to generate the likelihood
     inference = Type["SequentialMonteCarlo"]
@@ -68,14 +65,11 @@ class IterativeBayesianFilter:
         self,
         inference: Type["SequentialMonteCarlo"],
         sampling: Type["GaussianMixtureModel"],
-        sigma_max: float = 1.0e6,
+        sigma_max: float = 1.0e11,
         sigma_min: float = 1.0e-6,
         ess_tol: float = 1.0e-2,
     ):
-        """Initialize the Iterative Bayesian Filter class
-
-
-        """
+        """Initialize the Iterative Bayesian Filter class"""
         self.inference = inference
         self.sampling = sampling
         self.sigma_max = sigma_max
@@ -87,10 +81,10 @@ class IterativeBayesianFilter:
     def from_dict(cls: Type["IterativeBayesianFilter"], obj: dict):
         return cls(
             inference=SequentialMonteCarlo.from_dict(obj["inference"]),
-            sigma_max=obj.get("sigma_max", 1.0e6),
+            sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
+            sigma_max=obj.get("sigma_max", 1.0e11),
             sigma_min=obj.get("sigma_min", 1.0e-6),
             ess_tol=obj.get("ess_tol", 1.0e-2),
-            sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
         )
 
     def set_proposal(self, model: Type["Model"]):
@@ -102,23 +96,23 @@ class IterativeBayesianFilter:
         self.proposal_ibf = np.ones([model.num_samples]) / model.num_samples
 
     def check_sigma_bounds(self, sigma_adjust: float, model: Type["Model"]):
-        
+
         sigma_new = sigma_adjust
 
         while True:
             cov_matrices = self.inference.get_covariance_matrices(sigma_new, model)
-            
+
             # get determinant of all covariant matricies
             det_all = np.linalg.det(cov_matrices)
 
             # if all is above threshold, decrease sigma
             if (det_all > 1e16).all():
-                sigma_new *= 0.75
+                sigma_new *= 0.9
                 continue
 
             # if all is below threshold, increase sigma
-            if (det_all < 1e1).all():
-                sigma_new *= 1.25
+            if (det_all < 0.01).all():
+                sigma_new *= 1.1
                 continue
 
             break
@@ -139,7 +133,7 @@ class IterativeBayesianFilter:
     def run_inference(self, model: Type["Model"]):
 
         from scipy import optimize
-        
+
         result = optimize.minimize_scalar(
             self.inference.data_assimilation_loop,
             args=(self.proposal_ibf, model),
@@ -149,21 +143,15 @@ class IterativeBayesianFilter:
         self.sigma_max = result.x
 
         # make sure values are set
-        self.inference.data_assimilation_loop(
-            result.x, self.proposal_ibf, model
-        )
+        self.inference.data_assimilation_loop(result.x, self.proposal_ibf, model)
         self.proposal_ibf = self.inference.give_proposal()
-
-        # print(self.sigma_min,self.sigma_max,self.proposal_ibf,result.x)
-
-
+        
+        
     def run_sampling(self, model: Type["Model"]):
         new_params = self.sampling.regenerate_params(self.proposal_ibf, model)
         return new_params
 
-    def solve(
-        self, model: Type["Model"]
-    ) -> np.ndarray:
+    def solve(self, model: Type["Model"]) -> np.ndarray:
         self.run_inference(model)
         new_params = self.run_sampling(model)
         return new_params

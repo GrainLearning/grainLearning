@@ -13,16 +13,22 @@ class GaussianMixtureModel:
     See `BayesianGaussianMixture <https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html>`_.
     """
 
-    #: number of components for the Gaussian mixture model
     max_num_components: int = 0
 
     prior_weight: int = 0
+    
     cov_type: str = "full"
+    
     n_init: int = 100
+    
     tol: float = 1.0e-3
+    
     max_iter: int = 100000
+    
     expand_weight: int = 10
+    
     seed: int
+    
     gmm: Type["BayesianGaussianMixture"]
 
     def __init__(
@@ -36,6 +42,8 @@ class GaussianMixtureModel:
         expand_weight: int = 10,
         seed: int = None,
     ):
+        
+
         self.max_num_components = max_num_components
         self.cov_type = cov_type
         self.n_init = n_init
@@ -49,6 +57,16 @@ class GaussianMixtureModel:
         else:
             self.prior_weight = prior_weight
 
+        self.gmm = BayesianGaussianMixture(
+            n_components=self.max_num_components,
+            weight_concentration_prior=self.prior_weight,
+            covariance_type=self.cov_type,
+            tol=self.tol,
+            max_iter=int(self.max_iter),
+            n_init=self.n_init,
+            random_state=self.seed,
+        )
+        
     @classmethod
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
         return cls(
@@ -82,6 +100,7 @@ class GaussianMixtureModel:
         normalized_parameters = (
             expanded_parameters / max_params
         )  #  and do array broadcasting to divide by max
+        
         return normalized_parameters, max_params
 
 
@@ -92,21 +111,12 @@ class GaussianMixtureModel:
             proposal_weight, model
         )
 
-        self.gmm = BayesianGaussianMixture(
-            n_components=self.max_num_components,
-            weight_concentration_prior=self.prior_weight,
-            covariance_type=self.cov_type,
-            tol=self.tol,
-            max_iter=int(self.max_iter),
-            n_init=self.n_init,
-            random_state=self.seed,
-        )
         self.gmm.fit(expanded_normalized_params)
         new_params, _ = self.gmm.sample(model.num_samples)
         new_params *= max_params
+        
         # resample until all parameters are within min and max bounds, is there a better way to do this?
         while True:
-            # print("resample")
             new_params, _ = self.gmm.sample(model.num_samples)
             new_params *= max_params
 
@@ -115,4 +125,5 @@ class GaussianMixtureModel:
 
             if params_above_min.all() & params_below_max.all():
                 break
+            
         return new_params

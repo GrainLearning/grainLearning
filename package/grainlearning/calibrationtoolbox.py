@@ -1,21 +1,23 @@
-import numpy as np
-import typing as t
-from .models import Model
-from .iterativebayesianfilter import IterativeBayesianFilter
 
+from ast import Param
+from typing import Type, List, Dict
+from .models import Model,FunctionModel
+from .iterativebayesianfilter import IterativeBayesianFilter
+from .observations import Observations
+from .parameters import Parameters
 
 class CalibrationToolbox:
     
-    model: t.Type["Model"]
+    model: Type["Model"]
 
-    calibration: t.Type["IterativeBayesianFilter"]
+    calibration: Type["IterativeBayesianFilter"]
     
-    sigma_list : list = []
+    sigma_list : List = []
 
     def __init__(
         self,
-        model: t.Type["Model"],
-        calibration: t.Type["IterativeBayesianFilter"],
+        model: Type["Model"],
+        calibration: Type["IterativeBayesianFilter"],
     ):
         self.model = model
         
@@ -31,27 +33,39 @@ class CalibrationToolbox:
             self.model.parameters.data = new_parameter
             self.sigma_list.append( self.calibration.sigma_max)
 
+    @classmethod
+    def from_dict(
+        cls: Type["CalibrationToolbox"],
+        obj: Dict
+    ):
+        input_model = obj["model"]
+        
+        
+        # if model is command line argument 
+        if isinstance(input_model,str):
+            
+            print("command line argument not implemented yet")
+            
+        # if model is a python function
+        elif callable(input_model):
+            arguments = obj["arguments"].get("arguments", None)
+            model = FunctionModel(input_model,arguments)
 
-    # @classmethod
-    # def from_dict(
-    #     cls: t.Type["CalibrationToolbox"],
-    #     obj: dict,
-    #     simulation_model: t.Type["Model"] = Model,
-    #     set_sim_obs: bool = True,
-    # ):
-#         simulations = simulation_model.from_dict(obj["simulations"])
+        else:
+            model = input_model
+        
+        
+        model.observations = Observations.from_dict(obj["observations"])
+        model.parameters = Parameters.from_dict(obj["parameters"])
 
-#         observations = Observations.from_dict(obj["observations"])
-
-#         if set_sim_obs:
-#             simulations.set_observations(observations)
-
-#         return cls(
-#             simulations=simulations,
-#             observations=observations,
-#             calibration=IterativeBayesianFilter.from_dict(obj["calibration"]),
-#         )
-
-#     def set_model(self, model: t.Callable):
-#         self.simulations.set_model(model)
+        if model.num_samples is None:
+            model.num_samples = obj["num_samples"]
+            
+        if model.parameters.data is None:
+            model.parameters.generate_halton(model)
+            
+        return cls(
+            model = model,
+            calibration=IterativeBayesianFilter.from_dict(obj["calibration"]),
+        )
 

@@ -14,7 +14,6 @@ from grainlearning import (
 
 import matplotlib.pyplot as plt
 
-#%%
 
 
 x_obs = np.arange(10)
@@ -65,13 +64,11 @@ class MyModel(Model):
 mymodel = MyModel()
 
 smc_cls = SequentialMonteCarlo(
-    ess_target=0.5, inv_obs_weight=[1], scale_cov_with_max=True
+    ess_target=0.1, inv_obs_weight=[1], scale_cov_with_max=True
 )
-gmm_cls = GaussianMixtureModel(max_num_components=1)  # TODO replace parameters
+gmm_cls = GaussianMixtureModel(max_num_components=1) 
 
 ibf_cls = IterativeBayesianFilter(inference=smc_cls, sampling=gmm_cls)
-
-
 
 calibration = CalibrationToolbox(mymodel,ibf_cls)
 
