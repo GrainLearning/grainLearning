@@ -19,19 +19,19 @@ import matplotlib.pyplot as plt
 
 x_obs = np.arange(10)
 
-y_obs = 4 * x_obs + 5
+y_obs = 4 * x_obs**2 + 5
 
 plt.plot(x_obs, y_obs)
 
-
 #%%
-class MyModel(Model):
+class Strategy(Model):
     parameters = Parameters(
         names=["m", "c"],
         mins=[0, 0],
         maxs=[10, 10],
     )
     observations = Observations(data=y_obs, ctrl=x_obs, names=["y"], ctrl_name="x")
+    
     num_samples = 20
     
     iter_step = 0
@@ -42,10 +42,10 @@ class MyModel(Model):
     def run(self):
         # for each parameter calculate the spring force
         data = []
-        print("hello")
+        print(f"calibration step {self.iter_step}")
 
         for params in self.parameters.data:
-            y_sim = params[0] * self.observations.ctrl + params[1]
+            y_sim = params[0] * self.observations.ctrl**2 + params[1]
             data.append(np.array(y_sim, ndmin=2))
             plt.plot(x_obs, y_sim,label="simulation")
 
@@ -62,7 +62,7 @@ class MyModel(Model):
         for y_sims in self.data[:,0]:
             plt.plot(x_obs, y_sims,label="Simulation")
 
-mymodel = MyModel()
+# mymodel = MyModel()
 
 smc_cls = SequentialMonteCarlo(
     ess_target=0.2, inv_obs_weight=[1], scale_cov_with_max=True
@@ -71,8 +71,28 @@ gmm_cls = GaussianMixtureModel(max_num_components=1)  # TODO replace parameters
 
 ibf_cls = IterativeBayesianFilter(inference=smc_cls, sampling=gmm_cls)
 
+
+
+
+CalibrationToolbox.from_dict({
+  "num_samples":23,
+  "parameters":
+  "obervations": 
+  "action": {
+      "command" :
+  }
+#   "action": "callback" | "custom" | "command" |
+#   "command"
+  
+  
+    }
+)
+
 calibration = CalibrationToolbox(mymodel,ibf_cls)
 
+
+calibration = CalibrationToolbox.config
+CalibrationToolbox
 # %%
 
 calibration.run()
