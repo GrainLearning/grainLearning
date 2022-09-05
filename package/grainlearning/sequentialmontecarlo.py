@@ -173,8 +173,10 @@ class SequentialMonteCarlo:
 
         for stp_id in range(1, model.observations.num_steps):
             posteriors[stp_id, :] = posteriors[stp_id - 1, :] * likelihoods[stp_id, :]
+            posteriors[stp_id, :] /= posteriors[stp_id, :].sum()
+            
             #TODO normalization per step not after
-        posteriors = posteriors / posteriors.sum(axis=1)[:, None]
+        # posteriors = posteriors / posteriors.sum(axis=1)[:, None]
 
         return posteriors
 

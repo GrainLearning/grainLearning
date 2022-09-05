@@ -11,7 +11,6 @@ Welcome to GrainLearning's documentation!
    :caption: Contents:
 
    api
-   about.md
 
 Indices and tables
 ==================
