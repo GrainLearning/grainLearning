@@ -27,7 +27,7 @@ class CalibrationToolbox:
 
     def run(self):
 
-        for _ in range(10):
+        for _ in range(5):
             self.model.run()
             new_parameter = self.calibration.solve(self.model)
             self.model.parameters.data = new_parameter

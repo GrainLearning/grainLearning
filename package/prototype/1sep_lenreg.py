@@ -60,11 +60,12 @@ class MyModel(Model):
         plt.title(f"Calibration iteration {self.iter_step}")
         for y_sims in self.data[:,0]:
             plt.plot(x_obs, y_sims,label="Simulation")
+        plt.show()
 
 mymodel = MyModel()
 
 smc_cls = SequentialMonteCarlo(
-    ess_target=0.1, inv_obs_weight=[1], scale_cov_with_max=True
+    ess_target=0.1, inv_obs_weight=[1], scale_cov_with_max=False
 )
 gmm_cls = GaussianMixtureModel(max_num_components=1) 
 

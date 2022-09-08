@@ -1,4 +1,4 @@
-
+#%%
 import numpy as np
 
 from grainlearning import SequentialMonteCarlo, Observations, Model, Parameters
@@ -63,34 +63,34 @@ def test_get_covariance_matrix():
     )
 
 
-def test_get_likelihood():
-    """Test to see if likelihood is generated as expected"""
-    smc_cls = SequentialMonteCarlo(
-        ess_target=0.1, inv_obs_weight=[1, 1], scale_cov_with_max=True
-    )
+# def test_get_likelihood():
+"""Test to see if likelihood is generated as expected"""
+smc_cls = SequentialMonteCarlo(
+    ess_target=0.1, inv_obs_weight=[1, 1], scale_cov_with_max=True
+)
 
-    obs = Observations(
-        data=[[100, 200, 300], [30, 10, 5]],
-        ctrl=[-0.1, -0.2, -0.3],
-        names=["F", "G"],
-        ctrl_name="x",
-    )
+obs = Observations(
+    data=[[100, 200, 300], [30, 10, 5]],
+    ctrl=[-0.1, -0.2, -0.3],
+    names=["F", "G"],
+    ctrl_name="x",
+)
 
-    mdl = Model()
-    mdl.observations = obs
-    mdl.num_samples = 5
-    data = []
-    for _ in range(5):
-        data.append(np.random.rand(2, 3))
-    mdl.data = np.array(data)
+mdl = Model()
+mdl.observations = obs
+mdl.num_samples = 5
+data = []
+for _ in range(5):
+    data.append(np.random.rand(2, 3))
+mdl.data = np.array(data)
 
-    cov_matrices = np.repeat([np.identity(2)], 3, axis=0) * 100
+cov_matrices = np.repeat([np.identity(2)], 3, axis=0) * 100
 
-    likelihoods = smc_cls.get_likelihoods(mdl, cov_matrices)
+likelihoods = smc_cls.get_likelihoods(mdl, cov_matrices)
 
-    #: assert shape is (num_steps,num_samples)
-    assert likelihoods.shape == (3, 5)
+assert likelihoods.shape == (3, 5)
 
+#%%
 
 def test_get_posterior():
     """Test to see if posterior is generated as expected"""
@@ -157,3 +157,5 @@ def test_ips_covs():
 
     assert ips.shape == (3, 2)
     assert covs.shape == (3, 2)
+
+# %%

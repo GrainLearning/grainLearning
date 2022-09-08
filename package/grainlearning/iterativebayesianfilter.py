@@ -3,7 +3,6 @@
 import numpy as np
 from typing import Type
 
-
 from .models import Model
 
 from .sequentialmontecarlo import SequentialMonteCarlo
@@ -123,12 +122,12 @@ class IterativeBayesianFilter:
 
         self.set_proposal(model=model)
 
-        self.sigma_min = self.check_sigma_bounds(
-            sigma_adjust=self.sigma_min, model=model
-        )
-        self.sigma_max = self.check_sigma_bounds(
-            sigma_adjust=self.sigma_max, model=model
-        )
+        # self.sigma_min = self.check_sigma_bounds(
+        #     sigma_adjust=self.sigma_min, model=model
+        # )
+        # self.sigma_max = self.check_sigma_bounds(
+        #     sigma_adjust=self.sigma_max, model=model
+        # )
 
     def run_inference(self, model: Type["Model"]):
 
