@@ -1,9 +1,8 @@
-#%%
-
-from typing import Type, List
+from typing import Type
 import numpy as np
 
 from .models import Model
+
 from scipy.stats import multivariate_normal
 
 
@@ -39,14 +38,8 @@ class SequentialMonteCarlo:
     #: Targete effective sample size.
     ess_target: float
 
-    #: Inverse observation weights for the covariance matrix.
-    inv_obs_weight: List[float]
-
     #: Flag if the covariance matrix should be scaled with the maximum values of the observations
     scale_cov_with_max: bool = True
-
-    #: calculated normalized sigma to weigh the covariance matrix
-    _inv_normalized_sigma: np.array
 
     #: Numpy array containing the covariance matricies of shape (num_steps,num_obs,num_obs)
     cov_matrices: np.array
@@ -69,19 +62,11 @@ class SequentialMonteCarlo:
     def __init__(
         self,
         ess_target: float,
-        inv_obs_weight: List,
         scale_cov_with_max: bool = True,
     ):
         """Initialize the Sequential Monte Carlo class"""
         self.ess_target = ess_target
         self.scale_cov_with_max = scale_cov_with_max
-        self.inv_obs_weight = inv_obs_weight
-
-        inv_obs_mat = np.diagflat(self.inv_obs_weight)
-
-        self._inv_normalized_sigma = inv_obs_mat * np.linalg.det(inv_obs_mat) ** (
-            -1.0 / inv_obs_mat.shape[0]
-        )
 
     @classmethod
     def from_dict(cls: Type["SequentialMonteCarlo"], obj: dict):
@@ -105,7 +90,6 @@ class SequentialMonteCarlo:
         """
         return cls(
             ess_target=obj["ess_target"],
-            inv_obs_weight=obj.get("inv_obs_weight", None),
             scale_cov_with_max=obj.get("scale_cov_with_max", True),
         )
 
@@ -119,80 +103,51 @@ class SequentialMonteCarlo:
         :param load_step: the load step of the simulation, defaults to 0
         :return: a covariance matrix of shape (num_observables, num_observables)
         """
-        cov_matrix = sigma_guess * self._inv_normalized_sigma
+        cov_matrix = sigma_guess * model._inv_normalized_sigma
 
         # duplicated covariant matrix to loading step
-        cov_matrices = cov_matrix[None, :].repeat(model.observations.num_steps, axis=0)
+        cov_matrices = cov_matrix[None, :].repeat(model.num_steps, axis=0)
 
         if self.scale_cov_with_max:
-            cov_matrices *= model.observations.data.max(axis=1)[:, None]
+            cov_matrices *= model.obs_data.max(axis=1)[:, None]
         else:
             # element wise multiplication of covariant matrix with observables of all loading steps
-            cov_matrices *= model.observations.data.T[:, None] ** 2
+            cov_matrices *= model.obs_data.T[:, None] ** 2
 
         return cov_matrices
 
+
     def get_likelihoods(self, model: Type["Model"], cov_matrices: np.array) -> np.array:
 
-        likelihoods = np.zeros((model.observations.num_steps, model.num_samples))
+        likelihoods = np.zeros((model.num_steps, model.num_samples))
 
-        for stp_id in range(model.observations.num_steps):
+        for stp_id in range(model.num_steps):
             likelihood = multivariate_normal.pdf(
-                            model.data[:, :, stp_id],
-                            mean=model.observations.data[:,stp_id],
-                            cov=cov_matrices[stp_id]
-                        )
-            likelihood = likelihood/likelihood.sum()
-            likelihoods[stp_id,:] = likelihood
-        # print(model.observations.data)
-        # likelihoods = multivariate_normal.pdf(
-        #     model.data,
-        #     mean = model.observations.data,
-        #     # mean=np.repeat([model.observations.data], model.num_samples, axis=0),
-        #     cov=cov_matrices,
-        # )
-
-        # (num_samples, num_observations,num_steps )
-        # rel_vectors = (
-        #     np.repeat([model.observations.data], model.num_samples, axis=0) - model.data
-        # )
-
-        # inv_cov_matrices = np.linalg.inv(cov_matrices)
-
-        # likelihoods = np.zeros((model.observations.num_steps, model.num_samples))
-
-        # for sim_id in range(model.num_samples):
-        #     # create reshape the column vectors into a stack so they can be multiplied by covariance matricies
-        #     vec = rel_vectors[sim_id].reshape(
-        #         model.observations.num_steps, model.observations.num_obs, 1
-        #     )
-        #     vec_t = rel_vectors[sim_id].reshape(
-        #         model.observations.num_steps, 1, model.observations.num_obs
-        #     )
-
-        #     power = (vec_t @ inv_cov_matrices @ vec).flatten()
-
-        #     likelihoods[:, sim_id] = np.exp(-0.5 * power)
-
-        # # regularize
-        # likelihoods = likelihoods / likelihoods.sum(axis=1)[:, None]
+                model.sim_data[:, :, stp_id],
+                mean=model.obs_data[:, stp_id],
+                cov=cov_matrices[stp_id],
+            )
+            likelihoods[stp_id, :] = likelihood / likelihood.sum()
 
         return likelihoods
 
     def get_posterors(
-        self, model: Type["Model"], likelihoods: np.array, proposal_prev: np.array
+        self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array
     ) -> np.array:
 
-        posteriors = np.zeros((model.observations.num_steps, model.num_samples))
+        posteriors = np.zeros((model.num_steps, model.num_samples))
 
-        posteriors[0, :] = likelihoods[0, :] / proposal_prev
+        if proposal_ibf is None:
+            proposal = np.ones([model.num_samples]) / model.num_samples
+        else:
+            proposal = proposal_ibf
 
-        for stp_id in range(1, model.observations.num_steps):
+        posteriors[0, :] = likelihoods[0, :] / proposal
+        posteriors[0, :] /= posteriors[0, :].sum()
+
+        for stp_id in range(1, model.num_steps):
             posteriors[stp_id, :] = posteriors[stp_id - 1, :] * likelihoods[stp_id, :]
             posteriors[stp_id, :] /= posteriors[stp_id, :].sum()
-
-            # TODO normalization per step not after
-        # posteriors = posteriors / posteriors.sum(axis=1)[:, None]
 
         return posteriors
 
@@ -202,26 +157,26 @@ class SequentialMonteCarlo:
         posteriors: np.array,
     ) -> np.array:
 
-        ips = np.zeros((model.observations.num_steps, model.parameters.num_params))
-        covs = np.zeros((model.observations.num_steps, model.parameters.num_params))
+        ips = np.zeros((model.num_steps, model.num_params))
+        covs = np.zeros((model.num_steps, model.num_params))
 
-        for stp_id in range(model.observations.num_steps):
+        for stp_id in range(model.num_steps):
 
-            ips[stp_id, :] = posteriors[stp_id, :] @ model.parameters.data
+            ips[stp_id, :] = posteriors[stp_id, :] @ model.param_data
 
             covs[stp_id, :] = (
-                posteriors[stp_id, :] @ (ips[stp_id, :] - model.parameters.data) ** 2
+                posteriors[stp_id, :] @ (ips[stp_id, :] - model.param_data) ** 2
             )
 
             covs[stp_id, :] = np.sqrt(covs[stp_id, :]) / ips[stp_id, :]
 
         return ips, covs
 
-    def give_proposal(self):
+    def give_posterior(self):
         return self.posteriors[-1, :]
 
     def data_assimilation_loop(
-        self, sigma_guess: float, proposal_prev: np.ndarray, model: Type["Model"]
+        self, sigma_guess: float, proposal_ibf: np.ndarray, model: Type["Model"]
     ):
 
         self.cov_matrices = self.get_covariance_matrices(
@@ -232,7 +187,7 @@ class SequentialMonteCarlo:
         )
 
         self.posteriors = self.get_posterors(
-            model=model, likelihoods=self.likelihoods, proposal_prev=proposal_prev
+            model=model, likelihoods=self.likelihoods, proposal_ibf=proposal_ibf
         )
 
         self.ips, self.covs = self.get_ensamble_ips_covs(
@@ -243,6 +198,5 @@ class SequentialMonteCarlo:
 
         self.eff = eff_all_steps[-1]
 
-        return (self.eff - self.ess_target) ** 2
 
-# %%
+        return (self.eff - self.ess_target) ** 2

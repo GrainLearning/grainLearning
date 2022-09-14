@@ -1,54 +1,35 @@
 #%%
 import numpy as np
 
-from grainlearning import SequentialMonteCarlo, Observations, Model, Parameters
+from grainlearning import SequentialMonteCarlo, Model
 
 
 def test_smc_init():
-    """Test initialization of Sequential Monte Carlo class.
-    Also check to test if the inverse normalized sigma matrix is calculated correctly
-    """
-    smc_cls = SequentialMonteCarlo(
-        ess_target=0.1, inv_obs_weight=[0.5, 0.25], scale_cov_with_max=True
-    )
+    """Test initialization of Sequential Monte Carlo class."""
+    smc_cls = SequentialMonteCarlo(ess_target=0.1, scale_cov_with_max=True)
     assert isinstance(smc_cls, SequentialMonteCarlo)
 
     smc_dct = SequentialMonteCarlo.from_dict(
-        {"ess_target": 0.1, "inv_obs_weight": [0.5, 0.25], "scale_cov_with_max": True}
+        {"ess_target": 0.1, "scale_cov_with_max": True}
     )
 
     np.testing.assert_equal(smc_dct.__dict__, smc_cls.__dict__)
 
-    np.testing.assert_array_almost_equal(
-        smc_dct._inv_normalized_sigma,
-        [
-            [
-                1.41421356,
-                0.0,
-            ],
-            [0.0, 0.70710678],
-        ],
-        0.00001,
-    )
-
 
 def test_get_covariance_matrix():
     """Test to see if covariance matrix is generated as expected"""
-    smc_cls = SequentialMonteCarlo(
-        ess_target=0.1, inv_obs_weight=[1, 1], scale_cov_with_max=True
+
+    model_cls = Model(
+        param_mins=[1, 2],
+        param_maxs=[3, 4],
+        obs_data=[[12, 3, 4], [12, 4, 5]],
+        ctrl_data=[1, 2, 3, 4],
+        num_samples=3,
     )
 
-    obs = Observations(
-        data=[[100, 200, 300], [30, 10, 5]],
-        ctrl=[-0.1, -0.2, -0.3],
-        names=["F", "G"],
-        ctrl_name="x",
-    )
+    smc_cls = SequentialMonteCarlo(ess_target=0.1, scale_cov_with_max=True)
 
-    mdl = Model()
-    mdl.observations = obs
-
-    cov_matrices = smc_cls.get_covariance_matrices(100, mdl)
+    cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
 
     #: assert shape is (num_steps,num_obs,num_obs)
     assert cov_matrices.shape == (3, 2, 2)
@@ -56,64 +37,76 @@ def test_get_covariance_matrix():
     np.testing.assert_array_almost_equal(
         cov_matrices,
         [
-            [[30000.0, 0.0], [0.0, 3000.0]],
-            [[30000.0, 0.0], [0.0, 3000.0]],
-            [[30000.0, 0.0], [0.0, 3000.0]],
+            [[1200.0, 0.0], [0.0, 1200.0]],
+            [[1200.0, 0.0], [0.0, 1200.0]],
+            [[1200.0, 0.0], [0.0, 1200.0]],
+        ],
+    )
+
+    smc_cls = SequentialMonteCarlo(ess_target=0.1, scale_cov_with_max=False)
+
+    cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
+
+    np.testing.assert_array_almost_equal(
+        cov_matrices,
+        [
+            [[14400.0, 0.0], [0.0, 14400.0]],
+            [[900.0, 0.0], [0.0, 1600.0]],
+            [[1600.0, 0.0], [0.0, 2500.0]],
         ],
     )
 
 
-# def test_get_likelihood():
-"""Test to see if likelihood is generated as expected"""
-smc_cls = SequentialMonteCarlo(
-    ess_target=0.1, inv_obs_weight=[1, 1], scale_cov_with_max=True
-)
+def test_get_likelihood():
+    """Test to see if likelihood is generated as expected"""
+    smc_cls = SequentialMonteCarlo(
+        ess_target=0.1, scale_cov_with_max=True
+    )
 
-obs = Observations(
-    data=[[100, 200, 300], [30, 10, 5]],
-    ctrl=[-0.1, -0.2, -0.3],
-    names=["F", "G"],
-    ctrl_name="x",
-)
 
-mdl = Model()
-mdl.observations = obs
-mdl.num_samples = 5
-data = []
-for _ in range(5):
-    data.append(np.random.rand(2, 3))
-mdl.data = np.array(data)
+    model_cls = Model(
+        param_mins=[1, 2],
+        param_maxs=[3, 4],
+        obs_data=[[100, 200, 300], [30, 10, 5]],
+        ctrl_data=[1, 2, 3, 4],
+        num_samples=5,
+    )
 
-cov_matrices = np.repeat([np.identity(2)], 3, axis=0) * 100
 
-likelihoods = smc_cls.get_likelihoods(mdl, cov_matrices)
+    sim_data = []
+    for _ in range(model_cls.num_samples):
+        sim_data.append(np.random.rand(2, 3))
+    model_cls.sim_data = np.array(sim_data)
 
-assert likelihoods.shape == (3, 5)
+    cov_matrices = np.repeat([np.identity(2)], 3, axis=0) * 100
+
+    likelihoods = smc_cls.get_likelihoods(model_cls, cov_matrices)
+
+    assert likelihoods.shape == (3, 5)
 
 #%%
 
 def test_get_posterior():
     """Test to see if posterior is generated as expected"""
     smc_cls = SequentialMonteCarlo(
-        ess_target=0.1, inv_obs_weight=[1, 1], scale_cov_with_max=True
+        ess_target=0.1, scale_cov_with_max=True
     )
 
-    obs = Observations(
-        data=[[100, 200, 300], [30, 10, 5]],
-        ctrl=[-0.1, -0.2, -0.3],
-        names=["F", "G"],
-        ctrl_name="x",
+    model_cls = Model(
+        param_mins=[1, 2],
+        param_maxs=[3, 4],
+        obs_data=[[100, 200, 300], [30, 10, 5]],
+        ctrl_data=[1, 2, 3, 4],
+        num_samples=5,
+        inv_obs_weight=[1, 1],
     )
 
-    mdl = Model()
-    mdl.observations = obs
-    mdl.num_samples = 5
     likelihoods = np.ones((3, 5)) * 0.5
 
-    proposal_prev = np.ones([mdl.num_samples]) / mdl.num_samples
+    proposal_prev = np.ones([model_cls.num_samples]) / model_cls.num_samples
 
     posteriors = smc_cls.get_posterors(
-        model=mdl, likelihoods=likelihoods, proposal_prev=proposal_prev
+        model=model_cls, likelihoods=likelihoods, proposal_prev=proposal_prev
     )
 
     np.testing.assert_array_almost_equal(
@@ -125,26 +118,20 @@ def test_get_posterior():
         ],
     )
 
-
 def test_ips_covs():
     """Test to see if ips is generated as expected."""
 
     smc_cls = SequentialMonteCarlo(
-        ess_target=0.1, inv_obs_weight=[1, 1], scale_cov_with_max=True
+        ess_target=0.1, scale_cov_with_max=True
     )
 
-    obs = Observations(
-        data=[[100, 200, 300], [30, 10, 5]],
-        ctrl=[-0.1, -0.2, -0.3],
-        names=["F", "G"],
-        ctrl_name="x",
-    )
 
-    mdl = Model()
-    mdl.observations = obs
-    mdl.num_samples = 5
-    mdl.parameters = Parameters(names=["A", "B"], mins=[2, 2], maxs=[10, 10])
-    mdl.parameters.generate_halton(5)
+    model_cls = Model(
+        param_mins=[2, 2],
+        param_maxs=[10, 10],
+        obs_data=[[100, 200, 300], [30, 10, 5]],
+        num_samples=5,
+    )
 
     posteriors = np.array(
         [
@@ -153,9 +140,7 @@ def test_ips_covs():
             [0.2, 0.2, 0.2, 0.2, 0.2],
         ]
     )
-    ips, covs = smc_cls.get_ensamble_ips_covs(model=mdl, posteriors=posteriors)
+    ips, covs = smc_cls.get_ensamble_ips_covs(model=model_cls, posteriors=posteriors)
 
     assert ips.shape == (3, 2)
     assert covs.shape == (3, 2)
-
-# %%

@@ -1,42 +1,94 @@
 #%%
 import numpy as np
-from grainlearning import Model, Parameters, Observations
-
-def test_create_run_model():
-    """Test if a model can be created and run correctly.
-    """
-    class MyModel(Model):
-        parameters = Parameters(
-            names=["k", "t"],
-            mins=[100, 0.1],
-            maxs=[300, 10],
-        )
-        observations = Observations(
-            data=[100, 200, 300], ctrl=[-0.1, -0.2, -0.3], names=["F"], ctrl_name=["x"]
-        )
-        num_samples = 10
-
-        def __init__(self):
-            self.parameters.generate_halton(self.num_samples)
-
-        def run(self):
-            # for each parameter calculate the spring force
-            data = []
-            
-            for params in self.parameters.data:
-                F = params[0]*params[1]*self.observations.ctrl
-                data.append(np.array(F,ndmin=2))
-                
-            self.data = np.array(data)
-
-    tst_model = MyModel()
-
-    assert isinstance(tst_model, MyModel)
+from grainlearning import Model
 
 
-    tst_model.run()
+def test_init():
+    model_cls = Model(
+        param_mins=[1, 2],
+        param_maxs=[3, 4],
+        obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
+        ctrl_data=[1, 2, 3, 4],
+        num_samples=10,
+    )
+
+    assert isinstance(model_cls, Model)
+
+    config = {
+        "param_mins": [1, 2],
+        "param_maxs": [3, 4],
+        "obs_data":[[12, 3, 4, 4], [12, 4, 5, 4]],
+        "ctrl_data": [1, 2, 3, 4],
+        "num_samples": 10,
+    }
+    model_dct = Model.from_dict(config)
+
+    np.testing.assert_equal(model_cls.__dict__, model_dct.__dict__)
+    np.testing.assert_array_almost_equal(
+        model_cls._inv_normalized_sigma,
+        [
+            [
+                1.41421356,
+                0.0,
+            ],
+            [0.0, 0.70710678],
+        ],
+        0.00001,
+    )
+
+def test_run_model():
+    def run_model(model):
+
+        model.sim_data = [
+            [[12, 3, 4, 4]],
+            [[11, 24, 4, 3]],
+        ]  # must be of shape (num_samples,num_obs,num_steps), thus addinga dummy dimension
+
+    config = {
+        "param_mins": [1, 2],
+        "param_maxs": [3, 4],
+        "obs_data": [2, 4, 6, 7],
+        "ctrl_data": [1, 2, 3, 4],
+        "inv_obs_weigh": [0.5, 0.25],
+        "num_samples": 2,
+        "callback": run_model,
+    }
+    model_cls = Model.from_dict(config)
+
+    model_cls.run()
+
+    np.testing.assert_almost_equal(
+        model_cls.sim_data,
+        [
+            [[12, 3, 4, 4]],
+            [[11, 24, 4, 3]],
+        ],
+    )
 
 
-    assert tst_model.parameters.data.shape ==(10,2)
-    assert tst_model.observations.data.shape == (1,3)
-    assert tst_model.data.shape == (10,1,3)
+def test_generate_halton():
+    """Test the Parameters class if the generated halton sequence is between mins and maxs"""
+
+    model_cls = model_cls.from_dict(
+        {
+            "param_mins": [1, 2],
+            "param_maxs": [3, 4],
+            "obs_data": [2, 4, 6, 7],
+            "ctrl_data": [1, 2, 3, 4],
+            "num_samples": 2,
+        }
+    )
+
+    print(model_cls.params_data)
+    assert all(
+        model_cls.params_data[:, 1] >= 0.19 - 0.0000001
+    ), "parameter pios min out of range"
+    assert all(
+        model_cls.params_data[:, 1] <= 0.5 + 0.0000001
+    ), "parameter pios max out of range"
+    assert all(
+        model_cls.params_data[:, 0] >= 1e6 - 0.0000001
+    ), "parameter pios min out of range"
+    assert all(
+        model_cls.params_data[:, 0] <= 1e7 + 0.0000001
+    ), "parameter pios max out of range"

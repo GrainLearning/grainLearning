@@ -16,19 +16,19 @@ class GaussianMixtureModel:
     max_num_components: int = 0
 
     prior_weight: int = 0
-    
+
     cov_type: str = "full"
-    
+
     n_init: int = 100
-    
+
     tol: float = 1.0e-3
-    
+
     max_iter: int = 100000
-    
+
     expand_weight: int = 10
-    
+
     seed: int
-    
+
     gmm: Type["BayesianGaussianMixture"]
 
     def __init__(
@@ -42,7 +42,6 @@ class GaussianMixtureModel:
         expand_weight: int = 10,
         seed: int = None,
     ):
-        
 
         self.max_num_components = max_num_components
         self.cov_type = cov_type
@@ -67,6 +66,7 @@ class GaussianMixtureModel:
             random_state=self.seed,
         )
         
+
     @classmethod
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
         return cls(
@@ -85,24 +85,21 @@ class GaussianMixtureModel:
     ) -> Tuple[np.ndarray, np.ndarray]:
         num_copies = (
             np.floor(
-                self.expand_weight
-                * model.num_samples
-                * np.asarray(proposal_weight)
+                self.expand_weight * model.num_samples * np.asarray(proposal_weight)
             )
         ).astype(int)
 
         indices = np.repeat(np.arange(model.num_samples), num_copies).astype(int)
 
-        expanded_parameters = model.parameters.data[indices]
+        expanded_parameters = model.param_data[indices]
 
         max_params = np.amax(expanded_parameters, axis=0)  # find max along axis
 
         normalized_parameters = (
             expanded_parameters / max_params
         )  #  and do array broadcasting to divide by max
-        
-        return normalized_parameters, max_params
 
+        return normalized_parameters, max_params
 
     def regenerate_params(
         self, proposal_weight: np.ndarray, model: Type["Model"]
@@ -114,16 +111,16 @@ class GaussianMixtureModel:
         self.gmm.fit(expanded_normalized_params)
         new_params, _ = self.gmm.sample(model.num_samples)
         new_params *= max_params
-        
+
         # resample until all parameters are within min and max bounds, is there a better way to do this?
         while True:
             new_params, _ = self.gmm.sample(model.num_samples)
             new_params *= max_params
 
-            params_above_min = new_params > np.array(model.parameters.mins)
-            params_below_max = new_params < np.array(model.parameters.maxs)
+            params_above_min = new_params > np.array(model.param_mins)
+            params_below_max = new_params < np.array(model.param_maxs)
 
             if params_above_min.all() & params_below_max.all():
                 break
-            
+
         return new_params

@@ -1,4 +1,4 @@
-# # %%
+# %%
 
 import numpy as np
 from typing import Type
@@ -52,82 +52,33 @@ class IterativeBayesianFilter:
     ess_tol: float = 1.0e-2
 
     #: this is the current proposal distribution
+    posterior_ibf: np.ndarray
+    
     proposal_ibf: np.ndarray
-
-    #: This is the minimum value of sigma which is automatically adjusted such that to covariance matrix is not too big.
-    sigma_min: float = 1.0e-6
-
-    #: This is the maximum value of sigma which is automatically adjusted such that the covariance matrix is not singular
-    sigma_max: float = 1.0e6
 
     def __init__(
         self,
         inference: Type["SequentialMonteCarlo"],
         sampling: Type["GaussianMixtureModel"],
-        sigma_max: float = 1.0e11,
-        sigma_min: float = 1.0e-6,
+        num_samples: int,
         ess_tol: float = 1.0e-2,
+        proposal_ibf: np.ndarray = None 
     ):
         """Initialize the Iterative Bayesian Filter class"""
         self.inference = inference
         self.sampling = sampling
-        self.sigma_max = sigma_max
-        self.sigma_min = sigma_min
         self.ess_tol = ess_tol
-        self.proposal_ibf = None
+        self.proposal_ibf = proposal_ibf
 
     @classmethod
     def from_dict(cls: Type["IterativeBayesianFilter"], obj: dict):
         return cls(
             inference=SequentialMonteCarlo.from_dict(obj["inference"]),
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
-            sigma_max=obj.get("sigma_max", 1.0e11),
-            sigma_min=obj.get("sigma_min", 1.0e-6),
+            num_samples=obj["num_samples"],
             ess_tol=obj.get("ess_tol", 1.0e-2),
+            proposal_ibf = obj.get("ess_tol", None),
         )
-
-    def set_proposal(self, model: Type["Model"]):
-        """set the proposal distribution iterative bayesian filter
-
-        :param model: Calibration model.
-        :param input_proposal: initial proposal distribution, defaults to None
-        """
-        self.proposal_ibf = np.ones([model.num_samples]) / model.num_samples
-
-    def check_sigma_bounds(self, sigma_adjust: float, model: Type["Model"]):
-
-        sigma_new = sigma_adjust
-
-        while True:
-            cov_matrices = self.inference.get_covariance_matrices(sigma_new, model)
-
-            # get determinant of all covariant matricies
-            det_all = np.linalg.det(cov_matrices)
-
-            # if all is above threshold, decrease sigma
-            if (det_all > 1e16).all():
-                sigma_new *= 0.9
-                continue
-
-            # if all is below threshold, increase sigma
-            if (det_all < 0.01).all():
-                sigma_new *= 1.1
-                continue
-
-            break
-
-        return sigma_new
-
-    def configure(self, model: Type["Model"]):
-
-        self.set_proposal(model=model)
-
-        # self.sigma_min = self.check_sigma_bounds(
-        #     sigma_adjust=self.sigma_min, model=model
-        # )
-        # self.sigma_max = self.check_sigma_bounds(
-        #     sigma_adjust=self.sigma_max, model=model
-        # )
 
     def run_inference(self, model: Type["Model"]):
 
@@ -137,20 +88,63 @@ class IterativeBayesianFilter:
             self.inference.data_assimilation_loop,
             args=(self.proposal_ibf, model),
             method="bounded",
-            bounds=(self.sigma_min, self.sigma_max),
+            bounds=(model.sigma_min, model.sigma_max),
         )
-        self.sigma_max = result.x
+        model.sigma_max = result.x
 
         # make sure values are set
-        self.inference.data_assimilation_loop(result.x, self.proposal_ibf, model)
-        self.proposal_ibf = self.inference.give_proposal()
+        self.inference.data_assimilation_loop(model.sigma_max, self.proposal_ibf, model)
         
+        self.posterior_ibf = self.inference.give_posterior()
         
-    def run_sampling(self, model: Type["Model"]):
-        new_params = self.sampling.regenerate_params(self.proposal_ibf, model)
-        return new_params
+                
+        print(self.inference.eff,"eff")
 
+    def run_sampling(self, model: Type["Model"]):
+        model.param_data = self.sampling.regenerate_params(self.posterior_ibf, model)
+
+        
     def solve(self, model: Type["Model"]) -> np.ndarray:
         self.run_inference(model)
-        new_params = self.run_sampling(model)
-        return new_params
+        self.run_sampling(model)
+
+
+
+
+
+
+
+
+
+
+
+    # def check_sigma_bounds(self, sigma_adjust: float, model: Type["Model"]):
+
+    #     sigma_new = sigma_adjust
+
+    #     while True:
+    #         cov_matrices = self.inference.get_covariance_matrices(sigma_new, model)
+
+    #         # get determinant of all covariant matricies
+    #         det_all = np.linalg.det(cov_matrices)
+
+    #         # if all is above threshold, decrease sigma
+    #         if (det_all > 1e16).all():
+    #             sigma_new *= 0.9
+    #             continue
+
+    #         # if all is below threshold, increase sigma
+    #         if (det_all < 0.01).all():
+    #             sigma_new *= 1.1
+    #             continue
+
+    #         break
+
+    #     return sigma_new
+
+    # self.sigma_min = self.check_sigma_bounds(
+    #     sigma_adjust=self.sigma_min, model=model
+    # )
+    # self.sigma_max = self.check_sigma_bounds(
+    #     sigma_adjust=self.sigma_max, model=model
+    # )
