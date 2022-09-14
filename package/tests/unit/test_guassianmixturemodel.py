@@ -1,10 +1,10 @@
-#%%
 import numpy as np
 
 from grainlearning import GaussianMixtureModel, Model
 
 
 def test_init():
+    """Test initialization of the Gausian Mixture Model"""
     gmm_cls = GaussianMixtureModel(max_num_components=5)
 
     assert isinstance(gmm_cls, GaussianMixtureModel)
@@ -25,6 +25,7 @@ def test_init():
 
 
 def test_expand_proposal_to_normalized_params():
+    """Test if parameters are expanded given certain weights"""
     proposal = np.array([0.25, 0.25, 0.25, 0.25])
 
     model_cls = Model(
@@ -61,6 +62,7 @@ def test_expand_proposal_to_normalized_params():
 
 
 def test_regenerate_params():
+    """Test if resampling is within bounds"""
     proposal = np.array([0.25, 0.25, 0.25, 0.25])
 
 
@@ -81,5 +83,5 @@ def test_regenerate_params():
 
     new_params = gmm_cls.regenerate_params(proposal,model_cls)
 
-    assert np.all(new_params > np.array(model_cls.parameters.mins))
-    assert np.all(new_params < np.array(model_cls.parameters.maxs))
+    assert np.all(new_params > np.array(model_cls.param_mins))
+    assert np.all(new_params < np.array(model_cls.param_maxs))

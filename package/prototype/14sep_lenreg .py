@@ -8,11 +8,12 @@ from grainlearning import CalibrationToolbox
 import matplotlib.pyplot as plt
 
 
+
 x_obs = np.arange(100)
 
 y_obs = 0.2* x_obs + 5.0
 
-y_obs += np.random.rand(100) * 10
+y_obs += np.random.rand(100) * 2.5
 
 
 def run_sim(model):
@@ -20,9 +21,11 @@ def run_sim(model):
     for params in model.param_data:
         y_sim = params[0] * model.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
-
+    
     model.sim_data = np.array(data)
-    print(model.sigma_max)
+    
+    
+    # print(model.sigma_max)
 
     plt.figure()
     plt.plot(model.ctrl_data, model.obs_data, ls="", marker=".", label="Observation")
@@ -37,15 +40,15 @@ calibration = CalibrationToolbox.from_dict(
         "model": {
             "param_mins": [0, 0],
             "param_maxs": [1, 10],
-            "num_samples": 20,
+            "num_samples": 14,
             "obs_data": y_obs,
             "ctrl_data": x_obs,
             "callback": run_sim,
         },
-        "ibf": {
+        "calibration": {
             "inference": {"ess_target": 0.3},
             "sampling": {"max_num_components": 1},
-        },
+        }
     }
 )
 
@@ -54,6 +57,7 @@ calibration.run()
 #%%
 
 print(calibration.model.param_data)
+
 
 #%%
 plt.plot( np.arange(calibration.num_iter),calibration.sigma_list)

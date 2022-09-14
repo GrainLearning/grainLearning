@@ -1,5 +1,3 @@
-#%%
-
 import numpy as np
 
 from grainlearning import (
@@ -9,11 +7,11 @@ from grainlearning import (
     Model,
 )
 
-
 def test_init():
+    """Test if the iterative bayesian filter is initialized correctly"""
     smc_cls = SequentialMonteCarlo(ess_target=0.1)
-    gmm_cls = GaussianMixtureModel(max_num_components=5)  # TODO
-    ibf_cls = IterativeBayesianFilter(num_samples=2, inference=smc_cls, sampling=gmm_cls)
+    gmm_cls = GaussianMixtureModel(max_num_components=5)
+    ibf_cls = IterativeBayesianFilter(inference=smc_cls, sampling=gmm_cls)
 
 
     ibf_dct = IterativeBayesianFilter.from_dict(
@@ -36,12 +34,10 @@ def test_init():
     raw_ibf_cls.pop("inference")
 
     np.testing.assert_equal(raw_ibf_dct, raw_ibf_cls)
-    np.testing.assert_equal(ibf_cls.proposal_ibf, np.array([0.5, 0.5]))
 
 
-
-#%%
 def test_run_inference():
+    """Test if the inference runs"""
     model_cls = Model.from_dict({
         "param_mins": [0, 10],
         "param_maxs": [10, 100],

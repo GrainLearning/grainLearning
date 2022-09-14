@@ -9,37 +9,43 @@ from .sequentialmontecarlo import SequentialMonteCarlo
 
 from .gaussianmixturemodel import GaussianMixtureModel
 
+from scipy import optimize
+
 
 class IterativeBayesianFilter:
-    """This class contains the iterative bayesian filter algorithm.
+    """Iterative Bayesian Filter class.
 
-    Initialize the module like this:
 
+    Method 1 - dictionary style
     .. highlight:: python
     .. code-block:: python
-
-        ibf = IterativeBayesianFilter(
-            inference =SequentialMonteCarlo(
-                ess_target=0.1, inv_obs_weight=[0.5, 0.25], scale_cov_with_max=True
-            ),
-            sampling = GaussianMixtureModel(max_num_components=5)
+        ibf_cls = IterativeBayesianFilter.from_dict(
+            {
+                "inference":{
+                    "ess_target": 0.3,
+                    "scale_cov_with_max": True
+                },
+                "sampling":{
+                    "max_num_components": 2
+                }
+            }
         )
 
-        # after initialization we have to configure the algorithm to some model (see :class:`.Parameters`)
-        # this will select an appropriate sigma min and sigma max
-        ibf.configure(mymodel)
+    or
 
-        # the data assimilation loop can be run like this
-        ibf.run_inference(mymodel)
-
-
+    Method 2 - class style
+    .. highlight:: python
+    .. code-block:: python
+        model_cls = IterativeBayesianFilter(
+                inference = SequentialMonteCarlo(...),
+                sampling = GaussianMixtureModel(...)
+        )
 
     :param inference: Sequential Monte Carlo class (SMC)
     :param sampling: Gaussian Mixture Model class (GMM)
-    :param sigma_max: Initial sigma max (this value gets automatically adjusted), defaults to 1.0e6
-    :param sigma_min: Initial sigma min (this value gets automatically adjusted), defaults to 1.0e-6
+    :param num_samples: Number of samples within a user model.
     :param ess_tol: Tolarance for the effective sample size to converge, defaults to 1.0e-2
-
+    :param proposal_ibf: User defined proposal distribution for the data assimilation loop, defaults to None
     """
 
     #: The inference class is a member variable of the particle filter which is used to generate the likelihood
@@ -53,18 +59,17 @@ class IterativeBayesianFilter:
 
     #: this is the current proposal distribution
     posterior_ibf: np.ndarray
-    
+
     proposal_ibf: np.ndarray
 
     def __init__(
         self,
         inference: Type["SequentialMonteCarlo"],
         sampling: Type["GaussianMixtureModel"],
-        num_samples: int,
         ess_tol: float = 1.0e-2,
-        proposal_ibf: np.ndarray = None 
+        proposal_ibf: np.ndarray = None,
     ):
-        """Initialize the Iterative Bayesian Filter class"""
+        """Initialize the Iterative Bayesian Filter."""
         self.inference = inference
         self.sampling = sampling
         self.ess_tol = ess_tol
@@ -72,51 +77,46 @@ class IterativeBayesianFilter:
 
     @classmethod
     def from_dict(cls: Type["IterativeBayesianFilter"], obj: dict):
+        """Initialize the class using a dictionary style"""
         return cls(
             inference=SequentialMonteCarlo.from_dict(obj["inference"]),
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
-            num_samples=obj["num_samples"],
             ess_tol=obj.get("ess_tol", 1.0e-2),
-            proposal_ibf = obj.get("ess_tol", None),
+            proposal_ibf=obj.get("ess_tol", None),
         )
 
     def run_inference(self, model: Type["Model"]):
+        """Run inference (e.g, data assimilation loop) using the Sequential Monte Carlo
 
-        from scipy import optimize
-
+        :param model: Model class
+        """
         result = optimize.minimize_scalar(
             self.inference.data_assimilation_loop,
-            args=(self.proposal_ibf, model),
+            args=(model, self.proposal_ibf),
             method="bounded",
             bounds=(model.sigma_min, model.sigma_max),
         )
         model.sigma_max = result.x
 
         # make sure values are set
-        self.inference.data_assimilation_loop(model.sigma_max, self.proposal_ibf, model)
-        
+        self.inference.data_assimilation_loop(model.sigma_max, model, self.proposal_ibf)
+
         self.posterior_ibf = self.inference.give_posterior()
-        
-                
-        print(self.inference.eff,"eff")
 
     def run_sampling(self, model: Type["Model"]):
+        """Resample the parameters using the Gaussian mixture model
+
+        :param model: Model class
+        """
         model.param_data = self.sampling.regenerate_params(self.posterior_ibf, model)
 
-        
-    def solve(self, model: Type["Model"]) -> np.ndarray:
+    def solve(self, model: Type["Model"]):
+        """Run both inference and sampling on a model
+
+        :param model: Model class
+        """
         self.run_inference(model)
         self.run_sampling(model)
-
-
-
-
-
-
-
-
-
-
 
     # def check_sigma_bounds(self, sigma_adjust: float, model: Type["Model"]):
 

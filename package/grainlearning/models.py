@@ -1,49 +1,63 @@
-#%%
 from typing import Type, List, Callable, Tuple
 import numpy as np
 
 
 class Model:
-    """This is a base class which is used to call a user defined model.
+    """
+    This is the probabalistic model class. It contains information on the observation (or reference) data, simulation data, parameters and reference. It is also used to run a callback for the simulations.
 
-        It contains the :class:`.Parameters` and the :class:`.Observations` classes.
 
-        The number of samples, parameters and observations should be set first.
+    There are two ways of initializing the class:
 
-        Initialize a Model like this:
+    Method 1 - dictionary style
+    .. highlight:: python
+    .. code-block:: python
+        model_cls = Model.from_dict(
+            {
 
-        .. highlight:: python    def check_input(self, obj: dict):
+                "param_mins": [0, 0],
+                "param_maxs": [1, 10],
+                "num_samples": 14,
+                "obs_data": y_obs,
+                "ctrl_data": x_ctrl,
+                "callback": run_sim
+            }
+        )
 
-        .. code-block:: python
+    or
 
-            class MyModel(Model):
-                parameters = Parameters(
-                    names=["k", "t"],
-                    mins=[100, 0.1],
-                    maxs=[300, 10],
-                )
-                observations = Observations(
-                    data=[100, 200, 300], ctrl=[-0.1, -0.2, -0.3], names=["F"], ctrl_name=["x"]
-                )
-                num_samples = 10
+    Method 2 - class style
+    .. highlight:: python
+    .. code-block:: python
+        model_cls = Model(
+                param_mins = [0, 0],
+                param_maxs = [1, 10],
+                num_samples = 14,
+                obs_data = y_obs,
+                ctrl_data = x_ctrl,
+                callback = run_sim
+        )
 
-                def __init__(self):
-                    self.parameters.generate_halton(self.num_samples)
-    obs_weight
-                def run(self):
-                    # for each parameter calculate the spring force
-                    data = []
+    y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.
 
-                    for params in self.parameters.data:
-                        F = params[0]*params[1]*self.observations.ctrl
-                        data.append(np.array(F,ndmin=2))
-
-                    self.data = np.array(data)
-
+    :param obs_data: Observation or reference data
+    :param num_samples: Sample size
+    :param param_mins: List of parameter lower bounds
+    :param param_maxs: List of parameter Upper bounds
+    :param ctrl_data: Optional control data (e.g, time), defaults to None
+    :param obs_names: Column names of the observation data, defaults to None
+    :param ctrl_names: Coloumn names of the control data, defaults to None
+    :param inv_obs_weight: Inverse of the observation weight, defaults to None
+    :param param_data: Parameter data, defaults to None
+    :param param_names: Parameternames, defaults to None
+    :param sim_data: Simulation data, defaults to None
+    :param callback: Callback function, defaults to None
+    :param sigma_max: Uncertainty, defaults to 1.0e6
     """
 
     ##### Parameters #####
-    #: Parameter data of shape (num_samples,num_params)
+
+    #: Parameter data of shape (num_samples, num_params)
     param_data: np.ndarray
 
     #: Number of parameters
@@ -60,7 +74,7 @@ class Model:
 
     ##### Observations #####
 
-    #: Observation data (e.g., axial stress or volumetric strain) of shape (num_obs,num_steps)
+    #: Observation (or reference) data of shape (num_obs,num_steps)
     obs_data: np.ndarray
 
     #: Observation keys
@@ -78,7 +92,7 @@ class Model:
     #: Control data (num_control,num_steps)
     ctrl_data = np.ndarray
 
-    #: Observation control (e.g., axail strain or time)
+    #: Observation control (e.g., time)
     ctrl_names: List[str]
 
     #: Number of control data
@@ -92,7 +106,7 @@ class Model:
     #: Number of samples (usually specified by user)
     num_samples: int
 
-    #: Callback function
+    #: Callback function. The input arugment is the model where model.sim_data is modified
     callback: Callable
 
     ##### Uncertainty #####
@@ -102,8 +116,8 @@ class Model:
 
     #: Maximum value of the uncertainty
     sigma_max: float = 1.0e6
-    
-    #: calculated normalized sigma to weigh the covariance matrix
+
+    #: Calculated normalized sigma to weigh the covariance matrix
     _inv_normalized_sigma: np.array
 
     def __init__(
@@ -122,7 +136,7 @@ class Model:
         callback: Callable = None,
         sigma_max: float = 1.0e6,
     ):
-
+        """Initialize the Model class"""
         #### Observations ####
         self.obs_data = np.array(
             obs_data, ndmin=2
@@ -173,18 +187,13 @@ class Model:
 
         #### Uncertainty ####
         self.sigma_max = sigma_max
-        
+
         self._inv_normalized_sigma = inv_obs_mat * np.linalg.det(inv_obs_mat) ** (
             -1.0 / inv_obs_mat.shape[0]
         )
 
-        
-
     def generate_params_halton(self):
-        """Generate a Halton table of the parameters.
-
-        :param num_samples: number of simulations
-        """
+        """Generate a Halton table of the parameters"""
 
         from scipy.stats import qmc
 
@@ -203,25 +212,9 @@ class Model:
 
     @classmethod
     def from_dict(cls: Type["Model"], obj: dict) -> Type["Model"]:
-        """The class can also be initialized using a dictionary style.
+        """ Initialize the class using a dictionary style"""
 
-        :param cls: The Parameters class referenced to itself.
-        :param obj: Dictionary containing the input parameters to the object.
-        :return: An initialized Parameters object
-
-        Example usage:
-
-        .. highlight:: python
-        .. code-block:: python
-
-            parameters = Parameters.from_dict({
-                "names": ["E", "Eta", "Psi"],
-                "mins": [1e6,0.05,7.],
-                "maxs": [4e7,1.0,13.],
-            })
-
-        """
-
+        # TODO do proper error checking on the input
         assert "obs_data" in obj.keys(), "Error no obs_data key found in input"
         assert "num_samples" in obj.keys(), "Error no num_samples key found in input"
         assert "param_mins" in obj.keys(), "Error no param_mins key found in input"
@@ -232,7 +225,7 @@ class Model:
             num_samples=obj["num_samples"],
             param_mins=obj["param_mins"],
             param_maxs=obj["param_maxs"],
-            ctrl_data=obj.get("ctrl_data",None),
+            ctrl_data=obj.get("ctrl_data", None),
             obs_names=obj.get("obs_names", None),
             ctrl_names=obj.get("ctrl_names", None),
             inv_obs_weight=obj.get("inv_obs_weight", None),
@@ -243,9 +236,9 @@ class Model:
         )
 
     def run(self):
-        """By default this function calls the callback function. It can be overwritten as well"""
+        """This function runs the callback function"""
 
         if self.callback is None:
-            raise ValueError("No callback function defined")
+            raise ValueError("No callbacallsck function defined")
 
         self.callback(self)

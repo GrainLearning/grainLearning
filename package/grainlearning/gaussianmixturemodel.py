@@ -6,13 +6,40 @@ from sklearn.mixture import BayesianGaussianMixture
 
 from .models import Model
 
-
 class GaussianMixtureModel:
     """This class is used for variational inference (sampling) of parameters using a baysian gausian mixture model.
 
     See `BayesianGaussianMixture <https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html>`_.
-    """
 
+    There are two ways of initializing the class:
+
+    Method 1 - dictionary style
+    .. highlight:: python
+    .. code-block:: python
+        model_cls = GaussianMixtureModel.from_dict(
+            {
+                "max_num_components": 2
+            }
+        )
+
+    or
+
+    Method 2 - class style
+    .. highlight:: python
+    .. code-block:: python
+        model_cls = GaussianMixtureModel(
+            max_num_components = 2
+        )
+
+    :param max_num_components: Maximum number of components
+    :param prior_weight: Prior weight, defaults to None
+    :param cov_type: Covariance type, defaults to "full"
+    :param n_init: number of initial samples, defaults to 100
+    :param tol: tolarance, defaults to 1.0e-5
+    :param max_iter: maximum number of iterations, defaults to 100000
+    :param expand_weight: weighted expansions, defaults to 10
+    :param seed: random generation seed, defaults to None
+    """
     max_num_components: int = 0
 
     prior_weight: int = 0
@@ -42,7 +69,7 @@ class GaussianMixtureModel:
         expand_weight: int = 10,
         seed: int = None,
     ):
-
+        """ Initialize the gaussian mixture model class"""
         self.max_num_components = max_num_components
         self.cov_type = cov_type
         self.n_init = n_init
@@ -69,6 +96,7 @@ class GaussianMixtureModel:
 
     @classmethod
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
+        """Initialize the class using a dictionary style"""
         return cls(
             max_num_components=obj["max_num_components"],
             prior_weight=obj.get("prior_weight", None),
@@ -81,11 +109,17 @@ class GaussianMixtureModel:
         )
 
     def expand_weighted_parameters(
-        self, proposal_weight: np.ndarray, model: Type["Model"]
+        self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> Tuple[np.ndarray, np.ndarray]:
+        """Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value
+
+        :param posterior_weight: Posterior found by the data assimulation
+        :param model: Model class
+        :return: Expanded parameters
+        """
         num_copies = (
             np.floor(
-                self.expand_weight * model.num_samples * np.asarray(proposal_weight)
+                self.expand_weight * model.num_samples * np.asarray(posterior_weight)
             )
         ).astype(int)
 
@@ -102,10 +136,16 @@ class GaussianMixtureModel:
         return normalized_parameters, max_params
 
     def regenerate_params(
-        self, proposal_weight: np.ndarray, model: Type["Model"]
+        self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> np.ndarray:
+        """Regenerate the parameters by fitting the Gaussian Mixture model
+
+        :param posterior_weight: Posterior found by the data assimulation
+        :param model: Model class
+        :return: Expanded parameters
+        """
         expanded_normalized_params, max_params = self.expand_weighted_parameters(
-            proposal_weight, model
+            posterior_weight, model
         )
 
         self.gmm.fit(expanded_normalized_params)

@@ -1,9 +1,9 @@
-#%%
 import numpy as np
 from grainlearning import Model
 
 
 def test_init():
+    """Test if models are initialized correctly"""
     model_cls = Model(
         param_mins=[1, 2],
         param_maxs=[3, 4],
@@ -37,6 +37,7 @@ def test_init():
     )
 
 def test_run_model():
+    """Test if the run model callback function works as expected"""
     def run_model(model):
 
         model.sim_data = [
@@ -68,8 +69,7 @@ def test_run_model():
 
 def test_generate_halton():
     """Test the Parameters class if the generated halton sequence is between mins and maxs"""
-
-    model_cls = model_cls.from_dict(
+    model_cls = Model.from_dict(
         {
             "param_mins": [1, 2],
             "param_maxs": [3, 4],
@@ -79,16 +79,17 @@ def test_generate_halton():
         }
     )
 
-    print(model_cls.params_data)
+    print(model_cls.param_data)
+    
     assert all(
-        model_cls.params_data[:, 1] >= 0.19 - 0.0000001
-    ), "parameter pios min out of range"
+        model_cls.param_data[:, 1] >= 2 - 0.0000001
+    ), "parameter 1 min out of range"
     assert all(
-        model_cls.params_data[:, 1] <= 0.5 + 0.0000001
-    ), "parameter pios max out of range"
+        model_cls.param_data[:, 1] <= 4 + 0.0000001
+    ), "parameter 1 max out of range"
     assert all(
-        model_cls.params_data[:, 0] >= 1e6 - 0.0000001
-    ), "parameter pios min out of range"
+        model_cls.param_data[:, 0] >= 1 - 0.0000001
+    ), "parameter 2 min out of range"
     assert all(
-        model_cls.params_data[:, 0] <= 1e7 + 0.0000001
-    ), "parameter pios max out of range"
+        model_cls.param_data[:, 0] <= 3 + 0.0000001
+    ), "parameter 3 max out of range"

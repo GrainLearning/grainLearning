@@ -5,58 +5,57 @@ from .models import Model
 
 from scipy.stats import multivariate_normal
 
-
 class SequentialMonteCarlo:
-    """Sequential Monte Carlo (SMC) filter class.
+    """This is the Sequential Monte Carlo class that is used the call the data assimilation.
 
-    :param ess_target: _description_
-    :param inv_obs_weight: _description_
-    :param scale_cov_with_max: _description_, defaults to True
+    There are two ways of initializing the class:
 
-    Example usage:
-
+    Method 1 - dictionary style
     .. highlight:: python
     .. code-block:: python
-
-        smc = SequentialMonteCarlo(
-            ess_target=0.1, inv_obs_weight=[0.5, 0.25], scale_cov_with_max=True
+        model_cls = SequentialMonteCarlo.from_dict(
+            {
+                "ess_target": 0.3,
+                "scale_cov_with_max": True
+            }
         )
 
-        # make sure sigma_guess is not very big or not very small.
-        # So that the determinant of covariance matrix should be sufficiently small and not zero.
-        # i.e check sigma_guess for some initialized model.
+    or
 
-        cov_matrices = smc_cls.get_covariance_matrices(sigma_guess, mymodel)
-
-        # initialize proposal_prev or use values from previous iteration
-        smc = smc.data_assimilation_loop(
-            sigma_guess = sigma_guess, proposal_prev= someproposal, model mymodel
+    Method 2 - class style
+    .. highlight:: python
+    .. code-block:: python
+        model_cls = SequentialMonteCarlo(
+                ess_target = 0.3,
+                scale_cov_with_max = True
         )
 
+    :param ess_target: Target effective sample size (what we want)
+    :param scale_cov_with_max: Flag if the covariance matrix should scale with the maximum accross the loading steps, defaults to True
     """
 
-    #: Targete effective sample size.
+    #: Target effective sample size.
     ess_target: float
 
     #: Flag if the covariance matrix should be scaled with the maximum values of the observations
     scale_cov_with_max: bool = True
 
-    #: Numpy array containing the covariance matricies of shape (num_steps,num_obs,num_obs)
+    #: Covariance matricies of shape (num_steps,num_obs,num_obs)
     cov_matrices: np.array
 
-    #: Numpy array containing data for the likelihoods of shape (num_steps, num_samples)
+    #: Likelihoods of shape (num_steps, num_samples)
     likelihoods: np.array
 
-    #: Numpy array containing data for the posteriors of shape (num_steps, num_samples)
+    #: Posteriors of shape (num_steps, num_samples)
     posteriors: np.array
 
-    #: Numpy array containing ips of (num_steps, num_params)
+    #: Array containing ips of (num_steps, num_params)
     ips: np.array
 
-    #: Numpy array containing covs of (num_steps, num_params)
+    #: Array containing covs of (num_steps, num_params)
     covs: np.array
 
-    #: The calculated effective sample size
+    #: Calculated effective sample size
     eff: float
 
     def __init__(
@@ -64,30 +63,13 @@ class SequentialMonteCarlo:
         ess_target: float,
         scale_cov_with_max: bool = True,
     ):
-        """Initialize the Sequential Monte Carlo class"""
+        """Initialize the variables."""
         self.ess_target = ess_target
         self.scale_cov_with_max = scale_cov_with_max
 
     @classmethod
     def from_dict(cls: Type["SequentialMonteCarlo"], obj: dict):
-        """The class can also be initialized using a dictionary style.
-
-        :param cls: The SequentialMonteCarlo class referenced to itself.
-        :param obj: Dictionary containing the input to the object.
-        :return: An initialized SequentialMonteCarlo object
-
-        Example usage:
-
-        .. highlight:: python
-        .. code-block:: python
-
-            smc = SequentialMonteCarlo.from_dict({
-            "data": {"ess_target": 0.2,
-                "inv_obs_weight": [0.3,0.7], # a weight per observable
-                "scale_cov_with_max": False
-            })
-
-        """
+        """Initialize the class using a dictionary style"""
         return cls(
             ess_target=obj["ess_target"],
             scale_cov_with_max=obj.get("scale_cov_with_max", True),
@@ -96,32 +78,41 @@ class SequentialMonteCarlo:
     def get_covariance_matrices(
         self, sigma_guess: float, model: Type["Model"]
     ) -> np.array:
-        """Create a diagonal covariance matrix from a given input sigma.
+        """Compute the diagonal covariance matrices from a given input sigma.
+
+        This function is vectorized for all loading steps
 
         :param sigma_guess: input sigma
-        :param observations: Observations class
-        :param load_step: the load step of the simulation, defaults to 0
-        :return: a covariance matrix of shape (num_observables, num_observables)
+        :param model: Model class
+        :return: Covariance matrices for all loading steps
         """
         cov_matrix = sigma_guess * model._inv_normalized_sigma
 
         # duplicated covariant matrix to loading step
         cov_matrices = cov_matrix[None, :].repeat(model.num_steps, axis=0)
 
+        # scale with the maximum of the loading steps
         if self.scale_cov_with_max:
             cov_matrices *= model.obs_data.max(axis=1)[:, None]
         else:
-            # element wise multiplication of covariant matrix with observables of all loading steps
+            # or element wise multiplication of covariant matrix with observables of all loading steps
             cov_matrices *= model.obs_data.T[:, None] ** 2
 
         return cov_matrices
 
-
     def get_likelihoods(self, model: Type["Model"], cov_matrices: np.array) -> np.array:
+        """Compute the likelihoods as a multivariate normal of the simulation data centered around the observations.
 
+        This function is vectorized for all loading steps
+
+        :param model: Model class
+        :param cov_matrices: covariance matricies
+        :return: Likelihood matrices for all loading steps
+        """
         likelihoods = np.zeros((model.num_steps, model.num_samples))
 
         for stp_id in range(model.num_steps):
+            # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multivariate_normal.html
             likelihood = multivariate_normal.pdf(
                 model.sim_data[:, :, stp_id],
                 mean=model.obs_data[:, stp_id],
@@ -132,9 +123,17 @@ class SequentialMonteCarlo:
         return likelihoods
 
     def get_posterors(
-        self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array
+        self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array =None
     ) -> np.array:
+        """Compute the posteriors for all the loading steps
 
+        This function is vectorized for all loading steps
+
+        :param model: Model class
+        :param likelihoods: Likelihood matrices
+        :param proposal_ibf: Optional input proposal
+        :return: Posterior distributions for all loading steps
+        """
         posteriors = np.zeros((model.num_steps, model.num_samples))
 
         if proposal_ibf is None:
@@ -156,7 +155,14 @@ class SequentialMonteCarlo:
         model: Type["Model"],
         posteriors: np.array,
     ) -> np.array:
+        """Compute the ensamble averages for parameters. (Used for post processing)
 
+        This function is vectorized for all loading steps
+
+        :param model: Model class
+        :param posteriors: Posterior distributions
+        :return: Ensamble averages
+        """
         ips = np.zeros((model.num_steps, model.num_params))
         covs = np.zeros((model.num_steps, model.num_params))
 
@@ -172,13 +178,24 @@ class SequentialMonteCarlo:
 
         return ips, covs
 
-    def give_posterior(self):
-        return self.posteriors[-1, :]
+    def give_posterior(self, loading_step=-1):
+        """Give posterior distrubution of a loading step
+
+        :param loading_step: Optional input loading step, defaults to -1 (last value)
+        :return: Posterior distribution for a single step
+        """
+        return self.posteriors[loading_step, :]
 
     def data_assimilation_loop(
-        self, sigma_guess: float, proposal_ibf: np.ndarray, model: Type["Model"]
+        self, sigma_guess: float, model: Type["Model"], proposal_ibf: np.ndarray = None
     ):
+        """Perform data assimilation loop
 
+        :param sigma_guess: Guess of sigma
+        :param proposal_ibf: Input distribution
+        :param model: Model class
+        :return: Result of the objective function which converges to a user defined effective sample size
+        """
         self.cov_matrices = self.get_covariance_matrices(
             sigma_guess=sigma_guess, model=model
         )
@@ -194,9 +211,10 @@ class SequentialMonteCarlo:
             model=model, posteriors=self.posteriors
         )
 
-        eff_all_steps = 1.0 / sum(self.posteriors**2)
+        self.eff = 1.0 / np.sum(
+            self.posteriors[-1, :] ** 2,
+        )
 
-        self.eff = eff_all_steps[-1]
-
+        self.eff /= model.num_samples
 
         return (self.eff - self.ess_target) ** 2

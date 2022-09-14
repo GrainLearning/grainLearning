@@ -103,10 +103,8 @@ def test_get_posterior():
 
     likelihoods = np.ones((3, 5)) * 0.5
 
-    proposal_prev = np.ones([model_cls.num_samples]) / model_cls.num_samples
-
     posteriors = smc_cls.get_posterors(
-        model=model_cls, likelihoods=likelihoods, proposal_prev=proposal_prev
+        model=model_cls, likelihoods=likelihoods, proposal_ibf= None
     )
 
     np.testing.assert_array_almost_equal(
