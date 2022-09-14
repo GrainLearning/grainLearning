@@ -7,13 +7,14 @@ from .iterativebayesianfilter import IterativeBayesianFilter
 
 class CalibrationToolbox:
     """This is the main calibration tooblox
-
   
-    There are two ways of initializing the class:
+    There are two ways of initializing the class.
 
     Method 1 - dictionary style (recommended)
+    
     .. highlight:: python
     .. code-block:: python
+    
         model_cls = CalibrationToolbox.from_dict(
             {
                 "num_iter": 8,
@@ -35,8 +36,10 @@ class CalibrationToolbox:
     or
 
     Method 2 - class style
+    
     .. highlight:: python
     .. code-block:: python
+    
         model_cls = CalibrationToolbox(
             num_iter = 8,
             model = Model(...),

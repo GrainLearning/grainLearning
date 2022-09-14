@@ -1,27 +1,19 @@
 Python API
 ==================
 
+``CalibrationToolBox``
+*****************************
+
+.. automodule:: grainlearning.calibrationtoolbox
+    :members:
+    :show-inheritance:
+    :inherited-members:
+
+
 ``Models``
 *****************************
 
 .. automodule:: grainlearning.models
-    :members:
-    :show-inheritance:
-    :inherited-members:
-
-
-``Parameters``
-*****************************
-
-.. automodule:: grainlearning.parameters
-    :members:
-    :show-inheritance:
-    :inherited-members:
-
-``Observations``
-*****************************
-
-.. automodule:: grainlearning.observations
     :members:
     :show-inheritance:
     :inherited-members:
@@ -40,6 +32,15 @@ Python API
 *****************************
 
 .. automodule:: grainlearning.sequentialmontecarlo
+    :members:
+    :show-inheritance:
+    :inherited-members:
+
+
+``Gaussian Mixture Model``
+*****************************
+
+.. automodule:: grainlearning.gaussianmixturemodel
     :members:
     :show-inheritance:
     :inherited-members:

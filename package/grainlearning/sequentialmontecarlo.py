@@ -8,11 +8,13 @@ from scipy.stats import multivariate_normal
 class SequentialMonteCarlo:
     """This is the Sequential Monte Carlo class that is used the call the data assimilation.
 
-    There are two ways of initializing the class:
+    There are two ways of initializing the class.
 
     Method 1 - dictionary style
+    
     .. highlight:: python
     .. code-block:: python
+    
         model_cls = SequentialMonteCarlo.from_dict(
             {
                 "ess_target": 0.3,
@@ -23,8 +25,10 @@ class SequentialMonteCarlo:
     or
 
     Method 2 - class style
+    
     .. highlight:: python
     .. code-block:: python
+    
         model_cls = SequentialMonteCarlo(
                 ess_target = 0.3,
                 scale_cov_with_max = True

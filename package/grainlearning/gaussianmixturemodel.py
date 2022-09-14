@@ -11,11 +11,13 @@ class GaussianMixtureModel:
 
     See `BayesianGaussianMixture <https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html>`_.
 
-    There are two ways of initializing the class:
+    There are two ways of initializing the class.
 
     Method 1 - dictionary style
+    
     .. highlight:: python
     .. code-block:: python
+    
         model_cls = GaussianMixtureModel.from_dict(
             {
                 "max_num_components": 2
@@ -25,8 +27,10 @@ class GaussianMixtureModel:
     or
 
     Method 2 - class style
+    
     .. highlight:: python
     .. code-block:: python
+    
         model_cls = GaussianMixtureModel(
             max_num_components = 2
         )

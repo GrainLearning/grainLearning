@@ -14,11 +14,14 @@ from scipy import optimize
 
 class IterativeBayesianFilter:
     """Iterative Bayesian Filter class.
-
+    
+    There are two ways of initializing the class.
 
     Method 1 - dictionary style
+
     .. highlight:: python
     .. code-block:: python
+        
         ibf_cls = IterativeBayesianFilter.from_dict(
             {
                 "inference":{
@@ -34,8 +37,10 @@ class IterativeBayesianFilter:
     or
 
     Method 2 - class style
+    
     .. highlight:: python
     .. code-block:: python
+        
         model_cls = IterativeBayesianFilter(
                 inference = SequentialMonteCarlo(...),
                 sampling = GaussianMixtureModel(...)
@@ -117,34 +122,3 @@ class IterativeBayesianFilter:
         """
         self.run_inference(model)
         self.run_sampling(model)
-
-    # def check_sigma_bounds(self, sigma_adjust: float, model: Type["Model"]):
-
-    #     sigma_new = sigma_adjust
-
-    #     while True:
-    #         cov_matrices = self.inference.get_covariance_matrices(sigma_new, model)
-
-    #         # get determinant of all covariant matricies
-    #         det_all = np.linalg.det(cov_matrices)
-
-    #         # if all is above threshold, decrease sigma
-    #         if (det_all > 1e16).all():
-    #             sigma_new *= 0.9
-    #             continue
-
-    #         # if all is below threshold, increase sigma
-    #         if (det_all < 0.01).all():
-    #             sigma_new *= 1.1
-    #             continue
-
-    #         break
-
-    #     return sigma_new
-
-    # self.sigma_min = self.check_sigma_bounds(
-    #     sigma_adjust=self.sigma_min, model=model
-    # )
-    # self.sigma_max = self.check_sigma_bounds(
-    #     sigma_adjust=self.sigma_max, model=model
-    # )

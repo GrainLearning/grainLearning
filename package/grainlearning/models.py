@@ -6,12 +6,13 @@ class Model:
     """
     This is the probabalistic model class. It contains information on the observation (or reference) data, simulation data, parameters and reference. It is also used to run a callback for the simulations.
 
-
-    There are two ways of initializing the class:
+    There are two ways of initializing the class.
 
     Method 1 - dictionary style
+    
     .. highlight:: python
     .. code-block:: python
+        
         model_cls = Model.from_dict(
             {
 
@@ -27,8 +28,10 @@ class Model:
     or
 
     Method 2 - class style
+    
     .. highlight:: python
     .. code-block:: python
+        
         model_cls = Model(
                 param_mins = [0, 0],
                 param_maxs = [1, 10],
