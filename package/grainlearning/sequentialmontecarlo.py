@@ -5,6 +5,7 @@ from .models import Model
 
 from scipy.stats import multivariate_normal
 
+
 class SequentialMonteCarlo:
     """This is the Sequential Monte Carlo class that is used the call the data assimilation.
 
@@ -63,9 +64,9 @@ class SequentialMonteCarlo:
     eff: float
 
     def __init__(
-        self,
-        ess_target: float,
-        scale_cov_with_max: bool = True,
+            self,
+            ess_target: float,
+            scale_cov_with_max: bool = True,
     ):
         """Initialize the variables."""
         self.ess_target = ess_target
@@ -80,7 +81,7 @@ class SequentialMonteCarlo:
         )
 
     def get_covariance_matrices(
-        self, sigma_guess: float, model: Type["Model"]
+            self, sigma_guess: float, model: Type["Model"]
     ) -> np.array:
         """Compute the diagonal covariance matrices from a given input sigma.
 
@@ -127,7 +128,7 @@ class SequentialMonteCarlo:
         return likelihoods
 
     def get_posterors(
-        self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array =None
+            self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array = None
     ) -> np.array:
         """Compute the posteriors for all the loading steps
 
@@ -155,27 +156,26 @@ class SequentialMonteCarlo:
         return posteriors
 
     def get_ensamble_ips_covs(
-        self,
-        model: Type["Model"],
-        posteriors: np.array,
+            self,
+            model: Type["Model"],
+            posteriors: np.array,
     ) -> np.array:
-        """Compute the ensamble averages for parameters. (Used for post processing)
+        """Compute the ensemble averages for parameters. (Used for post-processing)
 
         This function is vectorized for all loading steps
 
         :param model: Model class
         :param posteriors: Posterior distributions
-        :return: Ensamble averages
+        :return: Ensemble averages
         """
         ips = np.zeros((model.num_steps, model.num_params))
         covs = np.zeros((model.num_steps, model.num_params))
 
         for stp_id in range(model.num_steps):
-
             ips[stp_id, :] = posteriors[stp_id, :] @ model.param_data
 
             covs[stp_id, :] = (
-                posteriors[stp_id, :] @ (ips[stp_id, :] - model.param_data) ** 2
+                    posteriors[stp_id, :] @ (ips[stp_id, :] - model.param_data) ** 2
             )
 
             covs[stp_id, :] = np.sqrt(covs[stp_id, :]) / ips[stp_id, :]
@@ -183,7 +183,7 @@ class SequentialMonteCarlo:
         return ips, covs
 
     def give_posterior(self, loading_step=-1):
-        """Give posterior distrubution of a loading step
+        """Give posterior distribution of a loading step
 
         :param loading_step: Optional input loading step, defaults to -1 (last value)
         :return: Posterior distribution for a single step
@@ -191,7 +191,7 @@ class SequentialMonteCarlo:
         return self.posteriors[loading_step, :]
 
     def data_assimilation_loop(
-        self, sigma_guess: float, model: Type["Model"], proposal_ibf: np.ndarray = None
+            self, sigma_guess: float, model: Type["Model"], proposal_ibf: np.ndarray = None
     ):
         """Perform data assimilation loop
 
@@ -215,6 +215,8 @@ class SequentialMonteCarlo:
             model=model, posteriors=self.posteriors
         )
 
+        # TODO: I (Hongyang) would save the whole effective sample size sequence in time.
+        #  Examining the evolution of eff gives you a good idea how your filtering algorithm is doing.
         self.eff = 1.0 / np.sum(
             self.posteriors[-1, :] ** 2,
         )

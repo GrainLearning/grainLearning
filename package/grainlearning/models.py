@@ -124,20 +124,20 @@ class Model:
     _inv_normalized_sigma: np.array
 
     def __init__(
-        self,
-        obs_data: np.ndarray,
-        num_samples: int,
-        param_mins: List[float],
-        param_maxs: List[float],
-        ctrl_data: np.ndarray = None,
-        obs_names: List[str] = None,
-        ctrl_names: List[str] = None,
-        inv_obs_weight: List[float] = None,
-        param_data: np.ndarray = None,
-        param_names: List[str] = None,
-        sim_data: np.ndarray = None,
-        callback: Callable = None,
-        sigma_max: float = 1.0e6,
+            self,
+            obs_data: np.ndarray,
+            num_samples: int,
+            param_mins: List[float],
+            param_maxs: List[float],
+            ctrl_data: np.ndarray = None,
+            obs_names: List[str] = None,
+            ctrl_names: List[str] = None,
+            inv_obs_weight: List[float] = None,
+            param_data: np.ndarray = None,
+            param_names: List[str] = None,
+            sim_data: np.ndarray = None,
+            callback: Callable = None,
+            sigma_max: float = 1.0e6,
     ):
         """Initialize the Model class"""
         #### Observations ####
@@ -192,9 +192,10 @@ class Model:
         self.sigma_max = sigma_max
 
         self._inv_normalized_sigma = inv_obs_mat * np.linalg.det(inv_obs_mat) ** (
-            -1.0 / inv_obs_mat.shape[0]
+                -1.0 / inv_obs_mat.shape[0]
         )
 
+    # TODO: this should go to the sampling class
     def generate_params_halton(self):
         """Generate a Halton table of the parameters"""
 
@@ -208,7 +209,7 @@ class Model:
                 mean = 0.5 * (self.param_maxs[param_i] + self.param_mins[param_i])
                 std = 0.5 * (self.param_maxs[param_i] - self.param_mins[param_i])
                 param_table[sim_i][param_i] = (
-                    mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
+                        mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
                 )
 
         self.param_data = np.array(param_table, ndmin=2)

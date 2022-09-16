@@ -48,8 +48,8 @@ class IterativeBayesianFilter:
 
     :param inference: Sequential Monte Carlo class (SMC)
     :param sampling: Gaussian Mixture Model class (GMM)
-    :param num_samples: Number of samples within a user model.
-    :param ess_tol: Tolarance for the effective sample size to converge, defaults to 1.0e-2
+    :param num_samples: Number of samples within a user model
+    :param ess_tol: Tolerance for the effective sample size to converge, defaults to 1.0e-2
     :param proposal_ibf: User defined proposal distribution for the data assimilation loop, defaults to None
     """
 
@@ -59,7 +59,7 @@ class IterativeBayesianFilter:
     #: The gaussian mixture model class is used to sample the parameters
     sampling = Type["GaussianMixtureModel"]
 
-    #: This a tolarance to which the optimization algorithm converges.
+    #: This a tolerance to which the optimization algorithm converges.
     ess_tol: float = 1.0e-2
 
     #: this is the current proposal distribution
@@ -68,11 +68,11 @@ class IterativeBayesianFilter:
     proposal_ibf: np.ndarray
 
     def __init__(
-        self,
-        inference: Type["SequentialMonteCarlo"],
-        sampling: Type["GaussianMixtureModel"],
-        ess_tol: float = 1.0e-2,
-        proposal_ibf: np.ndarray = None,
+            self,
+            inference: Type["SequentialMonteCarlo"],
+            sampling: Type["GaussianMixtureModel"],
+            ess_tol: float = 1.0e-2,
+            proposal_ibf: np.ndarray = None,
     ):
         """Initialize the Iterative Bayesian Filter."""
         self.inference = inference

@@ -6,9 +6,13 @@ from .iterativebayesianfilter import IterativeBayesianFilter
 
 
 class CalibrationToolbox:
-    """This is the main calibration tooblox
+    """This is the main calibration toolbox
   
-    There are two ways of initializing the class.
+    A Bayesian calibration method consists of the inference class and the (re)sampling class.
+    For instance, in GrainLearning, we have a calibration method called "iterative Bayesian filter"
+    which consists of "sequential Monte Carlo" for the inference and "variational Gaussian mixture" for the resampling
+
+    There are two ways of initializing a calibration toolbox class.
 
     Method 1 - dictionary style (recommended)
     
@@ -55,15 +59,15 @@ class CalibrationToolbox:
 
     #: Calibration method (e.g, Iterative Bayesian Filter)
     calibration: Type["IterativeBayesianFilter"]
-    
-    #: Number of iteratives
+
+    #: Number of iterations
     num_iter: int
-    
+
     #: Current calibration step
-    curr_iter:int = 0
-    
+    curr_iter: int = 0
+
     #: List of sigmas
-    sigma_list : List = []
+    sigma_list: List = []
 
     def __init__(
         self,
@@ -72,16 +76,18 @@ class CalibrationToolbox:
         num_iter: int
     ):
         self.model = model
-        
+
         self.calibration = calibration
-        
+
         self.num_iter = num_iter
 
 
     def run(self):
-        """Main calibration loop."""
+        """Main calibration loop.
+        TODO: more docu needed
+        """
         for self.curr_iter in range(self.num_iter):
-            print(f"Calibrationg step {self.curr_iter}")
+            print(f"Calibration step {self.curr_iter}")
             self.model.run()
             self.calibration.solve(self.model)
             self.sigma_list.append( self.model.sigma_max)
@@ -92,12 +98,12 @@ class CalibrationToolbox:
         obj: Dict
     ):
         model = Model.from_dict(obj["model"])
-        
-        calibration = IterativeBayesianFilter.from_dict( obj["calibration"])
-        
+
+        calibration = IterativeBayesianFilter.from_dict(obj["calibration"])
+
         return cls(
-            model = model,
+            model=model,
             calibration=calibration,
-            num_iter = obj["num_iter"]
+            num_iter=obj["num_iter"]
         )
 

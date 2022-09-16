@@ -6,10 +6,12 @@ from sklearn.mixture import BayesianGaussianMixture
 
 from .models import Model
 
-class GaussianMixtureModel:
-    """This class is used for variational inference (sampling) of parameters using a baysian gausian mixture model.
 
-    See `BayesianGaussianMixture <https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html>`_.
+class GaussianMixtureModel:
+    """This class is used for the inference (sampling) of parameters using a variational Gaussian mixture model.
+
+    See `BayesianGaussianMixture <https://scikit-learn.org/stable/modules/generated/sklearn.mixture
+    .BayesianGaussianMixture.html>`_.
 
     There are two ways of initializing the class.
 
@@ -46,7 +48,7 @@ class GaussianMixtureModel:
     """
     max_num_components: int = 0
 
-    prior_weight: int = 0
+    prior_weight: float = 0.0
 
     cov_type: str = "full"
 
@@ -63,15 +65,15 @@ class GaussianMixtureModel:
     gmm: Type["BayesianGaussianMixture"]
 
     def __init__(
-        self,
-        max_num_components,
-        prior_weight: int = None,
-        cov_type: str = "full",
-        n_init: int = 100,
-        tol: float = 1.0e-5,
-        max_iter: int = 100000,
-        expand_weight: int = 10,
-        seed: int = None,
+            self,
+            max_num_components,
+            prior_weight: int = None,
+            cov_type: str = "full",
+            n_init: int = 100,
+            tol: float = 1.0e-5,
+            max_iter: int = 100000,
+            expand_weight: int = 10,
+            seed: int = None,
     ):
         """ Initialize the gaussian mixture model class"""
         self.max_num_components = max_num_components
@@ -96,9 +98,9 @@ class GaussianMixtureModel:
             n_init=self.n_init,
             random_state=self.seed,
         )
-        
 
     @classmethod
+    # TODO: with this class method, GaussianMixtureModel has only one argument, can we use **kwargs to allow more user input?
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
         """Initialize the class using a dictionary style"""
         return cls(
@@ -112,8 +114,9 @@ class GaussianMixtureModel:
             expand_weight=obj.get("expand_weight", 10),
         )
 
+    # TODO: review below with Retief (originally in resample.py)
     def expand_weighted_parameters(
-        self, posterior_weight: np.ndarray, model: Type["Model"]
+            self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value
 
@@ -134,13 +137,13 @@ class GaussianMixtureModel:
         max_params = np.amax(expanded_parameters, axis=0)  # find max along axis
 
         normalized_parameters = (
-            expanded_parameters / max_params
-        )  #  and do array broadcasting to divide by max
+                expanded_parameters / max_params
+        )  # and do array broadcasting to divide by max
 
         return normalized_parameters, max_params
 
     def regenerate_params(
-        self, posterior_weight: np.ndarray, model: Type["Model"]
+            self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> np.ndarray:
         """Regenerate the parameters by fitting the Gaussian Mixture model
 
@@ -157,6 +160,7 @@ class GaussianMixtureModel:
         new_params *= max_params
 
         # resample until all parameters are within min and max bounds, is there a better way to do this?
+        # TODO: we can just sample normally and take out those that are out of bounds. The while loop might be slow
         while True:
             new_params, _ = self.gmm.sample(model.num_samples)
             new_params *= max_params
