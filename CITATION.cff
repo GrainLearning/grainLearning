@@ -1,0 +1,22 @@
+# YAML 1.2
+---
+cff-version: "1.1.0"
+title: "grainlearning"
+authors:
+  -
+    family-names: Cheng
+    given-names: Hongyang
+    orcid: "https://orcid.org/0000-0001-7652-8600"
+  -
+    family-names: Orozco
+    given-names: Luisa
+    orcid: "https://orcid.org/0000-0002-9153-650X"
+date-released: 2020-10-30
+doi: <insert your DOI here>
+version: "1.0"
+repository-code: "https://github.com/GrainLearning/grainlearning"
+keywords:
+  - dem
+  - bayesian
+message: "If you use this software, please cite it using these metadata."
+license: Apache-2.0
