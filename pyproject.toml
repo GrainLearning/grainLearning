@@ -2,7 +2,11 @@
 name = "GrainLearning"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Hongyang Cheng <h.cheng@utwente.nl>",
+"Luisa Orozco <l.orozco@esciencecenter.nl>"]
+readme = "README.md"
+keywords = ["DEM", "Bayesian inference"]
+
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"

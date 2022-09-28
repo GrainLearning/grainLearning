@@ -17,6 +17,7 @@ version: "1.0"
 repository-code: "https://github.com/GrainLearning/grainlearning"
 keywords:
   - dem
-  - bayesian
+  - Bayesian Calibration
+  - nonparametric Gaussian mixture
 message: "If you use this software, please cite it using these metadata."
 license: Apache-2.0

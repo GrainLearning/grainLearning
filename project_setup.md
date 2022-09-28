@@ -1,34 +1,36 @@
 # Project Setup
 
-Here we provide some details about the project setup. Most of the choices are explained in the
-[guide](https://guide.esciencecenter.nl). Links to the relevant sections are included below. Feel free to remove this
-text when the development of the software package takes off.
+GrainLearning is setup using poetry. 
 
-For a quick reference on software development, we refer to [the software guide
-checklist](https://guide.esciencecenter.nl/#/best_practices/checklist).
-
-## Python versions
+## Python versions (to check)
 
 This repository is set up with Python versions:
 
-- 3.6
 - 3.7
 - 3.8
 - 3.9
 
-Add or remove Python versions based on project requirements. See [the
-guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python) for more information about Python
-versions.
 
 ## Package management and dependencies
 
-You can use either pip or conda for installing dependencies and package management. This repository does not force you
-to use one or the other, as project requirements differ. For advice on what to use, please check [the relevant section
-of the
-guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=dependencies-and-package-management).
+### Install using poetry
 
-- Runtime dependencies should be added to `setup.cfg` in the `install_requires` list under `[options]`.
-- Development dependencies should be added to `setup.cfg` in one of the lists under `[options.extras_require]`.
+1. Install poetry following [these instructions](https://python-poetry.org/docs/#installation).
+1. Clone the repository: https://github.com/GrainLearning/grainLearning.git
+1. `cd grainLearning`
+1. `poetry shell`
+1. `poetry install`
+1. You can either run your code via: `poetry run python example.py` or `python example.py`
+
+### Install using pip
+
+1. Clone the repository: https://github.com/GrainLearning/grainLearning.git
+1. `cd grainLearning`
+1. We recomend to work on an environment conda or any other python environment manager
+  `conda create --name grainlearning python=3.8`
+  `conda activate grainlearning`
+1. `pip install .`
+1. Additionally you'll need to install matplotlib to do some plotting: `pip install matplotlib`
 
 ## Packaging/One command install
 
@@ -38,28 +40,18 @@ help you decide which tool to use for packaging.
 
 ## Testing and code coverage
 
-- Tests should be put in the `tests` folder.
-- The `tests` folder contains:
-  - Example tests that you should replace with your own meaningful tests (file: `test_my_module.py`)
-- The testing framework used is [PyTest](https://pytest.org)
-  - [PyTest introduction](https://pythontest.com/pytest-book/)
-  - PyTest is listed as a development dependency
-  - This is configured in `setup.cfg`
-- The project uses [GitHub action workflows](https://docs.github.com/en/actions) to automatically run tests on GitHub infrastructure against multiple Python versions
-  - Workflows can be found in [`.github/workflows`](.github/workflows/)
-- [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=testing)
+Instructions to run the tests
 
 ## Documentation
 
-- Documentation should be put in the [`docs/`](docs/) directory. The contents have been generated using `sphinx-quickstart` (Sphinx version 1.6.5).
-- We recommend writing the documentation using Restructured Text (reST) and Google style docstrings.
-  - [Restructured Text (reST) and Sphinx CheatSheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
-  - [Google style docstring examples](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
-- The documentation is set up with the ReadTheDocs Sphinx theme.
-  - Check out its [configuration options](https://sphinx-rtd-theme.readthedocs.io/en/latest/).
-- [AutoAPI](https://sphinx-autoapi.readthedocs.io/) is used to generate documentation for the package Python objects.
-- `.readthedocs.yaml` is the ReadTheDocs configuration file. When ReadTheDocs is building the documentation this package and its development dependencies are installed so the API reference can be rendered.
-- [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=writingdocumentation)
+### Online:
+You can check the documentation here (TODO)
+
+### Create the documentation using poetry
+1. You need to be in the same `poetry shell` used to install grainlearning, or repeat the process to install using poetry.
+1. `cd docs`
+1. `poetry run make html`
+
 
 ## Coding style conventions and code quality
 
@@ -67,33 +59,16 @@ help you decide which tool to use for packaging.
 
 ## Continuous code quality
 
-[Sonarcloud](https://sonarcloud.io/) is used to perform quality analysis and code coverage report
-
-- `sonar-project.properties` is the SonarCloud [configuration](https://docs.sonarqube.org/latest/analysis/analysis-parameters/) file
-- `.github/workflows/sonarcloud.yml` is the GitHub action workflow which performs the SonarCloud analysis
+TODO: integration of sonarcloud
 
 ## Package version number
 
-- We recommend using [semantic versioning](https://guide.esciencecenter.nl/#/best_practices/releases?id=semantic-versioning).
-- For convenience, the package version is stored in a single place: `grainlearning/.bumpversion.cfg`.
-- Don't forget to update the version number before [making a release](https://guide.esciencecenter.nl/#/best_practices/releases)!
+TODO: update
 
-## Logging
-
-- We recommend using the logging module for getting useful information from your module (instead of using print).
-- The project is set up with a logging example.
-- [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=logging)
 
 ## CHANGELOG.md
 
-- Document changes to your software package
-- [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/releases?id=changelogmd)
-
-## CITATION.cff
-
-- To allow others to cite your software, add a `CITATION.cff` file
-- It only makes sense to do this once there is something to cite (e.g., a software release with a DOI).
-- Follow the [making software citable](https://guide.esciencecenter.nl/#/citable_software/making_software_citable) section in the guide.
+- In this file we document changes to our software package
 
 ## CODE_OF_CONDUCT.md
 
