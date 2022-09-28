@@ -35,8 +35,11 @@ This repository is set up with Python versions:
 ## Packaging/One command install
 
 You can distribute your code using PyPI.
-[The guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=building-and-packaging-code) can
-help you decide which tool to use for packaging.
+
+### For developers: (Needs to be tested)
+We can distribute grainLearning using Pypi as follows:
+1. poetry publish --build
+This will by defaukt register the package to pypi. You'll need to put your pypi username and password, alternatively you can pass the as -u and -p, respectively. More info [here](https://python-poetry.org/docs/cli/#build).
 
 ## Testing and code coverage
 
