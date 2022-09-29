@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "GrainLearning"
+version = "2.0.0"
+description = ""
+authors = ["Hongyang Cheng <h.cheng@utwente.nl>",
+"Luisa Orozco <l.orozco@esciencecenter.nl>"]
+readme = "README.md"
+keywords = ["DEM", "Bayesian inference"]
+
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+numpy = "^1.23.2"
+scipy = "^1.9.1"
+sklearn = "^0.0"
+
+[tool.poetry.dev-dependencies]
+Sphinx = "^5.1.1"
+sphinx-autodoc-typehints = "^1.19.2"
+
+[tool.poetry.group.visual.dependencies]
+matplotlib = "^3.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
