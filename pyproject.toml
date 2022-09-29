@@ -14,7 +14,7 @@ numpy = "^1.23.2"
 scipy = "^1.9.1"
 sklearn = "^0.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.docs.dependencies]
 Sphinx = "^5.1.1"
 sphinx-autodoc-typehints = "^1.19.2"
 
