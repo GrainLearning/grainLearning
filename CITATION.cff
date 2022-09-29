@@ -20,4 +20,4 @@ keywords:
   - Bayesian Calibration
   - nonparametric Gaussian mixture
 message: "If you use this software, please cite it using these metadata."
-license: Apache-2.0
+license: GPL-2.0 license
