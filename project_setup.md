@@ -89,6 +89,5 @@ TODO: update
 - [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=building-and-packaging-code)
 
 ## NOTICE
-
-- List of attributions of this project and Apache-license dependencies
-- [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/licensing?id=notice)
+TODO (also modify/check NOTICE)
+- List of attributions of this project and license dependencies
