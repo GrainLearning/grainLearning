@@ -1,10 +1,28 @@
 
 # Welcome to GrainLearning!
 
-|Authors |Hongyang Cheng, Philipp Hartmann, and Klaus Thoeni|
+
+|Authors |Hongyang Cheng, Retief Lubbe, Luisa Orozco, Philipp Hartmann, and Klaus Thoeni|
 |---|---|
 |Contacts |h.cheng@utwente.nl |
 |Version|1.0 |
+
+
+## Badges
+
+(Customize these badges with your own links, and check https://shields.io/ or https://badgen.net/ to see which other badges are available.)
+
+| fair-software.eu recommendations | |
+| :-- | :--  |
+| (1/5) code repository              | [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](https://github.com/GrainLearning/grainlearning) |
+| (2/5) license                      | [![github license badge](https://img.shields.io/github/license/GrainLearning/grainlearning)](https://github.com/GrainLearning/grainlearning) |
+| (3/5) community registry           | [![RSD](https://img.shields.io/badge/rsd-grainlearning-00a3e3.svg)](https://www.research-software.nl/software/grainlearning) [![workflow pypi badge](https://img.shields.io/pypi/v/grainlearning.svg?colorB=blue)](https://pypi.python.org/project/grainlearning/) |
+| (4/5) citation                     | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123966.svg)](https://doi.org/10.5281/zenodo.7123966) |
+| (5/5) checklist                    | [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>/badge)](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>) |
+| howfairis                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
+| **Other best practices**           | &nbsp; |
+| Documentation                      | [![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest) |
+
 
 # Description
 
@@ -398,3 +416,7 @@ H. Cheng, T. Shuku, K. Thoeni, P. Tempone, S. Luding, V. Magnanimo. **An iterati
 # Help and Support
 
 For assistance with the GrainLearning software or Bayesian calibration for geomechanical models in general, please raise an issue on the Github Issues page or drop me an email at h.cheng@utwente.nl.
+
+## Credits
+
+This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the [NLeSC/python-template](https://github.com/NLeSC/python-template).
