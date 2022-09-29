@@ -38,6 +38,7 @@ rm -rf dist
 poetry shell
 poetry install
 poetry build 
+pip install twine
 
 # This generates folder dist that has the wheel that is going to be distributed. Install twine in your system or in an environment.
 twine upload --repository-url https://test.pypi.org/legacy/ dist/* 
