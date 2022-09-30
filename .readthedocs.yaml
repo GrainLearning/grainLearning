@@ -8,4 +8,5 @@ build:
     post_install:
       - pip install poetry==1.2.0b1
       - poetry config virtualenvs.create false
-      - poetry install --with docs
+      - poetry lock --no-update
+      - poetry install --with docs --without dev
