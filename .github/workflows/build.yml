@@ -33,5 +33,4 @@ jobs:
     - name: Verify that we can build the package
       run: poetry build
     - name: Test with pytest
-      run: |
-        poetry run pytest
+      run: poetry run pytest

@@ -23,7 +23,9 @@ matplotlib = "^3.6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
+pytest-cov = "^2.12.1"
 matplotlib = "^3.6.0"
+prospector = {version = "^1.7.6", extras = ["with_pyroma"]}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
