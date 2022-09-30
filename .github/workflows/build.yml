@@ -4,9 +4,9 @@ name: Python package
 
 on:
   push:
-    branches: [ "luisaforozco-test_build_action" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "luisaforozco-test_build_action" ]
+    branches: [ "main" ]
 
 jobs:
   build:
