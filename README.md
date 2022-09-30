@@ -14,7 +14,7 @@
 | (2/5) license                      | [![github license badge](https://img.shields.io/github/license/GrainLearning/grainlearning)](https://github.com/GrainLearning/grainlearning) |
 | (3/5) community registry           | [![RSD](https://img.shields.io/badge/rsd-grainlearning-00a3e3.svg)](https://research-software-directory.org/projects/granular-materials) [![workflow pypi badge](https://img.shields.io/pypi/v/grainlearning.svg?colorB=blue)](https://pypi.python.org/project/grainlearning/) |
 | (4/5) citation                     | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123966.svg)](https://doi.org/10.5281/zenodo.7123966) |
-| (5/5) checklist                    | [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/en/projects/6533/badge)](https://bestpractices.coreinfrastructure.org/projects/en/projects/6533) |
+| (5/5) checklist                    | [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/6533/badge)](https://bestpractices.coreinfrastructure.org/projects/6533) |
 | howfairis                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
 | **Other best practices**           | &nbsp; |
 | Documentation                      | [![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest) |
