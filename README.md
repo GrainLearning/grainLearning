@@ -6,9 +6,6 @@
 |Contacts |h.cheng@utwente.nl |
 |Version|1.0.1 |
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123966.svg)](https://doi.org/10.5281/zenodo.7123966)
-[![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest)
-
 
 ## Badges
 
