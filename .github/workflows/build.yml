@@ -51,6 +51,6 @@ jobs:
           poetry lock --no-update
           poetry install
       - name: Check style against standards using prospector
-        run: prospector
+        run: poetry run prospector
       - name: Check import order
         run: isort --check-only grainlearning --diff
