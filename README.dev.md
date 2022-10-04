@@ -9,13 +9,11 @@ This section describes how to make a release in 3 parts:
 
 1. Update the <CHANGELOG.md> (don't forget to update links at bottom of page)
 2. Verify that the information in `CITATION.cff` is correct, and that `.zenodo.json` contains equivalent data
-3. Update the version: Bumping the version across all files is done with [bumpversion](https://github.com/c4urself/bump2version), e.g.
-
-```shell
-bumpversion major
-bumpversion minor
-bumpversion patch
-```
+3. Update the version in different places (Non -exhaustive check-list) :
+- CITATION.cff
+- docs/source/conf.py
+- pyproject.toml
+- README.md
 4. Run the unit tests with `poetry run pytest -v`
 
 ### (2/3) PyPI

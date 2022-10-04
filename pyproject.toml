@@ -21,7 +21,7 @@ sphinx-autodoc-typehints = "^1.19.2"
 [tool.poetry.group.visual.dependencies]
 matplotlib = "^3.6.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^6.2.4"
 pytest-cov = "^2.12.1"
 matplotlib = "^3.6.0"
