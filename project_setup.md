@@ -24,7 +24,7 @@ This repository is set up with Python versions:
 
 ### Install using pip
 
-1. Clone the repository: https://github.com/GrainLearning/grainLearning.git
+1. Clone the repository: ` git clone https://github.com/GrainLearning/grainLearning.git`
 1. `cd grainLearning`
 1. We recomend to work on an environment conda or any other python environment manager
   `conda create --name grainlearning python=3.8`
@@ -33,22 +33,32 @@ This repository is set up with Python versions:
 1. Additionally you'll need to install matplotlib to do some plotting: `pip install matplotlib`
 
 ## Packaging/One command install
-
-You can distribute your code using PyPI.
-
-### For developers: (Needs to be tested)
-We can distribute grainLearning using Pypi as follows:
-1. poetry publish --build
-This will by defaukt register the package to pypi. You'll need to put your pypi username and password, alternatively you can pass the as -u and -p, respectively. More info [here](https://python-poetry.org/docs/cli/#build).
+TODO
+```shell
+pip install grainlearning
+```
 
 ## Testing and code coverage
 
-Instructions to run the tests
+To run the tests:
+``` shell
+poetry run pytest -v
+```
+
+To create a file coverage.xml with the information of the code coverage:
+``` shell
+poetry run coverage xml
+```
+
+To create a more complete output of tests and coverage:
+``` shell
+poetry run pytest --cov --cov-report term --cov-report xml --junitxml=xunit-result.xml tests/ 
+```
 
 ## Documentation
 
 ### Online:
-You can check the documentation here (TODO)
+You can check the documentation [here](https://grainlearning.readthedocs.io/en/latest/)
 
 ### Create the documentation using poetry
 1. You need to be in the same `poetry shell` used to install grainlearning, or repeat the process to install using poetry.
@@ -67,7 +77,6 @@ TODO: integration of sonarcloud
 ## Package version number
 
 TODO: update
-
 
 ## CHANGELOG.md
 
