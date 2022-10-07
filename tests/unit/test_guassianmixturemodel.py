@@ -15,9 +15,6 @@ def test_init():
 
     gmm_dct_dct = gmm_dct.__dict__
 
-    gmm_cls_dct.pop("gmm")
-
-    gmm_dct_dct.pop("gmm")
 
     np.testing.assert_equal(gmm_dct.__dict__, gmm_cls.__dict__)
 
