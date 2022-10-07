@@ -88,10 +88,13 @@ class CalibrationToolbox:
         """
         for self.curr_iter in range(self.num_iter):
             print(f"Calibration step {self.curr_iter}")
-            self.model.run()
-            self.calibration.solve(self.model)
-            self.sigma_list.append( self.model.sigma_max)
+            self.next()
 
+    def next(self):
+        self.model.run()
+        self.calibration.solve(self.model)
+        self.sigma_list.append( self.model.sigma_max)
+    
     @classmethod
     def from_dict(
         cls: Type["CalibrationToolbox"],
