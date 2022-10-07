@@ -113,6 +113,7 @@ class IterativeBayesianFilter:
 
         :param model: Model class
         """
+        model.param_data_prev = model.param_data
         model.param_data = self.sampling.regenerate_params(self.posterior_ibf, model)
 
     def solve(self, model: Type["Model"]):

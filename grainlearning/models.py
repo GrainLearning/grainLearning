@@ -62,6 +62,9 @@ class Model:
 
     #: Parameter data of shape (num_samples, num_params)
     param_data: np.ndarray
+    
+    #: Parameter data of previous iteration
+    param_data_prev: np.ndarray
 
     #: Number of parameters
     num_params: int
@@ -213,6 +216,7 @@ class Model:
                 )
 
         self.param_data = np.array(param_table, ndmin=2)
+        self.param_data_prev = self.param_data
 
     @classmethod
     def from_dict(cls: Type["Model"], obj: dict) -> Type["Model"]:
