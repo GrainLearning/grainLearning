@@ -38,7 +38,7 @@ calibration = CalibrationToolbox.from_dict(
         "model": {
             "param_mins": [0, 0],
             "param_maxs": [1, 10],
-            "num_samples": 14,
+            "num_samples": 13,
             "obs_data": y_obs,
             "ctrl_data": x_obs,
             "callback": run_sim,
