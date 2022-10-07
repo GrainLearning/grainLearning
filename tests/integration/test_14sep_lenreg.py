@@ -13,7 +13,7 @@ x_obs = np.arange(100)
 
 y_obs = 0.2* x_obs + 5.0
 
-y_obs += np.random.rand(100) * 2.5
+#y_obs += np.random.rand(100) * 2.5
 
 
 def run_sim(model):
@@ -53,29 +53,30 @@ calibration = CalibrationToolbox.from_dict(
 calibration.run()
 
 #%%
-print(calibration.model.param_data)
+print(f'All parameter samples at the last iteration:\n {calibration.model.param_data}')
 
 #%%
 plt.plot( np.arange(calibration.num_iter),calibration.sigma_list)
 #%%
 # calibration.sigma_list,len(calibration.sigma_list),calibration.num_iter
-print(calibration.sigma_list)
+# print(calibration.sigma_list)
 
 # %%
 most_prob = np.argmax(calibration.calibration.proposal_ibf)
 
 # %%
-calibration.model.param_data[most_prob]
+most_prob_params = calibration.model.param_data[most_prob] 
+
+print(f'Most probable parameter values: {most_prob_params}')
 # %%
 
 #tests
-error_tolerance = 0.001
+error_tolerance = 0.01
 
 #1. Testing values of parameters
-for params in calibration.model.param_data:
-    error = params - [0.2,5.0]
-    assert error[0] < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {params[0]}"
-    assert error[1] < error_tolerance, f"Model parameters are not correct, expected 0.5 but got {params[1]}"
+error = most_prob_params - [0.2,5.0]
+assert abs(error[0])/0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
+assert abs(error[1])/5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
 
 #2. Checking sigma
 assert calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
