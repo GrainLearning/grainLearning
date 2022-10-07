@@ -53,7 +53,7 @@ calibration = CalibrationToolbox.from_dict(
 calibration.run()
 
 #%%
-print(f'All parameter samples at the last iteration:\n {calibration.model.param_data}')
+print(f'All parameter samples at the last iteration:\n {calibration.model.param_data_prev}')
 
 #%%
 plt.plot( np.arange(calibration.num_iter),calibration.sigma_list)
@@ -62,10 +62,10 @@ plt.plot( np.arange(calibration.num_iter),calibration.sigma_list)
 # print(calibration.sigma_list)
 
 # %%
-most_prob = np.argmax(calibration.calibration.proposal_ibf)
+most_prob = np.argmax(calibration.calibration.posterior_ibf)
 
 # %%
-most_prob_params = calibration.model.param_data[most_prob] 
+most_prob_params = calibration.model.param_data_prev[most_prob] 
 
 print(f'Most probable parameter values: {most_prob_params}')
 # %%
@@ -80,3 +80,5 @@ assert abs(error[1])/5.0 < error_tolerance, f"Model parameters are not correct, 
 
 #2. Checking sigma
 assert calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
+
+# %%
