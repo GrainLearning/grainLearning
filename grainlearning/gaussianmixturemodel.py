@@ -89,16 +89,6 @@ class GaussianMixtureModel:
         else:
             self.prior_weight = prior_weight
 
-        self.gmm = BayesianGaussianMixture(
-            n_components=self.max_num_components,
-            weight_concentration_prior=self.prior_weight,
-            covariance_type=self.cov_type,
-            tol=self.tol,
-            max_iter=int(self.max_iter),
-            n_init=self.n_init,
-            random_state=self.seed,
-        )
-
     @classmethod
     # TODO: with this class method, GaussianMixtureModel has only one argument, can we use **kwargs to allow more user input?
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
@@ -153,6 +143,16 @@ class GaussianMixtureModel:
         """
         expanded_normalized_params, max_params = self.expand_weighted_parameters(
             posterior_weight, model
+        )
+
+        self.gmm = BayesianGaussianMixture(
+            n_components=self.max_num_components,
+            weight_concentration_prior=self.prior_weight,
+            covariance_type=self.cov_type,
+            tol=self.tol,
+            max_iter=int(self.max_iter),
+            n_init=self.n_init,
+            random_state=self.seed,
         )
 
         self.gmm.fit(expanded_normalized_params)
