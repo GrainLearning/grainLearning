@@ -1,7 +1,7 @@
 # %%
 
 import numpy as np
-from typing import Type
+from typing import Type, List
 
 from .models import Model
 
@@ -58,6 +58,9 @@ class IterativeBayesianFilter:
 
     #: The gaussian mixture model class is used to sample the parameters
     sampling = Type["GaussianMixtureModel"]
+    
+    #: list of parameter data of shape (num_samples, num_params) from all iterations 
+    list_of_param_data: List = []
 
     #: This a tolerance to which the optimization algorithm converges.
     ess_tol: float = 1.0e-2
@@ -108,12 +111,19 @@ class IterativeBayesianFilter:
 
         self.posterior_ibf = self.inference.give_posterior()
 
+    def initialize(self, model: Type["Model"]):
+        """Resample the parameters using the Gaussian mixture model
+
+        :param model: Model class
+        """
+        self.list_of_param_data.append(self.sampling.generate_params_halton(model))
+
     def run_sampling(self, model: Type["Model"]):
         """Resample the parameters using the Gaussian mixture model
 
         :param model: Model class
         """
-        model.param_data = self.sampling.regenerate_params(self.posterior_ibf, model)
+        self.list_of_param_data.append(self.sampling.regenerate_params(self.posterior_ibf, model))
 
     def solve(self, model: Type["Model"]):
         """Run both inference and sampling on a model
@@ -122,3 +132,6 @@ class IterativeBayesianFilter:
         """
         self.run_inference(model)
         self.run_sampling(model)
+
+    def add_curr_param_data_to_list(self, param_data: np.ndarray):
+        self.list_of_param_data.append(param_data)

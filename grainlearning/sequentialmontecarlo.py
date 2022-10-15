@@ -98,7 +98,7 @@ class SequentialMonteCarlo:
 
         # scale with the maximum of the loading steps
         if self.scale_cov_with_max:
-            cov_matrices *= model.obs_data.max(axis=1)[:, None]
+            cov_matrices *= model.obs_data.max(axis=1)[:, None] ** 2
         else:
             # or element wise multiplication of covariant matrix with observables of all loading steps
             cov_matrices *= model.obs_data.T[:, None] ** 2

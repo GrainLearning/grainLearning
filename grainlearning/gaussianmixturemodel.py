@@ -142,6 +142,25 @@ class GaussianMixtureModel:
 
         return normalized_parameters, max_params
 
+    # TODO: this should go to the sampling class
+    def generate_params_halton(self, model: Type["Model"]) -> np.ndarray:
+        """Generate a Halton table of the parameters"""
+
+        from scipy.stats import qmc
+
+        halton_sampler = qmc.Halton(model.num_params, scramble=False)
+        param_table = halton_sampler.random(n=model.num_samples)
+
+        for param_i in range(model.num_params):
+            for sim_i in range(model.num_samples):
+                mean = 0.5 * (model.param_maxs[param_i] + model.param_mins[param_i])
+                std = 0.5 * (model.param_maxs[param_i] - model.param_mins[param_i])
+                param_table[sim_i][param_i] = (
+                        mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
+                )
+
+        return np.array(param_table, ndmin=2)
+
     def regenerate_params(
             self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> np.ndarray:
@@ -161,7 +180,7 @@ class GaussianMixtureModel:
 
         # resample until all parameters are within min and max bounds, is there a better way to do this?
         # TODO: we can just sample normally and take out those that are out of bounds. The while loop might be slow
-        while True:
+        while True and model.param_mins and model.param_maxs:
             new_params, _ = self.gmm.sample(model.num_samples)
             new_params *= max_params
 

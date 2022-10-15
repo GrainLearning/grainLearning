@@ -34,13 +34,15 @@ def run_sim(model):
 
 calibration = CalibrationToolbox.from_dict(
     {
-        "num_iter": 8,
+        "num_iter": 10,
         "model": {
             "param_mins": [0, 0],
             "param_maxs": [1, 10],
+            "param_names": ['a', 'b'],
             "num_samples": 14,
             "obs_data": y_obs,
             "ctrl_data": x_obs,
+            "sim_name":'linear',
             "callback": run_sim,
         },
         "calibration": {
@@ -57,6 +59,7 @@ print(f'All parameter samples at the last iteration:\n {calibration.model.param_
 
 #%%
 plt.plot( np.arange(calibration.num_iter),calibration.sigma_list)
+plt.show()
 #%%
 # calibration.sigma_list,len(calibration.sigma_list),calibration.num_iter
 # print(calibration.sigma_list)
