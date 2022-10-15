@@ -177,7 +177,7 @@ def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4,
 
     dim = len(keys)
     # resample parameters from a proposal probability distribution
-    ResampleIndices = unWeighted_resample(proposal, 10 * num)
+    ResampleIndices = unweighted_resample(proposal, 10 * num)
     newSMcSamples = smcSamples[ResampleIndices]
 
     # normalize parameter samples
@@ -258,7 +258,7 @@ def get_pool(mpi=False, threads=1):
         raise RuntimeError("Wrong arguments: either mpi=True or threads>1.")
     return pool
 
-def unWeighted_resample(weights,N):
+def unweighted_resample(weights,N):
     # take int(N*w) copies of each weight, which ensures particles with the same weight are drawn uniformly
     num_copies = (np.floor(N*np.asarray(weights))).astype(int)
     indexes = np.zeros(sum(num_copies), 'i')

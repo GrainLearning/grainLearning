@@ -16,7 +16,7 @@ calibration = CalibrationToolbox.from_dict(
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'linear',
-            "sim_data_dir": '/home/xfan/grainLearning/WorkWithOtherCodes/SimData',
+            "sim_data_dir": './tests/data/linear_sim_data',
             "param_data_file": 'smcTable0.txt',
             "param_names": ['a', 'b'],
         },
