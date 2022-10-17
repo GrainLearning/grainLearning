@@ -388,7 +388,7 @@ def residual_resample(weights, expand_num=10):
 
 
 
-def stratified_resample(weights, expand_num=100):
+def stratified_resample(weights, expand_num=10):
     """ Performs the stratified resampling algorithm used by particle filters.
     This algorithms aims to make selections relatively uniformly across the
     particles. It divides the cumulative sum of the weights into N equal

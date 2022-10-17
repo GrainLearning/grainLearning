@@ -49,7 +49,7 @@ calibration = CalibrationToolbox.from_dict(
             "inference": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
-                "n_init": 100,
+                "n_init": 1,
                 "seed": 0,
             }
         }
