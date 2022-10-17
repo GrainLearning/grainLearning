@@ -65,31 +65,3 @@ def test_run_model():
             [[11, 24, 4, 3]],
         ],
     )
-
-
-def test_generate_halton():
-    """Test the Parameters class if the generated halton sequence is between mins and maxs"""
-    model_cls = Model.from_dict(
-        {
-            "param_mins": [1, 2],
-            "param_maxs": [3, 4],
-            "obs_data": [2, 4, 6, 7],
-            "ctrl_data": [1, 2, 3, 4],
-            "num_samples": 2,
-        }
-    )
-
-    print(model_cls.param_data)
-    
-    assert all(
-        model_cls.param_data[:, 1] >= 2 - 0.0000001
-    ), "parameter 1 min out of range"
-    assert all(
-        model_cls.param_data[:, 1] <= 4 + 0.0000001
-    ), "parameter 1 max out of range"
-    assert all(
-        model_cls.param_data[:, 0] >= 1 - 0.0000001
-    ), "parameter 2 min out of range"
-    assert all(
-        model_cls.param_data[:, 0] <= 3 + 0.0000001
-    ), "parameter 3 max out of range"

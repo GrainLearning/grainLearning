@@ -57,6 +57,8 @@ def test_run_inference():
     )
     print(model_cls.sigma_max)
 
+    ibf_cls.initialize(model=model_cls)
+
     ibf_cls.run_inference(model=model_cls)
 
     assert True

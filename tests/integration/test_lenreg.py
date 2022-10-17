@@ -39,7 +39,7 @@ calibration = CalibrationToolbox.from_dict(
             "param_mins": [0, 0],
             "param_maxs": [1, 10],
             "param_names": ['a', 'b'],
-            "num_samples": 14,
+            "num_samples": 20,
             "obs_data": y_obs,
             "ctrl_data": x_obs,
             "sim_name":'linear',
@@ -47,7 +47,11 @@ calibration = CalibrationToolbox.from_dict(
         },
         "calibration": {
             "inference": {"ess_target": 0.3},
-            "sampling": {"max_num_components": 1},
+            "sampling": {
+                "max_num_components": 1,
+                "n_init": 100,
+                "seed": 0,
+            }
         }
     }
 )
@@ -58,14 +62,14 @@ calibration.run()
 print(f'All parameter samples at the last iteration:\n {calibration.model.param_data}')
 
 #%%
-plt.plot( np.arange(calibration.num_iter),calibration.sigma_list)
-plt.show()
+# plt.plot( np.arange(calibration.num_iter),calibration.sigma_list); plt.show()
+
 #%%
 # calibration.sigma_list,len(calibration.sigma_list),calibration.num_iter
 # print(calibration.sigma_list)
 
 # %%
-most_prob = np.argmax(calibration.calibration.proposal_ibf)
+most_prob = np.argmax(calibration.calibration.posterior_ibf)
 
 # %%
 most_prob_params = calibration.model.param_data[most_prob] 

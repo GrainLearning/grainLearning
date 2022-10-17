@@ -189,8 +189,8 @@ class Model:
 
         #### Parameters ####
 
-        self.num_params = len(param_names)
-        
+        if param_mins: self.num_params = len(param_mins)
+
         self.param_data = param_data
 
         self.param_names = param_names
@@ -355,6 +355,8 @@ class IOModel(Model):
 
         ##### Parameters #####
 
+        self.num_params = len(param_names)
+        
         self.param_data_file = param_data_file
 
         #### Observations ####

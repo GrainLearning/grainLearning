@@ -124,6 +124,7 @@ class IterativeBayesianFilter:
         :param model: Model class
         """
         self.list_of_param_data.append(self.sampling.regenerate_params(self.posterior_ibf, model))
+        # self.list_of_param_data.append(self.sampling.regenerate_params_with_gmm(self.posterior_ibf, model))
 
     def solve(self, model: Type["Model"]):
         """Run both inference and sampling on a model

@@ -7,6 +7,7 @@ import sys, os
 import numpy as np
 from sklearn import mixture
 import subprocess
+from typing import Type, List, Callable, Tuple
 
 def startSimulations(platform,software,tableName,fileName):   
  #platform desktop, aws or rcg    # software so far only yade 
@@ -118,6 +119,99 @@ def get_keys_and_data(fileName):
     return keysAndData
 
 
+def regenerate_params_with_gmm(
+        proposal: np.ndarray,
+        param_data: np.ndarray,
+        num: int,
+        max_num_components: int,
+        prior_weight: float,
+        cov_type: str = "full",
+        resample_to_unweighted: Callable = None,
+        param_mins: List[float] = None,
+        param_maxs: List[float] = None,
+        n_init = 1,
+        tol = 0.001,
+        max_iter = 100,
+        seed = None,
+    ) -> np.ndarray:
+    """
+    Resample parameters using a variational Gaussian mixture model
+
+    :param proposal: ndarray of shape model.num_samples
+        proposal probability distribution associated to the current parameter data
+    
+    :param param_data: ndarray of shape (model.num_samples, model.num_params)
+        current parameter data
+
+    :param num: int
+        number of samples for the resampling
+
+    :param max_num_components: int, default = num/10
+
+    :param prior_weight: float, default = 1./maxNumComponents
+        weight_concentration_prior of the BayesianGaussianMixture class
+        The dirichlet concentration of each component on the weight distribution (Dirichlet).
+        This is commonly called gamma in the literature.
+        The higher concentration puts more mass in the center and will lead to more components being active,
+        while a lower concentration parameter will lead to more mass at the edge of the mixture weights simplex.
+        (https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
+
+    :param cov_type: string, default = 'full'
+        covariance_type of the BayesianGaussianMixture class
+        String describing the type of covariance parameters to use. Must be one of:
+        'full' (each component has its own general covariance matrix),
+        'tied' (all components share the same general covariance matrix),
+        'diag' (each component has its own diagonal covariance matrix),
+        'spherical' (each component has its own single variance).
+        (https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
+
+    :param resample_to_unweighted: Callable
+        Function to expand samples from weighted to unweighted
+
+    :param param_mins: list
+        lower bound of the parameter values
+
+    :param param_maxs: list
+        uper bound of the parameter values
+
+    :param seed: int
+        random generation seed, defaults to None
+
+    :return:
+        new_param_data: ndarray, parameter samples for the next iteration
+
+        gmm: BayesianGaussianMixture
+            A variational Gaussian mixture model trained with current parameter samples and proposal probabilities
+    """
+
+    # expand the parameters from a proposal distribution represented via importance sampling
+    indices = resample_to_unweighted(proposal)
+    expanded_param_data = param_data[indices]
+
+    # normalize parameter samples
+    max_params = np.amax(expanded_param_data, axis=0)  # find max along axis
+
+    expanded_param_data = (
+            expanded_param_data / max_params
+    )  # and do array broadcasting to divide by max
+
+    gmm = mixture.BayesianGaussianMixture(
+        n_components=max_num_components,
+        weight_concentration_prior=prior_weight,
+        covariance_type=cov_type,
+        n_init = n_init,
+        tol = tol,
+        max_iter = max_iter,
+        random_state = seed,
+    )
+
+    gmm.fit(expanded_param_data)
+    new_param_data, _ = gmm.sample(num)
+    new_param_data *= max_params
+
+    return new_param_data, gmm
+
+
 def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4, maxNumComponents=10, priorWeight=0,
                          covType='full', tableName='smcTableNew.txt',seed=0,simNum=0):
     """
@@ -177,7 +271,7 @@ def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4,
 
     dim = len(keys)
     # resample parameters from a proposal probability distribution
-    ResampleIndices = unweighted_resample(proposal, 10 * num)
+    ResampleIndices = unweighted_resample(proposal)
     newSMcSamples = smcSamples[ResampleIndices]
 
     # normalize parameter samples
@@ -224,7 +318,6 @@ def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4,
     writeToTable(tableName, newSMcSamples, dim, num, threads, keys,simNum)
     return newSMcSamples, tableName, gmm, maxNumComponents
 
-
 def getGMMFromPosterior(smcSamples, posterior, n_components, priorWeight, covType='full',seed=0):
     """
     Train a Gaussian mixture model from the posterior distribution
@@ -258,8 +351,9 @@ def get_pool(mpi=False, threads=1):
         raise RuntimeError("Wrong arguments: either mpi=True or threads>1.")
     return pool
 
-def unweighted_resample(weights,N):
+def unweighted_resample(weights, expand_num=10):
     # take int(N*w) copies of each weight, which ensures particles with the same weight are drawn uniformly
+    N = len(weights)*expand_num
     num_copies = (np.floor(N*np.asarray(weights))).astype(int)
     indexes = np.zeros(sum(num_copies), 'i')
     k = 0
@@ -269,15 +363,15 @@ def unweighted_resample(weights,N):
             k += 1
     return indexes
 
-def residual_resample(weights):
-    N = len(weights)
+def residual_resample(weights, expand_num=10):
+    N = len(weights)*expand_num
     indexes = np.zeros(N, 'i')
 
     # take int(N*w) copies of each weight, which ensures particles with the
     # same weight are drawn uniformly
     num_copies = (np.floor(N*np.asarray(weights))).astype(int)
     k = 0
-    for i in range(N):
+    for i in range(len(weights)):
         for _ in range(num_copies[i]): # make n copies
             indexes[k] = i
             k += 1
@@ -288,13 +382,13 @@ def residual_resample(weights):
     residual /= sum(residual)           # normalize
     cumulative_sum = np.cumsum(residual)
     cumulative_sum[-1] = 1. # avoid round-off errors: ensures sum is exactly one
-    indexes[k:N] = np.searchsorted(cumulative_sum, random(N-k))
+    indexes[k:N] = np.searchsorted(cumulative_sum, np.random.random(N-k))
 
     return indexes
 
 
 
-def stratified_resample(weights):
+def stratified_resample(weights, expand_num=100):
     """ Performs the stratified resampling algorithm used by particle filters.
     This algorithms aims to make selections relatively uniformly across the
     particles. It divides the cumulative sum of the weights into N equal
@@ -313,7 +407,7 @@ def stratified_resample(weights):
 
     N = len(weights)
     # make N subdivisions, and chose a random position within each one
-    positions = (random(N) + range(N)) / N
+    positions = (np.random.random(N) + range(N)) / N
 
     indexes = np.zeros(N, 'i')
     cumulative_sum = np.cumsum(weights)
@@ -327,7 +421,7 @@ def stratified_resample(weights):
     return indexes
 
 
-def systematic_resample(weights):
+def systematic_resample(weights, expand_num=10):
     """ Performs the systemic resampling algorithm used by particle filters.
     This algorithm separates the sample space into N divisions. A single random
     offset is used to to choose where to sample from for all divisions. This
@@ -345,7 +439,7 @@ def systematic_resample(weights):
     N = len(weights)
 
     # make N subdivisions, and choose positions with a consistent random offset
-    positions = (random() + np.arange(N)) / N
+    positions = (np.random.random() + np.arange(N)) / N
 
     indexes = np.zeros(N, 'i')
     cumulative_sum = np.cumsum(weights)
@@ -359,7 +453,7 @@ def systematic_resample(weights):
     return indexes
 
 
-def multinomial_resample(weights):
+def multinomial_resample(weights, expand_num=10):
     """ This is the naive form of roulette sampling where we compute the
     cumulative sum of the weights and then use binary search to select the
     resampled point based on a uniformly distributed random number. Run time
@@ -378,7 +472,7 @@ def multinomial_resample(weights):
     """
     cumulative_sum = np.cumsum(weights)
     cumulative_sum[-1] = 1.  # avoid round-off errors: ensures sum is exactly one
-    return np.searchsorted(cumulative_sum, random(len(weights)))
+    return np.searchsorted(cumulative_sum, np.random.random(len(weights)*expand_num))
 
 def estimate_gmm(X, num_components, method='EM'):
     # bring data into shogun representation (note that Shogun data is in column vector form, so transpose)

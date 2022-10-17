@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 
 from .models import Model
-
+from .tools import regenerate_params_with_gmm, unweighted_resample
 
 class GaussianMixtureModel:
     """This class is used for the inference (sampling) of parameters using a variational Gaussian mixture model.
@@ -52,7 +52,7 @@ class GaussianMixtureModel:
 
     cov_type: str = "full"
 
-    n_init: int = 100
+    n_init: int = 1
 
     tol: float = 1.0e-3
 
@@ -69,7 +69,7 @@ class GaussianMixtureModel:
             max_num_components,
             prior_weight: int = None,
             cov_type: str = "full",
-            n_init: int = 100,
+            n_init: int = 1,
             tol: float = 1.0e-5,
             max_iter: int = 100000,
             expand_weight: int = 10,
@@ -107,7 +107,7 @@ class GaussianMixtureModel:
             max_num_components=obj["max_num_components"],
             prior_weight=obj.get("prior_weight", None),
             cov_type=obj.get("cov_type", "full"),
-            n_init=obj.get("n_init", 100),
+            n_init=obj.get("n_init", 1),
             tol=obj.get("tol", 1.0e-5),
             max_iter=obj.get("max_iter", 100000),
             seed=obj.get("seed", None),
@@ -159,7 +159,9 @@ class GaussianMixtureModel:
                         mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
                 )
 
-        return np.array(param_table, ndmin=2)
+        model.param_data = np.array(param_table, ndmin=2)
+
+        return model.param_data
 
     def regenerate_params(
             self, posterior_weight: np.ndarray, model: Type["Model"]
@@ -175,19 +177,60 @@ class GaussianMixtureModel:
         )
 
         self.gmm.fit(expanded_normalized_params)
+        minimum_num_samples = model.num_samples
+
+        new_params = self.get_samples_within_bounds(model, max_params)
+
+        # resample until all parameters are within the upper and lower bounds
+        while (model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples):
+            model.num_samples *= 1.1
+            new_params = self.get_samples_within_bounds(model, max_params)
+
+        model.num_samples = new_params.shape[0]
+
+        return new_params
+
+    def get_samples_within_bounds(
+            self, model: Type["Model"], max_params
+    ) -> np.ndarray:
         new_params, _ = self.gmm.sample(model.num_samples)
         new_params *= max_params
-
-        # resample until all parameters are within min and max bounds, is there a better way to do this?
-        # TODO: we can just sample normally and take out those that are out of bounds. The while loop might be slow
-        while True and model.param_mins and model.param_maxs:
-            new_params, _ = self.gmm.sample(model.num_samples)
-            new_params *= max_params
-
+        
+        if model.param_mins and model.param_maxs:
             params_above_min = new_params > np.array(model.param_mins)
             params_below_max = new_params < np.array(model.param_maxs)
+            bool_array = params_above_min & params_below_max
+            indices = bool_array[:,0]
+            for i in range(model.num_params-1):
+                indices = np.logical_and(indices, bool_array[:,i+1])
+            return new_params[indices]
+        else:
+            return new_params
 
-            if params_above_min.all() & params_below_max.all():
-                break
+    def regenerate_params_with_gmm(
+            self, posterior_weight: np.ndarray, model: Type["Model"]
+    ) -> np.ndarray:
+        """Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)
+
+        :param posterior_weight: Posterior found by the data assimulation
+        :param model: Model class
+        :return: Expanded parameters
+        """
+
+        new_params, self.gmm = regenerate_params_with_gmm(
+            posterior_weight,
+            model.param_data,
+            model.num_samples,
+            self.max_num_components,
+            self.prior_weight,
+            self.cov_type,
+            unweighted_resample,
+            model.param_mins,
+            model.param_maxs,
+            self.n_init,
+            self.tol,
+            self.max_iter,
+            self.seed,
+        )
 
         return new_params

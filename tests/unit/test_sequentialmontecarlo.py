@@ -1,7 +1,7 @@
 #%%
 import numpy as np
 
-from grainlearning import SequentialMonteCarlo, Model
+from grainlearning import SequentialMonteCarlo, Model, GaussianMixtureModel
 
 
 def test_smc_init():
@@ -37,9 +37,9 @@ def test_get_covariance_matrix():
     np.testing.assert_array_almost_equal(
         cov_matrices,
         [
-            [[1200.0, 0.0], [0.0, 1200.0]],
-            [[1200.0, 0.0], [0.0, 1200.0]],
-            [[1200.0, 0.0], [0.0, 1200.0]],
+            [[14400.0, 0.0], [0.0, 14400.0]],
+            [[14400.0, 0.0], [0.0, 14400.0]],
+            [[14400.0, 0.0], [0.0, 14400.0]],
         ],
     )
 
@@ -130,15 +130,34 @@ def test_ips_covs():
         obs_data=[[100, 200, 300], [30, 10, 5]],
         num_samples=5,
     )
+    
+    gmm_cls = GaussianMixtureModel(max_num_components=1)
+
+    gmm_cls.generate_params_halton(model_cls)
 
     posteriors = np.array(
         [
-            [0.2, 0.2, 0.2, 0.2, 0.2],
-            [0.2, 0.2, 0.2, 0.2, 0.2],
-            [0.2, 0.2, 0.2, 0.2, 0.2],
+            [0.1, 0.2, 0.3, 0.2, 0.2],
+            [0.2, 0.1, 0.2, 0.3, 0.1],
+            [0.3, 0.2, 0.2, 0.1, 0.2],
         ]
     )
     ips, covs = smc_cls.get_ensamble_ips_covs(model=model_cls, posteriors=posteriors)
 
-    assert ips.shape == (3, 2)
-    assert covs.shape == (3, 2)
+    np.testing.assert_array_almost_equal(
+        ips,
+        [    
+            [4.8, 5.02222222],
+            [4.5, 3.75555556],
+            [4., 4.4],
+        ],
+    )
+
+    np.testing.assert_array_almost_equal(
+        covs,
+        [
+            [0.4145781, 0.3729435 ],
+            [0.51759176, 0.51966342],
+            [0.48733972, 0.45218241],
+        ],
+    )

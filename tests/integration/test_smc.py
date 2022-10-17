@@ -38,6 +38,7 @@ posterior_ref = posterior_ref.T
 #%% 
 # reproduce the result with a given sigma value
 calibration.load_and_process(sigma_ref)
+# ~ calibration.load_and_run_one_iteration()
 posterior = calibration.calibration.inference.posteriors
 
 #%%
