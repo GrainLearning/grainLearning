@@ -91,7 +91,6 @@ class CalibrationToolbox:
         2. The following iterations continue by sampling parameter space, until certain criterion is met.
         """
         print(f"Calibration step {self.curr_iter}")
-        self.calibration.initialize(self.model)
         self.run_one_iteration()
 
         for i in range(self.num_iter-1):
@@ -102,11 +101,14 @@ class CalibrationToolbox:
                 self.num_iter = self.curr_iter + 1
                 break
 
-    def run_one_iteration(self):
+    def run_one_iteration(self, index: int = -1):
         """Run GrainLearning for one iteration.
         TODO: more docu needed
         """
-        self.model.param_data = self.calibration.list_of_param_data[-1]
+        if self.curr_iter == 0: self.calibration.initialize(self.model)
+        self.model.param_data = self.calibration.list_of_param_data[index]
+        self.model.num_samples = self.model.param_data.shape[0]
+
         self.model.run()
         self.calibration.solve(self.model)
         self.sigma_list.append(self.model.sigma_max)
@@ -137,7 +139,7 @@ class CalibrationToolbox:
         resampled_param_data = self.calibration.list_of_param_data[-1]
         np.save(f'./{self.model.sim_name}_table_{self.curr_iter + 1}.npy',resampled_param_data)
         return resampled_param_data
-
+    
     @classmethod
     def from_dict(
         cls: Type["CalibrationToolbox"],

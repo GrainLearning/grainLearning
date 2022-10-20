@@ -89,16 +89,6 @@ class GaussianMixtureModel:
         else:
             self.prior_weight = prior_weight
 
-        self.gmm = BayesianGaussianMixture(
-            n_components=self.max_num_components,
-            weight_concentration_prior=self.prior_weight,
-            covariance_type=self.cov_type,
-            tol=self.tol,
-            max_iter=int(self.max_iter),
-            n_init=self.n_init,
-            random_state=self.seed,
-        )
-
     @classmethod
     # TODO: with this class method, GaussianMixtureModel has only one argument, can we use **kwargs to allow more user input?
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
@@ -176,24 +166,33 @@ class GaussianMixtureModel:
             posterior_weight, model
         )
 
+        self.gmm = BayesianGaussianMixture(
+            n_components=self.max_num_components,
+            weight_concentration_prior=self.prior_weight,
+            covariance_type=self.cov_type,
+            tol=self.tol,
+            max_iter=int(self.max_iter),
+            n_init=self.n_init,
+            random_state=self.seed,
+        )
+
         self.gmm.fit(expanded_normalized_params)
         minimum_num_samples = model.num_samples
 
-        new_params = self.get_samples_within_bounds(model, max_params)
+        new_params = self.get_samples_within_bounds(model, model.num_samples, max_params)
 
         # resample until all parameters are within the upper and lower bounds
+        test_num = model.num_samples
         while (model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples):
-            model.num_samples *= 1.1
-            new_params = self.get_samples_within_bounds(model, max_params)
-
-        model.num_samples = new_params.shape[0]
+            test_num *= 1.1
+            new_params = self.get_samples_within_bounds(model, test_num, max_params)
 
         return new_params
 
     def get_samples_within_bounds(
-            self, model: Type["Model"], max_params
+            self, model: Type["Model"], num: int, max_params
     ) -> np.ndarray:
-        new_params, _ = self.gmm.sample(model.num_samples)
+        new_params, _ = self.gmm.sample(num)
         new_params *= max_params
         
         if model.param_mins and model.param_maxs:

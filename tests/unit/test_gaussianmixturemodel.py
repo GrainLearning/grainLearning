@@ -11,14 +11,6 @@ def test_init():
 
     gmm_dct = GaussianMixtureModel.from_dict({"max_num_components": 5})
 
-    gmm_cls_dct = gmm_cls.__dict__
-
-    gmm_dct_dct = gmm_dct.__dict__
-
-    gmm_cls_dct.pop("gmm")
-
-    gmm_dct_dct.pop("gmm")
-
     np.testing.assert_equal(gmm_dct.__dict__, gmm_cls.__dict__)
 
     assert gmm_cls.prior_weight == 1.0 / 5

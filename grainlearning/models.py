@@ -62,6 +62,9 @@ class Model:
 
     #: Parameter data of shape (num_samples, num_params)
     param_data: np.ndarray
+    
+    #: Parameter data of previous iteration
+    param_data_prev: np.ndarray
 
     #: Number of parameters
     num_params: int

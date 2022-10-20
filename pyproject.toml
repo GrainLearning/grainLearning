@@ -3,7 +3,7 @@ name = "GrainLearning"
 version = "2.0.0"
 description = ""
 authors = ["Hongyang Cheng <h.cheng@utwente.nl>",
-"Luisa Orozco <l.orozco@esciencecenter.nl>"]
+"Luisa Orozco <l.orozco@esciencecenter.nl>","Retief Lubbe <r.lubbe@utwente.nl>"]
 readme = "README.md"
 keywords = ["DEM", "Bayesian inference"]
 
@@ -30,3 +30,8 @@ prospector = {version = "^1.7.6", extras = ["with_pyroma"]}
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+packages = [
+    { include = "grainlearning"}
+]

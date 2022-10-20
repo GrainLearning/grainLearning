@@ -87,3 +87,5 @@ assert abs(error[1])/5.0 < error_tolerance, f"Model parameters are not correct, 
 
 #2. Checking sigma
 assert calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
+
+# %%
