@@ -106,7 +106,7 @@ class CalibrationToolbox:
         TODO: more docu needed
         """
         if self.curr_iter == 0: self.calibration.initialize(self.model)
-        self.model.param_data = self.calibration.list_of_param_data[index]
+        self.model.param_data = self.calibration.param_data_list[index]
         self.model.num_samples = self.model.param_data.shape[0]
 
         self.model.run()
@@ -136,7 +136,7 @@ class CalibrationToolbox:
         """
         self.calibration.posterior_ibf = self.calibration.inference.give_posterior()
         self.calibration.run_sampling(self.model)
-        resampled_param_data = self.calibration.list_of_param_data[-1]
+        resampled_param_data = self.calibration.param_data_list[-1]
         np.save(f'./{self.model.sim_name}_table_{self.curr_iter + 1}.npy',resampled_param_data)
         return resampled_param_data
     

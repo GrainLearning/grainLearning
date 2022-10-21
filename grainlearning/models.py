@@ -174,8 +174,6 @@ class Model:
         else:
             self.inv_obs_weight = inv_obs_weight
 
-        inv_obs_mat = np.diagflat(self.inv_obs_weight)
-
         #### Simulations ####
 
         self.num_samples = num_samples
@@ -203,10 +201,8 @@ class Model:
         self.sigma_max = sigma_max
 
         self.sigma_tol = sigma_tol
-
-        self._inv_normalized_sigma = inv_obs_mat * np.linalg.det(inv_obs_mat) ** (
-                -1.0 / inv_obs_mat.shape[0]
-        )
+        
+        self.get_inv_normalized_sigma()
 
     @classmethod
     def from_dict(cls: Type["Model"], obj: dict) -> Type["Model"]:
@@ -241,6 +237,13 @@ class Model:
             raise ValueError("No callback function defined")
 
         self.callback(self)
+
+    def get_inv_normalized_sigma(self):   
+        inv_obs_mat = np.diagflat(self.inv_obs_weight)
+        self._inv_normalized_sigma = inv_obs_mat * np.linalg.det(inv_obs_mat) ** (
+                -1.0 / inv_obs_mat.shape[0]
+        )
+
 
 class IOModel(Model):
     """
@@ -362,6 +365,12 @@ class IOModel(Model):
         
         self.param_data_file = param_data_file
 
+        #### Simulations ####
+        
+        self.sim_name = sim_name
+
+        self.sim_data_dir = sim_data_dir
+
         #### Observations ####
 
         self.obs_data_file = obs_data_file
@@ -370,13 +379,14 @@ class IOModel(Model):
 
         self.obs_names = obs_names
 
-        #### Simulations ####
-        
-        self.sim_name = sim_name
-
-        self.sim_data_dir = sim_data_dir
-
         self.get_obs_data()
+
+        if inv_obs_weight is None:
+            self.inv_obs_weight = list(np.ones(self.num_obs))
+        else:
+            self.inv_obs_weight = inv_obs_weight
+        
+        self.get_inv_normalized_sigma()
 
     @classmethod
     def from_dict(cls: Type["IOModel"], obj: dict) -> Type["IOModel"]:

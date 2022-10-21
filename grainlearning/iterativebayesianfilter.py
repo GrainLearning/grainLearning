@@ -60,7 +60,7 @@ class IterativeBayesianFilter:
     sampling = Type["GaussianMixtureModel"]
     
     #: list of parameter data of shape (num_samples, num_params) from all iterations 
-    list_of_param_data: List = []
+    param_data_list: List = []
 
     #: This a tolerance to which the optimization algorithm converges.
     ess_tol: float = 1.0e-2
@@ -90,7 +90,7 @@ class IterativeBayesianFilter:
             inference=SequentialMonteCarlo.from_dict(obj["inference"]),
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
             ess_tol=obj.get("ess_tol", 1.0e-2),
-            proposal_ibf=obj.get("ess_tol", None),
+            proposal_ibf=obj.get("proposal_ibf", None),
         )
 
     def run_inference(self, model: Type["Model"]):
@@ -116,15 +116,15 @@ class IterativeBayesianFilter:
 
         :param model: Model class
         """
-        self.list_of_param_data.append(self.sampling.generate_params_halton(model))
+        self.param_data_list.append(self.sampling.generate_params_halton(model))
 
     def run_sampling(self, model: Type["Model"]):
         """Resample the parameters using the Gaussian mixture model
 
         :param model: Model class
         """
-        self.list_of_param_data.append(self.sampling.regenerate_params(self.posterior_ibf, model))
-        # self.list_of_param_data.append(self.sampling.regenerate_params_with_gmm(self.posterior_ibf, model))
+        self.param_data_list.append(self.sampling.regenerate_params(self.posterior_ibf, model))
+        # self.param_data_list.append(self.sampling.regenerate_params_with_gmm(self.posterior_ibf, model))
 
     def solve(self, model: Type["Model"]):
         """Run both inference and sampling on a model
@@ -135,4 +135,4 @@ class IterativeBayesianFilter:
         self.run_sampling(model)
 
     def add_curr_param_data_to_list(self, param_data: np.ndarray):
-        self.list_of_param_data.append(param_data)
+        self.param_data_list.append(param_data)
