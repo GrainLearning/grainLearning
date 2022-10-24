@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: sequences
+message: Please cite this version of the sofware.
+type: software
+authors:
+  - given-names: Aron
+    family-names: Jansen
+    email: a.p.jansen@esciencecenter.nl
+    affiliation: Netherlands eScience center
+    orcid: 'https://orcid.org/0000-0002-4764-9347'
+  - given-names: Luisa Fernanda
+    family-names: Orozco
+    email: l.orozco@esciencecenter.nl
+    affiliation: Netherlands eScience center
+    orcid: 'https://orcid.org/0000-0002-9153-650X'
+  - orcid: 'https://orcid.org/0000-0001-7652-8600'
+    affiliation: University of Twente
+    given-names: Hongyang
+    family-names: Cheng
+    email: h.cheng@utwente.nl
+repository-code: 'https://github.com/GrainLearning/sequences'
+url: >-
+  https://www.esciencecenter.nl/projects/an-artificial-brain-for-interpreting-and-accelerating-physics-based-simulations-of-granular-materials/
+keywords:
+  - DEM
+  - granular materials
+  - RNN
+  - Machine learning
+  - geomechanics
+license: GPL-2.0
