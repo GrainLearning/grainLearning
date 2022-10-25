@@ -2,8 +2,11 @@
 name = "GrainLearning"
 version = "2.0.0"
 description = ""
-authors = ["Hongyang Cheng <h.cheng@utwente.nl>",
-"Luisa Orozco <l.orozco@esciencecenter.nl>","Retief Lubbe <r.lubbe@utwente.nl>"]
+authors = [
+    "Hongyang Cheng <h.cheng@utwente.nl>",
+    "Luisa Orozco <l.orozco@esciencecenter.nl>",
+    "Retief Lubbe <r.lubbe@utwente.nl>",
+    "Aron Jansen <a.p.jansen@esciencecenter.nl>"]
 readme = "README.md"
 keywords = ["DEM", "Bayesian inference"]
 
@@ -17,6 +20,12 @@ sklearn = "^0.0"
 [tool.poetry.group.docs.dependencies]
 Sphinx = "^5.1.1"
 sphinx-autodoc-typehints = "^1.19.2"
+
+[tool.poetry.group.rnn.dependencies]
+h5py = "^3.7.0"
+wandb = "^0.13.4"
+tensorflow-macos = "^2.10.0"
+matplotlib = "^3.6.0"
 
 [tool.poetry.group.visual.dependencies]
 matplotlib = "^3.6.0"
