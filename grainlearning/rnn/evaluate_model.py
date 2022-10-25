@@ -12,15 +12,6 @@ EXPERIMENT_TYPES = ['drained', 'undrained']
 P_INDEX = 5
 E_INDEX = 6
 
-PRESSURE = 'All'
-EXPERIMENT_TYPE = 'All'
-MODEL_NAME = 'simple_rnn'
-PLOT_DIR = 'plots/'
-DATA_DIR = 'data/sequences.hdf5'
-
-SAVED_MODEL_NAME = f'{MODEL_NAME}_{PRESSURE}_{EXPERIMENT_TYPE}_conditional'
-use_windows = True
-
 
 def plot_predictions(model, data, train_stats, config):
     """
@@ -144,24 +135,30 @@ def _find_representatives(input_data):
 
 
 def main():
-    datafile = h5py.File(DATA_DIR, 'r')
+    data_dir = 'data/sequences.hdf5'
+    plot_dir = 'plots/'
 
-    model_directory = f'trained_models' + '/' + SAVED_MODEL_NAME
+    pressure = 'All'
+    experiment_type = 'All'
+    model_name = 'simple_rnn'
+    saved_model_name = f'{model_name}_{pressure}_{experiment_type}_conditional'
+    model_directory = f'trained_models' + '/' + saved_model_name
+
     model = keras.models.load_model(model_directory)
     train_stats = np.load(model_directory + '/train_stats.npy', allow_pickle=True).item()
     losses = np.load(model_directory + '/losses.npy', allow_pickle=True).item()
 
     split_data, _ = prepare_datasets(
-            raw_data=DATA_DIR,
-            pressure=PRESSURE,
-            experiment_type=EXPERIMENT_TYPE,
+            raw_data=data_dir,
+            pressure=pressure,
+            experiment_type=experiment_type,
             pad_length=train_stats['window_size'],
             use_windows=False,
             add_e0=True,  # was used in the model that is tested with
             )
 
-    if not os.path.exists(PLOT_DIR):
-        os.makedirs(PLOT_DIR)
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
 
     config = {'use_windows': True, 'window_size': train_stats['window_size'],
             'standardize_outputs': True}
