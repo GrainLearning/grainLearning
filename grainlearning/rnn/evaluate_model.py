@@ -1,5 +1,4 @@
 import os
-import h5py
 from matplotlib import pyplot as plt
 from tensorflow import keras
 import numpy as np
@@ -20,8 +19,8 @@ def plot_predictions(model, data, train_stats, config):
     features.
 
     Args:
-        split_data: Tensorflow dataset to predict on.
         model: Model to perform predictions with.
+        data: Tensorflow dataset to predict on.
         train_stats: Dictionary containing training set statistics.
         config: Dictionary containing the configuration with which the model was trained.
 
@@ -62,7 +61,7 @@ def plot_predictions(model, data, train_stats, config):
         fill_ax(ax[i, j], x, y, x_p, y_p, x_label=x_key, y_label=y_key, color=color)
 
     def extract_combination_inv(data, i_s=0):
-        """Combination of parameters that is supposed to be zero."""
+        """Combine parameters in way that is supposed to be zero."""
         q = data[i_s, :, ids['q']]
         p = data[i_s, :, ids['p']]
         a_c = data[i_s, :, ids['a_c']]
@@ -114,10 +113,7 @@ def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
         ax.set_ylim(ylim)
 
 def _find_representatives(input_data):
-    """
-    returns a list of indices indicating samples each combination of pressure
-    and experiment type.
-    """
+    """Return a list of indices indicating samples each combination of pressure and experiment type."""
     representatives = []
     contact_params = input_data['contact_parameters']
     for pressure in PRESSURES:
@@ -142,7 +138,7 @@ def main():
     experiment_type = 'All'
     model_name = 'simple_rnn'
     saved_model_name = f'{model_name}_{pressure}_{experiment_type}_conditional'
-    model_directory = f'trained_models' + '/' + saved_model_name
+    model_directory = 'trained_models' + '/' + saved_model_name
 
     model = keras.models.load_model(model_directory)
     train_stats = np.load(model_directory + '/train_stats.npy', allow_pickle=True).item()
@@ -164,6 +160,6 @@ def main():
             'standardize_outputs': True}
     plot_predictions(model, split_data['test'], train_stats, config)
 
+
 if __name__ == '__main__':
     main()
-

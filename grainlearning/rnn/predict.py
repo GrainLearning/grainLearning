@@ -9,6 +9,7 @@ from windows import predict_over_windows
 def get_best_run_from_sweep(entity_project_sweep_id: str):
     """
     Load the best performing model found with a weights and biases sweep.
+
     Also load the data splits it was trained on.
 
     Args:
@@ -44,6 +45,7 @@ def predict_macroscopics(
         ):
     """
     Use the given model to predict the features of the given data.
+
     If standardized, rescale the predictions to their original units.
 
     Args:
@@ -78,5 +80,3 @@ if __name__ == '__main__':
     model, data, stats, config = get_best_run_from_sweep(entity_project_sweep_id)
     predictions = predict_macroscopics(model, data['test'], stats, config,
             batch_size=256, single_batch=True)
-
-

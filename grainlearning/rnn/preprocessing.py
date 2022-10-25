@@ -24,8 +24,7 @@ def prepare_datasets(
         **kwargs,
         ):
     """
-    Read the raw data in a hdf5 file, preprocess it and split it into a
-    training, validation and test set.
+    Convert raw data into preprocessed split datasets.
 
     Args:
         raw_data (str): Path to hdf5 file containing the data.
@@ -49,7 +48,6 @@ def prepare_datasets(
         train_stats: Dictionary containing the shape of the data, and
             'mean' and 'std' of the training set, in case `standardize_outputs` is True.
     """
-
     datafile = h5py.File(raw_data, 'r')
 
     inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type)
@@ -66,7 +64,7 @@ def prepare_datasets(
     if standardize_outputs:
         split_data, train_stats = _standardize_outputs(split_data)
     else:
-        train_stats = dict()
+        train_stats = {}
 
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
@@ -79,8 +77,9 @@ def prepare_datasets(
 
 def _merge_datasets(datafile, pressure, experiment_type):
     """
-    Merge the datasets with different pressures and experiment types,
-    if `pressure` or `experiment_type` is 'All'.
+    Merge the datasets with different pressures and experiment types.
+
+    If `pressure` or `experiment_type` is 'All'.
     Otherwise just return the inputs, outputs and contact_params.
     """
     if pressure == 'All':
@@ -115,10 +114,7 @@ def _merge_datasets(datafile, pressure, experiment_type):
     return input_sequences, output_sequences, contact_params
 
 def _add_e0_to_contacts(contacts, inputs):
-    """
-    Add the initial void ratio e_0 as an extra contact parameter.
-    It is added at the end.
-    """
+    """Add the initial void ratio e_0 as an extra contact parameter at the end."""
     e0s = inputs[:, 0, 0]  # first element in series, 0th feature == e_0
     e0s = np.expand_dims(e0s, axis=1)
     contacts = np.concatenate([contacts, e0s], axis=1)
@@ -172,7 +168,6 @@ def _make_splits(dataset, train_frac, val_frac, seed):
     n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
     n_val = int(val_frac * n_tot)
-    n_test = n_tot - n_train - n_val
 
     np.random.seed(seed=seed)
     inds = np.random.permutation(np.arange(n_tot))
@@ -192,7 +187,9 @@ def _make_splits(dataset, train_frac, val_frac, seed):
 
 def _standardize_outputs(split_data):
     """
-    Standardize outputs, using the mean and std of the training data,
+    Standardize outputs of split_data.
+
+    Usingsing the mean and std of the training data
     taken over both the samples and the timesteps.
     """
     train_outputs = split_data['train'][1]
@@ -241,4 +238,3 @@ def get_dimensions(data):
             'num_contact_params': num_contact_params,
             'num_labels': num_labels,
             }
-

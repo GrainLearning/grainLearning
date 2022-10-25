@@ -14,8 +14,9 @@ def rnn_model(
         **kwargs,
         ):
     """
-    Neural network with an LSTM layer that takes in a load sequence and contact parameters,
-    and outputs the macroscopic responses.
+    Neural network with an LSTM layer.
+
+    Takes in a load sequence and contact parameters, and outputs the macroscopic responses.
     Default settings are based on Ma et al. and simply concatenate the contact parameters
     to the load sequence.
     This can be changed into a conditional RNN by setting `conditional=True`.
@@ -73,11 +74,13 @@ def rnn_model(
 def _DynamicRepeatVector(contact_params, num_repeats):
     """
     To deal with repetitions of variable sequence lenghts.
+
     Adapted from https://github.com/keras-team/keras/issues/7949#issuecomment-383550274
 
     NOTE: Can't get this to work when not using windows..
     """
     num_features = K.shape(contact_params)[1]  # contact_params.shape[1]
+
     def repeat_vector(contact_params):
         return layers.RepeatVector(num_repeats)(contact_params)
     return layers.Lambda(repeat_vector, output_shape=(None, num_repeats, num_features))
@@ -91,8 +94,9 @@ def main():
     window_size = 20
     model = rnn_model(input_shapes, window_size, conditional=True)
     model.summary()
-    tst_params = tf.random.normal((32, num_params))
-    tst_load = tf.random.normal((32, window_size, num_load_features))
+    tst_params = tf.random.normal((32, input_shapes['num_params']))
+    tst_load = tf.random.normal(
+            (32, input_shapes['window_size'], input_shapes['num_load_features']))
     out = model({'load_sequence': tst_load, 'contact_parameters': tst_params})
     print(out.shape)
 
@@ -100,4 +104,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

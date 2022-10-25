@@ -1,9 +1,9 @@
 """
 Script to train a model to predict macroscopic features of a DEM simulation.
+
 Tracked using weights and biases.
 """
 from tensorflow import keras
-import numpy as np
 import wandb
 
 from preprocessing import prepare_datasets
@@ -88,4 +88,3 @@ if __name__ == '__main__':
     }
 
     main(config=defaults)
-
