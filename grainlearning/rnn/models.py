@@ -85,22 +85,3 @@ def _DynamicRepeatVector(contact_params, num_repeats):
         return layers.RepeatVector(num_repeats)(contact_params)
     return layers.Lambda(repeat_vector, output_shape=(None, num_repeats, num_features))
 
-def main():
-    input_shapes = {
-            'num_load_features': 3,
-            'num_params': 6,
-            'num_labels': 10,
-        }
-    window_size = 20
-    model = rnn_model(input_shapes, window_size, conditional=True)
-    model.summary()
-    tst_params = tf.random.normal((32, input_shapes['num_params']))
-    tst_load = tf.random.normal(
-            (32, input_shapes['window_size'], input_shapes['num_load_features']))
-    out = model({'load_sequence': tst_load, 'contact_parameters': tst_params})
-    print(out.shape)
-
-
-
-if __name__ == '__main__':
-    main()
