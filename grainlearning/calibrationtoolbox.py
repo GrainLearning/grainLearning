@@ -129,6 +129,8 @@ class CalibrationToolbox:
         self.model.load_param_data(self.curr_iter)
         self.model.get_sim_data_files(self.curr_iter)
         self.model.load_sim_data()
+        self.calibration.add_curr_param_data_to_list(self.model.param_data)
+        self.calibration.load_proposal_from_file(self.model)
         self.calibration.inference.data_assimilation_loop(sigma, self.model)
 
     def resample(self):

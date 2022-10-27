@@ -69,6 +69,8 @@ class IterativeBayesianFilter:
     posterior_ibf: np.ndarray
 
     proposal_ibf: np.ndarray
+    
+    proposal_data_file: str
 
     def __init__(
             self,
@@ -76,12 +78,14 @@ class IterativeBayesianFilter:
             sampling: Type["GaussianMixtureModel"],
             ess_tol: float = 1.0e-2,
             proposal_ibf: np.ndarray = None,
+            proposal_data_file: str = None,
     ):
         """Initialize the Iterative Bayesian Filter."""
         self.inference = inference
         self.sampling = sampling
         self.ess_tol = ess_tol
         self.proposal_ibf = proposal_ibf
+        self.proposal_data_file = proposal_data_file
 
     @classmethod
     def from_dict(cls: Type["IterativeBayesianFilter"], obj: dict):
@@ -91,6 +95,7 @@ class IterativeBayesianFilter:
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
             ess_tol=obj.get("ess_tol", 1.0e-2),
             proposal_ibf=obj.get("proposal_ibf", None),
+            proposal_data_file=obj.get("proposal_data_file", None),
         )
 
     def run_inference(self, model: Type["Model"]):
@@ -106,7 +111,10 @@ class IterativeBayesianFilter:
         )
         model.sigma_max = result.x
 
-        # make sure values are set
+        # if the name of proposal data file is given, make use of the proposal density during Bayesian updating
+        if self.proposal_data_file is not None and self.proposal_ibf is None:
+            self.load_proposal_from_file(model)
+
         self.inference.data_assimilation_loop(model.sigma_max, model, self.proposal_ibf)
 
         self.posterior_ibf = self.inference.give_posterior()
@@ -136,3 +144,24 @@ class IterativeBayesianFilter:
 
     def add_curr_param_data_to_list(self, param_data: np.ndarray):
         self.param_data_list.append(param_data)
+
+    def load_proposal_from_file(self, model: Type["Model"]):
+        if model.param_data is None:
+            RuntimeError("parameter samples not yet loaded...")
+        
+        if self.proposal_data_file is None: return
+
+        from .tools import voronoi_vols
+        from pickle import load
+        param_maxs, gmm = load(open(model.sim_data_dir + '/' + self.proposal_data_file, 'rb'), encoding='latin1')
+        samples = np.copy(model.param_data)
+        samples /= param_maxs
+
+        proposal = np.exp(gmm.score_samples(samples))
+        proposal *= voronoi_vols(samples)
+        # assign the maximum vol to open regions (use a uniform proposal distribution if Voronoi fails)
+        if (proposal < 0.0).all():
+            self.proposal_ibf = np.ones(proposal.shape) / model.num_samples
+        else:
+            proposal[np.where(proposal < 0.0)] = min(proposal[np.where(proposal > 0.0)])
+            self.proposal_ibf = proposal / sum(proposal)

@@ -488,3 +488,16 @@ def estimate_gmm(X, num_components, method='EM'):
     
     # return GMM object and sampled data
     return gmm, gmm.sample()
+
+
+def voronoi_vols(samples: np.ndarray):
+	from scipy.spatial import Voronoi, ConvexHull
+	v = Voronoi(samples)
+	vol = np.zeros(v.npoints)
+	for i, reg_num in enumerate(v.point_region):
+		indices = v.regions[reg_num]
+		if -1 in indices:
+			vol[i] = -1.0
+		else:
+			vol[i] = ConvexHull(v.vertices[indices]).volume
+	return vol
