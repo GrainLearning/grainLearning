@@ -1,5 +1,5 @@
-from .models import Model
+from .models import Model, IOModel
 from .calibrationtoolbox import CalibrationToolbox
 from .iterativebayesianfilter import IterativeBayesianFilter
-from .gaussianmixturemodel import GaussianMixtureModel
-from .sequentialmontecarlo import SequentialMonteCarlo
+from .sampling import GaussianMixtureModel
+from .inference import SequentialMonteCarlo

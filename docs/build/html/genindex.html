@@ -13,6 +13,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
    
@@ -57,18 +58,30 @@
 </li>
       <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox">CalibrationToolbox (class in grainlearning.calibrationtoolbox)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.callback">callback (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.callback">callback (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.callback">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.cov_matrices">cov_matrices (SequentialMonteCarlo attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.cov_matrices">cov_matrices (SequentialMonteCarlo attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.covs">covs (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.covs">covs (SequentialMonteCarlo attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.ctrl_data">ctrl_data (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.ctrl_data">ctrl_data (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.ctrl_data">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.ctrl_names">ctrl_names (Model attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.ctrl_name">ctrl_name (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.ctrl_name">(Model attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.curr_iter">curr_iter (CalibrationToolbox attribute)</a>
 </li>
   </ul></td>
@@ -77,7 +90,7 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.data_assimilation_loop">data_assimilation_loop() (SequentialMonteCarlo method)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.data_assimilation_loop">data_assimilation_loop() (SequentialMonteCarlo method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -85,15 +98,15 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.eff">eff (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.eff">eff (SequentialMonteCarlo attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.ess_target">ess_target (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.ess_target">ess_target (SequentialMonteCarlo attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.ess_tol">ess_tol (IterativeBayesianFilter attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.gaussianmixturemodel.GaussianMixtureModel.expand_weighted_parameters">expand_weighted_parameters() (GaussianMixtureModel method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters">expand_weighted_parameters() (GaussianMixtureModel method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -101,14 +114,16 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.gaussianmixturemodel.GaussianMixtureModel.from_dict">from_dict() (GaussianMixtureModel class method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.from_dict">from_dict() (GaussianMixtureModel class method)</a>
 
       <ul>
+        <li><a href="api.html#grainlearning.models.IOModel.from_dict">(IOModel class method)</a>
+</li>
         <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.from_dict">(IterativeBayesianFilter class method)</a>
 </li>
         <li><a href="api.html#grainlearning.models.Model.from_dict">(Model class method)</a>
 </li>
-        <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.from_dict">(SequentialMonteCarlo class method)</a>
+        <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.from_dict">(SequentialMonteCarlo class method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -117,19 +132,19 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.gaussianmixturemodel.GaussianMixtureModel">GaussianMixtureModel (class in grainlearning.gaussianmixturemodel)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel">GaussianMixtureModel (class in grainlearning.sampling)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.generate_params_halton">generate_params_halton() (Model method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.generate_params_halton">generate_params_halton() (GaussianMixtureModel method)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_covariance_matrices">get_covariance_matrices() (SequentialMonteCarlo method)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.get_covariance_matrices">get_covariance_matrices() (SequentialMonteCarlo method)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_ensamble_ips_covs">get_ensamble_ips_covs() (SequentialMonteCarlo method)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.get_ensamble_ips_covs">get_ensamble_ips_covs() (SequentialMonteCarlo method)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_likelihoods">get_likelihoods() (SequentialMonteCarlo method)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.get_likelihoods">get_likelihoods() (SequentialMonteCarlo method)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_posterors">get_posterors() (SequentialMonteCarlo method)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.get_posterors">get_posterors() (SequentialMonteCarlo method)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.give_posterior">give_posterior() (SequentialMonteCarlo method)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.give_posterior">give_posterior() (SequentialMonteCarlo method)</a>
 </li>
       <li>
     grainlearning.calibrationtoolbox
@@ -141,10 +156,10 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    grainlearning.gaussianmixturemodel
+    grainlearning.inference
 
       <ul>
-        <li><a href="api.html#module-grainlearning.gaussianmixturemodel">module</a>
+        <li><a href="api.html#module-grainlearning.inference">module</a>
 </li>
       </ul></li>
       <li>
@@ -162,10 +177,10 @@
 </li>
       </ul></li>
       <li>
-    grainlearning.sequentialmontecarlo
+    grainlearning.sampling
 
       <ul>
-        <li><a href="api.html#module-grainlearning.sequentialmontecarlo">module</a>
+        <li><a href="api.html#module-grainlearning.sampling">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -176,11 +191,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.inference">inference (IterativeBayesianFilter attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.inv_obs_weight">inv_obs_weight (Model attribute)</a>
+      <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initialize">initialize() (IterativeBayesianFilter method)</a>
 </li>
+      <li><a href="api.html#grainlearning.models.IOModel.inv_obs_weight">inv_obs_weight (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.inv_obs_weight">(Model attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.ips">ips (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel">IOModel (class in grainlearning.models)</a>
+</li>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.ips">ips (SequentialMonteCarlo attribute)</a>
 </li>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter">IterativeBayesianFilter (class in grainlearning.iterativebayesianfilter)</a>
 </li>
@@ -190,7 +213,19 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.likelihoods">likelihoods (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.likelihoods">likelihoods (SequentialMonteCarlo attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_process">load_and_process() (CalibrationToolbox method)</a>
+</li>
+      <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_run_one_iteration">load_and_run_one_iteration() (CalibrationToolbox method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.load_model">load_model() (CalibrationToolbox method)</a>
+</li>
+      <li><a href="api.html#grainlearning.models.IOModel.load_param_data">load_param_data() (IOModel method)</a>
+</li>
+      <li><a href="api.html#grainlearning.models.IOModel.load_sim_data">load_sim_data() (IOModel method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -208,13 +243,13 @@
       <ul>
         <li><a href="api.html#module-grainlearning.calibrationtoolbox">grainlearning.calibrationtoolbox</a>
 </li>
-        <li><a href="api.html#module-grainlearning.gaussianmixturemodel">grainlearning.gaussianmixturemodel</a>
+        <li><a href="api.html#module-grainlearning.inference">grainlearning.inference</a>
 </li>
         <li><a href="api.html#module-grainlearning.iterativebayesianfilter">grainlearning.iterativebayesianfilter</a>
 </li>
         <li><a href="api.html#module-grainlearning.models">grainlearning.models</a>
 </li>
-        <li><a href="api.html#module-grainlearning.sequentialmontecarlo">grainlearning.sequentialmontecarlo</a>
+        <li><a href="api.html#module-grainlearning.sampling">grainlearning.sampling</a>
 </li>
       </ul></li>
   </ul></td>
@@ -223,51 +258,107 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.num_ctrl">num_ctrl (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.num_ctrl">num_ctrl (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.num_ctrl">(Model attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.num_iter">num_iter (CalibrationToolbox attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.num_obs">num_obs (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.num_obs">num_obs (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.num_obs">(Model attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.num_params">num_params (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.num_params">num_params (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.num_params">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.num_samples">num_samples (Model attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.num_samples">num_samples (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.num_samples">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.num_steps">num_steps (Model attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.num_steps">num_steps (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.num_steps">(Model attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.obs_data">obs_data (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.obs_data">obs_data (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.obs_data">(Model attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.obs_names">obs_names (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.obs_data_file">obs_data_file (IOModel attribute)</a>
 </li>
+      <li><a href="api.html#grainlearning.models.IOModel.obs_names">obs_names (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.obs_names">(Model attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.param_data">param_data (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.param_data">param_data (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.param_data">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.param_maxs">param_maxs (Model attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.param_data_file">param_data_file (IOModel attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.param_mins">param_mins (Model attribute)</a>
+      <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.param_data_list">param_data_list (IterativeBayesianFilter attribute)</a>
 </li>
+      <li><a href="api.html#grainlearning.models.IOModel.param_data_prev">param_data_prev (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.param_data_prev">(Model attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.param_maxs">param_maxs (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.param_maxs">(Model attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.param_names">param_names (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.param_mins">param_mins (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.param_mins">(Model attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.param_names">param_names (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.param_names">(Model attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.posterior_ibf">posterior_ibf (IterativeBayesianFilter attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.posteriors">posteriors (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.posteriors">posteriors (SequentialMonteCarlo attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -275,17 +366,25 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.gaussianmixturemodel.GaussianMixtureModel.regenerate_params">regenerate_params() (GaussianMixtureModel method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.regenerate_params">regenerate_params() (GaussianMixtureModel method)</a>
+</li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm">regenerate_params_with_gmm() (GaussianMixtureModel method)</a>
+</li>
+      <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.resample">resample() (CalibrationToolbox method)</a>
 </li>
       <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.run">run() (CalibrationToolbox method)</a>
 
       <ul>
+        <li><a href="api.html#grainlearning.models.IOModel.run">(IOModel method)</a>
+</li>
         <li><a href="api.html#grainlearning.models.Model.run">(Model method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_inference">run_inference() (IterativeBayesianFilter method)</a>
+</li>
+      <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.run_one_iteration">run_one_iteration() (CalibrationToolbox method)</a>
 </li>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_sampling">run_sampling() (IterativeBayesianFilter method)</a>
 </li>
@@ -297,20 +396,48 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.sampling">sampling (IterativeBayesianFilter attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.scale_cov_with_max">scale_cov_with_max (SequentialMonteCarlo attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo.scale_cov_with_max">scale_cov_with_max (SequentialMonteCarlo attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sequentialmontecarlo.SequentialMonteCarlo">SequentialMonteCarlo (class in grainlearning.sequentialmontecarlo)</a>
+      <li><a href="api.html#grainlearning.inference.SequentialMonteCarlo">SequentialMonteCarlo (class in grainlearning.inference)</a>
 </li>
       <li><a href="api.html#grainlearning.calibrationtoolbox.CalibrationToolbox.sigma_list">sigma_list (CalibrationToolbox attribute)</a>
 </li>
+      <li><a href="api.html#grainlearning.models.IOModel.sigma_max">sigma_max (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.sigma_max">(Model attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.sigma_min">sigma_min (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.sigma_min">(Model attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.models.Model.sigma_max">sigma_max (Model attribute)</a>
+      <li><a href="api.html#grainlearning.models.IOModel.sigma_tol">sigma_tol (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.sigma_tol">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.sigma_min">sigma_min (Model attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.sim_data">sim_data (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.sim_data">(Model attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.models.Model.sim_data">sim_data (Model attribute)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.models.IOModel.sim_data_dir">sim_data_dir (IOModel attribute)</a>
 </li>
+      <li><a href="api.html#grainlearning.models.IOModel.sim_data_files">sim_data_files (IOModel attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.models.IOModel.sim_name">sim_name (IOModel attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.models.Model.sim_name">(Model attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api.html#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.solve">solve() (IterativeBayesianFilter method)</a>
 </li>
   </ul></td>
@@ -336,6 +463,14 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a></li>
 </ul>
 
@@ -369,10 +504,10 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2022, Hongyang Cheng, Retief Lubbe.
+      &copy;2022, Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

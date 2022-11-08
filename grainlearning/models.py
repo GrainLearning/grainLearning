@@ -1,6 +1,6 @@
 from typing import Type, List, Callable, Tuple
 import numpy as np
-from .tools import get_keys_and_data
+from .tools import get_keys_and_data, write_to_table
 
 class Model:
     """
@@ -230,13 +230,13 @@ class Model:
             param_names=obj.get("param_names", None),
         )
 
-    def run(self):
+    def run(self, **kwargs):
         """This function runs the callback function"""
 
         if self.callback is None:
             raise ValueError("No callback function defined")
-
-        self.callback(self)
+        
+        self.callback(self, **kwargs)
 
     def get_inv_normalized_sigma(self):   
         inv_obs_mat = np.diagflat(self.inv_obs_weight)
@@ -373,7 +373,7 @@ class IOModel(Model):
 
         #### Observations ####
 
-        self.obs_data_file = obs_data_file
+        self.obs_data_file = sim_data_dir + '/' + obs_data_file
 
         self.ctrl_name = ctrl_name
 
@@ -398,7 +398,7 @@ class IOModel(Model):
         assert "obs_data_file" in obj.keys(), "Error no obs_data_file key found in input"
         assert "obs_names" in obj.keys(), "Error no obs_names key found in input"
         assert "ctrl_name" in obj.keys(), "Error no ctrl_name key found in input"
-        assert "param_data_file" in obj.keys(), "Error no param_data_file key found in input"
+        if "param_data_file" not in obj.keys(): obj["param_data_file"] = None
 
         return cls(
             sim_name=obj["sim_name"],
@@ -422,8 +422,7 @@ class IOModel(Model):
     def get_obs_data(self):
         # if self.ctrl_name specifies the control variable during the observation
         if self.ctrl_name:
-            file_name = self.sim_data_dir + '/' + self.obs_data_file
-            keys_and_data = get_keys_and_data(file_name)
+            keys_and_data = get_keys_and_data(self.obs_data_file)
             # separate the control data sequence from the observation data
             self.ctrl_data = keys_and_data.pop(self.ctrl_name)
             self.num_steps = len(self.ctrl_data)
@@ -488,7 +487,7 @@ class IOModel(Model):
             self.param_data = np.genfromtxt(file_name, comments='!')[:, -self.num_params:]
             self.num_samples = self.param_data.shape[0]
         else:
-			# get all simulation data files 
+            # get all simulation data files 
             files = glob(self.sim_data_dir + f'/iter{curr_iter}/' + self.sim_name + '*.npy')
             self.num_samples = len(files)
             self.sim_data_files = sorted(files)
@@ -497,3 +496,32 @@ class IOModel(Model):
                 data = np.load(f, allow_pickle=True).item()
                 params = [data[key] for key in self.param_names] 
                 self.param_data[i, :] = params
+
+    def run(self, **kwargs):
+        """This function runs the callback function"""
+
+        if self.callback is None:
+            raise ValueError("No callback function defined")
+        
+        # create a directory to store simulation data
+        import os
+        curr_iter = kwargs['curr_iter']
+        sim_data_sub_dir = f'{self.sim_data_dir}/iter{curr_iter}' 
+        if not os.path.exists(sim_data_sub_dir):
+            os.makedirs(sim_data_sub_dir)
+        else:
+            input(f'Removing existing simulation data in {sim_data_sub_dir}?\n')
+            os.system('rm ' + sim_data_sub_dir + '/*')
+
+        # write the parameter table to a text file
+        self.write_to_table(curr_iter)
+
+        # run the callback function    
+        self.callback(self, **kwargs)
+
+        # move simulation data files into the directory per iteration 
+        os.system(f'mv {self.sim_name}*.npy {sim_data_sub_dir}')
+
+    def write_to_table(self, curr_iter: int):
+        self.param_data_file = write_to_table(
+            f'{self.sim_data_dir}/{self.sim_name}', self.param_data, self.param_names, curr_iter)

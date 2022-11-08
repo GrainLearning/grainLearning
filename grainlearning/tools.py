@@ -46,7 +46,7 @@ def startSimulations(platform,software,tableName,fileName):
 
 
 
-def initParamsTable(keys, maxs, mins, num=100, threads=4, tableName='smcTable0.txt', simNum=0):
+def initParamsTable(keys, maxs, mins, num=100, threads=4, tableName='smcTable0', simNum=0):
     """
     Generate initial parameter samples using a halton sequence
     and write the samples into a text file
@@ -66,7 +66,7 @@ def initParamsTable(keys, maxs, mins, num=100, threads=4, tableName='smcTable0.t
     :return:
         table: ndarray of shape (num, len(keys)), initial parameter samples
 
-        tableName: string, default='smcTable.txt'
+        tableName: string, default='smcTable0'
     """
     print(tableName)
     dim = len(keys)
@@ -78,25 +78,27 @@ def initParamsTable(keys, maxs, mins, num=100, threads=4, tableName='smcTable0.t
             std = .5 * (maxs[i] - mins[i])
             table[j][i] = mean + (table[j][i] - .5) * 2 * std
     # write parameters in the format for Yade batch mode
-    writeToTable(tableName, table, dim, num, threads, keys, simNum)
+    table_file_name = write_to_table(tableName, table, keys, simNum)
     return np.array(table), tableName
 
 
-def writeToTable(tableName, table, dim, num, threads, keys,simNum):
+def write_to_table(sim_name, table, names, curr_iter = 0, threads = 8):
     """
-    write parameter samples into a text file in order to run Yade in batch mode
+    write parameter samples into a text file
     """
     
     # Computation of decimal number for unique key 
-    magn = floor(log(num, 10))+1
-    #iterNum = 0
+    table_file_name = f'{sim_name}_iter{curr_iter}_samples.txt'
     
-    fout = open(tableName, 'w')
-    fout.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + keys + ['\n']))
+    fout = open(table_file_name, 'w')
+    num, dim = table.shape
+    magn = floor(log(num, 10)) + 1
+    fout.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
     for j in range(num):
-       description = 'Iter'+str(simNum)+'-Sample'+str(j).zfill(magn)
+       description = 'Iter'+str(curr_iter)+'-Sample'+str(j).zfill(magn)
        fout.write(' '.join(['%2i' % threads] + [description] + ['%9i' % j] + ['%20.10e' % table[j][i] for i in range(dim)] + ['\n']))
     fout.close()
+    return table_file_name
 
 
 def get_keys_and_data(fileName):
@@ -213,7 +215,7 @@ def regenerate_params_with_gmm(
 
 
 def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4, maxNumComponents=10, priorWeight=0,
-                         covType='full', tableName='smcTableNew.txt',seed=0,simNum=0):
+                         covType='full', tableName='smcTableNew',seed=0,simNum=0):
     """
     Resample parameters using a variational Gaussian mixture model
     and write the samples into a text file
@@ -251,14 +253,14 @@ def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4,
         'spherical' (each component has its own single variance).
         (https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
 
-    :param tableName: string, default='smcTableNew.txt'
+    :param tableName: string, default='smcTableNew'
         Name of the parameter table
 
     :return:
         newSMcSamples: ndarray of shape (num, len(keys))
             parameter samples for the next iteration
 
-        tableName: string, default='smcTableNew.txt'
+        tableName: string, default='smcTableNew'
             Name of the parameter table
 
         gmm: BayesianGaussianMixture
@@ -315,7 +317,7 @@ def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4,
     # scale resampled parameters back to their right units
     for i in range(sampleMaxs.shape[0]): newSMcSamples[:, i] *= sampleMaxs[i]  
     # write parameters in the format for Yade batch mode
-    writeToTable(tableName, newSMcSamples, dim, num, threads, keys,simNum)
+    table_file_name = write_to_table(tableName, newSMcSamples, keys, simNum)
     return newSMcSamples, tableName, gmm, maxNumComponents
 
 def getGMMFromPosterior(smcSamples, posterior, n_components, priorWeight, covType='full',seed=0):

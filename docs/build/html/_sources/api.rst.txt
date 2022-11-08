@@ -28,19 +28,19 @@ Python API
     :inherited-members:
 
 
-``Sequential Monte Carlo``
+``Inference``
 *****************************
 
-.. automodule:: grainlearning.sequentialmontecarlo
+.. automodule:: grainlearning.inference
     :members:
     :show-inheritance:
     :inherited-members:
 
 
-``Gaussian Mixture Model``
+``Sampling``
 *****************************
 
-.. automodule:: grainlearning.gaussianmixturemodel
+.. automodule:: grainlearning.sampling
     :members:
     :show-inheritance:
     :inherited-members:

@@ -5,9 +5,9 @@ from typing import Type, List
 
 from .models import Model
 
-from .sequentialmontecarlo import SequentialMonteCarlo
+from .inference import SequentialMonteCarlo
 
-from .gaussianmixturemodel import GaussianMixtureModel
+from .sampling import GaussianMixtureModel
 
 from scipy import optimize
 

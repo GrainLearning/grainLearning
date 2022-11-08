@@ -14,14 +14,14 @@ import sys
 sys.path.insert(0, os.path.abspath("../../"))
 # sys.path.insert(0, os.path.abspath("./package"))
 # sys.path.insert(0, os.path.join(os.path.dirname((os.path.abspath('.')), 'package')))
-                
+
 print(sys.path)
 
 # project information ( you can change this )
 
 project = 'GrainLearning'
-copyright = '2022, Hongyang Cheng, Retief Lubbe'
-author = 'Hongyang Cheng, Retief Lubbe'
+copyright = '2022, Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen'
+author = 'Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -4,45 +4,41 @@
 import numpy as np
 
 from grainlearning import CalibrationToolbox
+from grainlearning.models import IOModel
 
 import matplotlib.pyplot as plt
 
-
-
-x_obs = np.arange(100)
-
-y_obs = 0.2* x_obs + 5.0
-
-#y_obs += np.random.rand(100) * 2.5
-
+executable = './tutorials/linear_regression/LinearModel.py'
 
 def run_sim(model, **kwargs):
-    data = []
-    for params in model.param_data:
-        y_sim = params[0] * model.ctrl_data + params[1]
-        data.append(np.array(y_sim, ndmin=2))
-    
-    model.sim_data = np.array(data)
-    
-    # print(model.sigma_max)
+	from math import floor, log
+	import os
+	# keep the naming convention consistent between iterations
+	magn = floor(log(model.num_samples, 10)) + 1
+	curr_iter = kwargs['curr_iter']
+	# check the software name and version
+	print("*** Running external software... ***\n")
+	# loop over and pass parameter samples to the executable
+	for i, params in enumerate(model.param_data):
+		description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(magn)
+		print(" ".join([executable, '%.8e %.8e'%tuple(params), description]))
+		os.system(' '.join([executable, '%.8e %.8e'%tuple(params), description]))
 
-    #plt.figure()
-    #plt.plot(model.ctrl_data, model.obs_data, ls="", marker=".", label="Observation")
-    #for y_sims in model.sim_data:
-    #    plt.plot(model.ctrl_data[0], y_sims[0], label="Simulation")
-    #plt.show()
 
 calibration = CalibrationToolbox.from_dict(
     {
         "num_iter": 10,
         "model": {
-            "param_mins": [0, 0],
+            "param_mins": [0.1, 0.1],
             "param_maxs": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
-            "obs_data": y_obs,
-            "ctrl_data": x_obs,
-            "sim_name":'linear',
+            "obs_data_file": 'linearObs.dat',
+            "obs_names": ['f'],
+            "ctrl_name": 'u',
+            "sim_name": 'linear',
+            "sim_data_dir": './tutorials/linear_regression/',
+            "param_names": ['a', 'b'],
             "callback": run_sim,
         },
         "calibration": {
@@ -52,7 +48,8 @@ calibration = CalibrationToolbox.from_dict(
                 "n_init": 1,
                 "seed": 0,
             }
-        }
+        },
+        "model_type": IOModel
     }
 )
 

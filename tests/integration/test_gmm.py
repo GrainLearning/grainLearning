@@ -21,8 +21,8 @@ calibration = CalibrationToolbox.from_dict(
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'linear',
-            "sim_data_dir": './tests/data/linear_sim_data',
             "param_data_file": 'smcTable0.txt',
+            "sim_data_dir": './tests/data/linear_sim_data',
             "param_names": ['a', 'b'],
         },
         "calibration": {
@@ -56,23 +56,11 @@ np.testing.assert_allclose(cov_matrix_ref, cov_matrices[-1], err_msg = "The (co)
 np.testing.assert_allclose(posterior, posterior_ref, err_msg = "The posterior distributions do not match.")
 
 #%%
-# compare the existing dataset and the new resampled data using two approaches
-paramRanges = {'a': [0, 1], 'b': [0.0, 10]}
-newSmcSamples, newparamsFile, gmm, maxNumComponents = resampledParamsTable(keys=calibration.model.param_names,
-            smcSamples=calibration.model.param_data,
-            proposal=calibration.calibration.posterior_ibf,
-            ranges=paramRanges,
-            num=calibration.model.num_samples,
-            maxNumComponents=1,
-            priorWeight=1,
-            covType='full',
-            tableName='table_new.txt',
-            seed=calibration.calibration.sampling.seed,
-            simNum=1)            
+# write new parameter table to the simulation directory
+calibration.model.write_to_table(calibration.curr_iter + 1)
 
 # ~ plt.plot(resampled_param_data_ref[:,0], resampled_param_data_ref[:,1], 'o', label='ref')
 # ~ plt.plot(resampled_param_data[:,0], resampled_param_data[:,1], 'o', label='rewrite')
-# ~ plt.plot(newSmcSamples[:,0], newSmcSamples[:,1], 'o', label='rewrite_old_mthod')
 # ~ plt.legend()
 # ~ plt.show()
 

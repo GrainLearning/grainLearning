@@ -1,7 +1,7 @@
 
 from ast import Param
 from typing import Type, List, Dict
-from .models import *
+from .models import Model, IOModel
 from .iterativebayesianfilter import IterativeBayesianFilter
 
 
@@ -90,12 +90,12 @@ class CalibrationToolbox:
         1. The first iteration starts with a Halton sequence
         2. The following iterations continue by sampling parameter space, until certain criterion is met.
         """
-        print(f"Calibration step {self.curr_iter}")
+        print(f"Bayesian calibration iter No. {self.curr_iter}")
         self.run_one_iteration()
 
         for i in range(self.num_iter-1):
             self.curr_iter += 1
-            print(f"Calibration step {self.curr_iter}")
+            print(f"Baysian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
             if self.model.sigma_max < self.model.sigma_tol:
                 self.num_iter = self.curr_iter + 1
@@ -109,16 +109,23 @@ class CalibrationToolbox:
         self.model.param_data = self.calibration.param_data_list[index]
         self.model.num_samples = self.model.param_data.shape[0]
 
-        self.model.run()
+        self.model.run(curr_iter = self.curr_iter)
+        if type(self.model) is IOModel: self.load_model()
+
         self.calibration.solve(self.model)
         self.sigma_list.append(self.model.sigma_max)
     
-    def load_and_run_one_iteration(self):
-        """Load an existing dataset and run GrainLearning for one iteration
+    def load_model(self):
+        """Load existing simulation data into the model
         """
         self.model.load_param_data(self.curr_iter)
         self.model.get_sim_data_files(self.curr_iter)
         self.model.load_sim_data()
+
+    def load_and_run_one_iteration(self):
+        """Load an existing dataset and run GrainLearning for one iteration
+        """
+        self.load_model()
         self.calibration.add_curr_param_data_to_list(self.model.param_data)
         self.calibration.solve(self.model)
         self.sigma_list.append(self.model.sigma_max)
@@ -126,9 +133,7 @@ class CalibrationToolbox:
     def load_and_process(self, sigma: float):
         """Load an existing dataset and compute posterior distribution with a given sigma
         """
-        self.model.load_param_data(self.curr_iter)
-        self.model.get_sim_data_files(self.curr_iter)
-        self.model.load_sim_data()
+        self.load_model()
         self.calibration.add_curr_param_data_to_list(self.model.param_data)
         self.calibration.load_proposal_from_file(self.model)
         self.calibration.inference.data_assimilation_loop(sigma, self.model)
@@ -139,7 +144,7 @@ class CalibrationToolbox:
         self.calibration.posterior_ibf = self.calibration.inference.give_posterior()
         self.calibration.run_sampling(self.model)
         resampled_param_data = self.calibration.param_data_list[-1]
-        np.save(f'./{self.model.sim_name}_table_{self.curr_iter + 1}.npy',resampled_param_data)
+        self.model.write_to_table(self.curr_iter + 1)
         return resampled_param_data
     
     @classmethod

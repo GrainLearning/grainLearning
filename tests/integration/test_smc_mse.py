@@ -19,7 +19,7 @@ y_obs = p1* x_obs + p2
 y_obs_w_noise = y_obs + np.random.rand(100) * 2.5
 
 
-def run_sim(model):
+def run_sim(model, **kwargs):
     data = []
     for params in model.param_data:
         y_sim = params[0] * model.ctrl_data + params[1]

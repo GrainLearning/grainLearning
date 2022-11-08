@@ -14,9 +14,10 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Python API" href="api.html" />
+    <link rel="next" title="Introduction" href="introduction.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,15 +36,43 @@
             
   <section id="welcome-to-grainlearning-s-documentation">
 <h1>Welcome to GrainLearning’s documentation!<a class="headerlink" href="#welcome-to-grainlearning-s-documentation" title="Permalink to this heading">¶</a></h1>
+<p>GrainLearning is a Bayesian uncertainty quantification and propagation toolbox for computer simulations
+of granular materials.
+The software is primarily used to infer and quantify parameter uncertainties in computational models of granular materials
+from observation data, which is also known as inverse analyses or data assimilation.
+Implemented in Python, GrainLearning can be loaded into a Python environment to process the simulation and observation data,
+or alternatively, as an independent tool where simulation runs are done separately, e.g., via a shell script.</p>
+<p>If you use GrainLearning, please cite <a class="reference external" href="https://zenodo.org/record/7123966">the version of the GrainLearning software you used</a> and the following paper:</p>
+<p>H. Cheng, T. Shuku, K. Thoeni, P. Tempone, S. Luding, V. Magnanimo.
+An iterative Bayesian filtering framework for fast and automated calibration of DEM models. <em>Comput. Methods Appl. Mech. Eng., 350 (2019)</em>, pp. 268-294,
+<a class="reference external" href="https://doi.org/10.1016/j.cma.2019.01.027">10.1016/j.cma.2019.01.027</a></p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#python-versions">Python versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#package-management-and-dependencies">Package management and dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#packaging-one-command-install">Packaging/One command install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#the-models-module">The models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#interact-with-third-party-software">Interact with third-party software</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.calibrationtoolbox"><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.models"><code class="docutils literal notranslate"><span class="pre">Models</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.iterativebayesianfilter"><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.sequentialmontecarlo"><code class="docutils literal notranslate"><span class="pre">Sequential</span> <span class="pre">Monte</span> <span class="pre">Carlo</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.gaussianmixturemodel"><code class="docutils literal notranslate"><span class="pre">Gaussian</span> <span class="pre">Mixture</span> <span class="pre">Model</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.inference"><code class="docutils literal notranslate"><span class="pre">Inference</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.sampling"><code class="docutils literal notranslate"><span class="pre">Sampling</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -77,6 +106,14 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a></li>
 </ul>
 
@@ -84,7 +121,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="api.html" title="next chapter">Python API</a></li>
+      <li>Next: <a href="introduction.html" title="next chapter">Introduction</a></li>
   </ul></li>
 </ul>
 </div>
@@ -111,10 +148,10 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2022, Hongyang Cheng, Retief Lubbe.
+      &copy;2022, Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
