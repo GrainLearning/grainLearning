@@ -10,8 +10,6 @@ from grainlearning.models import IOModel
 import os, sys
 sys.path.append(os.getcwd() +'/grainlearning')
 
-from tools import resampledParamsTable
-
 calibration = CalibrationToolbox.from_dict(
     {
         "curr_iter": 0,
