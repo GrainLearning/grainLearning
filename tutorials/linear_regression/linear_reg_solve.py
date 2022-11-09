@@ -50,6 +50,7 @@ calibration = CalibrationToolbox.from_dict(
                 "seed": 0,
             }
         },
+        "save_fig": 0,
         "model_type": IOModel
     }
 )

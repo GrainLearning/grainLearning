@@ -5,6 +5,7 @@
 from math import *
 import sys, os
 import numpy as np
+import matplotlib.pylab as plt
 
 from sklearn.mixture import BayesianGaussianMixture
 
@@ -352,3 +353,65 @@ def voronoi_vols(samples: np.ndarray):
         else:
             vol[i] = ConvexHull(v.vertices[indices]).volume
     return vol
+
+
+def plot_param_stats(fig_name, param_names, means, covs, savefig = 0):
+    """
+    Plot the posterior means and coefficients of variation of the model parameters over time.
+    :param fig_name: string
+    :param param_names: parameter names
+    :param means: ndarray
+    :param covs: ndarray
+    :param savefig: bool defaults to False  
+    """
+    if savefig < 0: return
+    num = len(param_names)
+    ncols = int(np.ceil(num/2))
+    plt.figure('Posterior means of the parameters')
+    for i in range(num):
+        plt.subplot(2,ncols, i+1)
+        plt.plot(means[:,i])
+        plt.xlabel("'Time' step")
+        plt.ylabel(r'$|'+param_names[i]+r'|$')
+        plt.grid(True)
+    plt.tight_layout()
+    if savefig: plt.savefig(f'{fig_name}_param_means.png')
+    else: plt.show()
+    plt.close()
+
+    plt.figure('Posterior coefficients of variance of the parameters')
+    for i in range(num):
+        plt.subplot(2,ncols,i+1)
+        plt.plot(covs[:,i])
+        plt.xlabel("'Time' step")
+        plt.ylabel(r'$COV('+param_names[i]+')$')
+        plt.grid(True)
+    plt.tight_layout()
+    if savefig: plt.savefig(f'{fig_name}_param_covs.png')
+    else: plt.show()
+    plt.close()
+
+
+def plot_posterior(fig_name, param_names, param_data, posterior, savefig = 0):
+    """
+    Plot the evolution of discrete posterior distribution over the parameters in time.
+    :param fig_name: string
+    :param param_names: parameter names
+    :param param_data: ndarray
+    :param posterior: ndarray
+    :param savefig: bool defaults to False  
+    """
+    if savefig < 0: return
+    num_steps = posterior.shape[0]
+    for i,name in enumerate(param_names):
+        plt.figure(f'Posterior distribution of {name}')
+        for j in range(6):
+            plt.subplot(2,3,j+1)
+            plt.plot(param_data[:,i], posterior[int(num_steps*(j+1)/6-1), :],'o')
+            plt.title("'Time' step No.%3i "%(int(num_steps*(j+1)/6-1)))
+            plt.xlabel(r'$'+name+'$')
+            plt.ylabel('Posterior distribution')
+            plt.grid(True)
+        plt.tight_layout()
+        if savefig: plt.savefig(f'{fig_name}_posterior_{name}.png')
+        else: plt.show()

@@ -13,5 +13,7 @@ from .tools import (
     stratified_resample,
     systematic_resample,
     multinomial_resample,
-    voronoi_vols
+    voronoi_vols,
+    plot_param_stats,
+    plot_posterior
     )

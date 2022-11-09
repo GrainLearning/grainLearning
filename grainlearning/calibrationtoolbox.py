@@ -3,7 +3,7 @@ from ast import Param
 from typing import Type, List, Dict
 from .models import Model, IOModel
 from .iterativebayesianfilter import IterativeBayesianFilter
-
+from .tools import plot_param_stats, plot_posterior
 
 class CalibrationToolbox:
     """This is the main calibration toolbox
@@ -69,12 +69,16 @@ class CalibrationToolbox:
     #: List of sigmas
     sigma_list: List = []
 
+    #: Flag to save figures
+    save_fig: int
+
     def __init__(
         self,
         model: Type["Model"],
         calibration: Type["IterativeBayesianFilter"],
         num_iter: int,
-        curr_iter: int
+        curr_iter: int,
+        save_fig: int
     ):
         self.model = model
 
@@ -83,6 +87,8 @@ class CalibrationToolbox:
         self.num_iter = num_iter
 
         self.curr_iter = curr_iter
+
+        self.save_fig = save_fig
 
 
     def run(self):
@@ -113,6 +119,7 @@ class CalibrationToolbox:
         if type(self.model) is IOModel: self.load_model()
 
         self.calibration.solve(self.model)
+        self.plot_UQ_in_time()
         self.sigma_list.append(self.model.sigma_max)
     
     def load_model(self):
@@ -128,6 +135,7 @@ class CalibrationToolbox:
         self.load_model()
         self.calibration.add_curr_param_data_to_list(self.model.param_data)
         self.calibration.solve(self.model)
+        self.plot_UQ_in_time()
         self.sigma_list.append(self.model.sigma_max)
 
     def load_and_process(self, sigma: float):
@@ -146,7 +154,32 @@ class CalibrationToolbox:
         resampled_param_data = self.calibration.param_data_list[-1]
         self.model.write_to_table(self.curr_iter + 1)
         return resampled_param_data
-    
+
+    def plot_UQ_in_time(self):
+        """Plot the evolution of uncertainty moments and distribution over time
+        """
+        import os
+        path = f'{self.model.sim_data_dir}/iter{self.curr_iter}'\
+            if type(self.model) == IOModel \
+            else f'./{self.model.sim_name}/iter{self.curr_iter}'
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        fig_name = f'{path}/{self.model.sim_name}'
+        plot_param_stats(
+            fig_name, self.model.param_names,
+            self.calibration.inference.ips,
+            self.calibration.inference.covs,
+            self.save_fig
+        )
+        plot_posterior(fig_name,
+            self.model.param_names,
+            self.model.param_data,
+            self.calibration.inference.posteriors,
+            self.save_fig
+        )
+        
     @classmethod
     def from_dict(
         cls: Type["CalibrationToolbox"],
@@ -161,5 +194,6 @@ class CalibrationToolbox:
             model=model,
             calibration=calibration,
             num_iter=obj["num_iter"],
-            curr_iter=obj.get("curr_iter", 0)
+            curr_iter=obj.get("curr_iter", 0),
+            save_fig=obj.get("save_fig", -1)
         )

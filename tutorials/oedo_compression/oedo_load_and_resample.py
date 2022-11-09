@@ -43,6 +43,7 @@ calibration = CalibrationToolbox.from_dict(
 # ~ calibration.load_and_run_one_iteration()
 calibration.load_and_process(0.01)
 _ = calibration.resample()
-posterior = calibration.calibration.inference.posteriors
 
 #%%
+# plot the uncertainty evolution
+calibration.plot_UQ_in_time(savefig = False)
