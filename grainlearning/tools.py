@@ -5,7 +5,9 @@
 from math import *
 import sys, os
 import numpy as np
-from sklearn import mixture
+
+from sklearn.mixture import BayesianGaussianMixture
+
 import subprocess
 from typing import Type, List, Callable, Tuple
 
@@ -159,7 +161,7 @@ def regenerate_params_with_gmm(
             expanded_param_data / max_params
     )  # and do array broadcasting to divide by max
 
-    gmm = mixture.BayesianGaussianMixture(
+    gmm = BayesianGaussianMixture(
         n_components=max_num_components,
         weight_concentration_prior=prior_weight,
         covariance_type=cov_type,
