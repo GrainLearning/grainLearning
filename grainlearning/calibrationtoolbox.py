@@ -95,7 +95,7 @@ class CalibrationToolbox:
 
         for i in range(self.num_iter-1):
             self.curr_iter += 1
-            print(f"Baysian calibration iter No. {self.curr_iter}")
+            print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
             if self.model.sigma_max < self.model.sigma_tol:
                 self.num_iter = self.curr_iter + 1

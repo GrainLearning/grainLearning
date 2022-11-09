@@ -318,12 +318,16 @@ class IOModel(Model):
     sim_data_files: List[str]
       
     #: Name of the directory where simulation data is stored
-    sim_data_dir: str = './SimData'
+    sim_data_dir: str = './sim_data'
+
+    #: Extension of simulation data files
+    sim_data_file_ext: str = '.npy'
 
     def __init__(
             self,
             sim_name: str,
             sim_data_dir: str,
+            sim_data_file_ext: str,
             obs_data_file: str,
             obs_names: List[str],
             ctrl_name: str,
@@ -337,7 +341,7 @@ class IOModel(Model):
             sim_data: np.ndarray = None,
             callback: Callable = None,
             param_data: np.ndarray = None,
-            param_names: List[str] = None
+            param_names: List[str] = None,
     ):
         """Initialize the IOModel class"""
 
@@ -371,6 +375,8 @@ class IOModel(Model):
 
         self.sim_data_dir = sim_data_dir
 
+        self.sim_data_file_ext = sim_data_file_ext
+
         #### Observations ####
 
         self.obs_data_file = sim_data_dir + '/' + obs_data_file
@@ -403,6 +409,7 @@ class IOModel(Model):
         return cls(
             sim_name=obj["sim_name"],
             sim_data_dir=obj["sim_data_dir"],
+            sim_data_file_ext=obj.get("sim_data_file_ext", '.npy'),
             obs_data_file=obj["obs_data_file"],
             obs_names=obj["obs_names"],
             ctrl_name=obj["ctrl_name"],
@@ -446,9 +453,16 @@ class IOModel(Model):
 
         magn = floor(log(self.num_samples, 10)) + 1
         self.sim_data_files = []
+
         for i in range(self.num_samples):
-            file_name = self.sim_data_dir + f'/iter{curr_iter}/' + self.sim_name + '*' + str(i).zfill(magn) + '*.npy'
+            if self.sim_data_file_ext != '.npy':
+                sim_data_file_ext = '_sim*' + self.sim_data_file_ext
+            else:
+                sim_data_file_ext = self.sim_data_file_ext
+            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*'\
+                + str(i).zfill(magn) + '*' + sim_data_file_ext
             files = glob(file_name)
+
             if not files:
                 raise RuntimeError("No data files with name " + file_name + ' found')
             elif len(files) > 1:
@@ -462,16 +476,26 @@ class IOModel(Model):
         """
         self.sim_data = np.zeros([self.num_samples,self.num_obs,self.num_steps])
         for i, f in enumerate(self.sim_data_files):
-            data = np.load(f, allow_pickle=True).item()
+            if self.sim_data_file_ext != '.npy':
+                data = get_keys_and_data(f)
+                param_data = np.genfromtxt(f.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
+                for j, key in enumerate(self.param_names):
+                    data[key] = param_data[j]
+            else:
+                data = np.load(f, allow_pickle=True).item()
+
             for j, key in enumerate(self.obs_names):
                 self.sim_data[i, j, :] = data[key]
+
             params = [data[key] for key in self.param_names] 
             if not (np.abs((params - self.param_data[i, :])
                            / self.param_data[i, :] < 1e-5).all()):
                 raise RuntimeError(
-                    "Parameters " + ", ".join(
-                        ["%s" % v for v in self.param_data[i, :]]) + \
-                        " are not matching between the data file and the parameter table in " + f)
+                    "Parameters [" + ", ".join(
+                        ["%s" % v for v in self.param_data[i, :]])
+                         + '] vs [' + \
+                         ", ".join("%s" % v for v in params) + \
+                        f"] from the simulation data file {f} and the parameter table do not match")
 
     def load_param_data(self, curr_iter: int = 0):
         """
@@ -480,15 +504,13 @@ class IOModel(Model):
         import os
         from glob import glob
         
-        file_name = self.sim_data_dir + f'/iter{curr_iter}/' + self.param_data_file
-
-        if os.path.exists(file_name):
+        if os.path.exists(self.param_data_file):
             # we assumes parameter data in the last columns.
-            self.param_data = np.genfromtxt(file_name, comments='!')[:, -self.num_params:]
+            self.param_data = np.genfromtxt(self.param_data_file, comments='!')[:, -self.num_params:]
             self.num_samples = self.param_data.shape[0]
         else:
             # get all simulation data files 
-            files = glob(self.sim_data_dir + f'/iter{curr_iter}/' + self.sim_name + '*.npy')
+            files = glob(self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*{self.sim_data_file_ext}')
             self.num_samples = len(files)
             self.sim_data_files = sorted(files)
             self.param_data = np.zeros([self.num_samples, self.num_params])
@@ -520,8 +542,8 @@ class IOModel(Model):
         self.callback(self, **kwargs)
 
         # move simulation data files into the directory per iteration 
-        os.system(f'mv {self.sim_name}*.npy {sim_data_sub_dir}')
+        os.system(f'mv {self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext} {sim_data_sub_dir}')
 
     def write_to_table(self, curr_iter: int):
         self.param_data_file = write_to_table(
-            f'{self.sim_data_dir}/{self.sim_name}', self.param_data, self.param_names, curr_iter)
+            f'{self.sim_data_dir}/iter{curr_iter}/{self.sim_name}', self.param_data, self.param_names, curr_iter)

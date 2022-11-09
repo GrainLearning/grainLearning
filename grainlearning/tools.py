@@ -52,7 +52,7 @@ def write_to_table(sim_name, table, names, curr_iter = 0, threads = 8):
     """
     
     # Computation of decimal number for unique key 
-    table_file_name = f'{sim_name}_iter{curr_iter}_samples.txt'
+    table_file_name = f'{sim_name}_Iter{curr_iter}_samples.txt'
     
     fout = open(table_file_name, 'w')
     num, dim = table.shape
@@ -65,23 +65,40 @@ def write_to_table(sim_name, table, names, curr_iter = 0, threads = 8):
     return table_file_name
 
 
-def get_keys_and_data(fileName):
+def get_keys_and_data(fileName, delimiters = ['\t', ' ', ',']):
     """
-    Get keys and corresponding data sequence from a Yade output file
+    Get keys and corresponding data sequence from a text file
 
     :param fileName: string
 
-    :return: keysAndData: dictionary
+    :return: keys_and_data: dictionary
     """
     data = np.genfromtxt(fileName)
+
+    try:
+        ncols = data.shape[1]
+    except IndexError:
+        nrows = data.shape[0]
+        ncols = 1
+        data = data.reshape([nrows, 1])
+
     fopen = open(fileName, 'r')
-    keys = (fopen.read().splitlines()[0]).split('\t\t')
-    if '#' in keys: keys.remove('#')
+    first_line = fopen.read().splitlines()[0]
+    for d in delimiters:
+        keys = first_line.split(d)
+        # remove # in the header line
+        if '#' in keys: keys.remove('#')
+        # remove empty strings from the list
+        keys = list(filter(None, keys))
+        if len(keys) == ncols: break
+
+    # store data in a dictory
     keys_and_data = {}
     for key in keys:
         if '#' in key: key_no_hash = key.split(' ')[-1]
         else: key_no_hash = key
         keys_and_data[key_no_hash] = data[:, keys.index(key)]
+
     return keys_and_data
 
 
@@ -325,13 +342,13 @@ def multinomial_resample(weights, expand_num=10):
 
 
 def voronoi_vols(samples: np.ndarray):
-	from scipy.spatial import Voronoi, ConvexHull
-	v = Voronoi(samples)
-	vol = np.zeros(v.npoints)
-	for i, reg_num in enumerate(v.point_region):
-		indices = v.regions[reg_num]
-		if -1 in indices:
-			vol[i] = -1.0
-		else:
-			vol[i] = ConvexHull(v.vertices[indices]).volume
-	return vol
+    from scipy.spatial import Voronoi, ConvexHull
+    v = Voronoi(samples)
+    vol = np.zeros(v.npoints)
+    for i, reg_num in enumerate(v.point_region):
+        indices = v.regions[reg_num]
+        if -1 in indices:
+            vol[i] = -1.0
+        else:
+            vol[i] = ConvexHull(v.vertices[indices]).volume
+    return vol

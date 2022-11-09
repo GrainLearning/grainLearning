@@ -26,18 +26,9 @@ def run_sim(model, **kwargs):
         data.append(np.array(y_sim, ndmin=2))
     
     model.sim_data = np.array(data)
-    
-    # ~ plt.figure()
-    # ~ plt.plot(model.ctrl_data, model.obs_data, ls="", marker=".", label="Observation")
-    # ~ for i,y_sims in enumerate(model.sim_data):
-       # ~ params =  model.param_data[i]
-       # ~ print(i,params)
-       # ~ plt.plot(model.ctrl_data[0], y_sims[0], label="Simulation")
-       # ~ plt.text(model.ctrl_data[0][-1], y_sims[0][-1], "{}".format(i,params[0],params[1]), bbox=dict(facecolor='red', alpha=0.5))
-    # ~ plt.show()
 
 
-def test_step_forward():
+def test_smc_mse():
     calibration = CalibrationToolbox.from_dict(
         {
             "num_iter": 0,
@@ -67,4 +58,4 @@ def test_step_forward():
     assert most_prob == least_err, f"most probable does not have the least MAE {most_prob=} {least_err=}"
 
 
-test_step_forward()
+test_smc_mse()

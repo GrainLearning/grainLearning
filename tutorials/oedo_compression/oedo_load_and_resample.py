@@ -8,6 +8,7 @@ from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
 
 curr_iter = 1
+sim_data_dir = './tests/data/oedo_sim_data'
 
 calibration = CalibrationToolbox.from_dict(
     {
@@ -18,8 +19,8 @@ calibration = CalibrationToolbox.from_dict(
             "obs_names": ['p','q','n'],
             "ctrl_name": 'e_a',
             "sim_name": 'oedo',
-            "sim_data_dir": './tests/data/oedo_sim_data',
-            "param_data_file": f'smcTable{curr_iter}.txt',
+            "sim_data_dir": sim_data_dir,
+            "param_data_file": f'{sim_data_dir}/iter{curr_iter}/smcTable{curr_iter}.txt',
             "param_names": ['E', 'mu', 'k_r', 'mu_r'],
             "param_mins": [100e9, 0.3, 0, 0.1],
             "param_maxs": [200e9, 0.5, 1e4, 0.5], 

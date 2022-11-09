@@ -3,7 +3,6 @@ from .calibrationtoolbox import CalibrationToolbox
 from .iterativebayesianfilter import IterativeBayesianFilter
 from .sampling import GaussianMixtureModel
 from .inference import SequentialMonteCarlo
-# from .tools import *
 from .tools import (
     startSimulations,
     write_to_table,

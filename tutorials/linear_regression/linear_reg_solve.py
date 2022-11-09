@@ -38,6 +38,7 @@ calibration = CalibrationToolbox.from_dict(
             "ctrl_name": 'u',
             "sim_name": 'linear',
             "sim_data_dir": './tutorials/linear_regression/',
+            "sim_data_file_ext": '.txt',
             "param_names": ['a', 'b'],
             "callback": run_sim,
         },
