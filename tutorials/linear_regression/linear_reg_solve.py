@@ -29,7 +29,7 @@ calibration = CalibrationToolbox.from_dict(
     {
         "num_iter": 10,
         "model": {
-            "param_mins": [0.1, 0.1],
+            "param_mins": [0.001, 0.001],
             "param_maxs": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,

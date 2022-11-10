@@ -364,7 +364,6 @@ def plot_param_stats(fig_name, param_names, means, covs, savefig = 0):
     :param covs: ndarray
     :param savefig: bool defaults to False  
     """
-    if savefig < 0: return
     num = len(param_names)
     ncols = int(np.ceil(num/2))
     plt.figure('Posterior means of the parameters')
@@ -401,7 +400,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, savefig = 0):
     :param posterior: ndarray
     :param savefig: bool defaults to False  
     """
-    if savefig < 0: return
     num_steps = posterior.shape[0]
     for i,name in enumerate(param_names):
         plt.figure(f'Posterior distribution of {name}')
@@ -415,3 +413,71 @@ def plot_posterior(fig_name, param_names, param_data, posterior, savefig = 0):
         plt.tight_layout()
         if savefig: plt.savefig(f'{fig_name}_posterior_{name}.png')
         else: plt.show()
+
+
+def plot_param_data(fig_name, param_names, param_data_list, savefig = 0):
+    num = len(param_names)
+    ncols = int(np.ceil(num / 2))
+    num = num - 1
+    num_iter = len(param_data_list)
+    plt.figure('Resampling the parameter space')
+    for j in range(num):
+        plt.subplot(2, ncols, j + 1)
+        for i in range(num_iter):
+            plt.plot(param_data_list[i][:, j], param_data_list[i][:,j+1], 'o', label='iterNo. %.2i' % i)
+            plt.xlabel(r'$' + param_names[j] + '$')
+            plt.ylabel(r'$' + param_names[j + 1] + '$')
+            plt.legend()
+        plt.legend()
+        plt.tight_layout()
+    if savefig: plt.savefig(f'{fig_name}_param_space.png')
+    else: plt.show()
+
+
+def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, savefig = 0):
+    """
+    Plot the ensemble prediction, observation data, and top three best-fits
+    :param fig_name: string
+    :param ctrl_name: name of the control variable
+    :param obs_names: names of the observables
+    :param ctrl_data: ndarray
+    :param obs_data: ndarray
+    :param sim_data: ndarray
+    :param posterior: ndarray
+    :param savefig: bool defaults to False  
+    """
+    ensemble_mean = np.einsum('ijk, ki->jk', sim_data, posteriors)
+    ensemble_std = np.einsum('ijk, ki->jk', (sim_data - ensemble_mean)**2, posteriors)
+    ensemble_std = np.sqrt(ensemble_std)
+    num = len(obs_names)
+    ncols = int(np.ceil(num/2)) if num > 1 else 1
+    plt.figure('Model prediction versus observation')
+    for i in range(num):
+        plt.subplot(2, ncols, i + 1)
+
+        plt.fill_between(
+            ctrl_data,
+            ensemble_mean[i, :] - 2 * ensemble_std[i, :],
+            ensemble_mean[i, :] + 2 * ensemble_std[i, :],
+            color = 'darkred', 
+            label = 'ensemble prediction'
+        )
+
+        for j in (-posteriors[-1, :]).argsort()[:3]:
+            plt.plot(ctrl_data, sim_data[j, i, :], label='sim No. %i' % j)
+
+        plt.plot(ctrl_data,
+            obs_data[i, :], 'ok',
+            label = 'obs.',
+            markevery = int(len(ctrl_data)/10.)
+        )
+
+        plt.xlabel(ctrl_name)
+        plt.ylabel(obs_names[i])
+        plt.legend()
+        plt.grid(True)
+
+    plt.tight_layout()
+    if savefig: plt.savefig(f'{fig_name}_obs_and_sim.png')
+    else: plt.show()
+    plt.close()

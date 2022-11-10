@@ -34,6 +34,7 @@ calibration = CalibrationToolbox.from_dict(
 			},
 				"proposal_data_file": f"iter{curr_iter-1}/gmm_iter{curr_iter-1}.pkl",
         },
+        "save_fig": 0,
         "model_type": IOModel
     }
 )
@@ -46,4 +47,4 @@ _ = calibration.resample()
 
 #%%
 # plot the uncertainty evolution
-calibration.plot_UQ_in_time(savefig = False)
+calibration.plot_UQ_in_time()

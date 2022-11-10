@@ -3,7 +3,7 @@ from ast import Param
 from typing import Type, List, Dict
 from .models import Model, IOModel
 from .iterativebayesianfilter import IterativeBayesianFilter
-from .tools import plot_param_stats, plot_posterior
+from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
 
 class CalibrationToolbox:
     """This is the main calibration toolbox
@@ -158,6 +158,8 @@ class CalibrationToolbox:
     def plot_UQ_in_time(self):
         """Plot the evolution of uncertainty moments and distribution over time
         """
+        if self.save_fig < 0: return
+
         import os
         path = f'{self.model.sim_data_dir}/iter{self.curr_iter}'\
             if type(self.model) == IOModel \
@@ -179,7 +181,28 @@ class CalibrationToolbox:
             self.calibration.inference.posteriors,
             self.save_fig
         )
-        
+
+        plot_param_data(fig_name,
+            self.model.param_names,
+            self.calibration.param_data_list,
+            self.save_fig
+        )
+
+        plot_obs_and_sim(fig_name,
+            self.model.ctrl_name,
+            self.model.obs_names,
+            self.model.ctrl_data,
+            self.model.obs_data,
+            self.model.sim_data,
+            self.calibration.inference.posteriors,
+            self.save_fig
+        )
+
+    def get_most_prob_params(self):
+        from numpy import argmax
+        most_prob = argmax(self.calibration.posterior_ibf)
+        return self.model.param_data[most_prob] 
+
     @classmethod
     def from_dict(
         cls: Type["CalibrationToolbox"],

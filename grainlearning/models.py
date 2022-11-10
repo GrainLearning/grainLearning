@@ -157,9 +157,7 @@ class Model:
         )  # ensure data is of shape (num_obs,num_step).
 
         if ctrl_data is not None:
-            self.ctrl_data = np.array(
-                ctrl_data, ndmin=2
-            )  # ensure data is of shape (num_obs,num_step).
+            self.ctrl_data = ctrl_data
 
         self.obs_names = obs_names
 
