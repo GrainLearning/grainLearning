@@ -17,7 +17,7 @@ developed by various projects of the University of Twente (NL), the Netherlands 
 Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io/en/latest/) to get started. 
 
 ## Features
-- Infer and update model parameters using "time" series (sequence) data, using [Sequential Monte Carlo](https://en.wikipedia.org/wiki/Particle_Filter)
+- Infer and update model parameters using "time" series (sequence) data via [Sequential Monte Carlo filtering](https://en.wikipedia.org/wiki/Particle_Filter)
 - Uniform, quasi-random sampling using [low-discrepancy sequences](https://en.wikipedia.org/wiki/Halton_sequence) 
 - Iterative sampling by training a nonparametric [Gaussian mixture model](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
 - Surrogate modeling capability for "time" series data
@@ -35,19 +35,7 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 1. Install GrainLearning and its dependencies: `poetry install`
 1. Run all self-tests of GrainLearning with pytest: `poetry run pytest -v`
 
-### Install using pip
-
-1. `git clone https://github.com/GrainLearning/grainLearning.git`
-1. `cd grainLearning`
-1. We recommend to work on an environment conda or any other python environment manager
-
-    `conda create --name grainlearning python=3.8`
-  
-    `conda activate grainlearning`
- 
-1. `pip install .`
-1. You may need to install matplotlib to do some plotting: `conda install matplotlib`
-1. To run the self-tests of GrainLearning, do `conda install pytest`
+For windows users, click [here](https://grainlearning.readthedocs.io/en/latest/installation.html#for-windows-users) to check other installation options.
 
 ## Tutorials
 
@@ -66,13 +54,13 @@ Please choose from the following:
 
 ## Software using GrainLearning
 
-- YADE
-- MercuryDPM
+- YADE: http://yade-dem.org/
+- MercuryDPM: https://www.mercurydpm.org/
 
 ## Community
 
-The original development of `GrainLearning` is done by [Hongyang Cheng](hongyangcheng.weebly.com), in collaboration with [Klaus Thoeni](), [Philipp Hartmann](), and [Takayuki Shuku]().
-The software is currently maintained with the help of [Luisa Orozco](), [Retief Lubbe](), and [Aron Jansen]().
+The original development of `GrainLearning` is done by [Hongyang Cheng](hongyangcheng.weebly.com), in collaboration with [Klaus Thoeni](https://www.newcastle.edu.au/profile/klaus-thoeni), [Philipp Hartmann](https://www.newcastle.edu.au/profile/philipp-hartmann), and [Takayuki Shuku](https://sites.google.com/view/takayukishukuswebsite/home).
+The software is currently maintained with the help of [Luisa Orozco](https://www.esciencecenter.nl/team/dr-luisa-orozco/), [Retief Lubbe](https://tusail.eu/projects/esr-12.html), and [Aron Jansen](https://www.esciencecenter.nl/team/dr-aron-jansen/).
 The GrainLearning project receives contributions from students and collaborators. For an exhaustive list, see [CONTRIBUTORS.md]().
 
 ## Help and Support
