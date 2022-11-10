@@ -46,7 +46,24 @@ Install using pip
 
 4. `pip install .`
 
-5. You may need to install matplotlib to do some plotting: `pip install matplotlib`
+5. You may need to install matplotlib to do some plotting: `conda install matplotlib`
+
+6. To run the self-tests of GrainLearning, do `conda install pytest` and run `pytest -v`
+
+For Windows users
+`````````````````
+1. Enable WSL1 or WSL2 following `this link <https://learn.microsoft.com/en-us/windows/wsl/install-manual>`_ 
+
+2. Install GrainLearning following the instructions above
+ 
+3. Use anaconda if there are no Windows Subsystem for Linux available on your operating system
+
+4. Open Anaconda Prompt and install GrainLearning with pip
+
+5. Now you should have a virtual environment, possibly called GrainLearning. Choose that environment from your anaconda navigator: click Environments and select grainlearning from the drop-down menu
+
+6. Open any editor, for example, spider and run the examples in grainLearning/tutorials.
+
 
 Packaging/One command install
 -----------------------------

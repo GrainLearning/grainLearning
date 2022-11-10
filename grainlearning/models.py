@@ -525,13 +525,15 @@ class IOModel(Model):
         
         # create a directory to store simulation data
         import os
+        from glob import glob
         curr_iter = kwargs['curr_iter']
         sim_data_sub_dir = f'{self.sim_data_dir}/iter{curr_iter}' 
         if not os.path.exists(sim_data_sub_dir):
             os.makedirs(sim_data_sub_dir)
         else:
             input(f'Removing existing simulation data in {sim_data_sub_dir}?\n')
-            os.system('rm ' + sim_data_sub_dir + '/*')
+            files = glob(sim_data_sub_dir + '/*')
+            for f in files: os.remove(f)
 
         # write the parameter table to a text file
         self.write_to_table(curr_iter)
@@ -539,8 +541,9 @@ class IOModel(Model):
         # run the callback function    
         self.callback(self, **kwargs)
 
-        # move simulation data files into the directory per iteration 
-        os.system(f'mv {self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext} {sim_data_sub_dir}')
+        # move simulation data files into the directory per iteration
+        files = glob(f'{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
+        for f in files: os.replace(f'./{f}', f'./{sim_data_sub_dir}/{f}')
 
     def write_to_table(self, curr_iter: int):
         self.param_data_file = write_to_table(

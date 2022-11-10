@@ -46,7 +46,8 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
     `conda activate grainlearning`
  
 1. `pip install .`
-1. You may need to install matplotlib to do some plotting: `pip install matplotlib`
+1. You may need to install matplotlib to do some plotting: `conda install matplotlib`
+1. To run the self-tests of GrainLearning, do `conda install pytest`
 
 ## Tutorials
 

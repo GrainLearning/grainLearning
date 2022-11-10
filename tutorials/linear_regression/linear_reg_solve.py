@@ -6,7 +6,6 @@ import numpy as np
 from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
 
-import matplotlib.pyplot as plt
 
 executable = 'python ./tutorials/linear_regression/LinearModel.py'
 
@@ -39,7 +38,6 @@ calibration = CalibrationToolbox.from_dict(
             "sim_name": 'linear',
             "sim_data_dir": './tutorials/linear_regression/',
             "sim_data_file_ext": '.txt',
-            "param_names": ['a', 'b'],
             "callback": run_sim,
         },
         "calibration": {
