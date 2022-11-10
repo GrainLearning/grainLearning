@@ -21,7 +21,7 @@ Install using poetry
 
 1. Install poetry following `these instructions <https://python-poetry.org/docs/#installation>`_.
 
-2. Clone the repository: https://github.com/GrainLearning/grainLearning.git
+2. `git clone https://github.com/GrainLearning/grainLearning.git`
 
 3. `cd grainLearning`
 
@@ -34,7 +34,7 @@ Install using poetry
 Install using pip
 `````````````````
 
-1. Clone the repository: git clone https://github.com/GrainLearning/grainLearning.git
+1. `git clone https://github.com/GrainLearning/grainLearning.git`
 
 2. `cd grainLearning`
 

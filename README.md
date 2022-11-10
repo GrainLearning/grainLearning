@@ -29,15 +29,28 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 ### Install using poetry (recommended)
 
 1. Install poetry following [these instructions](https://python-poetry.org/docs/#installation).
-1. Clone the repository: https://github.com/GrainLearning/grainLearning.git
+1. Clone the repository: `git clone https://github.com/GrainLearning/grainLearning.git`
 1. Go to the source code directory: `cd grainLearning`
 1. Activate the virtual environment: `poetry shell`
 1. Install GrainLearning and its dependencies: `poetry install`
 1. Run all self-tests of GrainLearning with pytest: `poetry run pytest -v`
 
+### Install using pip
+
+1. `git clone https://github.com/GrainLearning/grainLearning.git`
+1. `cd grainLearning`
+1. We recommend to work on an environment conda or any other python environment manager
+
+    `conda create --name grainlearning python=3.8`
+  
+    `conda activate grainlearning`
+ 
+1. `pip install .`
+1. You may need to install matplotlib to do some plotting: `pip install matplotlib`
+
 ## Tutorials
 
-1. Linear regression with the `run_sim` callback function of the [`Model`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/models.py) class
+1. Linear regression with the [`run_sim`](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/linear_regression/linear_reg_solve.py#L13) callback function of the [`Model`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/models.py) class
 2. Nonlinear, multivariate regression
 3. Interact with the numerical model of your choice
 4. Load existing simulation data and run GrainLearning for one iteration 

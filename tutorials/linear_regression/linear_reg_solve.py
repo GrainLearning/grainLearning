@@ -1,6 +1,6 @@
 
 #%%
- 
+
 import numpy as np
 
 from grainlearning import CalibrationToolbox
@@ -8,7 +8,7 @@ from grainlearning.models import IOModel
 
 import matplotlib.pyplot as plt
 
-executable = './tutorials/linear_regression/LinearModel.py'
+executable = 'python ./tutorials/linear_regression/LinearModel.py'
 
 def run_sim(model, **kwargs):
 	from math import floor, log
@@ -71,7 +71,7 @@ print(f'All parameter samples at the last iteration:\n {calibration.model.param_
 most_prob = np.argmax(calibration.calibration.posterior_ibf)
 
 # %%
-most_prob_params = calibration.model.param_data[most_prob] 
+most_prob_params = calibration.model.param_data[most_prob]
 
 print(f'Most probable parameter values: {most_prob_params}')
 # %%
