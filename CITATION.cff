@@ -1,23 +1,38 @@
 # YAML 1.2
 ---
 cff-version: "1.1.0"
-title: "grainlearning"
+title: "GrainLearning: a Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials"
 authors:
   -
     family-names: Cheng
     given-names: Hongyang
     orcid: "https://orcid.org/0000-0001-7652-8600"
   -
+    family-names: Hartmann 
+    given-names: Philipp
+  -
+    family-names: Lubbe
+    given-names: Retief
+  -
     family-names: Orozco
     given-names: Luisa
     orcid: "https://orcid.org/0000-0002-9153-650X"
+  -
+    family-names: Aron
+    given-names: Jansen
+    orcid: "https://orcid.org/0000-0002-4764-9347"
+  -
+    family-names: Thoeni
+    given-names: Klaus
+
 date-released: 2020-10-30
 doi: <insert your DOI here>
 version: "1.0"
 repository-code: "https://github.com/GrainLearning/grainlearning"
 keywords:
-  - dem
+  - DEM
   - Bayesian Calibration
+  - Uncertainty Quantification
   - nonparametric Gaussian mixture
 message: "If you use this software, please cite it using these metadata."
 license: GPL-2.0 license
