@@ -1,2 +1,7 @@
 Inference
 =========
+
+The inference module
+--------------------
+
+

@@ -25,9 +25,11 @@ GrainLearning can be used together `YADE <http://yade-dem.org/>`_,
 Integration another model or software into GrainLearning can be easily done
 in the **models** module, via a callback function.
 
-Prior
-Posterior
-Proposal
-Samples
-Model evaluation
-Ensemble
+It is important to bear in mind the following definitions as they will appear frequently in this documentation.
+
+- `Prior <https://en.wikipedia.org/wiki/Prior_probability>`_: the initial knowledge about model state or parameter before any data is taken into account, expressed as a probability distribution.
+- `Posterior <https://en.wikipedia.org/wiki/Posterior_probability>`_: the updated knowledge after the data is taken into account via the Bayes' theorem.
+- Proposal: the distribution where we drawn new samples. It can be assumed or learned.
+- Samples: the combination of model parameters drawn from a distribution, leading certain "randomly" distributed model states.
+- Model evaluation: the execution of the model at the sample points.
+- Ensemble: the probability distribution of the model state, represented as a collection of state vectors and their associated weights.

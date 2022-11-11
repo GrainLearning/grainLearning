@@ -46,7 +46,7 @@ The following gives an example of the callback where the "software" model :math:
 .. code-block:: python
    :caption: A callback function implemented in Python
 
-   def run_sim(model: Type["Model"]):
+   def run_sim(model: Type["Model"], **kwargs):
        data = []
        for params in model.param_data:
            # a linear function y = a*x + b
@@ -70,15 +70,15 @@ Below is an example of the callback where parameter samples are passed as comman
    executable = './software'
 
    def run_sim(model, **kwargs):
-      from math import floor, log
-      import os
-      # keep the naming convention consistent between iterations
-      magn = floor(log(model.num_samples, 10)) + 1
-      curr_iter = kwargs['curr_iter']
-      # check the software name and version
-      print("*** Running external software... ***\n")
-      # loop over and pass parameter samples to the executable
-      for i, params in enumerate(model.param_data):
-         description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(magn)
-         print(" ".join([executable, '%.8e %.8e'%tuple(params), description]))
-         os.system(' '.join([executable, '%.8e %.8e'%tuple(params), description]))
+       from math import floor, log
+       import os
+       # keep the naming convention consistent between iterations
+       magn = floor(log(model.num_samples, 10)) + 1
+       curr_iter = kwargs['curr_iter']
+       # check the software name and version
+       print("*** Running external software... ***\n")
+       # loop over and pass parameter samples to the executable
+       for i, params in enumerate(model.param_data):
+           description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(magn)
+           print(" ".join([executable, '%.8e %.8e'%tuple(params), description]))
+           os.system(' '.join([executable, '%.8e %.8e'%tuple(params), description]))
