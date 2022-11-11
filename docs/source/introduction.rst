@@ -10,9 +10,9 @@ for computational models of granular materials, such as soils, rocks, pharmaceut
 
 GrainLearning was initially developed for the inference of the particle- or microstructure-scale parameters
 of **discrete element method (DEM)** models of granular media, formulated as a inverse or data asimilation problem.
-We name the software ''GrainLearning'' because not only the properties of physical particles
+We name the software "GrainLearning" because not only the properties of physical particles
 (e,g., powders and grains) are learned from limited observations for accurate simulations,
-but also statistical ''paricles'' are used in the context of sequential Monte Carlo filtering.
+but also statistical "paricles" are used in the context of sequential Monte Carlo filtering.
 Nevertheless, GrainLearning can be used with other empirical, numerical, or data-driven models
 that are stronly nonlinear in time.
 
@@ -33,3 +33,5 @@ It is important to bear in mind the following definitions as they will appear fr
 - Samples: the combination of model parameters drawn from a distribution, leading certain "randomly" distributed model states.
 - Model evaluation: the execution of the model at the sample points.
 - Ensemble: the probability distribution of the model state, represented as a collection of state vectors and their associated weights.
+
+We draw inspiration from the `UQpy <https://uqpyproject.readthedocs.io/en/latest/index.html>`_ and `MUSCLE3 <https://muscle3.readthedocs.io/en/latest/index.html>`_ libraries when designing the GrainLearning software and its documentation.

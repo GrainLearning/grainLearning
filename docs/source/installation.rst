@@ -1,8 +1,8 @@
 Installation
 ============
 
-GrainLearning is set up using poetry, with a Python version higher than 3.7.
-We have tested GrainLearning with Python verions 3.7, 3.8, and 3.9.
+GrainLearning is set up using poetry, with a Python version higher than 3.8.
+We have tested GrainLearning with Python versions 3.8, 3.9, and 3.10.
 
 Package management and dependencies
 -----------------------------------
