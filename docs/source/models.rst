@@ -8,11 +8,11 @@ The :mod:`.models` module is essential for GrainLearning to execute computationa
 and encapsulate simulation and observation (reference) data in a single :class:`.Model` class
 Currently, the :mod:`.models` module contains
 
-- a :class:`.Model` class that execute simulations handles the simulation and observation data in a *Python environment*,
-- a :class:`.IOModel` class that sends instructions to a *third-party software* (from the command line) and retrieve simulation data from the output files of the software.
+- a :class:`.Model` class that executes simulations handles the simulation and observation data in a *Python environment*,
+- an :class:`.IOModel` class that sends instructions to *third-party software* (from the command line) and retrieves simulation data from the output files of the software.
 
 Note that the models defined in GrainLearning are state space models
-consist of both numerical predictions :math:`\vec{x}_t` (:attr:`.Model.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.Model.obs_data`).
+that consist of both numerical predictions :math:`\vec{x}_t` (:attr:`.Model.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.Model.obs_data`).
 
 .. math::
 
@@ -24,14 +24,14 @@ consist of both numerical predictions :math:`\vec{x}_t` (:attr:`.Model.sim_data`
 	\end{align}
 
 where :math:`\mathbb{F}` represents the *third-party software* model that
-takes the previous model state :math:`\vec{x}_{t-1}` to make predict for time :math:`t`. 
-If all observables :math:`\vec{y}_t` are independent and have one-to-one relationship with :math:`\vec{y}_t`,
+takes the previous model state :math:`\vec{x}_{t-1}` to make predictions for time :math:`t`. 
+If all observables :math:`\vec{y}_t` are independent and have a one-to-one relationship with :math:`\vec{y}_t`,
 the observation model :math:`\mathbb{H}` reduces to the identity matrix :math:`\mathbf{I}_d`, 
 with :math:`d` being the number of independent observables.
 
 The simulation and observation errors :math:`\vec{\nu}_t` and :math:`\vec{\omega}_t`
 are random variables and assumed to be normally distributed with zero means.
-We consider both errors together in the covariance matrix with :attr:`.SequentialMonteCarlo.cov_matrices`.
+We consider both errors together in the covariance matrix with :attr:`.SMC.cov_matrices`.
 In fact, :math:`\vec{x}_t` and :math:`\vec{y}_t` are also random variables
 whose distributions are updated by the :mod:`.inference` module.
 
@@ -52,7 +52,7 @@ The following gives an example of the callback where the "software" model :math:
            # a linear function y = a*x + b
            y_sim = params[0] * model.ctrl_data + params[1]
            data.append(np.array(y_sim, ndmin=2))
-       # assign model ouput to the model class
+       # assign model output to the model class
        model.sim_data = np.array(data)
 
 

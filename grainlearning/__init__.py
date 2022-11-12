@@ -1,8 +1,8 @@
 from .models import Model, IOModel
 from .calibrationtoolbox import CalibrationToolbox
 from .iterativebayesianfilter import IterativeBayesianFilter
-from .sampling import GaussianMixtureModel
-from .inference import SequentialMonteCarlo
+from .sampling import GaussianMixtureModel, generate_params_qmc
+from .inference import SMC
 from .tools import (
     write_to_table,
     get_keys_and_data,

@@ -39,7 +39,7 @@ Install using pip
    $ git clone https://github.com/GrainLearning/grainLearning.git 
    $ cd grainLearning
 
-   # We recommend to work on an environment conda or any other python environment manager,
+   # We recommend working on an environment conda or any other python environment manager,
    # for example, with anaconda
    $ conda create --name grainlearning python=3.8
    $ conda activate grainlearning`
@@ -70,7 +70,7 @@ For Windows users
 
 5. Now you should have a virtual environment, possibly called GrainLearning. Choose that environment from your anaconda navigator: click Environments and select grainlearning from the drop-down menu
 
-6. Open any editor, for example, spider and run the examples in grainLearning/tutorials.
+6. Open any editor, for example, spider, and run the examples in grainLearning/tutorials.
 
 
 Packaging/One command install

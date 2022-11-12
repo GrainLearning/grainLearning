@@ -1,6 +1,6 @@
 import numpy as np
 
-from grainlearning import GaussianMixtureModel, Model
+from grainlearning import GaussianMixtureModel, Model, generate_params_qmc
 
 
 def test_init():
@@ -30,7 +30,7 @@ def test_expand_proposal_to_normalized_params():
 
     gmm_cls = GaussianMixtureModel(max_num_components=5, expand_weight=2)
     
-    gmm_cls.generate_params_halton(model_cls)
+    generate_params_qmc(model_cls)
 
     expanded_parms, max_params = gmm_cls.expand_weighted_parameters(proposal, model_cls)
     # expanded_parms
@@ -68,7 +68,7 @@ def test_regenerate_params():
 
     gmm_cls = GaussianMixtureModel(max_num_components=2, expand_weight=2, seed=100)
 
-    gmm_cls.generate_params_halton(model_cls)
+    generate_params_qmc(model_cls)
 
     expanded_parms, max_params = gmm_cls.expand_weighted_parameters(proposal, model_cls)
 
@@ -97,9 +97,7 @@ def test_generate_halton():
         }
     )
 
-    gmm_cls = GaussianMixtureModel(max_num_components=1)
-
-    gmm_cls.generate_params_halton(model_cls)
+    generate_params_qmc(model_cls)
 
     print(model_cls.param_data)
     

@@ -1,7 +1,7 @@
 import numpy as np
 
 from grainlearning import (
-    SequentialMonteCarlo,
+    SMC,
     IterativeBayesianFilter,
     GaussianMixtureModel,
     Model,
@@ -9,7 +9,7 @@ from grainlearning import (
 
 def test_init():
     """Test if the iterative bayesian filter is initialized correctly"""
-    smc_cls = SequentialMonteCarlo(ess_target=0.1)
+    smc_cls = SMC(ess_target=0.1)
     gmm_cls = GaussianMixtureModel(max_num_components=5)
     ibf_cls = IterativeBayesianFilter(inference=smc_cls, sampling=gmm_cls)
 

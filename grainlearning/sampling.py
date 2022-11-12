@@ -3,6 +3,7 @@
 from typing import Tuple, Type
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
+from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 
 from .models import Model
 from .tools import regenerate_params_with_gmm, unweighted_resample
@@ -132,27 +133,6 @@ class GaussianMixtureModel:
 
         return normalized_parameters, max_params
 
-    # TODO: this should go to the sampling class
-    def generate_params_halton(self, model: Type["Model"]) -> np.ndarray:
-        """Generate a Halton table of the parameters"""
-
-        from scipy.stats import qmc
-
-        halton_sampler = qmc.Halton(model.num_params, scramble=False)
-        param_table = halton_sampler.random(n=model.num_samples)
-
-        for param_i in range(model.num_params):
-            for sim_i in range(model.num_samples):
-                mean = 0.5 * (model.param_maxs[param_i] + model.param_mins[param_i])
-                std = 0.5 * (model.param_maxs[param_i] - model.param_mins[param_i])
-                param_table[sim_i][param_i] = (
-                        mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
-                )
-
-        model.param_data = np.array(param_table, ndmin=2)
-
-        return model.param_data
-
     def regenerate_params(
             self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> np.ndarray:
@@ -233,3 +213,34 @@ class GaussianMixtureModel:
         )
 
         return new_params
+
+
+def generate_params_qmc(model: Type["Model"], method: str = "halton") -> np.ndarray:
+    """This is the class to uniformly draw samples in n-dimensional space from 
+    a low-discrepancy sequence or a Latin hypercube.
+
+    See `Quasi-Monte Carlo <https://docs.scipy.org/doc/scipy/reference/stats.qmc.html>`_.
+
+    :param max_iter: maximum number of iterations, defaults to 100000
+    :param expand_weight: weighted expansions, defaults to 10
+    :param seed: random generation seed, defaults to None
+    """
+
+    if method == "halton": sampler = Halton(model.num_params, scramble=False)
+    elif method == "sobol": sampler = Sobol(model.num_params)
+    elif method == "LH": sampler = LatinHypercube(model.num_params)
+
+    param_table = sampler.random(n=model.num_samples)
+
+    for param_i in range(model.num_params):
+        for sim_i in range(model.num_samples):
+            mean = 0.5 * (model.param_maxs[param_i] + model.param_mins[param_i])
+            std = 0.5 * (model.param_maxs[param_i] - model.param_mins[param_i])
+            param_table[sim_i][param_i] = (
+                    mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
+            )
+
+    model.param_data = np.array(param_table, ndmin=2)
+
+    return model.param_data
+

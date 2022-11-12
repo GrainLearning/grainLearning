@@ -1,15 +1,15 @@
 #%%
 import numpy as np
 
-from grainlearning import SequentialMonteCarlo, Model, GaussianMixtureModel
+from grainlearning import SMC, Model, GaussianMixtureModel, generate_params_qmc
 
 
 def test_smc_init():
     """Test initialization of Sequential Monte Carlo class."""
-    smc_cls = SequentialMonteCarlo(ess_target=0.1, scale_cov_with_max=True)
-    assert isinstance(smc_cls, SequentialMonteCarlo)
+    smc_cls = SMC(ess_target=0.1, scale_cov_with_max=True)
+    assert isinstance(smc_cls, SMC)
 
-    smc_dct = SequentialMonteCarlo.from_dict(
+    smc_dct = SMC.from_dict(
         {"ess_target": 0.1, "scale_cov_with_max": True}
     )
 
@@ -27,7 +27,7 @@ def test_get_covariance_matrix():
         num_samples=3,
     )
 
-    smc_cls = SequentialMonteCarlo(ess_target=0.1, scale_cov_with_max=True)
+    smc_cls = SMC(ess_target=0.1, scale_cov_with_max=True)
 
     cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
 
@@ -43,7 +43,7 @@ def test_get_covariance_matrix():
         ],
     )
 
-    smc_cls = SequentialMonteCarlo(ess_target=0.1, scale_cov_with_max=False)
+    smc_cls = SMC(ess_target=0.1, scale_cov_with_max=False)
 
     cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
 
@@ -59,7 +59,7 @@ def test_get_covariance_matrix():
 
 def test_get_likelihood():
     """Test to see if likelihood is generated as expected"""
-    smc_cls = SequentialMonteCarlo(
+    smc_cls = SMC(
         ess_target=0.1, scale_cov_with_max=True
     )
 
@@ -88,7 +88,7 @@ def test_get_likelihood():
 
 def test_get_posterior():
     """Test to see if posterior is generated as expected"""
-    smc_cls = SequentialMonteCarlo(
+    smc_cls = SMC(
         ess_target=0.1, scale_cov_with_max=True
     )
 
@@ -119,7 +119,7 @@ def test_get_posterior():
 def test_ips_covs():
     """Test to see if ips is generated as expected."""
 
-    smc_cls = SequentialMonteCarlo(
+    smc_cls = SMC(
         ess_target=0.1, scale_cov_with_max=True
     )
 
@@ -133,7 +133,7 @@ def test_ips_covs():
     
     gmm_cls = GaussianMixtureModel(max_num_components=1)
 
-    gmm_cls.generate_params_halton(model_cls)
+    generate_params_qmc(model_cls)
 
     posteriors = np.array(
         [
@@ -142,7 +142,7 @@ def test_ips_covs():
             [0.3, 0.2, 0.2, 0.1, 0.2],
         ]
     )
-    ips, covs = smc_cls.get_ensamble_ips_covs(model=model_cls, posteriors=posteriors)
+    ips, covs = smc_cls.get_ensemble_ips_covs(model=model_cls, posteriors=posteriors)
 
     np.testing.assert_array_almost_equal(
         ips,

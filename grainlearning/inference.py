@@ -6,8 +6,9 @@ from .models import Model
 from scipy.stats import multivariate_normal
 
 
-class SequentialMonteCarlo:
-    """This is the Sequential Monte Carlo class that is used the call the data assimilation.
+class SMC:
+    """This is the Sequential Monte Carlo class that recursively
+    update the model state and model parameters based on Bayes' theorem
 
     There are two ways of initializing the class.
 
@@ -16,7 +17,7 @@ class SequentialMonteCarlo:
     .. highlight:: python
     .. code-block:: python
     
-        model_cls = SequentialMonteCarlo.from_dict(
+        model_cls = SMC.from_dict(
             {
                 "ess_target": 0.3,
                 "scale_cov_with_max": True
@@ -30,7 +31,7 @@ class SequentialMonteCarlo:
     .. highlight:: python
     .. code-block:: python
     
-        model_cls = SequentialMonteCarlo(
+        model_cls = SMC(
                 ess_target = 0.3,
                 scale_cov_with_max = True
         )
@@ -61,7 +62,7 @@ class SequentialMonteCarlo:
     covs: np.array
 
     #: Calculated effective sample size
-    eff: float
+    ess: float
 
     def __init__(
             self,
@@ -73,7 +74,7 @@ class SequentialMonteCarlo:
         self.scale_cov_with_max = scale_cov_with_max
 
     @classmethod
-    def from_dict(cls: Type["SequentialMonteCarlo"], obj: dict):
+    def from_dict(cls: Type["SMC"], obj: dict):
         """Initialize the class using a dictionary style"""
         return cls(
             ess_target=obj["ess_target"],
@@ -155,7 +156,7 @@ class SequentialMonteCarlo:
 
         return posteriors
 
-    def get_ensamble_ips_covs(
+    def get_ensemble_ips_covs(
             self,
             model: Type["Model"],
             posteriors: np.array,
@@ -211,16 +212,16 @@ class SequentialMonteCarlo:
             model=model, likelihoods=self.likelihoods, proposal_ibf=proposal_ibf
         )
 
-        self.ips, self.covs = self.get_ensamble_ips_covs(
+        self.ips, self.covs = self.get_ensemble_ips_covs(
             model=model, posteriors=self.posteriors
         )
 
         # TODO: I (Hongyang) would save the whole effective sample size sequence in time.
         #  Examining the evolution of eff gives you a good idea how your filtering algorithm is doing.
-        self.eff = 1.0 / np.sum(
+        self.ess = 1.0 / np.sum(
             self.posteriors[-1, :] ** 2,
         )
 
-        self.eff /= model.num_samples
+        self.ess /= model.num_samples
 
-        return (self.eff - self.ess_target) ** 2
+        return (self.ess - self.ess_target) ** 2

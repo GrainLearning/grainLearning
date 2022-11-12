@@ -5,9 +5,9 @@ from typing import Type, List
 
 from .models import Model
 
-from .inference import SequentialMonteCarlo
+from .inference import SMC
 
-from .sampling import GaussianMixtureModel
+from .sampling import GaussianMixtureModel, generate_params_qmc
 
 from scipy import optimize
 
@@ -42,20 +42,21 @@ class IterativeBayesianFilter:
     .. code-block:: python
         
         model_cls = IterativeBayesianFilter(
-                inference = SequentialMonteCarlo(...),
+                inference = SMC(...),
                 sampling = GaussianMixtureModel(...)
         )
 
     :param inference: Sequential Monte Carlo class (SMC)
     :param sampling: Gaussian Mixture Model class (GMM)
+    :param initial_sampling: the initial sampling method, defaults to Halton
     :param num_samples: Number of samples within a user model
     :param ess_tol: Tolerance for the effective sample size to converge, defaults to 1.0e-2
     :param proposal_ibf: User defined proposal distribution for the data assimilation loop, defaults to None
     """
 
     #: The inference class is a member variable of the particle filter which is used to generate the likelihood
-    inference = Type["SequentialMonteCarlo"]
-
+    inference = Type["SMC"]
+    
     #: The gaussian mixture model class is used to sample the parameters
     sampling = Type["GaussianMixtureModel"]
     
@@ -64,6 +65,9 @@ class IterativeBayesianFilter:
 
     #: This a tolerance to which the optimization algorithm converges.
     ess_tol: float = 1.0e-2
+
+    #: The non-informative distribution to draw the initial samples
+    initial_sampling: str = "halton"
 
     #: this is the current proposal distribution
     posterior_ibf: np.ndarray
@@ -74,14 +78,16 @@ class IterativeBayesianFilter:
 
     def __init__(
             self,
-            inference: Type["SequentialMonteCarlo"],
+            inference: Type["SMC"],
             sampling: Type["GaussianMixtureModel"],
             ess_tol: float = 1.0e-2,
+            initial_sampling: str = 'halton',
             proposal_ibf: np.ndarray = None,
             proposal_data_file: str = None,
     ):
         """Initialize the Iterative Bayesian Filter."""
         self.inference = inference
+        self.initial_sampling = initial_sampling
         self.sampling = sampling
         self.ess_tol = ess_tol
         self.proposal_ibf = proposal_ibf
@@ -91,9 +97,10 @@ class IterativeBayesianFilter:
     def from_dict(cls: Type["IterativeBayesianFilter"], obj: dict):
         """Initialize the class using a dictionary style"""
         return cls(
-            inference=SequentialMonteCarlo.from_dict(obj["inference"]),
+            inference=SMC.from_dict(obj["inference"]),
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
             ess_tol=obj.get("ess_tol", 1.0e-2),
+            initial_sampling=obj.get("initial_sampling", "halton"),
             proposal_ibf=obj.get("proposal_ibf", None),
             proposal_data_file=obj.get("proposal_data_file", None),
         )
@@ -124,7 +131,7 @@ class IterativeBayesianFilter:
 
         :param model: Model class
         """
-        self.param_data_list.append(self.sampling.generate_params_halton(model))
+        self.param_data_list.append(generate_params_qmc(model, self.initial_sampling))
 
     def run_sampling(self, model: Type["Model"]):
         """Resample the parameters using the Gaussian mixture model
