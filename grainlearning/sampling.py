@@ -40,7 +40,7 @@ class GaussianMixtureModel:
 
     :param max_num_components: Maximum number of components
     :param prior_weight: Prior weight, defaults to None
-    :param cov_type: Covariance type, defaults to "full"
+    :param cov_type: Covariance type, defaults to "spherical"
     :param n_init: number of initial samples, defaults to 100
     :param tol: tolarance, defaults to 1.0e-5
     :param max_iter: maximum number of iterations, defaults to 100000
@@ -51,7 +51,7 @@ class GaussianMixtureModel:
 
     prior_weight: float = 0.0
 
-    cov_type: str = "full"
+    cov_type: str = "spherical"
 
     n_init: int = 1
 
@@ -69,7 +69,7 @@ class GaussianMixtureModel:
             self,
             max_num_components,
             prior_weight: int = None,
-            cov_type: str = "full",
+            cov_type: str = "spherical",
             n_init: int = 1,
             tol: float = 1.0e-5,
             max_iter: int = 100000,
@@ -91,13 +91,12 @@ class GaussianMixtureModel:
             self.prior_weight = prior_weight
 
     @classmethod
-    # TODO: with this class method, GaussianMixtureModel has only one argument, can we use **kwargs to allow more user input?
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
         """Initialize the class using a dictionary style"""
         return cls(
             max_num_components=obj["max_num_components"],
             prior_weight=obj.get("prior_weight", None),
-            cov_type=obj.get("cov_type", "full"),
+            cov_type=obj.get("cov_type", "spherical"),
             n_init=obj.get("n_init", 1),
             tol=obj.get("tol", 1.0e-5),
             max_iter=obj.get("max_iter", 100000),
@@ -105,7 +104,6 @@ class GaussianMixtureModel:
             expand_weight=obj.get("expand_weight", 10),
         )
 
-    # TODO: review below with Retief (originally in resample.py)
     def expand_weighted_parameters(
             self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> Tuple[np.ndarray, np.ndarray]:
@@ -226,9 +224,16 @@ def generate_params_qmc(model: Type["Model"], method: str = "halton") -> np.ndar
     :param seed: random generation seed, defaults to None
     """
 
-    if method == "halton": sampler = Halton(model.num_params, scramble=False)
-    elif method == "sobol": sampler = Sobol(model.num_params)
-    elif method == "LH": sampler = LatinHypercube(model.num_params)
+    if method == "halton":
+        sampler = Halton(model.num_params, scramble=False)
+
+    elif method == "sobol":
+        sampler = Sobol(model.num_params)
+        random_base = round(np.log2(model.num_samples))
+        model.num_samples = 2**random_base
+
+    elif method == "LH":
+        sampler = LatinHypercube(model.num_params)
 
     param_table = sampler.random(n=model.num_samples)
 

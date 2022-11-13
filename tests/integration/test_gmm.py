@@ -32,6 +32,7 @@ def test_gmm():
                 "inference": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
+                    "cov_type": "full",
                     "seed": 0,
                 },
             },

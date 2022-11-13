@@ -75,8 +75,6 @@ Below is an example of the callback where parameter samples are passed as comman
        # keep the naming convention consistent between iterations
        magn = floor(log(model.num_samples, 10)) + 1
        curr_iter = kwargs['curr_iter']
-       # check the software name and version
-       print("*** Running external software... ***\n")
        # loop over and pass parameter samples to the executable
        for i, params in enumerate(model.param_data):
            description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(magn)

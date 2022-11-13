@@ -42,9 +42,10 @@ calibration = CalibrationToolbox.from_dict(
         "calibration": {
             "inference": {"ess_target": 0.3},
             "sampling": {
-                "max_num_components": 1,
+                "max_num_components": 2,
                 "n_init": 1,
                 "seed": 0,
+                "cov_type": "full",
             }
         },
         "save_fig": 0,

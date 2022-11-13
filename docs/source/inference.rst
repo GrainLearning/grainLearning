@@ -71,7 +71,7 @@ By making use of importance sampling, the posterior distribution
 :math:`p(\hat{\vec{y}}_t|\hat{\vec{x}}_t^{(i)})` gets updated over time in :attr:`.SMC.data_assimilation_loop`
 --- this is known as `Bayesian updating <https://statswithr.github.io/book/the-basics-of-bayesian-statistics.html#bayes-updating>`_.
 
-.. image:: ../figs/bayesian updating.png
+.. image:: ../figs/bayesian_updating.png
   :width: 400
   :alt: Sequential Importance Sampling
   Time evolution of the importance weights over a model parameter.

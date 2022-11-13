@@ -66,7 +66,7 @@ def test_regenerate_params():
         num_samples=4,
     )
 
-    gmm_cls = GaussianMixtureModel(max_num_components=2, expand_weight=2, seed=100)
+    gmm_cls = GaussianMixtureModel(max_num_components=2, expand_weight=2, seed=100, cov_type="full")
 
     generate_params_qmc(model_cls)
 
