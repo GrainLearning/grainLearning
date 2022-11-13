@@ -40,7 +40,7 @@ class GaussianMixtureModel:
 
     :param max_num_components: Maximum number of components
     :param prior_weight: Prior weight, defaults to None
-    :param cov_type: Covariance type, defaults to "spherical"
+    :param cov_type: Covariance type, defaults to "tied"
     :param n_init: number of initial samples, defaults to 100
     :param tol: tolarance, defaults to 1.0e-5
     :param max_iter: maximum number of iterations, defaults to 100000
@@ -51,7 +51,7 @@ class GaussianMixtureModel:
 
     prior_weight: float = 0.0
 
-    cov_type: str = "spherical"
+    cov_type: str = "tied"
 
     n_init: int = 1
 
@@ -69,7 +69,7 @@ class GaussianMixtureModel:
             self,
             max_num_components,
             prior_weight: int = None,
-            cov_type: str = "spherical",
+            cov_type: str = "tied",
             n_init: int = 1,
             tol: float = 1.0e-5,
             max_iter: int = 100000,
@@ -96,7 +96,7 @@ class GaussianMixtureModel:
         return cls(
             max_num_components=obj["max_num_components"],
             prior_weight=obj.get("prior_weight", None),
-            cov_type=obj.get("cov_type", "spherical"),
+            cov_type=obj.get("cov_type", "tied"),
             n_init=obj.get("n_init", 1),
             tol=obj.get("tol", 1.0e-5),
             max_iter=obj.get("max_iter", 100000),

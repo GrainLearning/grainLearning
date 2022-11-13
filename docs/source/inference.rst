@@ -43,9 +43,10 @@ These distributions can be efficiently evaluated via `importance sampling <https
 The idea is to have samples that are more important than others when approximating a target distribution.
 The measure of this importance is the so-called **importance weight**.
 
-.. image:: ../figs/sis.png
+.. figure:: ./figs/SIS.png
   :width: 400
   :alt: Sequential Importance Sampling
+
   Illustration of importance sampling.
 
 Therefore, we draw samples :attr:`.Model.param_data`, :math:`\vec{\Theta}^{(i)} \ (i=1,...,N_p)`,
@@ -71,9 +72,10 @@ By making use of importance sampling, the posterior distribution
 :math:`p(\hat{\vec{y}}_t|\hat{\vec{x}}_t^{(i)})` gets updated over time in :attr:`.SMC.data_assimilation_loop`
 --- this is known as `Bayesian updating <https://statswithr.github.io/book/the-basics-of-bayesian-statistics.html#bayes-updating>`_.
 
-.. image:: ../figs/bayesian_updating.png
-  :width: 400
+.. figure:: ./figs/linear_posterior_a.png
+  :width: 600
   :alt: Sequential Importance Sampling
+
   Time evolution of the importance weights over a model parameter.
 
 Ensemble predictions
@@ -90,3 +92,9 @@ the ensemble mean :attr:`.SMC.ips` and variance :attr:`.SMC.covs` can be compute
    \mathrm{\widehat{Var}}[f_t(\hat{\vec{x}}_t)|\hat{\vec{y}}_{1:t}] & = \sum_{i=1}^{N_p} w_t^{(i)} (f_t(\hat{\vec{x}}_t^{(i)})-\mathrm{\widehat{E}}[f_t(\hat{\vec{x}}_t)|\hat{\vec{y}}_{1:t}])^2.
 
 where :math:`f_t` describes an arbitrary quantity of interest as a function of the model's state and parameters :math:`\hat{\vec{x}}_t^{(i)}`.
+
+.. figure:: ./figs/linear_obs_and_sim.png
+  :width: 600
+  :alt: simulation versus observation data
+
+  Ensemble predictions, top three fits, and the observation data

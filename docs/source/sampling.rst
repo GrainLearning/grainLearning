@@ -38,9 +38,10 @@ by specifying the initial sampling method :IterativeBayesianFilter:initial_sampl
        }
    )
 
-.. image:: ../figs/qmc.png
+.. figure:: ./figs/qmc.png
   :width: 400
   :alt: Quasi-Monte Carlo generator
+
   Samples generated with the Halton sequence, Sobol sequence and Latin Hypercube sampling.
 
 Sampling from a proposal density function
@@ -59,7 +60,8 @@ and their importance weights (i.e., an approximation of the posterior distributi
 obtained from :mod:`.inference` to construct a smooth proposal density function.
 New samples are then drawn from this proposal density in :attr:`.GaussianMixtureModel.regenerate_params`. 
 
-.. image:: ../figs/gmm.png
-  :width: 400
+.. figure:: figs/gmm.jpg
+  :width: 600
   :alt: Resampling via a Gaussian mixture
+
   Resampling of parameter space via a Gaussian mixture model.

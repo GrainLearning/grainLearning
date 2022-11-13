@@ -80,3 +80,55 @@ Below is an example of the callback where parameter samples are passed as comman
            description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(magn)
            print(" ".join([executable, '%.8e %.8e'%tuple(params), description]))
            os.system(' '.join([executable, '%.8e %.8e'%tuple(params), description]))
+
+
+Data format and directory structure
+```````````````````````````````````
+
+GrainLearning can read .npy (for backward compatibility) and plain text formats.
+When using :class:`.IOModel`, the directory :attr:`.IOModel.sim_data_dir` must exist and contains the observation data file :attr:`.IOModel.obs_data_file`.
+Subdirectories with name `iter<curr_iter>` will be created in :attr:`.IOModel.sim_data_dir`.
+In these subdirectories, you find
+
+- simulation data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_sim.txt`
+- parameter data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_param.txt`,
+
+where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.CalibrationToolbox.curr_iter`,
+and <sample_ID> is the index of the :attr:`.IOModel.param_data` sequence.
+
+For example, the observation data stored in a text file :attr:`.IOModel.obs_data_file` should look like this.
+
+.. code-block:: text
+
+	# u f
+	0		5.0
+	1		5.2
+	2		5.4
+	3		5.6
+	4		5.8
+	5		6.0
+
+Similarly, in a simulation data file `linear_Iter0-Sample00_sim.txt`, you find
+
+.. code-block:: text
+
+	# f
+	0.741666667
+	1.023635417
+	1.3056041669999998
+	1.587572917
+	1.869541667
+	2.151510417
+
+Note the simulation data doesn't contain the :attr:`Model.ctrl_data` sequence.
+
+Therefore, when using :class:`.IOModel` the user needs to provide the keys to the data sequence
+of the **control** and **observation** group.
+These keys are also used to extract the corresponding data from the simulation data files.
+
+.. code-block:: python
+
+    # name of the control variable
+    "ctrl_name": 'u',
+    # name of the output variables of the model
+    "obs_names": ['f'],

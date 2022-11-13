@@ -26,7 +26,7 @@ calibration = CalibrationToolbox.from_dict(
     {
         "num_iter": 10,
         "model": {
-            "param_mins": [0.1, 0.1],
+            "param_mins": [0.001, 0.001],
             "param_maxs": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
@@ -42,12 +42,11 @@ calibration = CalibrationToolbox.from_dict(
             "sampling": {
                 "max_num_components": 1,
                 "n_init": 1,
-                "cov_type": "full",
                 "seed": 0,
             },
             "initial_sampling": "halton",
         },
-        "save_fig": 0,
+        "save_fig": 1,
     }
 )
 

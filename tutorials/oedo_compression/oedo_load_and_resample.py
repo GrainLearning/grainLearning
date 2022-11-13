@@ -29,10 +29,10 @@ calibration = CalibrationToolbox.from_dict(
         "calibration": {
             "inference": {"ess_target": 0.2},
             "sampling": {
-			"max_num_components": 10,
-			"prior_weight": 0.01,
-			},
-				"proposal_data_file": f"iter{curr_iter-1}/gmm_iter{curr_iter-1}.pkl",
+            "max_num_components": 10,
+            "prior_weight": 0.01,
+            },
+            "proposal_data_file": f"iter{curr_iter-1}/gmm_iter{curr_iter-1}.pkl",
         },
         "save_fig": 0,
         "model_type": IOModel
