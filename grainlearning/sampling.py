@@ -46,6 +46,7 @@ class GaussianMixtureModel:
     :param max_iter: maximum number of iterations, defaults to 100000
     :param expand_weight: weighted expansions, defaults to 10
     :param seed: random generation seed, defaults to None
+    :param slice_sampling: flag to use slice sampling, defaults to False
     """
     max_num_components: int = 0
 
@@ -63,6 +64,8 @@ class GaussianMixtureModel:
 
     seed: int
 
+    slice_sampling: False
+
     gmm: Type["BayesianGaussianMixture"]
 
     def __init__(
@@ -75,6 +78,7 @@ class GaussianMixtureModel:
             max_iter: int = 100000,
             expand_weight: int = 10,
             seed: int = None,
+            slice_sampling: bool = False,
     ):
         """ Initialize the gaussian mixture model class"""
         self.max_num_components = max_num_components
@@ -83,6 +87,7 @@ class GaussianMixtureModel:
         self.tol = tol
         self.max_iter = max_iter
         self.seed = seed
+        self.slice_sampling = slice_sampling
         self.expand_weight = expand_weight
 
         if prior_weight is None:
@@ -101,6 +106,7 @@ class GaussianMixtureModel:
             tol=obj.get("tol", 1.0e-5),
             max_iter=obj.get("max_iter", 100000),
             seed=obj.get("seed", None),
+            slice_sampling=obj.get("slice_sampling", False),
             expand_weight=obj.get("expand_weight", 10),
         )
 
@@ -132,7 +138,7 @@ class GaussianMixtureModel:
         return normalized_parameters, max_params
 
     def regenerate_params(
-            self, posterior_weight: np.ndarray, model: Type["Model"]
+            self, posterior_weight: np.ndarray, model: Type["Model"],
     ) -> np.ndarray:
         """Regenerate the parameters by fitting the Gaussian Mixture model
 
@@ -140,7 +146,7 @@ class GaussianMixtureModel:
         :param model: Model class
         :return: Expanded parameters
         """
-        expanded_normalized_params, max_params = self.expand_weighted_parameters(
+        self.expanded_normalized_params, self.max_params = self.expand_weighted_parameters(
             posterior_weight, model
         )
 
@@ -154,25 +160,37 @@ class GaussianMixtureModel:
             random_state=self.seed,
         )
 
-        self.gmm.fit(expanded_normalized_params)
+        self.gmm.fit(self.expanded_normalized_params)
         minimum_num_samples = model.num_samples
 
-        new_params = self.get_samples_within_bounds(model, model.num_samples, max_params)
+        new_params = self.get_samples_within_bounds(model, model.num_samples)
 
         # resample until all parameters are within the upper and lower bounds
         test_num = model.num_samples
         while (model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples):
-            test_num *= 1.1
-            new_params = self.get_samples_within_bounds(model, test_num, max_params)
+            test_num = round(1.1*test_num)
+            new_params = self.get_samples_within_bounds(model, test_num)
 
         return new_params
 
     def get_samples_within_bounds(
-            self, model: Type["Model"], num: int, max_params
-    ) -> np.ndarray:
-        new_params, _ = self.gmm.sample(num)
-        new_params *= max_params
+            self, model: Type["Model"], num: int) -> np.ndarray:
         
+        if not self.slice_sampling:
+            new_params, _ = self.gmm.sample(num)
+
+        # use slice sampling scheme for resampling
+        else:
+            # define the mininum of score_samples as the threshold for slice sampling 
+            new_params = generate_params_qmc(model, num)
+            new_params /= self.max_params
+
+            scores = self.gmm.score_samples(self.expanded_normalized_params)
+            new_params = new_params[np.where(
+                    self.gmm.score_samples(new_params) > scores.mean() - 2 * scores.std())]
+        
+        new_params *= self.max_params
+
         if model.param_mins and model.param_maxs:
             params_above_min = new_params > np.array(model.param_mins)
             params_below_max = new_params < np.array(model.param_maxs)
@@ -213,7 +231,7 @@ class GaussianMixtureModel:
         return new_params
 
 
-def generate_params_qmc(model: Type["Model"], method: str = "halton") -> np.ndarray:
+def generate_params_qmc(model: Type["Model"], num_samples: int, method: str = "halton") -> np.ndarray:
     """This is the class to uniformly draw samples in n-dimensional space from 
     a low-discrepancy sequence or a Latin hypercube.
 
@@ -229,23 +247,20 @@ def generate_params_qmc(model: Type["Model"], method: str = "halton") -> np.ndar
 
     elif method == "sobol":
         sampler = Sobol(model.num_params)
-        random_base = round(np.log2(model.num_samples))
-        model.num_samples = 2**random_base
+        random_base = round(np.log2(num_samples))
+        num_samples = 2**random_base
 
     elif method == "LH":
         sampler = LatinHypercube(model.num_params)
 
-    param_table = sampler.random(n=model.num_samples)
+    param_table = sampler.random(n=num_samples)
 
     for param_i in range(model.num_params):
-        for sim_i in range(model.num_samples):
+        for sim_i in range(num_samples):
             mean = 0.5 * (model.param_maxs[param_i] + model.param_mins[param_i])
             std = 0.5 * (model.param_maxs[param_i] - model.param_mins[param_i])
             param_table[sim_i][param_i] = (
                     mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
             )
 
-    model.param_data = np.array(param_table, ndmin=2)
-
-    return model.param_data
-
+    return np.array(param_table, ndmin=2)

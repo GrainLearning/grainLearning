@@ -44,6 +44,7 @@ calibration = CalibrationToolbox.from_dict(
                 "max_num_components": 1,
                 "n_init": 1,
                 "seed": 0,
+                "slice_sampling": True,
             },
             "initial_sampling": "halton",
         },

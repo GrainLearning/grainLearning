@@ -134,7 +134,8 @@ class IterativeBayesianFilter:
 
         :param model: Model class
         """
-        self.param_data_list.append(generate_params_qmc(model, self.initial_sampling))
+        model.param_data = generate_params_qmc(model, model.num_samples, self.initial_sampling)
+        self.param_data_list.append(model.param_data)
 
     def run_sampling(self, model: Type["Model"]):
         """Resample the parameters using the Gaussian mixture model
