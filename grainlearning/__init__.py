@@ -17,4 +17,4 @@ from .tools import (
     plot_posterior,
     plot_param_data,
     plot_obs_and_sim,
-    )
+)

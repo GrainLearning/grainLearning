@@ -14,14 +14,14 @@ from scipy import optimize
 
 class IterativeBayesianFilter:
     """Iterative Bayesian Filter class.
-    
+
     There are two ways of initializing the class.
 
     Method 1 - dictionary style
 
     .. highlight:: python
     .. code-block:: python
-        
+
         ibf_cls = IterativeBayesianFilter.from_dict(
             {
                 "inference":{
@@ -37,10 +37,10 @@ class IterativeBayesianFilter:
     or
 
     Method 2 - class style
-    
+
     .. highlight:: python
     .. code-block:: python
-        
+
         model_cls = IterativeBayesianFilter(
                 inference = SMC(...),
                 sampling = GaussianMixtureModel(...)
@@ -56,11 +56,11 @@ class IterativeBayesianFilter:
 
     #: The inference class is a member variable of the particle filter which is used to generate the likelihood
     inference = Type["SMC"]
-    
+
     #: The gaussian mixture model class is used to sample the parameters
     sampling = Type["GaussianMixtureModel"]
-    
-    #: list of parameter data of shape (num_samples, num_params) from all iterations 
+
+    #: list of parameter data of shape (num_samples, num_params) from all iterations
     param_data_list: List = []
 
     #: This a tolerance to which the optimization algorithm converges.
@@ -73,17 +73,17 @@ class IterativeBayesianFilter:
     posterior_ibf: np.ndarray
 
     proposal_ibf: np.ndarray
-    
+
     proposal_data_file: str
 
     def __init__(
-            self,
-            inference: Type["SMC"],
-            sampling: Type["GaussianMixtureModel"],
-            ess_tol: float = 1.0e-2,
-            initial_sampling: str = 'halton',
-            proposal_ibf: np.ndarray = None,
-            proposal_data_file: str = None,
+        self,
+        inference: Type["SMC"],
+        sampling: Type["GaussianMixtureModel"],
+        ess_tol: float = 1.0e-2,
+        initial_sampling: str = 'halton',
+        proposal_ibf: np.ndarray = None,
+        proposal_data_file: str = None,
     ):
         """Initialize the Iterative Bayesian Filter."""
         self.inference = inference
@@ -159,7 +159,7 @@ class IterativeBayesianFilter:
     def load_proposal_from_file(self, model: Type["Model"]):
         if model.param_data is None:
             RuntimeError("parameter samples not yet loaded...")
-        
+
         if self.proposal_data_file is None: return
 
         from .tools import voronoi_vols

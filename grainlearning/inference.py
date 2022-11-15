@@ -13,10 +13,10 @@ class SMC:
     There are two ways of initializing the class.
 
     Method 1 - dictionary style
-    
+
     .. highlight:: python
     .. code-block:: python
-    
+
         model_cls = SMC.from_dict(
             {
                 "ess_target": 0.3,
@@ -27,10 +27,10 @@ class SMC:
     or
 
     Method 2 - class style
-    
+
     .. highlight:: python
     .. code-block:: python
-    
+
         model_cls = SMC(
                 ess_target = 0.3,
                 scale_cov_with_max = True
@@ -65,9 +65,9 @@ class SMC:
     ess: float
 
     def __init__(
-            self,
-            ess_target: float,
-            scale_cov_with_max: bool = True,
+        self,
+        ess_target: float,
+        scale_cov_with_max: bool = True,
     ):
         """Initialize the variables."""
         self.ess_target = ess_target
@@ -82,7 +82,7 @@ class SMC:
         )
 
     def get_covariance_matrices(
-            self, sigma_guess: float, model: Type["Model"]
+        self, sigma_guess: float, model: Type["Model"]
     ) -> np.array:
         """Compute the diagonal covariance matrices from a given input sigma.
 
@@ -129,7 +129,7 @@ class SMC:
         return likelihoods
 
     def get_posterors(
-            self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array = None
+        self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array = None
     ) -> np.array:
         """Compute the posteriors for all the loading steps
 
@@ -157,9 +157,9 @@ class SMC:
         return posteriors
 
     def get_ensemble_ips_covs(
-            self,
-            model: Type["Model"],
-            posteriors: np.array,
+        self,
+        model: Type["Model"],
+        posteriors: np.array,
     ) -> np.array:
         """Compute the ensemble averages for parameters. (Used for post-processing)
 
@@ -176,7 +176,7 @@ class SMC:
             ips[stp_id, :] = posteriors[stp_id, :] @ model.param_data
 
             covs[stp_id, :] = (
-                    posteriors[stp_id, :] @ (ips[stp_id, :] - model.param_data) ** 2
+                posteriors[stp_id, :] @ (ips[stp_id, :] - model.param_data) ** 2
             )
 
             covs[stp_id, :] = np.sqrt(covs[stp_id, :]) / ips[stp_id, :]
@@ -192,7 +192,7 @@ class SMC:
         return self.posteriors[loading_step, :]
 
     def data_assimilation_loop(
-            self, sigma_guess: float, model: Type["Model"], proposal_ibf: np.ndarray = None
+        self, sigma_guess: float, model: Type["Model"], proposal_ibf: np.ndarray = None
     ):
         """Perform data assimilation loop
 

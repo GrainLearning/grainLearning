@@ -60,7 +60,9 @@ most_prob_params = calibration.get_most_prob_params()
 print(f'Most probable parameter values: {most_prob_params}')
 
 error_tolerance = 0.1
- 
-error = most_prob_params - [0.2,5.0]
-assert abs(error[0])/0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
-assert abs(error[1])/5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
+
+error = most_prob_params - [0.2, 5.0]
+assert abs(
+    error[0]) / 0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
+assert abs(
+    error[1]) / 5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"

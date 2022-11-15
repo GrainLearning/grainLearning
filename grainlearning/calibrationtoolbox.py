@@ -1,13 +1,13 @@
-
 from ast import Param
 from typing import Type, List, Dict
 from .models import Model, IOModel
 from .iterativebayesianfilter import IterativeBayesianFilter
 from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
 
+
 class CalibrationToolbox:
     """This is the main calibration toolbox
-  
+
     A Bayesian calibration method consists of the inference class and the (re)sampling class.
     For instance, in GrainLearning, we have a calibration method called "iterative Bayesian filter"
     which consists of "sequential Monte Carlo" for the inference and "variational Gaussian mixture" for the resampling
@@ -15,10 +15,10 @@ class CalibrationToolbox:
     There are two ways of initializing a calibration toolbox class.
 
     Method 1 - dictionary style (recommended)
-    
+
     .. highlight:: python
     .. code-block:: python
-    
+
         model_cls = CalibrationToolbox.from_dict(
             {
                 "num_iter": 8,
@@ -40,10 +40,10 @@ class CalibrationToolbox:
     or
 
     Method 2 - class style
-    
+
     .. highlight:: python
     .. code-block:: python
-    
+
         model_cls = CalibrationToolbox(
             num_iter = 8,
             model = Model(...),
@@ -90,7 +90,6 @@ class CalibrationToolbox:
 
         self.save_fig = save_fig
 
-
     def run(self):
         """Main calibration loop.
         1. The first iteration starts with a Halton sequence
@@ -99,7 +98,7 @@ class CalibrationToolbox:
         print(f"Bayesian calibration iter No. {self.curr_iter}")
         self.run_one_iteration()
 
-        for i in range(self.num_iter-1):
+        for i in range(self.num_iter - 1):
             self.curr_iter += 1
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
@@ -115,13 +114,13 @@ class CalibrationToolbox:
         self.model.param_data = self.calibration.param_data_list[index]
         self.model.num_samples = self.model.param_data.shape[0]
 
-        self.model.run(curr_iter = self.curr_iter)
+        self.model.run(curr_iter=self.curr_iter)
         if type(self.model) is IOModel: self.load_model()
 
         self.calibration.solve(self.model)
         self.plot_UQ_in_time()
         self.sigma_list.append(self.model.sigma_max)
-    
+
     def load_model(self):
         """Load existing simulation data into the model
         """
@@ -161,7 +160,7 @@ class CalibrationToolbox:
         if self.save_fig < 0: return
 
         import os
-        path = f'{self.model.sim_data_dir}/iter{self.curr_iter}'\
+        path = f'{self.model.sim_data_dir}/iter{self.curr_iter}' \
             if type(self.model) == IOModel \
             else f'./{self.model.sim_name}/iter{self.curr_iter}'
 
@@ -176,32 +175,32 @@ class CalibrationToolbox:
             self.save_fig
         )
         plot_posterior(fig_name,
-            self.model.param_names,
-            self.model.param_data,
-            self.calibration.inference.posteriors,
-            self.save_fig
-        )
+                       self.model.param_names,
+                       self.model.param_data,
+                       self.calibration.inference.posteriors,
+                       self.save_fig
+                       )
 
         plot_param_data(fig_name,
-            self.model.param_names,
-            self.calibration.param_data_list,
-            self.save_fig
-        )
+                        self.model.param_names,
+                        self.calibration.param_data_list,
+                        self.save_fig
+                        )
 
         plot_obs_and_sim(fig_name,
-            self.model.ctrl_name,
-            self.model.obs_names,
-            self.model.ctrl_data,
-            self.model.obs_data,
-            self.model.sim_data,
-            self.calibration.inference.posteriors,
-            self.save_fig
-        )
+                         self.model.ctrl_name,
+                         self.model.obs_names,
+                         self.model.ctrl_data,
+                         self.model.obs_data,
+                         self.model.sim_data,
+                         self.calibration.inference.posteriors,
+                         self.save_fig
+                         )
 
     def get_most_prob_params(self):
         from numpy import argmax
         most_prob = argmax(self.calibration.posterior_ibf)
-        return self.model.param_data[most_prob] 
+        return self.model.param_data[most_prob]
 
     @classmethod
     def from_dict(
