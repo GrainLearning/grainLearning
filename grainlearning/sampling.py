@@ -82,6 +82,8 @@ class GaussianMixtureModel:
         slice_sampling: bool = False,
     ):
         """ Initialize the gaussian mixture model class"""
+        self.max_params = None
+        self.expanded_normalized_params = None
         self.max_num_components = max_num_components
         self.cov_type = cov_type
         self.n_init = n_init
@@ -136,7 +138,8 @@ class GaussianMixtureModel:
             expanded_parameters / max_params
         )  # and do array broadcasting to divide by max
 
-        return normalized_parameters, max_params
+        self.expanded_normalized_params = normalized_parameters
+        self.max_params = max_params
 
     def regenerate_params(
         self, posterior_weight: np.ndarray, model: Type["Model"],
@@ -147,9 +150,7 @@ class GaussianMixtureModel:
         :param model: Model class
         :return: Expanded parameters
         """
-        self.expanded_normalized_params, self.max_params = self.expand_weighted_parameters(
-            posterior_weight, model
-        )
+        self.expand_weighted_parameters(posterior_weight, model)
 
         self.gmm = BayesianGaussianMixture(
             n_components=self.max_num_components,
@@ -168,8 +169,8 @@ class GaussianMixtureModel:
 
         # resample until all parameters are within the upper and lower bounds
         test_num = model.num_samples
-        while (model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples):
-            test_num = round(1.1 * test_num)
+        while model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples:
+            test_num = int(np.ceil(1.1 * test_num))
             new_params = self.get_samples_within_bounds(model, test_num)
 
         return new_params

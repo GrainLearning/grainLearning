@@ -1,4 +1,4 @@
-#%%
+# %%
 import numpy as np
 
 from grainlearning import SMC, Model, GaussianMixtureModel, generate_params_qmc
@@ -63,7 +63,6 @@ def test_get_likelihood():
         ess_target=0.1, scale_cov_with_max=True
     )
 
-
     model_cls = Model(
         param_mins=[1, 2],
         param_maxs=[3, 4],
@@ -71,7 +70,6 @@ def test_get_likelihood():
         ctrl_data=[1, 2, 3, 4],
         num_samples=5,
     )
-
 
     sim_data = []
     for _ in range(model_cls.num_samples):
@@ -84,7 +82,8 @@ def test_get_likelihood():
 
     assert likelihoods.shape == (3, 5)
 
-#%%
+
+# %%
 
 def test_get_posterior():
     """Test to see if posterior is generated as expected"""
@@ -104,7 +103,7 @@ def test_get_posterior():
     likelihoods = np.ones((3, 5)) * 0.5
 
     posteriors = smc_cls.get_posterors(
-        model=model_cls, likelihoods=likelihoods, proposal_ibf= None
+        model=model_cls, likelihoods=likelihoods, proposal_ibf=None
     )
 
     np.testing.assert_array_almost_equal(
@@ -116,6 +115,7 @@ def test_get_posterior():
         ],
     )
 
+
 def test_ips_covs():
     """Test to see if ips is generated as expected."""
 
@@ -123,17 +123,16 @@ def test_ips_covs():
         ess_target=0.1, scale_cov_with_max=True
     )
 
-
     model_cls = Model(
         param_mins=[2, 2],
         param_maxs=[10, 10],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         num_samples=5,
     )
-    
+
     gmm_cls = GaussianMixtureModel(max_num_components=1)
 
-    generate_params_qmc(model_cls)
+    model_cls.param_data = generate_params_qmc(model_cls, model_cls.num_samples)
 
     posteriors = np.array(
         [
@@ -146,7 +145,7 @@ def test_ips_covs():
 
     np.testing.assert_array_almost_equal(
         ips,
-        [    
+        [
             [4.8, 5.02222222],
             [4.5, 3.75555556],
             [4., 4.4],
@@ -156,7 +155,7 @@ def test_ips_covs():
     np.testing.assert_array_almost_equal(
         covs,
         [
-            [0.4145781, 0.3729435 ],
+            [0.4145781, 0.3729435],
             [0.51759176, 0.51966342],
             [0.48733972, 0.45218241],
         ],

@@ -1,6 +1,5 @@
+# %%
 
-#%%
- 
 import numpy as np
 import matplotlib.pylab as plt
 
@@ -33,24 +32,24 @@ def test_smc():
         }
     )
 
-    #%%
+    # %%
     # load existing dataset for the test
-    file_name = calibration.model.sim_data_dir +\
-        f'/iter{calibration.curr_iter}/posterior.npy'
+    file_name = calibration.model.sim_data_dir + \
+                f'/iter{calibration.curr_iter}/posterior.npy'
     _, sigma_ref, cov_matrix_ref, posterior_ref = np.load(file_name, allow_pickle=True)
     posterior_ref = posterior_ref.T
 
-    #%% 
+    # %%
     # reproduce the result with a given sigma value
     calibration.load_and_process(sigma_ref)
     # ~ calibration.load_and_run_one_iteration()
     posterior = calibration.calibration.inference.posteriors
 
-    #%%
-    # check (co)variance and posterior distribution 
+    # %%
+    # check (co)variance and posterior distribution
     cov_matrices = calibration.calibration.inference.get_covariance_matrices(sigma_ref, calibration.model)
-    np.testing.assert_allclose(cov_matrix_ref, cov_matrices[-1], err_msg = "The (co)variances do not match.")
-    np.testing.assert_allclose(posterior, posterior_ref, err_msg = "The posterior distributions do not match.")
+    np.testing.assert_allclose(cov_matrix_ref, cov_matrices[-1], err_msg="The (co)variances do not match.")
+    np.testing.assert_allclose(posterior, posterior_ref, err_msg="The posterior distributions do not match.")
 
 
 test_smc()

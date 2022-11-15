@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "GrainLearning"
-version = "2.0.0"
+version = "2.0.1"
 description = ""
 authors = ["Hongyang Cheng <h.cheng@utwente.nl>",
 "Luisa Orozco <l.orozco@esciencecenter.nl>","Retief Lubbe <r.lubbe@utwente.nl>"]

@@ -1,19 +1,17 @@
+# %%
 
-#%%
- 
 import numpy as np
 
 from grainlearning import CalibrationToolbox
 
 import matplotlib.pyplot as plt
 
-
-
 x_obs = np.arange(100)
 
-y_obs = 0.2* x_obs + 5.0
+y_obs = 0.2 * x_obs + 5.0
 
-#y_obs += np.random.rand(100) * 2.5
+
+# y_obs += np.random.rand(100) * 2.5
 
 
 def run_sim(model, **kwargs):
@@ -21,7 +19,7 @@ def run_sim(model, **kwargs):
     for params in model.param_data:
         y_sim = params[0] * model.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
-    
+
     model.sim_data = np.array(data)
 
 
@@ -36,7 +34,7 @@ def test_lenreg():
                 "num_samples": 20,
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
-                "sim_name":'linear',
+                "sim_name": 'linear',
                 "callback": run_sim,
             },
             "calibration": {
@@ -53,13 +51,13 @@ def test_lenreg():
 
     calibration.run()
 
-    #%%
+    # %%
     print(f'All parameter samples at the last iteration:\n {calibration.model.param_data}')
 
-    #%%
+    # %%
     # plt.plot( np.arange(calibration.num_iter),calibration.sigma_list); plt.show()
 
-    #%%
+    # %%
     # calibration.sigma_list,len(calibration.sigma_list),calibration.num_iter
     # print(calibration.sigma_list)
 
@@ -67,20 +65,22 @@ def test_lenreg():
     most_prob = np.argmax(calibration.calibration.posterior_ibf)
 
     # %%
-    most_prob_params = calibration.model.param_data[most_prob] 
+    most_prob_params = calibration.model.param_data[most_prob]
 
     print(f'Most probable parameter values: {most_prob_params}')
     # %%
 
-    #tests
+    # tests
     error_tolerance = 0.01
 
-    #1. Testing values of parameters
-    error = most_prob_params - [0.2,5.0]
-    assert abs(error[0])/0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
-    assert abs(error[1])/5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
+    # 1. Testing values of parameters
+    error = most_prob_params - [0.2, 5.0]
+    assert abs(error[
+                   0]) / 0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
+    assert abs(error[
+                   1]) / 5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
 
-    #2. Checking sigma
+    # 2. Checking sigma
     assert calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
 
 
