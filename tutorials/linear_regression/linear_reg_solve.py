@@ -37,6 +37,7 @@ calibration = CalibrationToolbox.from_dict(
             "sim_name": 'linear',
             "sim_data_dir": './tutorials/linear_regression/',
             "sim_data_file_ext": '.txt',
+            "sigma_tol": 0.01,
             "callback": run_sim,
         },
         "calibration": {
@@ -55,36 +56,11 @@ calibration = CalibrationToolbox.from_dict(
 
 calibration.run()
 
-# %%
-print(f'All parameter samples at the last iteration:\n {calibration.model.param_data}')
-
-# %%
-# plt.plot( np.arange(calibration.num_iter),calibration.sigma_list); plt.show()
-
-# %%
-# calibration.sigma_list,len(calibration.sigma_list),calibration.num_iter
-# print(calibration.sigma_list)
-
-# %%
-most_prob = np.argmax(calibration.calibration.posterior_ibf)
-
-# %%
-most_prob_params = calibration.model.param_data[most_prob]
-
+most_prob_params = calibration.get_most_prob_params()
 print(f'Most probable parameter values: {most_prob_params}')
-# %%
 
-# tests
-error_tolerance = 0.01
-
-# 1. Testing values of parameters
-error = most_prob_params - [0.2, 5.0]
-assert abs(
-    error[0]) / 0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
-assert abs(
-    error[1]) / 5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
-
-# 2. Checking sigma
-assert calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
-
-# %%
+error_tolerance = 0.1
+ 
+error = most_prob_params - [0.2,5.0]
+assert abs(error[0])/0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
+assert abs(error[1])/5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"

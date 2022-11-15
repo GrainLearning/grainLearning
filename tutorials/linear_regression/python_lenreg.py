@@ -35,6 +35,7 @@ calibration = CalibrationToolbox.from_dict(
             "obs_data": y_obs,
             "ctrl_data": x_obs,
             "sim_name":'linear',
+            "sigma_tol": 0.01,
             "callback": run_sim,
         },
         "calibration": {
@@ -46,12 +47,15 @@ calibration = CalibrationToolbox.from_dict(
             },
             "initial_sampling": "halton",
         },
-        "save_fig": 1,
+        "save_fig": 0,
     }
 )
 
 calibration.run()
+
 most_prob_params = calibration.get_most_prob_params()
+print(f'Most probable parameter values: {most_prob_params}')
+
 error_tolerance = 0.1
  
 error = most_prob_params - [0.2,5.0]

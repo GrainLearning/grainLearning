@@ -226,6 +226,7 @@ class Model:
             callback=obj.get("callback", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
+            sigma_tol=obj.get("sigma_tol", 0.001),
         )
 
     def run(self, **kwargs):

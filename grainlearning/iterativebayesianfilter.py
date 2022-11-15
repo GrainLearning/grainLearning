@@ -122,7 +122,10 @@ class IterativeBayesianFilter:
         if self.proposal_data_file is not None and self.proposal_ibf is None:
             self.load_proposal_from_file(model)
 
-        self.inference.data_assimilation_loop(model.sigma_max, model, self.proposal_ibf)
+        if model.sigma_max > model.sigma_tol:
+            self.inference.data_assimilation_loop(model.sigma_max, model, self.proposal_ibf)
+        else:
+            self.inference.data_assimilation_loop(model.sigma_tol, model, self.proposal_ibf)
 
         self.posterior_ibf = self.inference.give_posterior()
 
