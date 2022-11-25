@@ -109,6 +109,9 @@ Once a version of GrainLearning is uploaded. It cannot be removed.
 poetry publish --build -r test-pypi
 ```
 
+Visit [https://pypi.org/project/grainlearning/](https://pypi.org/project/grainlearning/)
+and verify that your package was deployed successfully.
+
 ### (3/3) GitHub
 
 Don't forget to also make a [release on GitHub](https://github.com/GrainLearning/grainlearning/releases/new). Check that this release also triggers Zenodo into making a snapshot of your repository and sticking a DOI on it.
