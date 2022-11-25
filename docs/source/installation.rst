@@ -1,7 +1,7 @@
 Installation
 ============
 
-GrainLearning is set up using poetry, with a Python version higher than 3.8.
+GrainLearning is can be installed with poetry and pip, on Windows, Mac, and Linux OS, with a Python version higher than 3.8.
 We have tested GrainLearning with Python versions 3.8, 3.9, and 3.10.
 
 Package management and dependencies
@@ -15,20 +15,20 @@ First, install poetry following `these instructions <https://python-poetry.org/d
 .. code-block:: bash
   
    # Clone the repository
-   $ git clone https://github.com/GrainLearning/grainLearning.git 
+   git clone https://github.com/GrainLearning/grainLearning.git 
 
    # Activate a poetry environment
-   $ cd grainLearning
-   $ poetry shell
+   cd grainLearning
+   poetry shell
 
    # Install the dependencies of GrainLearning 
-   $ poetry install
+   poetry install
 
    # Run the self-tests
-   $ poetry run pytest -v  
+   poetry run pytest -v  
 
    # You are done. Try any examples in the ./tutorials directory
-   $ poetry run python <example.py>
+   poetry run python <example.py>
 
 Install using pip
 `````````````````
@@ -36,26 +36,26 @@ Install using pip
 .. code-block:: bash
   
    # clone the repository
-   $ git clone https://github.com/GrainLearning/grainLearning.git 
-   $ cd grainLearning
+   git clone https://github.com/GrainLearning/grainLearning.git 
+   cd grainLearning
 
    # We recommend working on an environment conda or any other python environment manager,
    # for example, with anaconda
-   $ conda create --name grainlearning python=3.8
-   $ conda activate grainlearning`
+   conda create --name grainlearning python=3.8
+   conda activate grainlearning
 
    # Install GrainLearning 
-   $ pip install .
+   pip install .
 
    # You may need to install matplotlib and pytest
-   $ conda install matplotlib # for visualization
-   $ conda install pytest # optional
+   conda install matplotlib # for visualization
+   conda install pytest # optional
 
    # Run the self-tests
-   $ pytest -v  
+   pytest -v  
 
    # You are done. Try any examples in the ./tutorials directory
-   $ python <example.py>
+   python <example.py>
 
 
 For Windows users
@@ -78,7 +78,9 @@ Packaging/One command install
 
 TODO
 
-`pip install grainlearning`
+.. code-block:: bash
+
+   pip install grainlearning
 
 Documentation
 -------------

@@ -26,7 +26,7 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 
 ## Installation
 
-### Install using poetry (recommended)
+### Install using poetry
 
 1. Install poetry following [these instructions](https://python-poetry.org/docs/#installation).
 1. Clone the repository: `git clone https://github.com/GrainLearning/grainLearning.git`
