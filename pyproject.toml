@@ -1,11 +1,14 @@
 [tool.poetry]
 name = "GrainLearning"
 version = "2.0.1"
-description = ""
-authors = ["Hongyang Cheng <h.cheng@utwente.nl>",
+description = "A Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials"
+authors = ["Hongyang Cheng <chyalexcheng@gmail.nl>",
 "Luisa Orozco <l.orozco@esciencecenter.nl>","Retief Lubbe <r.lubbe@utwente.nl>"]
 readme = "README.md"
-keywords = ["DEM", "Bayesian inference"]
+license = "GPLv2"
+homepage = "https://grainlearning.readthedocs.io/"
+repository = "https://github.com/GrainLearning/grainLearning"
+keywords = ["Bayesian inference", "Uncertainty quantification", "Non-parametric Gaussian mixture", "DEM", "Constitutive modeling", "Granular materials"]
 
 
 [tool.poetry.dependencies]

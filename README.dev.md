@@ -14,11 +14,36 @@ This section describes how to make a release in 3 parts:
 - docs/source/conf.py
 - pyproject.toml
 - README.md
-4. Run the unit tests with `poetry run pytest -v`
+4. Run the unit and integration tests with `poetry run pytest -v`
 
 ### (2/3) PyPI
 
-#### a. Deploying to test-pypi
+#### a. Set up your credentials 
+
+```shell
+poetry config http-basic.pypi <username> <password>
+```
+
+Those are your credentials to your account on pypi.org, which you do have to create if you don't have one.
+
+#### b. Deploying to test-pypi
+
+Before publishing unpolished package on PyPI, you can test it on a test version of PyPI.
+This test PyPI will allow us to mimic updating to PyPI, then pip installing our own package to see if it works as expected.
+For that you need another account on test.pypi.org (same username and password is fine).
+
+You can then add the repository to poetry:
+
+```shell
+poetry config repositories.testpypi https://test.pypi.org/legacy/
+```
+
+Create a token following [this link](https://test.pypi.org/manage/account/token/)
+
+```shell
+poetry config pypi-token.test-pypi <your-token>
+```
+
 In a new terminal, without an activated virtual environment or an env directory:
 
 ```shell
@@ -42,23 +67,16 @@ rm -rf dist
 poetry shell
 poetry install
 poetry build 
-pip install twine
 
-# This generates folder dist that has the wheel that is going to be distributed. Install twine in your system or in an environment.
-twine upload --repository-url https://test.pypi.org/legacy/ dist/* 
+# This generates folder dist that has the wheel that is going to be distributed on test-pypi.
+poetry publish --build -r test-pypi
 
 ```
-
-Alternatively, you can try instead of the last command (twine) use Poetry :
-```shell
-poetry publish --build
-```
-This will by default register the package to pypi. You'll need to put your pypi username and password, alternatively you can pass the as -u and -p, respectively. More info [here](https://python-poetry.org/docs/cli/#build).
-
+This will by default register the package to test-pypi.
 Visit [https://test.pypi.org/project/grainlearning](https://test.pypi.org/project/grainlearning)
 and verify that your package was uploaded successfully. Keep the terminal open, we'll need it later.
 
-#### b. Testing the deployed package to test-pypi
+#### c. Testing the deployed package to test-pypi
 In a new terminal, without an activated virtual environment or an env directory:
 
 ```shell
@@ -69,22 +87,26 @@ python3 -m venv env
 source env/bin/activate
 
 # install from test pypi instance:
+# TODO: why `pip install -i https://test.pypi.org/simple/ grainlearning` does not work
 python3 -m pip -v install --no-cache-dir \
 --index-url https://test.pypi.org/simple/ \
 --extra-index-url https://pypi.org/simple grainlearning
 ```
 
-Check that the package works as it should when installed from pypitest. For example run:
+Check that the package works as it should when installed from test-pypi. For example run:
 ``` shell
-python3 tests/integration/test_14sep_lengreg.py 
+python3 tests/integration/test_lengreg.py 
 ```
 
-#### c. Uploading to pypi
+#### d. Uploading to pypi
+
+If you are happy with the package on test-pypi, deploy it on pypi.
+Once a version of GrainLearning is uploaded. It cannot be removed.
 
 ```shell
-# Back to the first terminal,
-# FINAL STEP: upload to PyPI (requires credentials)
-twine upload dist/*
+# Go back to the first terminal in step b,
+# FINAL STEP: upload to PyPI
+poetry publish --build -r test-pypi
 ```
 
 ### (3/3) GitHub
