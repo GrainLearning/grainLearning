@@ -26,7 +26,9 @@ author = 'Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage","sphinx_autodoc_typehints"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage","sphinx_autodoc_typehints", "sphinx.ext.autosectionlabel"]
+
+autosectionlabel_prefix_document = True
 
 templates_path = ['_templates']
 exclude_patterns = []

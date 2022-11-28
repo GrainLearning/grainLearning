@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Python API &mdash; GrainLearning  documentation</title>
@@ -250,7 +250,7 @@ which consists of “sequential Monte Carlo” for the inference and “variatio
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>calibration</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter" title="grainlearning.iterativebayesianfilter.IterativeBayesianFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterativeBayesianFilter</span></code></a>]) – Iterative Bayesian Filter</p></li>
@@ -265,7 +265,7 @@ which consists of “sequential Monte Carlo” for the inference and “variatio
 <span class="sig-name descname"><span class="pre">load_and_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_process" title="Permalink to this definition"></a></dt>
 <dd><p>Load an existing dataset and compute posterior distribution with a given sigma</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>sigma</strong> (<em>float</em>) – </p>
 </dd>
 </dl>
@@ -309,7 +309,7 @@ which consists of “sequential Monte Carlo” for the inference and “variatio
 <dd><p>Run GrainLearning for one iteration.
 TODO: more docu needed</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – </p>
 </dd>
 </dl>
@@ -390,7 +390,7 @@ and generate new parameter values for additional simulation runs.</p>
 </div>
 <p>y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Observation or reference data</p></li>
 <li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
@@ -425,10 +425,10 @@ and generate new parameter values for additional simulation runs.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.IOModel" title="grainlearning.models.IOModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOModel</span></code></a>]</p>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dt class="field-even">Parameters</dt>
 <dd class="field-even"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -439,7 +439,7 @@ and generate new parameter values for additional simulation runs.</p>
 <span class="sig-name descname"><span class="pre">load_param_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel.load_param_data" title="Permalink to this definition"></a></dt>
 <dd><p>Load parameter data from a table written in a txt file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>curr_iter</strong> (<em>int</em>) – </p>
 </dd>
 </dl>
@@ -646,7 +646,7 @@ and generate new parameter values for additional simulation runs.</p>
 </div>
 <p>y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Observation or reference data</p></li>
 <li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
@@ -678,10 +678,10 @@ and generate new parameter values for additional simulation runs.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]</p>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dt class="field-even">Parameters</dt>
 <dd class="field-even"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -847,7 +847,7 @@ and generate new parameter values for additional simulation runs.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>inference</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.inference.SMC" title="grainlearning.inference.SMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SMC</span></code></a>]) – Sequential Monte Carlo class (SMC)</p></li>
 <li><p><strong>sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel" title="grainlearning.sampling.GaussianMixtureModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a>]) – Gaussian Mixture Model class (GMM)</p></li>
@@ -864,7 +864,7 @@ and generate new parameter values for additional simulation runs.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -875,7 +875,7 @@ and generate new parameter values for additional simulation runs.</p>
 <span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initialize" title="Permalink to this definition"></a></dt>
 <dd><p>Resample the parameters using the Gaussian mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -886,7 +886,7 @@ and generate new parameter values for additional simulation runs.</p>
 <span class="sig-name descname"><span class="pre">run_inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_inference" title="Permalink to this definition"></a></dt>
 <dd><p>Run inference (e.g, data assimilation loop) using the Sequential Monte Carlo</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -897,7 +897,7 @@ and generate new parameter values for additional simulation runs.</p>
 <span class="sig-name descname"><span class="pre">run_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_sampling" title="Permalink to this definition"></a></dt>
 <dd><p>Resample the parameters using the Gaussian mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -908,7 +908,7 @@ and generate new parameter values for additional simulation runs.</p>
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.solve" title="Permalink to this definition"></a></dt>
 <dd><p>Run both inference and sampling on a model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -982,7 +982,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ess_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Target effective sample size (what we want)</p></li>
 <li><p><strong>scale_cov_with_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Flag if the covariance matrix should scale with the maximum accross the loading steps, defaults to True</p></li>
@@ -994,14 +994,14 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">data_assimilation_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.data_assimilation_loop" title="Permalink to this definition"></a></dt>
 <dd><p>Perform data assimilation loop</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Guess of sigma</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Input distribution</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Result of the objective function which converges to a user defined effective sample size</p>
 </dd>
 </dl>
@@ -1012,7 +1012,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -1024,16 +1024,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the diagonal covariance matrices from a given input sigma.</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – input sigma</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Covariance matrices for all loading steps</p>
 </dd>
 </dl>
@@ -1045,16 +1045,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the ensemble averages for parameters. (Used for post-processing)</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>posteriors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Posterior distributions</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Ensemble averages</p>
 </dd>
 </dl>
@@ -1066,16 +1066,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the likelihoods as a multivariate normal of the simulation data centered around the observations.</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>cov_matrices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – covariance matricies</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Likelihood matrices for all loading steps</p>
 </dd>
 </dl>
@@ -1087,17 +1087,17 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the posteriors for all the loading steps</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>likelihoods</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Likelihood matrices</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – Optional input proposal</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Posterior distributions for all loading steps</p>
 </dd>
 </dl>
@@ -1108,10 +1108,10 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">give_posterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loading_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.give_posterior" title="Permalink to this definition"></a></dt>
 <dd><p>Give posterior distribution of a loading step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>loading_step</strong> – Optional input loading step, defaults to -1 (last value)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Posterior distribution for a single step</p>
 </dd>
 </dl>
@@ -1172,7 +1172,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span id="sampling"></span><h2><code class="docutils literal notranslate"><span class="pre">Sampling</span></code><a class="headerlink" href="#module-grainlearning.sampling" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GaussianMixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tied'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GaussianMixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tied'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class is used for the inference (sampling) of parameters using a variational Gaussian mixture model.</p>
 <p>See <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html">BayesianGaussianMixture</a>.</p>
@@ -1193,7 +1193,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_num_components</strong> (<em>int</em>) – Maximum number of components</p></li>
 <li><p><strong>prior_weight</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Prior weight, defaults to None</p></li>
@@ -1203,6 +1203,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <li><p><strong>max_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum number of iterations, defaults to 100000</p></li>
 <li><p><strong>expand_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – weighted expansions, defaults to 10</p></li>
 <li><p><strong>seed</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – random generation seed, defaults to None</p></li>
+<li><p><strong>slice_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – flag to use slice sampling, defaults to False</p></li>
 </ul>
 </dd>
 </dl>
@@ -1211,16 +1212,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">expand_weighted_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters" title="Permalink to this definition"></a></dt>
 <dd><p>Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -1231,7 +1232,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -1242,16 +1243,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">regenerate_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params" title="Permalink to this definition"></a></dt>
 <dd><p>Regenerate the parameters by fitting the Gaussian Mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -1262,16 +1263,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">regenerate_params_with_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm" title="Permalink to this definition"></a></dt>
 <dd><p>Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -1281,21 +1282,22 @@ update the model state and model parameters based on Bayes’ theorem</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="grainlearning.sampling.generate_params_qmc">
-<span class="sig-name descname"><span class="pre">generate_params_qmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'halton'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.generate_params_qmc" title="Permalink to this definition"></a></dt>
-<dd><p>This is the class to uniformly draw samples in n-dimensional space from 
+<span class="sig-name descname"><span class="pre">generate_params_qmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'halton'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.generate_params_qmc" title="Permalink to this definition"></a></dt>
+<dd><p>This is the class to uniformly draw samples in n-dimensional space from
 a low-discrepancy sequence or a Latin hypercube.</p>
 <p>See <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">Quasi-Monte Carlo</a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_iter</strong> – maximum number of iterations, defaults to 100000</p></li>
 <li><p><strong>expand_weight</strong> – weighted expansions, defaults to 10</p></li>
 <li><p><strong>seed</strong> – random generation seed, defaults to None</p></li>
 <li><p><strong>model</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><em>Model</em></a><em>]</em>) – </p></li>
+<li><p><strong>num_samples</strong> (<em>int</em>) – </p></li>
 <li><p><strong>method</strong> (<em>str</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
 </dl>

@@ -60,27 +60,42 @@ Install using pip
 
 For Windows users
 `````````````````
-1. Enable Windows Subsystem for Linux (WSL1 or WSL2) following `this link <https://learn.microsoft.com/en-us/windows/wsl/install-manual>`_ 
 
-2. Install GrainLearning following the instructions above
- 
-3. Use anaconda if there are no WSL available on your operating system
+- Installation using Windows Subsystem for Linx (WSL)
 
-4. Open Anaconda Prompt and install GrainLearning with pip
+  - Enable WSL1 or WSL2 according to the instructions `here <https://learn.microsoft.com/en-us/windows/wsl/install-manual>`_ 
+  - Install GrainLearning using :ref:`poetry<installation:Install using poetry>` or :ref:`pip<installation:Install using pip>`
 
-5. Now you should have a virtual environment, possibly called GrainLearning. Choose that environment from your anaconda navigator: click Environments and select grainlearning from the drop-down menu
+- Installation using anaconda (if no WSLs are available on your Windows system)
 
-6. Open any editor, for example, spider, and run the examples in grainLearning/tutorials.
-
+  - Open Anaconda Prompt and install GrainLearning using :ref:`pip<installation:Install using pip>`. This should create a virtual environment, named GrainLearning.
+  - Choose that environment from your anaconda navigator: click `Environments` and select `grainlearning` from the drop-down menu
+  - Open any editor, for example, spider, and run the examples in grainLearning/tutorials.
 
 Packaging/One command install
 `````````````````````````````
 
-TODO
+Stable versions of GrainLearning can be installed via pip.
+However, you would still need to clone the GrainLearning repository to run the tutorials. 
 
 .. code-block:: bash
 
+   # create a virtual environment
+   python3 -m venv env
+   source env/bin/activate
+
+   # install GrainLearning
    pip install grainlearning
+
+   # Clone the repository
+   git clone https://github.com/GrainLearning/grainLearning.git 
+
+   # run a simple linear regression test
+   python3 grainLearning/tests/integration/test_lenreg.py
+
+   # deactivate virtual environment
+   deactivate
+   rm -r env
 
 Documentation
 -------------
