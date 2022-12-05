@@ -1,4 +1,4 @@
-import os
+import os, pathlib
 from matplotlib import pyplot as plt
 from tensorflow import keras
 import numpy as np
@@ -70,10 +70,10 @@ def plot_predictions(model, data, train_stats, config):
         comb = q / p - 2 / 5 * (a_c + a_n + 3 / 2 * a_t)
         return comb
 
-    def extract_p_over_q(data, i_s=0):
+    def extract_q_over_p(data, i_s=0):
         q = data[i_s, :, ids['q']]
         p = data[i_s, :, ids['p']]
-        return p / q
+        return q / p
 
     ylim = [-3, 3]
     for i_s, color in zip(representative_idxs,
@@ -81,9 +81,9 @@ def plot_predictions(model, data, train_stats, config):
         _plot_sequence(0, 0, 'e', i_s=i_s, color=color)
         _plot_sequence(0, 1, 'f_0', i_s=i_s, color=color)
         fill_ax(ax[0, 2],
-                steps, extract_p_over_q(labels, i_s=i_s),
-                steps_predicted, extract_p_over_q(predictions, i_s=i_s),
-                y_label='p/q', x_label='steps', color=color,
+                steps, extract_q_over_p(labels, i_s=i_s),
+                steps_predicted, extract_q_over_p(predictions, i_s=i_s),
+                y_label='q/p', x_label='steps', color=color,
                 ylim=ylim)
         _plot_sequence(1, 0, 'a_c', i_s=i_s, color=color)
         _plot_sequence(1, 1, 'a_n', i_s=i_s, color=color)
@@ -131,18 +131,18 @@ def _find_representatives(input_data):
 
 
 def main():
-    data_dir = 'data/sequences.hdf5'
-    plot_dir = 'plots/'
+    data_dir = pathlib.Path('data/sequences.hdf5')
+    plot_dir = pathlib.Path('plots/')
 
     pressure = 'All'
     experiment_type = 'All'
     model_name = 'simple_rnn'
     saved_model_name = f'{model_name}_{pressure}_{experiment_type}_conditional'
-    model_directory = 'trained_models' + '/' + saved_model_name
+    model_directory = pathlib.Path('trained_models/' + saved_model_name)
 
     model = keras.models.load_model(model_directory)
-    train_stats = np.load(model_directory + '/train_stats.npy', allow_pickle=True).item()
-    losses = np.load(model_directory + '/losses.npy', allow_pickle=True).item()
+    train_stats = np.load(model_directory / 'train_stats.npy', allow_pickle=True).item()
+    losses = np.load(model_directory / 'losses.npy', allow_pickle=True).item()
 
     split_data, _ = prepare_datasets(
             raw_data=data_dir,
