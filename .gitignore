@@ -1,4 +1,15 @@
 # Byte-compiled / optimized / DLL files
 **/__pycache__/
 *.py[cod]
-package/docs/build/*
+docs/build/*
+poetry.lock
+
+htmlcov
+.coverage
+coverage.xml
+cov.xml
+.pytest_cache
+
+# Mac
+.DS_Store
+
