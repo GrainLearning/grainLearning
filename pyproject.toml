@@ -16,19 +16,18 @@ python = ">=3.8,<3.11"
 numpy = "^1.23.2"
 scipy = "^1.9.1"
 scikit-learn = "^1.1.3"
-
-[tool.poetry.group.docs.dependencies]
-Sphinx = "^5.1.1"
-sphinx-autodoc-typehints = "^1.19.2"
-
-[tool.poetry.group.visual.dependencies]
 matplotlib = "^3.6.0"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^6.2.4"
-pytest-cov = "^2.12.1"
-matplotlib = "^3.6.0"
-prospector = {version = "^1.7.6", extras = ["with_pyroma"]}
+
+Sphinx = {version = "^5.1.1", optional = true}
+sphinx-autodoc-typehints = {version = "^1.19.2", optional = true}
+pytest = {version = "^6.2.4", optional = true}
+pytest-cov = {version = "^2.12.1", optional = true}
+prospector = {version = "^1.7.6", extras = ["with_pyroma"], optional = true}
+
+[tool.poetry.extras]
+docs = ["Sphinx", "sphinx-autodoc-typehints"]
+dev = ["pytest", "pytest-cov", "prospector"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
