@@ -1,28 +1,16 @@
 # Welcome to GrainLearning!
 
-| fair-software.eu recommendations | |
-| :-- | :-- |
-| (1/5) code repository
-| [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](https://github.com/GrainLearning/grainlearning)
-|
-| (2/5) license
-| [![github license badge](https://img.shields.io/github/license/GrainLearning/grainlearning)](https://github.com/GrainLearning/grainlearning)
-|
-| (3/5) community registry
-| [![RSD](https://img.shields.io/badge/rsd-grainlearning-00a3e3.svg)](https://research-software-directory.org/projects/granular-materials) [![workflow pypi badge](https://img.shields.io/pypi/v/grainlearning.svg?colorB=blue)](https://pypi.python.org/project/grainlearning/)
-|
-| (4/5) citation
-| [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123966.svg)](https://doi.org/10.5281/zenodo.7123966) |
-| (5/5) checklist
-| [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/6533/badge)](https://bestpractices.coreinfrastructure.org/projects/6533)
-|
-| howfairis
-| [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
-|
-| **Other best practices**           | &nbsp; |
-| Documentation
-| [![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest)
-|
+| code repository              | [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](https://github.com/GrainLearning/grainlearning)|
+| license                      |  [![github license 
+| badge](https://img.shields.io/github/license/GrainLearning/grainlearning)](https://github.com/GrainLearning/grainlearning)|
+| community registry           |  [![RSD](https://img.shields.io/badge/rsd-grainlearning-00a3e3.svg)](https://research-software-directory.org/projects/granular-materials)|
+| [![workflow pypi badge](https://img.shields.io/pypi/v/grainlearning.svg?colorB=blue)](https://pypi.python.org/project/grainlearning/)|
+| citation                     | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123966.svg)](https://doi.org/10.5281/zenodo.7123966)|
+| Best practices checklist     | [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/6533/badge)](https://bestpractices.coreinfrastructure.org/projects/6533)|
+| howfairis                    | [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)|
+| Documentation                | [![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest)|
+| Code coverage                | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=GrainLearning_grainLearning&metric=coverage)](https://sonarcloud.io/summary/new_code?id=GrainLearning_grainLearning)|
+
 
 Bayesian uncertainty quantification for discrete and continuum numerical models of granular materials,
 developed by various projects of the University of Twente (NL), the Netherlands eScience Center (NL), University of
@@ -51,7 +39,6 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 1. Go to the source code directory: `cd grainLearning`
 1. Activate the virtual environment: `poetry shell`
 1. Install GrainLearning and its dependencies: `poetry install`
-1. Run all self-tests of GrainLearning with pytest: `poetry run pytest -v`
 
 ### Install using pip
 
@@ -59,7 +46,6 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 1. Go to the source code directory: `cd grainLearning`
 1. Activate the virtual environment: `conda create --name grainlearning python=3.8 && conda activate grainlearning`
 1. Install GrainLearning and its dependencies: `pip install .`
-1. Run all self-tests of GrainLearning with pytest: `pytest -v`
 
 ### For Windows users
 
