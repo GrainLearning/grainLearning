@@ -1,22 +1,12 @@
-# %%
-
 import numpy as np
-
 from grainlearning import CalibrationToolbox
-
-import matplotlib.pyplot as plt
-
 from sklearn.metrics import mean_squared_error as mse
 
 p1 = 0.2
-
 p2 = 5.0
 x_obs = np.arange(100)
-
 y_obs = p1 * x_obs + p2
-
 y_obs_w_noise = y_obs + np.random.rand(100) * 2.5
-
 
 def run_sim(model, **kwargs):
     data = []
@@ -47,11 +37,8 @@ def test_smc_mse():
     )
 
     calibration.run_one_iteration()
-
     most_prob = np.argmax(calibration.calibration.posterior_ibf)
-
     # most_prob_params = calibration.model.param_data[most_prob]
-
     least_err = np.argmin(
         [mse(calibration.model.sim_data[sid, 0, :], y_obs) for sid in range(calibration.model.num_samples)])
 

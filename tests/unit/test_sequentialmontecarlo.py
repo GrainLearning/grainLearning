@@ -1,8 +1,5 @@
-# %%
 import numpy as np
-
 from grainlearning import SMC, Model, GaussianMixtureModel, generate_params_qmc
-
 
 def test_smc_init():
     """Test initialization of Sequential Monte Carlo class."""
@@ -44,9 +41,7 @@ def test_get_covariance_matrix():
     )
 
     smc_cls = SMC(ess_target=0.1, scale_cov_with_max=False)
-
     cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
-
     np.testing.assert_array_almost_equal(
         cov_matrices,
         [
@@ -74,10 +69,9 @@ def test_get_likelihood():
     sim_data = []
     for _ in range(model_cls.num_samples):
         sim_data.append(np.random.rand(2, 3))
+
     model_cls.sim_data = np.array(sim_data)
-
     cov_matrices = np.repeat([np.identity(2)], 3, axis=0) * 100
-
     likelihoods = smc_cls.get_likelihoods(model_cls, cov_matrices)
 
     assert likelihoods.shape == (3, 5)
@@ -131,9 +125,7 @@ def test_ips_covs():
     )
 
     gmm_cls = GaussianMixtureModel(max_num_components=1)
-
     model_cls.param_data = generate_params_qmc(model_cls, model_cls.num_samples)
-
     posteriors = np.array(
         [
             [0.1, 0.2, 0.3, 0.2, 0.2],

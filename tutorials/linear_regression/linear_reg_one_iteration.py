@@ -1,16 +1,10 @@
-# %%
-
-import numpy as np
-import matplotlib.pylab as plt
-
 from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
-
 import os, sys
 
-sys.path.append(os.getcwd() + '/grainlearning')
+sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
 
-sim_data_dir = './tests/data/linear_sim_data'
+sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
 calibration = CalibrationToolbox.from_dict(

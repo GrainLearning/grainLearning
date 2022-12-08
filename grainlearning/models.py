@@ -1,11 +1,14 @@
-from typing import Type, List, Callable, Tuple
+from typing import Type, List, Callable
 import numpy as np
+import os
 from .tools import get_keys_and_data, write_to_table
 
 
 class Model:
     """
-    This is the probabalistic model class. It contains information on the observation (or reference) data, simulation data, parameters and reference. It is also used to run a callback for the simulations.
+    This is the probabalistic model class.
+    It contains information on the observation (or reference) data, simulation data, parameters and reference.
+    It is also used to run a callback for the simulations.
 
     There are two ways of initializing the class.
 
@@ -379,7 +382,7 @@ class IOModel(Model):
 
         #### Observations ####
 
-        self.obs_data_file = sim_data_dir + '/' + obs_data_file
+        self.obs_data_file = os.path.join(sim_data_dir, obs_data_file)
 
         self.ctrl_name = ctrl_name
 

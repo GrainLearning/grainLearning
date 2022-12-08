@@ -1,18 +1,9 @@
-# %%
-
 import numpy as np
-
 from grainlearning import CalibrationToolbox
 
-import matplotlib.pyplot as plt
-
 x_obs = np.arange(100)
-
 y_obs = 0.2 * x_obs + 5.0
-
-
 # y_obs += np.random.rand(100) * 2.5
-
 
 def run_sim(model, **kwargs):
     data = []
@@ -21,7 +12,6 @@ def run_sim(model, **kwargs):
         data.append(np.array(y_sim, ndmin=2))
 
     model.sim_data = np.array(data)
-
 
 def test_lenreg():
     calibration = CalibrationToolbox.from_dict(

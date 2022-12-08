@@ -1,15 +1,8 @@
-# %%
-
 import numpy as np
-
 from grainlearning import CalibrationToolbox
 
-import matplotlib.pyplot as plt
-
 x_obs = np.arange(100)
-
 y_obs = 0.2 * x_obs + 5.0
-
 
 def run_sim(model, **kwargs):
     data = []
