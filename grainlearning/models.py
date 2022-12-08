@@ -1,11 +1,13 @@
-from typing import Type, List, Callable, Tuple
+from typing import Type, List, Callable
 import numpy as np
 from .tools import get_keys_and_data, write_to_table
 
 
 class Model:
     """
-    This is the probabalistic model class. It contains information on the observation (or reference) data, simulation data, parameters and reference. It is also used to run a callback for the simulations.
+    This is the probabalistic model class.
+    It contains information on the observation (or reference) data, simulation data, parameters and reference.
+    It is also used to run a callback for the simulations.
 
     There are two ways of initializing the class.
 

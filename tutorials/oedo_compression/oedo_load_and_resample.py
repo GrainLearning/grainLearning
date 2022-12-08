@@ -1,13 +1,9 @@
-# %%
-
-import numpy as np
-import matplotlib.pylab as plt
-
 from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
+from pathlib import Path
 
 curr_iter = 1
-sim_data_dir = './tests/data/oedo_sim_data'
+sim_data_dir = Path("./tests/data/oedo_sim_data")
 
 calibration = CalibrationToolbox.from_dict(
     {

@@ -1,7 +1,3 @@
-# %%
-
-import numpy as np
-
 from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
 

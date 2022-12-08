@@ -1,16 +1,8 @@
-""" Author: Hongyang Cheng <chyalexcheng@gmail.com>
-     A collection of all kins of helper functions (IO, plotting, ...)
-"""
-
-from math import *
-import sys, os
+import sys, os, math, subprocess
 import numpy as np
 import matplotlib.pylab as plt
-
+from typing import List, Callable
 from sklearn.mixture import BayesianGaussianMixture
-
-import subprocess
-from typing import Type, List, Callable, Tuple
 
 
 def startSimulations(platform, software, tableName, fileName):
@@ -58,7 +50,7 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
 
     fout = open(table_file_name, 'w')
     num, dim = table.shape
-    magn = floor(log(num, 10)) + 1
+    magn = math.floor(math.log(num, 10)) + 1
     fout.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
     for j in range(num):
         description = 'Iter' + str(curr_iter) + '-Sample' + str(j).zfill(magn)

@@ -1,4 +1,3 @@
-from ast import Param
 from typing import Type, List, Dict
 from .models import Model, IOModel
 from .iterativebayesianfilter import IterativeBayesianFilter

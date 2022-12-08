@@ -1,14 +1,11 @@
-# %%
-
 import numpy as np
-import matplotlib.pylab as plt
+from pathlib import Path
 
 from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
 
-sim_data_dir = './tests/data/linear_sim_data'
+sim_data_dir = Path("./tests/data/linear_sim_data")
 curr_iter = 0
-
 
 def test_smc():
     calibration = CalibrationToolbox.from_dict(
