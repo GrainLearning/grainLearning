@@ -27,37 +27,24 @@ def prepare_datasets(
     Convert raw data into preprocessed split datasets.
 
     :param raw_data: Path to hdf5 file containing the data.
-    :type raw_data: str
     :param pressure: Transverse pressure as a string in format '0.xe6'.
-    :type pressure: str
     :param experiment_type: Either 'drained', 'undrained' or 'All'.
-    :type experiment_type: str
     :param train_frac: Fraction of data used in the training set.
-    :type train_frac: float
     :param val_frac: Fraction of the data used in the validation set.
-    :type val_frac: float
     :param pad_length: Amount by which to pad the sequences from the start.
-    :type pad_length: int
     :param use_windows: Whether to split up the time series into windows.
-    :type use_windows: bool
     :param window_size: Number of timesteps to include in a window.
-    :type window_size: int
     :param window_step: Offset between subsequent windows.
-    :type window_step: int
     :param standardize_outputs: Whether to transform the training set labels
             to have zero mean and unit variance.
-    :type standardize_outputs: bool
     :param add_e0: Whether to add the initial void ratio as a contact parameter.
-    :type add_e0: bool
     :param seed: Random seed used to split the datasets.
-    :type seed: int
 
     :return: (split_data, train_stats)
         split_data: Dictionary with keys 'train', 'val', 'test', and values the
         corresponding tensorflow Datasets.
         train_stats: Dictionary containing the shape of the data, and
         'mean' and 'std' of the training set, in case `standardize_outputs` is True.
-    :rtype: Tuple
     """
     datafile = h5py.File(raw_data, 'r')
 
@@ -90,15 +77,13 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     """
     Merge the datasets with different pressures and experiment types.
     If `pressure` or `experiment_type` is 'All'.
-    Otherwise just return the inputs, outputs and contact_params.
+    Otherwise just return the inputs, outputs and contact_params for the given pressure and experimen_type.
+
     :param datafile: h5py file containing the dataset.
-    :type datafile: h5py._hl.files.File
     :param pressure: Experiment confining pressure, 'All' will take all pressures available.
-    :type pressure: str
     :param experiment_type: 'drained', 'undrained' or 'All'
-    :type experiment_type: str
+
     :return: input, output and contact_params arrays merged for the given pressures and expriment_types.
-    :rtype: tuple
     """
     if pressure == 'All': pressures = PRESSURES
     else: pressures = [pressure]
@@ -127,13 +112,11 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     return input_sequences, output_sequences, contact_params
 
 def _add_e0_to_contacts(contacts: np.array, inputs: np.array):
-    """Add the initial void ratio e_0 as an extra contact parameter at the end.
+    """
+    Add the initial void ratio e_0 as an extra contact parameter at the end.
     :param contacts: List of contact parameters
-    :type contacts: Numpy Array
     :param inputs: List of input parameters
-    :type inputs: Numpy Array
     :return: Modified contacts list with e_0 added at the end.
-    :rtype: Numpy Array
     """
     e0s = inputs[:, 0, 0]  # first element in series, 0th feature == e_0
     e0s = np.expand_dims(e0s, axis=1)
@@ -150,18 +133,12 @@ def _augment_contact_params(
 
     :param contact_params: Array containing contact parameters for all the
             samples with the given pressure and experiment type
-    :type contact_params: Numpy array
     :param pressure: The corresponding pressure.
-    :type pressure: str
     :param experiment_type: The corresponding experiment type, 'drained' or 'undrained'.
-    :type experiment_type: str
     :param add_pressure: Whether to add pressure to contact parameters.
-    :type add_pressure: bool
     :param add_type: Whether to add experiment type to contact parameters.
-    :type add_type: bool
 
     :return: Numpy array containing augmented contact parameters.
-    :rtype: Numpy array
     """
     new_info = []
     pres_num = float(pressure) / 10**6
@@ -177,21 +154,15 @@ def _augment_contact_params(
 def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     """
     Split data into training, validation, and test sets.
-
     The split is done on a sample by sample basis, so sequences are not broken up.
     It is done randomly across all pressures and experiment types present.
 
-    :params dataset: Full dataset to split on, in form of a tuple (inputs, outputs),
+    :param dataset: Full dataset to split on, in form of a tuple (inputs, outputs),
             where inputs is a dictionary and its keys and the outputs are numpy arrays.
-    :type dataset: tuple
-    :params train_frac: Fraction of data used for training set.
-    :type train_frac: float
-    :params val_frac: Fraction of data used for validation set.
-    :type val_frac: float
-    :params seed: Random seed used to make the split.
-    :type seed: int
+    :param train_frac: Fraction of data used for training set.
+    :param val_frac: Fraction of data used for validation set.
+    :param seed: Random seed used to make the split.
     :return: Dictionary containing 'train', 'val', and 'test' datasets.
-    :rtype: dict
     """
     n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
@@ -215,9 +186,7 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
 
 def _standardize_outputs(split_data):
     """
-    Standardize outputs of split_data.
-
-    Using the mean and std of the training data
+    Standardize outputs of split_data using the mean and std of the training data
     taken over both the samples and the timesteps.
     """
     train_outputs = split_data['train'][1]
@@ -240,12 +209,10 @@ def _pad_initial(array: np.array, pad_length: int, axis=1):
     This is used to be able to predict also the first timestep from a window
     of the same size.
 
-    :parm array: Array that is going to be modified
-    :type array: numpy.array
+    :param array: Array that is going to be modified
     :param pad_lenght: number of copies of the initial state to be added at the beggining of `array`.
-    :type pad_lenght: int
+
     :return: Modified array
-    :rtype: numpy.array
     """
     starts = array[:, :1, :]
     padding = tf.repeat(starts, pad_length, axis=axis)
@@ -255,11 +222,11 @@ def _pad_initial(array: np.array, pad_length: int, axis=1):
 def get_dimensions(data: tf.Dataset):
     """
     Extract dimensions of sample from a tensorflow dataset.
-    :parm data: The dataset to extract from.
-    :type data: tensorflow.Dataset
+
+    :param data: The dataset to extract from.
+
     :return: Dictionary containing:
             sequence_length, num_load_features, num_contact_params, num_labels
-    :rtype: dict
     """
     train_sample = next(iter(data))  # just to extract a single batch
     sequence_length, num_load_features = train_sample[0]['load_sequence'].shape

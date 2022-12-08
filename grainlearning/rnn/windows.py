@@ -2,23 +2,19 @@ import numpy as np
 import tensorflow as tf
 
 
-def windowize_train_val(split_data, train_stats, window_size, window_step, **kwargs):
+def windowize_train_val(split_data:dict, train_stats: dict, window_size:int, window_step: int, **kwargs):
     """
     Convert sequences into windows of given length. Leave test set untouched.
+    Adds window_size and window_step to train_stats.
 
-    Args:
-        split_data (dict): Dictionary with keys 'train', 'val', 'test' pointing to
+    :param split_data: Dictionary with keys 'train', 'val', 'test' pointing to
             tensorflow datasets.
-        train_stats (dict): Dictionary storing statistics of the training data.
-        window_size (int): Number of timesteps to include in a window.
-        window_step (int): Offset between subsequent windows.
+    :param train_stats: Dictionary storing statistics of the training data.
+    :param window_size: Number of timesteps to include in a window.
+    :param window_step: Offset between subsequent windows.
 
-    Returns:
-        windows: Dictionary of dataset splits, where the training split has been
+    :return windows: Dictionary of dataset splits, where the training split has been
             modified into windows
-
-    Modifies:
-        train_stats: Adds window_size and window_step to this dictionary.
     """
     windows = split_data
     windows['train'] = _windowize_single_dataset(split_data['train'], window_size, window_step)
@@ -31,7 +27,7 @@ def windowize_train_val(split_data, train_stats, window_size, window_step, **kwa
 
 
 def _windowize_single_dataset(
-        data,
+        data: tf.dataset,
         window_size: int,
         window_step: int,
         seed: int = 42):
@@ -40,6 +36,11 @@ def _windowize_single_dataset(
     of shorter sequences of size `window_size`, taken at intervals `window_step`
     so of shape M, window_size, L, with M >> N.
     Also shuffle the data.
+
+    :param data: dataset of sequences of shape N, S, L
+    :param window_size: size of the window
+    :param window_step:
+    :param seed: Random seed
     """
     load_sequences, contact_parameters, outputs = extract_tensors(data)
     num_samples, sequence_length, num_labels = outputs.shape
@@ -77,8 +78,8 @@ def _shuffle(Xs, cs, ys, seed):
     return Xs[inds], cs[inds], ys[inds]
 
 def predict_over_windows(
-        data,
-        model,
+        data: dict,
+        model: tf.Keras.Model,
         window_size: int,
         sequence_length: int,
         ):
@@ -91,14 +92,12 @@ def predict_over_windows(
     Note the length of the output sequence will be shorter by the window_size than
     the input sequence.
 
-    Args:
-        data (dict): Dictionary of data containing 'load_sequence' and 'contact_parameters'.
-        model: The model to predict with.
-        window_size (int): Number of timesteps in a single window.
-        sequence_length (int): Number of timesteps in a full sequence.
+    :param data: Dictionary of data containing 'load_sequence' and 'contact_parameters'.
+    :param model: The model to predict with.
+    :param window_size: Number of timesteps in a single window.
+    :param sequence_length: Number of timesteps in a full sequence.
 
-    Returns:
-        Tensor of predicted sequences.
+    :return: Tensor of predicted sequences.
     """
     def predict_windows(inputs, outputs):
         predictions = [
@@ -110,15 +109,13 @@ def predict_over_windows(
 
     return data.map(predict_windows)
 
-def extract_tensors(data):
+def extract_tensors(data: tf.dataset):
     """
     Given a tensorflow Dataset extract all tensors.
 
-    Args:
-        data: Tensorflow dataset.
+    :param data: Tensorflow dataset.
 
-    Returns:
-        Tuple of numpy arrays inputs, contacts, outputs.
+    :return: Tuple of numpy arrays: inputs, contacts, outputs.
     """
     inputs, contacts, outputs = [], [], []
     for _inputs, _outputs in iter(data):
