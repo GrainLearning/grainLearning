@@ -381,7 +381,7 @@ class IOModel(Model):
 
         #### Observations ####
 
-        self.obs_data_file = sim_data_dir + '/' + obs_data_file
+        self.obs_data_file = os.path.join(sim_data_dir, obs_data_file)
 
         self.ctrl_name = ctrl_name
 
