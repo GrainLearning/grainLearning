@@ -17,7 +17,7 @@ def test_init():
     config = {
         "param_mins": [1, 2],
         "param_maxs": [3, 4],
-        "obs_data":[[12, 3, 4, 4], [12, 4, 5, 4]],
+        "obs_data": [[12, 3, 4, 4], [12, 4, 5, 4]],
         "ctrl_data": [1, 2, 3, 4],
         "num_samples": 10,
     }
@@ -36,10 +36,11 @@ def test_init():
         0.00001,
     )
 
+
 def test_run_model():
     """Test if the run model callback function works as expected"""
-    def run_model(model):
 
+    def run_model(model):
         model.sim_data = [
             [[12, 3, 4, 4]],
             [[11, 24, 4, 3]],

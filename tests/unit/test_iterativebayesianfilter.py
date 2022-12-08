@@ -1,18 +1,18 @@
 import numpy as np
 
 from grainlearning import (
-    SequentialMonteCarlo,
+    SMC,
     IterativeBayesianFilter,
     GaussianMixtureModel,
     Model,
 )
 
+
 def test_init():
     """Test if the iterative bayesian filter is initialized correctly"""
-    smc_cls = SequentialMonteCarlo(ess_target=0.1)
+    smc_cls = SMC(ess_target=0.1)
     gmm_cls = GaussianMixtureModel(max_num_components=5)
     ibf_cls = IterativeBayesianFilter(inference=smc_cls, sampling=gmm_cls)
-
 
     ibf_dct = IterativeBayesianFilter.from_dict(
         {
@@ -45,8 +45,8 @@ def test_run_inference():
         "num_samples": 3,
 
     })
-        
-    model_cls.sim_data =  np.random.uniform(0, 100, (3, 3, 4))
+
+    model_cls.sim_data = np.random.uniform(0, 100, (3, 3, 4))
 
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
@@ -62,5 +62,3 @@ def test_run_inference():
     ibf_cls.run_inference(model=model_cls)
 
     assert True
-
-

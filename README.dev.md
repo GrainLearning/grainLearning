@@ -1,3 +1,20 @@
+## Installation of grainlearning
+Install grainlearning with the posibility to build documentation and check tests.
+
+### Using poetry
+1. Install poetry following [these instructions](https://python-poetry.org/docs/#installation).
+1. Clone the repository: `git clone git@github.com:GrainLearning/grainLearning.git`
+1. Go to the source code directory: `cd grainLearning`
+1. Activate the virtual environment: `poetry shell`
+1. Install GrainLearning and its dependencies: `poetry install -E docs -E dev` or `poetry install --extras "docs dev"`
+1. Run all self-tests of GrainLearning with pytest: `poetry run pytest -v`
+
+### Using pip
+1. Clone the repository: `git clone git@github.com:GrainLearning/grainLearning.git`
+1. Go to the source code directory: `cd grainLearning`
+1. We advise to use a python environment using pyenv or conda.
+1. Install GrainLearning and its dependencies: `pip install .[docs,dev]`, if you are using an zsh shell you should run `pip install .'[docs,dev]'` instead, this is because zsh uses square brackets for globbing / pattern matching.
+
 ## Making a release
 This section describes how to make a release in 3 parts:
 
@@ -14,11 +31,36 @@ This section describes how to make a release in 3 parts:
 - docs/source/conf.py
 - pyproject.toml
 - README.md
-4. Run the unit tests with `poetry run pytest -v`
+4. Run the unit and integration tests with `poetry run pytest -v`
 
 ### (2/3) PyPI
 
-#### a. Deploying to test-pypi
+#### a. Set up your credentials 
+
+```shell
+poetry config http-basic.pypi <username> <password>
+```
+
+Those are your credentials to your account on pypi.org, which you do have to create if you don't have one.
+
+#### b. Deploying to test-pypi
+
+Before publishing unpolished package on PyPI, you can test it on a test version of PyPI.
+This test PyPI will allow us to mimic updating to PyPI, then pip installing our own package to see if it works as expected.
+For that you need another account on test.pypi.org (same username and password is fine).
+
+You can then add the repository to poetry:
+
+```shell
+poetry config repositories.testpypi https://test.pypi.org/legacy/
+```
+
+Create a token following [this link](https://test.pypi.org/manage/account/token/)
+
+```shell
+poetry config pypi-token.test-pypi <your-token>
+```
+
 In a new terminal, without an activated virtual environment or an env directory:
 
 ```shell
@@ -42,23 +84,16 @@ rm -rf dist
 poetry shell
 poetry install
 poetry build 
-pip install twine
 
-# This generates folder dist that has the wheel that is going to be distributed. Install twine in your system or in an environment.
-twine upload --repository-url https://test.pypi.org/legacy/ dist/* 
+# This generates folder dist that has the wheel that is going to be distributed on test-pypi.
+poetry publish --build -r test-pypi
 
 ```
-
-Alternatively, you can try instead of the last command (twine) use Poetry :
-```shell
-poetry publish --build
-```
-This will by default register the package to pypi. You'll need to put your pypi username and password, alternatively you can pass the as -u and -p, respectively. More info [here](https://python-poetry.org/docs/cli/#build).
-
+This will by default register the package to test-pypi.
 Visit [https://test.pypi.org/project/grainlearning](https://test.pypi.org/project/grainlearning)
 and verify that your package was uploaded successfully. Keep the terminal open, we'll need it later.
 
-#### b. Testing the deployed package to test-pypi
+#### c. Testing the deployed package to test-pypi
 In a new terminal, without an activated virtual environment or an env directory:
 
 ```shell
@@ -69,23 +104,30 @@ python3 -m venv env
 source env/bin/activate
 
 # install from test pypi instance:
+# TODO: why `pip install -i https://test.pypi.org/simple/ grainlearning` does not work
 python3 -m pip -v install --no-cache-dir \
 --index-url https://test.pypi.org/simple/ \
 --extra-index-url https://pypi.org/simple grainlearning
 ```
 
-Check that the package works as it should when installed from pypitest. For example run:
+Check that the package works as it should when installed from test-pypi. For example run:
 ``` shell
-python3 tests/integration/test_14sep_lengreg.py 
+python3 tests/integration/test_lengreg.py 
 ```
 
-#### c. Uploading to pypi
+#### d. Uploading to pypi
+
+If you are happy with the package on test-pypi, deploy it on pypi.
+Once a version of GrainLearning is uploaded. It cannot be removed.
 
 ```shell
-# Back to the first terminal,
-# FINAL STEP: upload to PyPI (requires credentials)
-twine upload dist/*
+# Go back to the first terminal in step b,
+# FINAL STEP: upload to PyPI
+poetry publish --build -r test-pypi
 ```
+
+Visit [https://pypi.org/project/grainlearning/](https://pypi.org/project/grainlearning/)
+and verify that your package was deployed successfully.
 
 ### (3/3) GitHub
 
@@ -96,13 +138,13 @@ Don't forget to also make a [release on GitHub](https://github.com/GrainLearning
 ### Online:
 You can check the documentation [here](https://grainlearning.readthedocs.io/en/latest/)
 
-### Create the documentation using poetry
-1. You need to be in the same `poetry shell` used to install grainlearning, or repeat the process to install using poetry.
+### Create the documentation locally using poetry
+1. You need to be in the same `poetry shell` used to install grainlearning, or repeat the process to install using poetry and doc extras: `poetry install -E docs` or `poetry install --extras "docs"`. Alternatively you can install via pip: `pip install .[docs]`
 1. `cd docs`
 1. `poetry run make html`
 
-
 ## Testing and code coverage
+You must have had installed grainlearning development dependencies: `poetry install -E dev` or `poetry install --extras "dev"` or `pip install .[dev]`
 
 To run the tests:
 ``` shell
@@ -118,3 +160,11 @@ To create a more complete output of tests and coverage:
 ``` shell
 poetry run pytest --cov --cov-report term --cov-report xml --junitxml=xunit-result.xml tests/ 
 ```
+
+## Linter
+Run several Python analysis tools to ensure that your contributions are following standards and best practices.
+
+1. You must have had installed grainlearning with dev dependencies either  
+a). `poetry install -E dev` or b). `pip install .[dev]`.
+1. While being in the main directory grainlearning, at the same level as .prospector.yaml, run prospector. Depending on how you have installed grainlearning you can either run
+a). `poetry run prospector` or b). `prospector`

@@ -1,48 +1,225 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-
-    <title>Python API &#8212; GrainLearning  documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python API &mdash; GrainLearning  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Welcome to GrainLearning’s documentation!" href="index.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> GrainLearning
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.calibrationtoolbox"><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_process"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.load_and_process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_run_one_iteration"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.load_and_run_one_iteration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_model"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.load_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.plot_UQ_in_time"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.plot_UQ_in_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.resample"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.resample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.run"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.run_one_iteration"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.run_one_iteration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.calibration"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.calibration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.curr_iter"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.curr_iter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.model"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.num_iter"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.num_iter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.save_fig"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.save_fig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.sigma_list"><code class="docutils literal notranslate"><span class="pre">CalibrationToolbox.sigma_list</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.models"><code class="docutils literal notranslate"><span class="pre">Models</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.models.IOModel"><code class="docutils literal notranslate"><span class="pre">IOModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.ctrl_data"><code class="docutils literal notranslate"><span class="pre">IOModel.ctrl_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.from_dict"><code class="docutils literal notranslate"><span class="pre">IOModel.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.load_param_data"><code class="docutils literal notranslate"><span class="pre">IOModel.load_param_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.load_sim_data"><code class="docutils literal notranslate"><span class="pre">IOModel.load_sim_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.run"><code class="docutils literal notranslate"><span class="pre">IOModel.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.callback"><code class="docutils literal notranslate"><span class="pre">IOModel.callback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.ctrl_name"><code class="docutils literal notranslate"><span class="pre">IOModel.ctrl_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.inv_obs_weight"><code class="docutils literal notranslate"><span class="pre">IOModel.inv_obs_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.num_ctrl"><code class="docutils literal notranslate"><span class="pre">IOModel.num_ctrl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.num_obs"><code class="docutils literal notranslate"><span class="pre">IOModel.num_obs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.num_params"><code class="docutils literal notranslate"><span class="pre">IOModel.num_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.num_samples"><code class="docutils literal notranslate"><span class="pre">IOModel.num_samples</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.num_steps"><code class="docutils literal notranslate"><span class="pre">IOModel.num_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.obs_data"><code class="docutils literal notranslate"><span class="pre">IOModel.obs_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.obs_data_file"><code class="docutils literal notranslate"><span class="pre">IOModel.obs_data_file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.obs_names"><code class="docutils literal notranslate"><span class="pre">IOModel.obs_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.param_data"><code class="docutils literal notranslate"><span class="pre">IOModel.param_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.param_data_file"><code class="docutils literal notranslate"><span class="pre">IOModel.param_data_file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.param_data_prev"><code class="docutils literal notranslate"><span class="pre">IOModel.param_data_prev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.param_maxs"><code class="docutils literal notranslate"><span class="pre">IOModel.param_maxs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.param_mins"><code class="docutils literal notranslate"><span class="pre">IOModel.param_mins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.param_names"><code class="docutils literal notranslate"><span class="pre">IOModel.param_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sigma_max"><code class="docutils literal notranslate"><span class="pre">IOModel.sigma_max</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sigma_min"><code class="docutils literal notranslate"><span class="pre">IOModel.sigma_min</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sigma_tol"><code class="docutils literal notranslate"><span class="pre">IOModel.sigma_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sim_data"><code class="docutils literal notranslate"><span class="pre">IOModel.sim_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sim_data_dir"><code class="docutils literal notranslate"><span class="pre">IOModel.sim_data_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sim_data_file_ext"><code class="docutils literal notranslate"><span class="pre">IOModel.sim_data_file_ext</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sim_data_files"><code class="docutils literal notranslate"><span class="pre">IOModel.sim_data_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.IOModel.sim_name"><code class="docutils literal notranslate"><span class="pre">IOModel.sim_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.models.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.ctrl_data"><code class="docutils literal notranslate"><span class="pre">Model.ctrl_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.from_dict"><code class="docutils literal notranslate"><span class="pre">Model.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.run"><code class="docutils literal notranslate"><span class="pre">Model.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.callback"><code class="docutils literal notranslate"><span class="pre">Model.callback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.ctrl_name"><code class="docutils literal notranslate"><span class="pre">Model.ctrl_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.inv_obs_weight"><code class="docutils literal notranslate"><span class="pre">Model.inv_obs_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.num_ctrl"><code class="docutils literal notranslate"><span class="pre">Model.num_ctrl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.num_obs"><code class="docutils literal notranslate"><span class="pre">Model.num_obs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.num_params"><code class="docutils literal notranslate"><span class="pre">Model.num_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.num_samples"><code class="docutils literal notranslate"><span class="pre">Model.num_samples</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.num_steps"><code class="docutils literal notranslate"><span class="pre">Model.num_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.obs_data"><code class="docutils literal notranslate"><span class="pre">Model.obs_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.obs_names"><code class="docutils literal notranslate"><span class="pre">Model.obs_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.param_data"><code class="docutils literal notranslate"><span class="pre">Model.param_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.param_data_prev"><code class="docutils literal notranslate"><span class="pre">Model.param_data_prev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.param_maxs"><code class="docutils literal notranslate"><span class="pre">Model.param_maxs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.param_mins"><code class="docutils literal notranslate"><span class="pre">Model.param_mins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.param_names"><code class="docutils literal notranslate"><span class="pre">Model.param_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.sigma_max"><code class="docutils literal notranslate"><span class="pre">Model.sigma_max</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.sigma_min"><code class="docutils literal notranslate"><span class="pre">Model.sigma_min</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.sigma_tol"><code class="docutils literal notranslate"><span class="pre">Model.sigma_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.sim_data"><code class="docutils literal notranslate"><span class="pre">Model.sim_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.models.Model.sim_name"><code class="docutils literal notranslate"><span class="pre">Model.sim_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.iterativebayesianfilter"><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.from_dict"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initialize"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_inference"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.run_inference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_sampling"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.run_sampling()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.solve"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.solve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.ess_tol"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.ess_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.inference"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.inference</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initial_sampling"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.initial_sampling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.param_data_list"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.param_data_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.posterior_ibf"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.posterior_ibf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.sampling"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.sampling</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.inference"><code class="docutils literal notranslate"><span class="pre">Inference</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.inference.SMC"><code class="docutils literal notranslate"><span class="pre">SMC</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.data_assimilation_loop"><code class="docutils literal notranslate"><span class="pre">SMC.data_assimilation_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.from_dict"><code class="docutils literal notranslate"><span class="pre">SMC.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_covariance_matrices"><code class="docutils literal notranslate"><span class="pre">SMC.get_covariance_matrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_ensemble_ips_covs"><code class="docutils literal notranslate"><span class="pre">SMC.get_ensemble_ips_covs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_likelihoods"><code class="docutils literal notranslate"><span class="pre">SMC.get_likelihoods()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_posterors"><code class="docutils literal notranslate"><span class="pre">SMC.get_posterors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.give_posterior"><code class="docutils literal notranslate"><span class="pre">SMC.give_posterior()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.cov_matrices"><code class="docutils literal notranslate"><span class="pre">SMC.cov_matrices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.covs"><code class="docutils literal notranslate"><span class="pre">SMC.covs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.ess"><code class="docutils literal notranslate"><span class="pre">SMC.ess</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.ess_target"><code class="docutils literal notranslate"><span class="pre">SMC.ess_target</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.ips"><code class="docutils literal notranslate"><span class="pre">SMC.ips</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.likelihoods"><code class="docutils literal notranslate"><span class="pre">SMC.likelihoods</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.posteriors"><code class="docutils literal notranslate"><span class="pre">SMC.posteriors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.scale_cov_with_max"><code class="docutils literal notranslate"><span class="pre">SMC.scale_cov_with_max</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.sampling"><code class="docutils literal notranslate"><span class="pre">Sampling</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.expand_weighted_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.from_dict"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.regenerate_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.regenerate_params_with_gmm()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#grainlearning.sampling.generate_params_qmc"><code class="docutils literal notranslate"><span class="pre">generate_params_qmc()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GrainLearning</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Python API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="python-api">
-<h1>Python API<a class="headerlink" href="#python-api" title="Permalink to this heading">¶</a></h1>
+<h1>Python API<a class="headerlink" href="#python-api" title="Permalink to this heading"></a></h1>
 <section id="module-grainlearning.calibrationtoolbox">
-<span id="calibrationtoolbox"></span><h2><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code><a class="headerlink" href="#module-grainlearning.calibrationtoolbox" title="Permalink to this heading">¶</a></h2>
+<span id="calibrationtoolbox"></span><h2><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code><a class="headerlink" href="#module-grainlearning.calibrationtoolbox" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CalibrationToolbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CalibrationToolbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the main calibration tooblox</p>
-<p>There are two ways of initializing the class.</p>
+<p>This is the main calibration toolbox</p>
+<p>A Bayesian calibration method consists of the inference class and the (re)sampling class.
+For instance, in GrainLearning, we have a calibration method called “iterative Bayesian filter”
+which consists of “sequential Monte Carlo” for the inference and “variational Gaussian mixture” for the resampling</p>
+<p>There are two ways of initializing a calibration toolbox class.</p>
 <p>Method 1 - dictionary style (recommended)</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">CalibrationToolbox</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
     <span class="p">{</span>
@@ -73,47 +250,104 @@
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>calibration</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter" title="grainlearning.iterativebayesianfilter.IterativeBayesianFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterativeBayesianFilter</span></code></a>]) – Iterative Bayesian Filter</p></li>
 <li><p><strong>num_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of iteration steps</p></li>
+<li><p><strong>curr_iter</strong> (<em>int</em>) – </p></li>
+<li><p><strong>save_fig</strong> (<em>int</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_process">
+<span class="sig-name descname"><span class="pre">load_and_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_process" title="Permalink to this definition"></a></dt>
+<dd><p>Load an existing dataset and compute posterior distribution with a given sigma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sigma</strong> (<em>float</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_run_one_iteration">
+<span class="sig-name descname"><span class="pre">load_and_run_one_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_and_run_one_iteration" title="Permalink to this definition"></a></dt>
+<dd><p>Load an existing dataset and run GrainLearning for one iteration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.load_model">
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.load_model" title="Permalink to this definition"></a></dt>
+<dd><p>Load existing simulation data into the model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.plot_UQ_in_time">
+<span class="sig-name descname"><span class="pre">plot_UQ_in_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.plot_UQ_in_time" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the evolution of uncertainty moments and distribution over time</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.resample" title="Permalink to this definition"></a></dt>
+<dd><p>Learn and resample from a posterior (proposal) distribution</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main calibration loop.</p>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.run" title="Permalink to this definition"></a></dt>
+<dd><p>Main calibration loop.
+1. The first iteration starts with a Halton sequence
+2. The following iterations continue by sampling parameter space, until certain criterion is met.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.run_one_iteration">
+<span class="sig-name descname"><span class="pre">run_one_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.run_one_iteration" title="Permalink to this definition"></a></dt>
+<dd><p>Run GrainLearning for one iteration.
+TODO: more docu needed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.calibration">
-<span class="sig-name descname"><span class="pre">calibration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter" title="grainlearning.iterativebayesianfilter.IterativeBayesianFilter"><span class="pre">IterativeBayesianFilter</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.calibration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calibration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter" title="grainlearning.iterativebayesianfilter.IterativeBayesianFilter"><span class="pre">IterativeBayesianFilter</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.calibration" title="Permalink to this definition"></a></dt>
 <dd><p>Calibration method (e.g, Iterative Bayesian Filter)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.curr_iter">
-<span class="sig-name descname"><span class="pre">curr_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.curr_iter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">curr_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.curr_iter" title="Permalink to this definition"></a></dt>
 <dd><p>Current calibration step</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.model">
-<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><span class="pre">Model</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><span class="pre">Model</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.model" title="Permalink to this definition"></a></dt>
 <dd><p>Model being calibrated on</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.num_iter">
-<span class="sig-name descname"><span class="pre">num_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.num_iter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of iteratives</p>
+<span class="sig-name descname"><span class="pre">num_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.num_iter" title="Permalink to this definition"></a></dt>
+<dd><p>Number of iterations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.save_fig">
+<span class="sig-name descname"><span class="pre">save_fig</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.save_fig" title="Permalink to this definition"></a></dt>
+<dd><p>Flag to save figures</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox.sigma_list">
-<span class="sig-name descname"><span class="pre">sigma_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.sigma_list" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sigma_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#grainlearning.calibrationtoolbox.CalibrationToolbox.sigma_list" title="Permalink to this definition"></a></dt>
 <dd><p>List of sigmas</p>
 </dd></dl>
 
@@ -121,10 +355,266 @@
 
 </section>
 <section id="module-grainlearning.models">
-<span id="models"></span><h2><code class="docutils literal notranslate"><span class="pre">Models</span></code><a class="headerlink" href="#module-grainlearning.models" title="Permalink to this heading">¶</a></h2>
+<span id="models"></span><h2><code class="docutils literal notranslate"><span class="pre">Models</span></code><a class="headerlink" href="#module-grainlearning.models" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IOModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_data_file_ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_mins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_maxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_obs_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
+<p>This is the IOModel class to compute the posterior distribution from an existing dataset,
+and generate new parameter values for additional simulation runs.</p>
+<p>There are two ways of initializing the class.</p>
+<p>Method 1 - dictionary style</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;param_mins&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;param_maxs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+        <span class="s2">&quot;num_samples&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+        <span class="s2">&quot;obs_data&quot;</span><span class="p">:</span> <span class="n">y_obs</span><span class="p">,</span>
+        <span class="s2">&quot;ctrl_data&quot;</span><span class="p">:</span> <span class="n">x_ctrl</span><span class="p">,</span>
+        <span class="s2">&quot;callback&quot;</span><span class="p">:</span> <span class="n">run_sim</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>or</p>
+<p>Method 2 - class style</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span>
+        <span class="n">param_mins</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">param_maxs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
+        <span class="n">obs_data</span> <span class="o">=</span> <span class="n">y_obs</span><span class="p">,</span>
+        <span class="n">ctrl_data</span> <span class="o">=</span> <span class="n">x_ctrl</span><span class="p">,</span>
+        <span class="n">callback</span> <span class="o">=</span> <span class="n">run_sim</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Observation or reference data</p></li>
+<li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
+<li><p><strong>param_mins</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter lower bounds</p></li>
+<li><p><strong>param_maxs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter Upper bounds</p></li>
+<li><p><strong>ctrl_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Optional control data (e.g, time), defaults to None</p></li>
+<li><p><strong>obs_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Column names of the observation data, defaults to None</p></li>
+<li><p><strong>ctrl_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Coloumn name of the control data, defaults to None</p></li>
+<li><p><strong>inv_obs_weight</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – Inverse of the observation weight, defaults to None</p></li>
+<li><p><strong>param_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Parameter data, defaults to None</p></li>
+<li><p><strong>param_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Parameter names, defaults to None</p></li>
+<li><p><strong>sim_data_files</strong> – Simulation data files, defaults to None</p></li>
+<li><p><strong>sim_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Simulation data, defaults to None</p></li>
+<li><p><strong>callback</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – Callback function, defaults to None</p></li>
+<li><p><strong>sigma_max</strong> – Uncertainty, defaults to 1.0e6</p></li>
+<li><p><strong>sim_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sim_data_dir</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sim_data_file_ext</strong> (<em>str</em>) – </p></li>
+<li><p><strong>obs_data_file</strong> (<em>str</em>) – </p></li>
+<li><p><strong>param_data_file</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.ctrl_data">
+<span class="sig-name descname"><span class="pre">ctrl_data</span></span><a class="headerlink" href="#grainlearning.models.IOModel.ctrl_data" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel.from_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the class using a dictionary style</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.IOModel" title="grainlearning.models.IOModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOModel</span></code></a>]</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>obj</strong> (<em>dict</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.load_param_data">
+<span class="sig-name descname"><span class="pre">load_param_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel.load_param_data" title="Permalink to this definition"></a></dt>
+<dd><p>Load parameter data from a table written in a txt file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>curr_iter</strong> (<em>int</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.load_sim_data">
+<span class="sig-name descname"><span class="pre">load_sim_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel.load_sim_data" title="Permalink to this definition"></a></dt>
+<dd><ol class="arabic simple">
+<li><p>Read simulation data into self.model.sim_data and remove the observation data sequence</p></li>
+<li><p>Check if parameter values read from the table matches those used to creat the simulation data</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.IOModel.run" title="Permalink to this definition"></a></dt>
+<dd><p>This function runs the callback function</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.callback">
+<span class="sig-name descname"><span class="pre">callback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#grainlearning.models.IOModel.callback" title="Permalink to this definition"></a></dt>
+<dd><p>Callback function. The input arugment is the model where model.sim_data is modified</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.ctrl_name">
+<span class="sig-name descname"><span class="pre">ctrl_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#grainlearning.models.IOModel.ctrl_name" title="Permalink to this definition"></a></dt>
+<dd><p>Observation control (e.g., time)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.inv_obs_weight">
+<span class="sig-name descname"><span class="pre">inv_obs_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.IOModel.inv_obs_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Inverse observation weight</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.num_ctrl">
+<span class="sig-name descname"><span class="pre">num_ctrl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.IOModel.num_ctrl" title="Permalink to this definition"></a></dt>
+<dd><p>Number of control data</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.num_obs">
+<span class="sig-name descname"><span class="pre">num_obs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.IOModel.num_obs" title="Permalink to this definition"></a></dt>
+<dd><p>Number of observations in the dataset</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.num_params">
+<span class="sig-name descname"><span class="pre">num_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.IOModel.num_params" title="Permalink to this definition"></a></dt>
+<dd><p>Number of parameters</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.num_samples">
+<span class="sig-name descname"><span class="pre">num_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.IOModel.num_samples" title="Permalink to this definition"></a></dt>
+<dd><p>Number of samples (usually specified by user)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.num_steps">
+<span class="sig-name descname"><span class="pre">num_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.IOModel.num_steps" title="Permalink to this definition"></a></dt>
+<dd><p>Number of steps or sequence size in the dataset</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.obs_data">
+<span class="sig-name descname"><span class="pre">obs_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.IOModel.obs_data" title="Permalink to this definition"></a></dt>
+<dd><p>Observation (or reference) data of shape (num_obs,num_steps)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.obs_data_file">
+<span class="sig-name descname"><span class="pre">obs_data_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#grainlearning.models.IOModel.obs_data_file" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the observation data file</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.obs_names">
+<span class="sig-name descname"><span class="pre">obs_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.IOModel.obs_names" title="Permalink to this definition"></a></dt>
+<dd><p>Observation keys</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.param_data">
+<span class="sig-name descname"><span class="pre">param_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.IOModel.param_data" title="Permalink to this definition"></a></dt>
+<dd><p>Parameter data of shape (num_samples, num_params)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.param_data_file">
+<span class="sig-name descname"><span class="pre">param_data_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#grainlearning.models.IOModel.param_data_file" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the parameter data file</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.param_data_prev">
+<span class="sig-name descname"><span class="pre">param_data_prev</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.IOModel.param_data_prev" title="Permalink to this definition"></a></dt>
+<dd><p>Parameter data of previous iteration</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.param_maxs">
+<span class="sig-name descname"><span class="pre">param_maxs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#grainlearning.models.IOModel.param_maxs" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum number of parameters</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.param_mins">
+<span class="sig-name descname"><span class="pre">param_mins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#grainlearning.models.IOModel.param_mins" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum values of the parameters</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.param_names">
+<span class="sig-name descname"><span class="pre">param_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.IOModel.param_names" title="Permalink to this definition"></a></dt>
+<dd><p>Names of the parameters.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sigma_max">
+<span class="sig-name descname"><span class="pre">sigma_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000000.0</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sigma_max" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum value of the uncertainty</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sigma_min">
+<span class="sig-name descname"><span class="pre">sigma_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-06</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sigma_min" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum value of the uncertainty</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sigma_tol">
+<span class="sig-name descname"><span class="pre">sigma_tol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sigma_tol" title="Permalink to this definition"></a></dt>
+<dd><p>Sigma tolerance</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sim_data">
+<span class="sig-name descname"><span class="pre">sim_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sim_data" title="Permalink to this definition"></a></dt>
+<dd><p>Simulation data of shape (num_samples,num_obs,num_steps)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sim_data_dir">
+<span class="sig-name descname"><span class="pre">sim_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'./sim_data'</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sim_data_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the directory where simulation data is stored</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sim_data_file_ext">
+<span class="sig-name descname"><span class="pre">sim_data_file_ext</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.npy'</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sim_data_file_ext" title="Permalink to this definition"></a></dt>
+<dd><p>Extension of simulation data files</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sim_data_files">
+<span class="sig-name descname"><span class="pre">sim_data_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.IOModel.sim_data_files" title="Permalink to this definition"></a></dt>
+<dd><p>Simulation data files (num_samples)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.IOModel.sim_name">
+<span class="sig-name descname"><span class="pre">sim_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sim'</span></em><a class="headerlink" href="#grainlearning.models.IOModel.sim_name" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the simulation (e.g., sim)</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.models.Model">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_mins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_maxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_obs_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_mins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_maxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_obs_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This is the probabalistic model class. It contains information on the observation (or reference) data, simulation data, parameters and reference. It is also used to run a callback for the simulations.</p>
 <p>There are two ways of initializing the class.</p>
@@ -156,7 +646,7 @@
 </div>
 <p>y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Observation or reference data</p></li>
 <li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
@@ -164,159 +654,173 @@
 <li><p><strong>param_maxs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter Upper bounds</p></li>
 <li><p><strong>ctrl_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Optional control data (e.g, time), defaults to None</p></li>
 <li><p><strong>obs_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Column names of the observation data, defaults to None</p></li>
-<li><p><strong>ctrl_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Coloumn names of the control data, defaults to None</p></li>
+<li><p><strong>ctrl_name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Coloumn name of the control data, defaults to None</p></li>
 <li><p><strong>inv_obs_weight</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – Inverse of the observation weight, defaults to None</p></li>
 <li><p><strong>param_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Parameter data, defaults to None</p></li>
-<li><p><strong>param_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Parameternames, defaults to None</p></li>
+<li><p><strong>param_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Parameter names, defaults to None</p></li>
 <li><p><strong>sim_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Simulation data, defaults to None</p></li>
 <li><p><strong>callback</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – Callback function, defaults to None</p></li>
 <li><p><strong>sigma_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Uncertainty, defaults to 1.0e6</p></li>
+<li><p><strong>sim_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sigma_tol</strong> (<em>float</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.ctrl_data">
-<span class="sig-name descname"><span class="pre">ctrl_data</span></span><a class="headerlink" href="#grainlearning.models.Model.ctrl_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">ctrl_data</span></span><a class="headerlink" href="#grainlearning.models.Model.ctrl_data" title="Permalink to this definition"></a></dt>
 <dd><p>Control data (num_control,num_steps)</p>
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.models.Model.from_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model.from_dict" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]</p>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dt class="field-even">Parameters</dt>
 <dd class="field-even"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.models.Model.generate_params_halton">
-<span class="sig-name descname"><span class="pre">generate_params_halton</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model.generate_params_halton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a Halton table of the parameters</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.models.Model.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model.run" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model.run" title="Permalink to this definition"></a></dt>
 <dd><p>This function runs the callback function</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.callback">
-<span class="sig-name descname"><span class="pre">callback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#grainlearning.models.Model.callback" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">callback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#grainlearning.models.Model.callback" title="Permalink to this definition"></a></dt>
 <dd><p>Callback function. The input arugment is the model where model.sim_data is modified</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.models.Model.ctrl_names">
-<span class="sig-name descname"><span class="pre">ctrl_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.ctrl_names" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.models.Model.ctrl_name">
+<span class="sig-name descname"><span class="pre">ctrl_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#grainlearning.models.Model.ctrl_name" title="Permalink to this definition"></a></dt>
 <dd><p>Observation control (e.g., time)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.inv_obs_weight">
-<span class="sig-name descname"><span class="pre">inv_obs_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.inv_obs_weight" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">inv_obs_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.inv_obs_weight" title="Permalink to this definition"></a></dt>
 <dd><p>Inverse observation weight</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.num_ctrl">
-<span class="sig-name descname"><span class="pre">num_ctrl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_ctrl" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">num_ctrl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_ctrl" title="Permalink to this definition"></a></dt>
 <dd><p>Number of control data</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.num_obs">
-<span class="sig-name descname"><span class="pre">num_obs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_obs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">num_obs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_obs" title="Permalink to this definition"></a></dt>
 <dd><p>Number of observations in the dataset</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.num_params">
-<span class="sig-name descname"><span class="pre">num_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">num_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_params" title="Permalink to this definition"></a></dt>
 <dd><p>Number of parameters</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.num_samples">
-<span class="sig-name descname"><span class="pre">num_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_samples" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">num_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_samples" title="Permalink to this definition"></a></dt>
 <dd><p>Number of samples (usually specified by user)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.num_steps">
-<span class="sig-name descname"><span class="pre">num_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_steps" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">num_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#grainlearning.models.Model.num_steps" title="Permalink to this definition"></a></dt>
 <dd><p>Number of steps or sequence size in the dataset</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.obs_data">
-<span class="sig-name descname"><span class="pre">obs_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.obs_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">obs_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.obs_data" title="Permalink to this definition"></a></dt>
 <dd><p>Observation (or reference) data of shape (num_obs,num_steps)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.obs_names">
-<span class="sig-name descname"><span class="pre">obs_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.obs_names" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">obs_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.obs_names" title="Permalink to this definition"></a></dt>
 <dd><p>Observation keys</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.param_data">
-<span class="sig-name descname"><span class="pre">param_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.param_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">param_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.param_data" title="Permalink to this definition"></a></dt>
 <dd><p>Parameter data of shape (num_samples, num_params)</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.Model.param_data_prev">
+<span class="sig-name descname"><span class="pre">param_data_prev</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.param_data_prev" title="Permalink to this definition"></a></dt>
+<dd><p>Parameter data of previous iteration</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.param_maxs">
-<span class="sig-name descname"><span class="pre">param_maxs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#grainlearning.models.Model.param_maxs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">param_maxs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#grainlearning.models.Model.param_maxs" title="Permalink to this definition"></a></dt>
 <dd><p>Maximum number of parameters</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.param_mins">
-<span class="sig-name descname"><span class="pre">param_mins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#grainlearning.models.Model.param_mins" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">param_mins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#grainlearning.models.Model.param_mins" title="Permalink to this definition"></a></dt>
 <dd><p>Minimum values of the parameters</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.param_names">
-<span class="sig-name descname"><span class="pre">param_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.param_names" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">param_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#grainlearning.models.Model.param_names" title="Permalink to this definition"></a></dt>
 <dd><p>Names of the parameters.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.sigma_max">
-<span class="sig-name descname"><span class="pre">sigma_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000000.0</span></em><a class="headerlink" href="#grainlearning.models.Model.sigma_max" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sigma_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000000.0</span></em><a class="headerlink" href="#grainlearning.models.Model.sigma_max" title="Permalink to this definition"></a></dt>
 <dd><p>Maximum value of the uncertainty</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.sigma_min">
-<span class="sig-name descname"><span class="pre">sigma_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-06</span></em><a class="headerlink" href="#grainlearning.models.Model.sigma_min" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sigma_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-06</span></em><a class="headerlink" href="#grainlearning.models.Model.sigma_min" title="Permalink to this definition"></a></dt>
 <dd><p>Minimum value of the uncertainty</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.Model.sigma_tol">
+<span class="sig-name descname"><span class="pre">sigma_tol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#grainlearning.models.Model.sigma_tol" title="Permalink to this definition"></a></dt>
+<dd><p>Sigma tolerance</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.models.Model.sim_data">
-<span class="sig-name descname"><span class="pre">sim_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.sim_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sim_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.models.Model.sim_data" title="Permalink to this definition"></a></dt>
 <dd><p>Simulation data of shape (num_samples,num_obs,num_steps)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.models.Model.sim_name">
+<span class="sig-name descname"><span class="pre">sim_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sim'</span></em><a class="headerlink" href="#grainlearning.models.Model.sim_name" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the simulation (e.g., sim)</p>
 </dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-grainlearning.iterativebayesianfilter">
-<span id="iterative-bayesian-filter"></span><h2><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code><a class="headerlink" href="#module-grainlearning.iterativebayesianfilter" title="Permalink to this heading">¶</a></h2>
+<span id="iterative-bayesian-filter"></span><h2><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code><a class="headerlink" href="#module-grainlearning.iterativebayesianfilter" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IterativeBayesianFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ess_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IterativeBayesianFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ess_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'halton'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_data_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Iterative Bayesian Filter class.</p>
 <p>There are two ways of initializing the class.</p>
@@ -337,39 +841,52 @@
 <p>or</p>
 <p>Method 2 - class style</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">IterativeBayesianFilter</span><span class="p">(</span>
-        <span class="n">inference</span> <span class="o">=</span> <span class="n">SequentialMonteCarlo</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+        <span class="n">inference</span> <span class="o">=</span> <span class="n">SMC</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
         <span class="n">sampling</span> <span class="o">=</span> <span class="n">GaussianMixtureModel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inference</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo" title="grainlearning.sequentialmontecarlo.SequentialMonteCarlo"><code class="xref py py-class docutils literal notranslate"><span class="pre">SequentialMonteCarlo</span></code></a>]) – Sequential Monte Carlo class (SMC)</p></li>
-<li><p><strong>sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.gaussianmixturemodel.GaussianMixtureModel" title="grainlearning.gaussianmixturemodel.GaussianMixtureModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a>]) – Gaussian Mixture Model class (GMM)</p></li>
-<li><p><strong>num_samples</strong> – Number of samples within a user model.</p></li>
-<li><p><strong>ess_tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolarance for the effective sample size to converge, defaults to 1.0e-2</p></li>
+<li><p><strong>inference</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.inference.SMC" title="grainlearning.inference.SMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SMC</span></code></a>]) – Sequential Monte Carlo class (SMC)</p></li>
+<li><p><strong>sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel" title="grainlearning.sampling.GaussianMixtureModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a>]) – Gaussian Mixture Model class (GMM)</p></li>
+<li><p><strong>initial_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the initial sampling method, defaults to Halton</p></li>
+<li><p><strong>num_samples</strong> – Number of samples within a user model</p></li>
+<li><p><strong>ess_tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance for the effective sample size to converge, defaults to 1.0e-2</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – User defined proposal distribution for the data assimilation loop, defaults to None</p></li>
+<li><p><strong>proposal_data_file</strong> (<em>str</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.from_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.from_dict" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initialize" title="Permalink to this definition"></a></dt>
+<dd><p>Resample the parameters using the Gaussian mixture model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_inference">
-<span class="sig-name descname"><span class="pre">run_inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_inference" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run_inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_inference" title="Permalink to this definition"></a></dt>
 <dd><p>Run inference (e.g, data assimilation loop) using the Sequential Monte Carlo</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -377,10 +894,10 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_sampling">
-<span class="sig-name descname"><span class="pre">run_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_sampling" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.run_sampling" title="Permalink to this definition"></a></dt>
 <dd><p>Resample the parameters using the Gaussian mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -388,10 +905,10 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.solve" title="Permalink to this definition"></a></dt>
 <dd><p>Run both inference and sampling on a model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p>
 </dd>
 </dl>
@@ -399,26 +916,38 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.ess_tol">
-<span class="sig-name descname"><span class="pre">ess_tol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.ess_tol" title="Permalink to this definition">¶</a></dt>
-<dd><p>This a tolarance to which the optimization algorithm converges.</p>
+<span class="sig-name descname"><span class="pre">ess_tol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.ess_tol" title="Permalink to this definition"></a></dt>
+<dd><p>This a tolerance to which the optimization algorithm converges.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.inference">
-<span class="sig-name descname"><span class="pre">inference</span></span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.inference" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">inference</span></span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.inference" title="Permalink to this definition"></a></dt>
 <dd><p>The inference class is a member variable of the particle filter which is used to generate the likelihood</p>
-<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">SequentialMonteCarlo</span></code>]</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">SMC</span></code>]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initial_sampling">
+<span class="sig-name descname"><span class="pre">initial_sampling</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'halton'</span></em><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.initial_sampling" title="Permalink to this definition"></a></dt>
+<dd><p>The non-informative distribution to draw the initial samples</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.param_data_list">
+<span class="sig-name descname"><span class="pre">param_data_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.param_data_list" title="Permalink to this definition"></a></dt>
+<dd><p>list of parameter data of shape (num_samples, num_params) from all iterations</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.posterior_ibf">
-<span class="sig-name descname"><span class="pre">posterior_ibf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.posterior_ibf" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">posterior_ibf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.posterior_ibf" title="Permalink to this definition"></a></dt>
 <dd><p>this is the current proposal distribution</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter.sampling">
-<span class="sig-name descname"><span class="pre">sampling</span></span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.sampling" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sampling</span></span><a class="headerlink" href="#grainlearning.iterativebayesianfilter.IterativeBayesianFilter.sampling" title="Permalink to this definition"></a></dt>
 <dd><p>The gaussian mixture model class is used to sample the parameters</p>
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code>]</p>
 </dd></dl>
@@ -426,16 +955,17 @@
 </dd></dl>
 
 </section>
-<section id="module-grainlearning.sequentialmontecarlo">
-<span id="sequential-monte-carlo"></span><h2><code class="docutils literal notranslate"><span class="pre">Sequential</span> <span class="pre">Monte</span> <span class="pre">Carlo</span></code><a class="headerlink" href="#module-grainlearning.sequentialmontecarlo" title="Permalink to this heading">¶</a></h2>
+<section id="module-grainlearning.inference">
+<span id="inference"></span><h2><code class="docutils literal notranslate"><span class="pre">Inference</span></code><a class="headerlink" href="#module-grainlearning.inference" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SequentialMonteCarlo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ess_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_cov_with_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SMC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ess_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_cov_with_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the Sequential Monte Carlo class that is used the call the data assimilation.</p>
+<p>This is the Sequential Monte Carlo class that recursively
+update the model state and model parameters based on Bayes’ theorem</p>
 <p>There are two ways of initializing the class.</p>
 <p>Method 1 - dictionary style</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">SequentialMonteCarlo</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">SMC</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;ess_target&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
         <span class="s2">&quot;scale_cov_with_max&quot;</span><span class="p">:</span> <span class="kc">True</span>
@@ -445,14 +975,14 @@
 </div>
 <p>or</p>
 <p>Method 2 - class style</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">SequentialMonteCarlo</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">SMC</span><span class="p">(</span>
         <span class="n">ess_target</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
         <span class="n">scale_cov_with_max</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ess_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Target effective sample size (what we want)</p></li>
 <li><p><strong>scale_cov_with_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Flag if the covariance matrix should scale with the maximum accross the loading steps, defaults to True</p></li>
@@ -460,191 +990,191 @@
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.data_assimilation_loop">
-<span class="sig-name descname"><span class="pre">data_assimilation_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.data_assimilation_loop" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.data_assimilation_loop">
+<span class="sig-name descname"><span class="pre">data_assimilation_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.data_assimilation_loop" title="Permalink to this definition"></a></dt>
 <dd><p>Perform data assimilation loop</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Guess of sigma</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Input distribution</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Result of the objective function which converges to a user defined effective sample size</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.from_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.from_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_covariance_matrices">
-<span class="sig-name descname"><span class="pre">get_covariance_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_covariance_matrices" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_covariance_matrices">
+<span class="sig-name descname"><span class="pre">get_covariance_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_covariance_matrices" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the diagonal covariance matrices from a given input sigma.</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – input sigma</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Covariance matrices for all loading steps</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_ensamble_ips_covs">
-<span class="sig-name descname"><span class="pre">get_ensamble_ips_covs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_ensamble_ips_covs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the ensamble averages for parameters. (Used for post processing)</p>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_ensemble_ips_covs">
+<span class="sig-name descname"><span class="pre">get_ensemble_ips_covs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_ensemble_ips_covs" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the ensemble averages for parameters. (Used for post-processing)</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>posteriors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Posterior distributions</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Ensamble averages</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Ensemble averages</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_likelihoods">
-<span class="sig-name descname"><span class="pre">get_likelihoods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_matrices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_likelihoods" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_likelihoods">
+<span class="sig-name descname"><span class="pre">get_likelihoods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_matrices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_likelihoods" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the likelihoods as a multivariate normal of the simulation data centered around the observations.</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>cov_matrices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – covariance matricies</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Likelihood matrices for all loading steps</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_posterors">
-<span class="sig-name descname"><span class="pre">get_posterors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihoods</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.get_posterors" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_posterors">
+<span class="sig-name descname"><span class="pre">get_posterors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihoods</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_posterors" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the posteriors for all the loading steps</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 <li><p><strong>likelihoods</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Likelihood matrices</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – Optional input proposal</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Posterior distributions for all loading steps</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.give_posterior">
-<span class="sig-name descname"><span class="pre">give_posterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loading_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.give_posterior" title="Permalink to this definition">¶</a></dt>
-<dd><p>Give posterior distrubution of a loading step</p>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.give_posterior">
+<span class="sig-name descname"><span class="pre">give_posterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loading_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.give_posterior" title="Permalink to this definition"></a></dt>
+<dd><p>Give posterior distribution of a loading step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>loading_step</strong> – Optional input loading step, defaults to -1 (last value)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Posterior distribution for a single step</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.cov_matrices">
-<span class="sig-name descname"><span class="pre">cov_matrices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.cov_matrices" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.cov_matrices">
+<span class="sig-name descname"><span class="pre">cov_matrices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.inference.SMC.cov_matrices" title="Permalink to this definition"></a></dt>
 <dd><p>Covariance matricies of shape (num_steps,num_obs,num_obs)</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.covs">
-<span class="sig-name descname"><span class="pre">covs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.covs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.covs">
+<span class="sig-name descname"><span class="pre">covs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.inference.SMC.covs" title="Permalink to this definition"></a></dt>
 <dd><p>Array containing covs of (num_steps, num_params)</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.eff">
-<span class="sig-name descname"><span class="pre">eff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.eff" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.ess">
+<span class="sig-name descname"><span class="pre">ess</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#grainlearning.inference.SMC.ess" title="Permalink to this definition"></a></dt>
 <dd><p>Calculated effective sample size</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.ess_target">
-<span class="sig-name descname"><span class="pre">ess_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.ess_target" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.ess_target">
+<span class="sig-name descname"><span class="pre">ess_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#grainlearning.inference.SMC.ess_target" title="Permalink to this definition"></a></dt>
 <dd><p>Target effective sample size.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.ips">
-<span class="sig-name descname"><span class="pre">ips</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.ips" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.ips">
+<span class="sig-name descname"><span class="pre">ips</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.inference.SMC.ips" title="Permalink to this definition"></a></dt>
 <dd><p>Array containing ips of (num_steps, num_params)</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.likelihoods">
-<span class="sig-name descname"><span class="pre">likelihoods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.likelihoods" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.likelihoods">
+<span class="sig-name descname"><span class="pre">likelihoods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.inference.SMC.likelihoods" title="Permalink to this definition"></a></dt>
 <dd><p>Likelihoods of shape (num_steps, num_samples)</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.posteriors">
-<span class="sig-name descname"><span class="pre">posteriors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.posteriors" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.posteriors">
+<span class="sig-name descname"><span class="pre">posteriors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#grainlearning.inference.SMC.posteriors" title="Permalink to this definition"></a></dt>
 <dd><p>Posteriors of shape (num_steps, num_samples)</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.sequentialmontecarlo.SequentialMonteCarlo.scale_cov_with_max">
-<span class="sig-name descname"><span class="pre">scale_cov_with_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#grainlearning.sequentialmontecarlo.SequentialMonteCarlo.scale_cov_with_max" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.scale_cov_with_max">
+<span class="sig-name descname"><span class="pre">scale_cov_with_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#grainlearning.inference.SMC.scale_cov_with_max" title="Permalink to this definition"></a></dt>
 <dd><p>Flag if the covariance matrix should be scaled with the maximum values of the observations</p>
 </dd></dl>
 
 </dd></dl>
 
 </section>
-<section id="module-grainlearning.gaussianmixturemodel">
-<span id="gaussian-mixture-model"></span><h2><code class="docutils literal notranslate"><span class="pre">Gaussian</span> <span class="pre">Mixture</span> <span class="pre">Model</span></code><a class="headerlink" href="#module-grainlearning.gaussianmixturemodel" title="Permalink to this heading">¶</a></h2>
+<section id="module-grainlearning.sampling">
+<span id="sampling"></span><h2><code class="docutils literal notranslate"><span class="pre">Sampling</span></code><a class="headerlink" href="#module-grainlearning.sampling" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="grainlearning.gaussianmixturemodel.GaussianMixtureModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GaussianMixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.gaussianmixturemodel.GaussianMixtureModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GaussianMixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tied'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class is used for variational inference (sampling) of parameters using a baysian gausian mixture model.</p>
+<p>This class is used for the inference (sampling) of parameters using a variational Gaussian mixture model.</p>
 <p>See <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html">BayesianGaussianMixture</a>.</p>
 <p>There are two ways of initializing the class.</p>
 <p>Method 1 - dictionary style</p>
@@ -663,65 +1193,86 @@
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_num_components</strong> (<em>int</em>) – Maximum number of components</p></li>
 <li><p><strong>prior_weight</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Prior weight, defaults to None</p></li>
-<li><p><strong>cov_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Covariance type, defaults to “full”</p></li>
+<li><p><strong>cov_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Covariance type, defaults to “tied”</p></li>
 <li><p><strong>n_init</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of initial samples, defaults to 100</p></li>
 <li><p><strong>tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – tolarance, defaults to 1.0e-5</p></li>
 <li><p><strong>max_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum number of iterations, defaults to 100000</p></li>
 <li><p><strong>expand_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – weighted expansions, defaults to 10</p></li>
 <li><p><strong>seed</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – random generation seed, defaults to None</p></li>
+<li><p><strong>slice_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – flag to use slice sampling, defaults to False</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.gaussianmixturemodel.GaussianMixtureModel.expand_weighted_parameters">
-<span class="sig-name descname"><span class="pre">expand_weighted_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.gaussianmixturemodel.GaussianMixtureModel.expand_weighted_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters">
+<span class="sig-name descname"><span class="pre">expand_weighted_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters" title="Permalink to this definition"></a></dt>
 <dd><p>Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.gaussianmixturemodel.GaussianMixtureModel.from_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.gaussianmixturemodel.GaussianMixtureModel.from_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.gaussianmixturemodel.GaussianMixtureModel.regenerate_params">
-<span class="sig-name descname"><span class="pre">regenerate_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.gaussianmixturemodel.GaussianMixtureModel.regenerate_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.regenerate_params">
+<span class="sig-name descname"><span class="pre">regenerate_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params" title="Permalink to this definition"></a></dt>
 <dd><p>Regenerate the parameters by fitting the Gaussian Mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
 <li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Expanded parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm">
+<span class="sig-name descname"><span class="pre">regenerate_params_with_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm" title="Permalink to this definition"></a></dt>
+<dd><p>Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
+<li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>]) – Model class</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -729,82 +1280,60 @@
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="grainlearning.sampling.generate_params_qmc">
+<span class="sig-name descname"><span class="pre">generate_params_qmc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'halton'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.generate_params_qmc" title="Permalink to this definition"></a></dt>
+<dd><p>This is the class to uniformly draw samples in n-dimensional space from
+a low-discrepancy sequence or a Latin hypercube.</p>
+<p>See <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">Quasi-Monte Carlo</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_iter</strong> – maximum number of iterations, defaults to 100000</p></li>
+<li><p><strong>expand_weight</strong> – weighted expansions, defaults to 10</p></li>
+<li><p><strong>seed</strong> – random generation seed, defaults to None</p></li>
+<li><p><strong>model</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#grainlearning.models.Model" title="grainlearning.models.Model"><em>Model</em></a><em>]</em>) – </p></li>
+<li><p><strong>num_samples</strong> (<em>int</em>) – </p></li>
+<li><p><strong>method</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
 
+           </div>
           </div>
-          
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">GrainLearning</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.calibrationtoolbox"><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.models"><code class="docutils literal notranslate"><span class="pre">Models</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.iterativebayesianfilter"><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.sequentialmontecarlo"><code class="docutils literal notranslate"><span class="pre">Sequential</span> <span class="pre">Monte</span> <span class="pre">Carlo</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.gaussianmixturemodel"><code class="docutils literal notranslate"><span class="pre">Gaussian</span> <span class="pre">Mixture</span> <span class="pre">Model</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to GrainLearning’s documentation!</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2022, Hongyang Cheng, Retief Lubbe.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/api.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

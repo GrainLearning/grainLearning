@@ -1,6 +1,6 @@
 import numpy as np
 
-from grainlearning import GaussianMixtureModel, Model
+from grainlearning import GaussianMixtureModel, Model, generate_params_qmc
 
 
 def test_init():
@@ -29,15 +29,15 @@ def test_expand_proposal_to_normalized_params():
     )
 
     gmm_cls = GaussianMixtureModel(max_num_components=5, expand_weight=2)
-    
-    gmm_cls.generate_params_halton(model_cls)
 
-    expanded_parms, max_params = gmm_cls.expand_weighted_parameters(proposal, model_cls)
+    model_cls.param_data = generate_params_qmc(model_cls, model_cls.num_samples)
+
+    gmm_cls.expand_weighted_parameters(proposal, model_cls)
     # expanded_parms
-    np.testing.assert_almost_equal(np.amax(expanded_parms, axis=0), np.ones(2))
+    np.testing.assert_almost_equal(np.amax(gmm_cls.expanded_normalized_params, axis=0), np.ones(2))
 
     np.testing.assert_array_almost_equal(
-        expanded_parms,
+        gmm_cls.expanded_normalized_params,
         np.array(
             [
                 [0.12903226, 0.4789916],
@@ -66,24 +66,25 @@ def test_regenerate_params():
         num_samples=4,
     )
 
-    gmm_cls = GaussianMixtureModel(max_num_components=2, expand_weight=2, seed=100)
+    gmm_cls = GaussianMixtureModel(max_num_components=2, expand_weight=2, seed=100, cov_type="full")
 
-    gmm_cls.generate_params_halton(model_cls)
+    model_cls.param_data = generate_params_qmc(model_cls, model_cls.num_samples)
 
-    expanded_parms, max_params = gmm_cls.expand_weighted_parameters(proposal, model_cls)
+    gmm_cls.expand_weighted_parameters(proposal, model_cls)
 
-    np.testing.assert_almost_equal(np.amax(expanded_parms, axis=0), np.ones(2))
+    np.testing.assert_almost_equal(np.amax(gmm_cls.expanded_normalized_params, axis=0), np.ones(2))
 
-    new_params = gmm_cls.regenerate_params(proposal,model_cls)
+    new_params = gmm_cls.regenerate_params(proposal, model_cls)
 
     np.testing.assert_allclose(
         new_params,
-            np.array(
-                [[2.50061801e+06, 1.92539376e-01],
-                 [5.40525882e+06, 3.10537276e-01],
-                 [3.46458943e+06, 3.76945456e-01],
-                 [5.66254261e+06, 2.67135646e-01]])
+        np.array(
+            [[2.50061801e+06, 1.92539376e-01],
+             [5.40525882e+06, 3.10537276e-01],
+             [3.46458943e+06, 3.76945456e-01],
+             [5.66254261e+06, 2.67135646e-01]])
     )
+
 
 def test_generate_halton():
     """Test the Parameters class if the generated halton sequence is between mins and maxs"""
@@ -97,12 +98,10 @@ def test_generate_halton():
         }
     )
 
-    gmm_cls = GaussianMixtureModel(max_num_components=1)
-
-    gmm_cls.generate_params_halton(model_cls)
+    model_cls.param_data = generate_params_qmc(model_cls, model_cls.num_samples)
 
     print(model_cls.param_data)
-    
+
     assert all(
         model_cls.param_data[:, 1] >= 2 - 0.0000001
     ), "parameter 1 min out of range"

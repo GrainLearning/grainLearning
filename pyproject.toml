@@ -1,45 +1,36 @@
 [tool.poetry]
 name = "GrainLearning"
-version = "2.0.0"
-description = ""
-authors = [
-    "Hongyang Cheng <h.cheng@utwente.nl>",
-    "Luisa Orozco <l.orozco@esciencecenter.nl>",
-    "Retief Lubbe <r.lubbe@utwente.nl>",
-    "Aron Jansen <a.p.jansen@esciencecenter.nl>"]
+version = "2.0.1"
+description = "A Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials"
+authors = ["Hongyang Cheng <chyalexcheng@gmail.nl>",
+"Luisa Orozco <l.orozco@esciencecenter.nl>","Retief Lubbe <r.lubbe@utwente.nl>"]
 readme = "README.md"
-keywords = ["DEM", "Bayesian inference"]
-
+license = "GPLv2"
+homepage = "https://grainlearning.readthedocs.io/"
+repository = "https://github.com/GrainLearning/grainLearning"
+keywords = ["Bayesian inference", "Uncertainty quantification", "Non-parametric Gaussian mixture", "DEM", "Constitutive modeling", "Granular materials"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
 numpy = "^1.23.2"
 scipy = "^1.9.1"
-sklearn = "^0.0"
-
-[tool.poetry.group.docs.dependencies]
-Sphinx = "^5.1.1"
-sphinx-autodoc-typehints = "^1.19.2"
-
-[tool.poetry.group.rnn.dependencies]
-h5py = "^3.7.0"
-wandb = "^0.13.4"
-tensorflow-macos = "^2.10.0"
+scikit-learn = "^1.1.3"
 matplotlib = "^3.6.0"
 
-[tool.poetry.group.visual.dependencies]
-matplotlib = "^3.6.0"
+Sphinx = {version = "^5.1.1", optional = true}
+sphinx-autodoc-typehints = {version = "^1.19.2", optional = true}
+pytest = {version = "^6.2.4", optional = true}
+pytest-cov = {version = "^2.12.1", optional = true}
+prospector = {version = "^1.7.6", optional = true, extras = ["with_pyroma"]}
+pyroma = {version = "^4.0", optional = true}
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^6.2.4"
-pytest-cov = "^2.12.1"
-matplotlib = "^3.6.0"
-prospector = {version = "^1.7.6", extras = ["with_pyroma"]}
+[tool.poetry.extras]
+docs = ["Sphinx", "sphinx-autodoc-typehints"]
+dev = ["pytest", "pytest-cov", "prospector", "pyroma"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
 
 packages = [
     { include = "grainlearning"}

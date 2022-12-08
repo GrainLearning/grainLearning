@@ -1,145 +1,125 @@
-""" Author: Hongyang Cheng <chyalexcheng@gmail.com>
-     A collection of all kins of helper functions (IO, plotting, ...) 
-"""
-
-from math import *
-import sys, os
+import sys, os, math, subprocess
 import numpy as np
-from sklearn import mixture
-import subprocess
-from typing import Type, List, Callable, Tuple
-
-def startSimulations(platform,software,tableName,fileName):   
- #platform desktop, aws or rcg    # software so far only yade 
- argument= tableName+" "+fileName
- if platform=='desktop':
-     # Definition where shell script can be found
-     path_to_shell = os.getcwd()+'/platform_shells/desktop' 
-     if software=='yade':
-         command = 'sh '+path_to_shell+'/yadeDesktop.sh'+" "+argument  
-         subprocess.call(command, shell=True)  
-     else:
-         print(Fore.RED +"Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-         sys.exit
-         
- elif platform=='aws':  
-     path_to_shell = os.getcwd()+'/platform_shells/aws' 
-     if software=='yade':
-         command = 'sh '+path_to_shell+'/yadeAWS.sh'+" "+argument  
-         subprocess.call(command, shell=True)  
-     else:
-         print(Fore.RED +"Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-         sys.exit
-  
- elif platform=='rcg':  
-     path_to_shell = os.getcwd()+'/platform_shells/rcg' 
-     if software=='yade':
-         command = 'sh '+path_to_shell+'/yadeRCG.sh'+" "+argument  
-         subprocess.call(command, shell=True)  
-     else:
-         print(Fore.RED +"Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-         sys.exit         
- else:
-  print('Exit code. Hardware for yade simulations not properly defined')
-  quit()
+import matplotlib.pylab as plt
+from typing import List, Callable
+from sklearn.mixture import BayesianGaussianMixture
 
 
+def startSimulations(platform, software, tableName, fileName):
+    # platform desktop, aws or rcg    # software so far only yade
+    argument = tableName + " " + fileName
+    if platform == 'desktop':
+        # Definition where shell script can be found
+        path_to_shell = os.getcwd() + '/platform_shells/desktop'
+        if software == 'yade':
+            command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
+            subprocess.call(command, shell=True)
+        else:
+            print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
+            sys.exit
+
+    elif platform == 'aws':
+        path_to_shell = os.getcwd() + '/platform_shells/aws'
+        if software == 'yade':
+            command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
+            subprocess.call(command, shell=True)
+        else:
+            print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
+            sys.exit
+
+    elif platform == 'rcg':
+        path_to_shell = os.getcwd() + '/platform_shells/rcg'
+        if software == 'yade':
+            command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
+            subprocess.call(command, shell=True)
+        else:
+            print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
+            sys.exit
+    else:
+        print('Exit code. Hardware for yade simulations not properly defined')
+        quit()
 
 
-def initParamsTable(keys, maxs, mins, num=100, threads=4, tableName='smcTable0.txt', simNum=0):
+def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
     """
-    Generate initial parameter samples using a halton sequence
-    and write the samples into a text file
-
-    :param keys: list of strings, names of parameters
-
-    :param maxs: list of floats, upper bounds of parameter values
-
-    :param mins: list of floats, lower bounds of parameter values
-
-    :param num: int, default=100, number of samples for Sequential Monte Carlo
-
-    :param threads: int, default=4, number of threads for each model evaluation
-
-    :param tableName: string, Name of the parameter table
-
-    :return:
-        table: ndarray of shape (num, len(keys)), initial parameter samples
-
-        tableName: string, default='smcTable.txt'
+    write parameter samples into a text file
     """
-    print(tableName)
-    dim = len(keys)
-    sequencer = ghalton.Halton(dim)
-    table = sequencer.get(num)
-    for i in range(dim):
-        for j in range(num):
-            mean = .5 * (maxs[i] + mins[i])
-            std = .5 * (maxs[i] - mins[i])
-            table[j][i] = mean + (table[j][i] - .5) * 2 * std
-    # write parameters in the format for Yade batch mode
-    writeToTable(tableName, table, dim, num, threads, keys, simNum)
-    return np.array(table), tableName
 
+    # Computation of decimal number for unique key
+    table_file_name = f'{sim_name}_Iter{curr_iter}_samples.txt'
 
-def writeToTable(tableName, table, dim, num, threads, keys,simNum):
-    """
-    write parameter samples into a text file in order to run Yade in batch mode
-    """
-    
-    # Computation of decimal number for unique key 
-    magn = floor(log(num, 10))+1
-    #iterNum = 0
-    
-    fout = open(tableName, 'w')
-    fout.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + keys + ['\n']))
+    fout = open(table_file_name, 'w')
+    num, dim = table.shape
+    magn = math.floor(math.log(num, 10)) + 1
+    fout.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
     for j in range(num):
-       description = 'Iter'+str(simNum)+'-Sample'+str(j).zfill(magn)
-       fout.write(' '.join(['%2i' % threads] + [description] + ['%9i' % j] + ['%20.10e' % table[j][i] for i in range(dim)] + ['\n']))
+        description = 'Iter' + str(curr_iter) + '-Sample' + str(j).zfill(magn)
+        fout.write(' '.join(
+            ['%2i' % threads] + [description] + ['%9i' % j] + ['%20.10e' % table[j][i] for i in range(dim)] + ['\n']))
     fout.close()
+    return table_file_name
 
 
-def get_keys_and_data(fileName):
+def get_keys_and_data(fileName, delimiters=['\t', ' ', ',']):
     """
-    Get keys and corresponding data sequence from a Yade output file
+    Get keys and corresponding data sequence from a text file
 
     :param fileName: string
 
-    :return: keysAndData: dictionary
+    :return: keys_and_data: dictionary
     """
     data = np.genfromtxt(fileName)
+
+    try:
+        ncols = data.shape[1]
+    except IndexError:
+        nrows = data.shape[0]
+        ncols = 1
+        data = data.reshape([nrows, 1])
+
     fopen = open(fileName, 'r')
-    keys = (fopen.read().splitlines()[0]).split('\t\t')
-    if '#' in keys: keys.remove('#')
-    keysAndData = {}
+    first_line = fopen.read().splitlines()[0]
+    for d in delimiters:
+        keys = first_line.split(d)
+        # remove # in the header line
+        if '#' in keys: keys.remove('#')
+        # remove empty strings from the list
+        keys = list(filter(None, keys))
+        if len(keys) == ncols: break
+
+    # store data in a dictory
+    keys_and_data = {}
     for key in keys:
-        if '#' in key: keyNoHash = key.split(' ')[-1]
-        else: keyNoHash = key
-        keysAndData[keyNoHash] = data[:, keys.index(key)]
-    return keysAndData
+        if '#' in key:
+            key_no_hash = key.split(' ')[-1]
+        else:
+            key_no_hash = key
+        keys_and_data[key_no_hash] = data[:, keys.index(key)]
+
+    return keys_and_data
 
 
 def regenerate_params_with_gmm(
-        proposal: np.ndarray,
-        param_data: np.ndarray,
-        num: int,
-        max_num_components: int,
-        prior_weight: float,
-        cov_type: str = "full",
-        resample_to_unweighted: Callable = None,
-        param_mins: List[float] = None,
-        param_maxs: List[float] = None,
-        n_init = 1,
-        tol = 0.001,
-        max_iter = 100,
-        seed = None,
-    ) -> np.ndarray:
+    proposal: np.ndarray,
+    param_data: np.ndarray,
+    num: int,
+    max_num_components: int,
+    prior_weight: float,
+    cov_type: str = "full",
+    resample_to_unweighted: Callable = None,
+    param_mins: List[float] = None,
+    param_maxs: List[float] = None,
+    n_init=1,
+    tol=0.001,
+    max_iter=100,
+    seed=None,
+) -> np.ndarray:
     """
     Resample parameters using a variational Gaussian mixture model
 
     :param proposal: ndarray of shape model.num_samples
         proposal probability distribution associated to the current parameter data
-    
+
     :param param_data: ndarray of shape (model.num_samples, model.num_params)
         current parameter data
 
@@ -192,17 +172,17 @@ def regenerate_params_with_gmm(
     max_params = np.amax(expanded_param_data, axis=0)  # find max along axis
 
     expanded_param_data = (
-            expanded_param_data / max_params
+        expanded_param_data / max_params
     )  # and do array broadcasting to divide by max
 
-    gmm = mixture.BayesianGaussianMixture(
+    gmm = BayesianGaussianMixture(
         n_components=max_num_components,
         weight_concentration_prior=prior_weight,
         covariance_type=cov_type,
-        n_init = n_init,
-        tol = tol,
-        max_iter = max_iter,
-        random_state = seed,
+        n_init=n_init,
+        tol=tol,
+        max_iter=max_iter,
+        random_state=seed,
     )
 
     gmm.fit(expanded_param_data)
@@ -210,124 +190,6 @@ def regenerate_params_with_gmm(
     new_param_data *= max_params
 
     return new_param_data, gmm
-
-
-def resampledParamsTable(keys, smcSamples, proposal, ranges, num=100, threads=4, maxNumComponents=10, priorWeight=0,
-                         covType='full', tableName='smcTableNew.txt',seed=0,simNum=0):
-    """
-    Resample parameters using a variational Gaussian mixture model
-    and write the samples into a text file
-    
-    :param keys: list of strings
-        names of parameters
-
-    :param smcSamples: ndarray of shape (num, len(keys))
-        current parameter samples
-
-    :param proposal: ndarray of shape num
-        proposal probability distribution associated to current parameter samples
-
-    :param num: int
-        number of samples for Sequential Monte Carlo
-
-    :param threads: int
-
-    :param maxNumComponents: int, default=num/10
-
-    :param priorWeight: float, default=1./maxNumComponents
-        weight_concentration_prior of the BayesianGaussianMixture class
-        The dirichlet concentration of each component on the weight distribution (Dirichlet).
-        This is commonly called gamma in the literature.
-        The higher concentration puts more mass in the center and will lead to more components being active,
-        while a lower concentration parameter will lead to more mass at the edge of the mixture weights simplex.
-        (https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
-
-    :param covType: string, default='full'
-        covariance_type of the BayesianGaussianMixture class
-        String describing the type of covariance parameters to use. Must be one of:
-        'full' (each component has its own general covariance matrix),
-        'tied' (all components share the same general covariance matrix),
-        'diag' (each component has its own diagonal covariance matrix),
-        'spherical' (each component has its own single variance).
-        (https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
-
-    :param tableName: string, default='smcTableNew.txt'
-        Name of the parameter table
-
-    :return:
-        newSMcSamples: ndarray of shape (num, len(keys))
-            parameter samples for the next iteration
-
-        tableName: string, default='smcTableNew.txt'
-            Name of the parameter table
-
-        gmm: BayesianGaussianMixture
-            A variational Gaussian mixture model trained with current parameter samples and proposal probabilities
-
-        maxNumComponents: int
-            Number of sufficient Gaussian components for the mixture model
-            (should be smaller than the input maxNumComponents)
-    """
-
-    dim = len(keys)
-    # resample parameters from a proposal probability distribution
-    ResampleIndices = unweighted_resample(proposal)
-    newSMcSamples = smcSamples[ResampleIndices]
-
-    # normalize parameter samples
-    sampleMaxs = np.zeros(smcSamples.shape[1])
-    for i in range(sampleMaxs.shape[0]):
-        sampleMaxs[i] = max(newSMcSamples[:, i])
-        newSMcSamples[:, i] /= sampleMaxs[i]
-
-    # regenerate new SMC samples from Bayesian gaussian mixture model
-    # details on http://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html
-    gmm = mixture.BayesianGaussianMixture(n_components=maxNumComponents, weight_concentration_prior=priorWeight,
-                                          covariance_type=covType, tol=1e-5, max_iter=int(1e5), n_init=100,random_state=seed)
-    gmm.fit(newSMcSamples)
-    newSMcSamples, _ = gmm.sample(num)
-
-    # ~ while num <= smcSamples.shape[0]:
-        # ~ newSMcSamples, _ = gmm.sample(num)
-        # ~ delParamIDs = []
-        # ~ for i, param in enumerate(newSMcSamples):
-            # ~ for j, name in enumerate(keys):
-                # ~ if not (ranges[name][0] < param[j]*sampleMaxs[j] < ranges[name][1]):
-                    # ~ delParamIDs.append(i)
-                    # ~ break
-        # ~ if not delParamIDs:
-            # ~ print("Is empty")
-            # ~ break
-        # ~ newSMcSamples = np.delete(newSMcSamples, delParamIDs, 0)
-        # ~ currentSampleSize = newSMcSamples.shape[0]
-        # ~ num *= int(sampleSize/currentSampleSize)
-    # check if parameters in predifined ranges. If not replace it randomly
-    for i in range(num):
-         for jj in range(len(keys)):
-             name = keys[jj]
-             val =  newSMcSamples[i, jj] #param[j]
-             while not (ranges[name][0] <= val*sampleMaxs[jj] <= ranges[name][1]):
-                 print('Parameter ',keys[jj] ,'in sample ',i, 'outside critical range')
-                 k= np.random.randint(0,num)
-                 newSMcSamples[i, jj] = newSMcSamples[k, jj]
-                 val = newSMcSamples[i, jj]
-           
-    # scale resampled parameters back to their right units
-    for i in range(sampleMaxs.shape[0]): newSMcSamples[:, i] *= sampleMaxs[i]  
-    # write parameters in the format for Yade batch mode
-    writeToTable(tableName, newSMcSamples, dim, num, threads, keys,simNum)
-    return newSMcSamples, tableName, gmm, maxNumComponents
-
-def getGMMFromPosterior(smcSamples, posterior, n_components, priorWeight, covType='full',seed=0):
-    """
-    Train a Gaussian mixture model from the posterior distribution
-    """
-    ResampleIndices = residual_resample(posterior)
-    newSMcSamples = smcSamples[ResampleIndices]
-    gmm = mixture.BayesianGaussianMixture(n_components=n_components, weight_concentration_prior=priorWeight,
-                                          covariance_type=covType, tol=1e-5, max_iter=int(1e5), n_init=100,random_state=seed)
-    gmm.fit(newSMcSamples)
-    return gmm
 
 
 def get_pool(mpi=False, threads=1):
@@ -351,41 +213,42 @@ def get_pool(mpi=False, threads=1):
         raise RuntimeError("Wrong arguments: either mpi=True or threads>1.")
     return pool
 
+
 def unweighted_resample(weights, expand_num=10):
     # take int(N*w) copies of each weight, which ensures particles with the same weight are drawn uniformly
-    N = len(weights)*expand_num
-    num_copies = (np.floor(N*np.asarray(weights))).astype(int)
+    N = len(weights) * expand_num
+    num_copies = (np.floor(N * np.asarray(weights))).astype(int)
     indexes = np.zeros(sum(num_copies), 'i')
     k = 0
     for i in range(len(weights)):
-        for _ in range(num_copies[i]): # make n copies
+        for _ in range(num_copies[i]):  # make n copies
             indexes[k] = i
             k += 1
     return indexes
 
+
 def residual_resample(weights, expand_num=10):
-    N = len(weights)*expand_num
+    N = len(weights) * expand_num
     indexes = np.zeros(N, 'i')
 
     # take int(N*w) copies of each weight, which ensures particles with the
     # same weight are drawn uniformly
-    num_copies = (np.floor(N*np.asarray(weights))).astype(int)
+    num_copies = (np.floor(N * np.asarray(weights))).astype(int)
     k = 0
     for i in range(len(weights)):
-        for _ in range(num_copies[i]): # make n copies
+        for _ in range(num_copies[i]):  # make n copies
             indexes[k] = i
             k += 1
 
     # use multinormal resample on the residual to fill up the rest. This
     # maximizes the variance of the samples
-    residual = weights - num_copies     # get fractional part
-    residual /= sum(residual)           # normalize
+    residual = weights - num_copies  # get fractional part
+    residual /= sum(residual)  # normalize
     cumulative_sum = np.cumsum(residual)
-    cumulative_sum[-1] = 1. # avoid round-off errors: ensures sum is exactly one
-    indexes[k:N] = np.searchsorted(cumulative_sum, np.random.random(N-k))
+    cumulative_sum[-1] = 1.  # avoid round-off errors: ensures sum is exactly one
+    indexes[k:N] = np.searchsorted(cumulative_sum, np.random.random(N - k))
 
     return indexes
-
 
 
 def stratified_resample(weights, expand_num=10):
@@ -472,19 +335,156 @@ def multinomial_resample(weights, expand_num=10):
     """
     cumulative_sum = np.cumsum(weights)
     cumulative_sum[-1] = 1.  # avoid round-off errors: ensures sum is exactly one
-    return np.searchsorted(cumulative_sum, np.random.random(len(weights)*expand_num))
+    return np.searchsorted(cumulative_sum, np.random.random(len(weights) * expand_num))
 
-def estimate_gmm(X, num_components, method='EM'):
-    # bring data into shogun representation (note that Shogun data is in column vector form, so transpose)
-    features_train=RealFeatures(X.T)
-    
-    # initialize GMM, passing the desired number of mixture components.
-    gmm = GMM(num_components)
-    
-    # train feature and sample data-points from the trained model.
-    gmm.set_features(features_train)
-    if method == 'EM': gmm.train_em()
-    elif method == 'SMEM': gmm.train_smem()
-    
-    # return GMM object and sampled data
-    return gmm, gmm.sample()
+
+def voronoi_vols(samples: np.ndarray):
+    from scipy.spatial import Voronoi, ConvexHull
+    v = Voronoi(samples)
+    vol = np.zeros(v.npoints)
+    for i, reg_num in enumerate(v.point_region):
+        indices = v.regions[reg_num]
+        if -1 in indices:
+            vol[i] = -1.0
+        else:
+            vol[i] = ConvexHull(v.vertices[indices]).volume
+    return vol
+
+
+def plot_param_stats(fig_name, param_names, means, covs, savefig=0):
+    """
+    Plot the posterior means and coefficients of variation of the model parameters over time.
+    :param fig_name: string
+    :param param_names: parameter names
+    :param means: ndarray
+    :param covs: ndarray
+    :param savefig: bool defaults to False
+    """
+    num = len(param_names)
+    ncols = int(np.ceil(num / 2))
+    plt.figure('Posterior means of the parameters')
+    for i in range(num):
+        plt.subplot(2, ncols, i + 1)
+        plt.plot(means[:, i])
+        plt.xlabel("'Time' step")
+        plt.ylabel(r'$|' + param_names[i] + r'|$')
+        plt.grid(True)
+    plt.tight_layout()
+    if savefig:
+        plt.savefig(f'{fig_name}_param_means.png')
+    else:
+        plt.show()
+    plt.close()
+
+    plt.figure('Posterior coefficients of variance of the parameters')
+    for i in range(num):
+        plt.subplot(2, ncols, i + 1)
+        plt.plot(covs[:, i])
+        plt.xlabel("'Time' step")
+        plt.ylabel(r'$COV(' + param_names[i] + ')$')
+        plt.grid(True)
+    plt.tight_layout()
+    if savefig:
+        plt.savefig(f'{fig_name}_param_covs.png')
+    else:
+        plt.show()
+    plt.close()
+
+
+def plot_posterior(fig_name, param_names, param_data, posterior, savefig=0):
+    """
+    Plot the evolution of discrete posterior distribution over the parameters in time.
+    :param fig_name: string
+    :param param_names: parameter names
+    :param param_data: ndarray
+    :param posterior: ndarray
+    :param savefig: bool defaults to False
+    """
+    num_steps = posterior.shape[0]
+    for i, name in enumerate(param_names):
+        plt.figure(f'Posterior distribution of {name}')
+        for j in range(6):
+            plt.subplot(2, 3, j + 1)
+            plt.plot(param_data[:, i], posterior[int(num_steps * (j + 1) / 6 - 1), :], 'o')
+            plt.title("'Time' step No.%3i " % (int(num_steps * (j + 1) / 6 - 1)))
+            plt.xlabel(r'$' + name + '$')
+            plt.ylabel('Posterior distribution')
+            plt.grid(True)
+        plt.tight_layout()
+        if savefig:
+            plt.savefig(f'{fig_name}_posterior_{name}.png')
+        else:
+            plt.show()
+        plt.close()
+
+
+def plot_param_data(fig_name, param_names, param_data_list, savefig=0):
+    num = len(param_names)
+    ncols = int(np.ceil(num / 2))
+    num = num - 1
+    num_iter = len(param_data_list)
+    plt.figure('Resampling the parameter space')
+    for j in range(num):
+        plt.subplot(2, ncols, j + 1)
+        for i in range(num_iter):
+            plt.plot(param_data_list[i][:, j], param_data_list[i][:, j + 1], 'o', label='iterNo. %.2i' % i)
+            plt.xlabel(r'$' + param_names[j] + '$')
+            plt.ylabel(r'$' + param_names[j + 1] + '$')
+            plt.legend()
+        plt.legend()
+        plt.tight_layout()
+    if savefig:
+        plt.savefig(f'{fig_name}_param_space.png')
+    else:
+        plt.show()
+
+
+def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, savefig=0):
+    """
+    Plot the ensemble prediction, observation data, and top three best-fits
+    :param fig_name: string
+    :param ctrl_name: name of the control variable
+    :param obs_names: names of the observables
+    :param ctrl_data: ndarray
+    :param obs_data: ndarray
+    :param sim_data: ndarray
+    :param posterior: ndarray
+    :param savefig: bool defaults to False
+    """
+    ensemble_mean = np.einsum('ijk, ki->jk', sim_data, posteriors)
+    ensemble_std = np.einsum('ijk, ki->jk', (sim_data - ensemble_mean) ** 2, posteriors)
+    ensemble_std = np.sqrt(ensemble_std)
+    num = len(obs_names)
+    ncols = int(np.ceil(num / 2)) if num > 1 else 1
+    plt.figure('Model prediction versus observation')
+    for i in range(num):
+        plt.subplot(2, ncols, i + 1)
+
+        plt.fill_between(
+            ctrl_data,
+            ensemble_mean[i, :] - 2 * ensemble_std[i, :],
+            ensemble_mean[i, :] + 2 * ensemble_std[i, :],
+            color='darkred',
+            label='ensemble prediction'
+        )
+
+        for j in (-posteriors[-1, :]).argsort()[:3]:
+            plt.plot(ctrl_data, sim_data[j, i, :], label='sim No. %i' % j)
+
+        plt.plot(ctrl_data,
+                 obs_data[i, :], 'ok',
+                 label='obs.',
+                 markevery=int(len(ctrl_data) / 10.)
+                 )
+
+        plt.xlabel(ctrl_name)
+        plt.ylabel(obs_names[i])
+        plt.legend()
+        plt.grid(True)
+
+    plt.tight_layout()
+    if savefig:
+        plt.savefig(f'{fig_name}_obs_and_sim.png')
+    else:
+        plt.show()
+    plt.close()
