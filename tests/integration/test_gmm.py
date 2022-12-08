@@ -1,12 +1,11 @@
 import numpy as np
 import os, sys
-from pathlib import Path
 
 from grainlearning import CalibrationToolbox
 from grainlearning.models import IOModel
 
 sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
-sim_data_dir = Path("./tests/data/linear_sim_data")
+sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
 def test_gmm():
