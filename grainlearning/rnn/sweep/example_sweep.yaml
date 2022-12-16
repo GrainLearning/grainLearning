@@ -1,4 +1,4 @@
-program: sequences/train.py
+program: ../train.py
 project: grain_sequence
 entity: apjansen
 method: bayes
