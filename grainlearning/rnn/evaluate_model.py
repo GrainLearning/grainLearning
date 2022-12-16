@@ -11,21 +11,18 @@ EXPERIMENT_TYPES = ['drained', 'undrained']
 P_INDEX = 5
 E_INDEX = 6
 
-
-def plot_predictions(model, data, train_stats, config):
+def plot_predictions(model: keras.model, data: tf.dataset, train_stats: dict, config: dict):
     """
     Take the first sample in the test set for each combination of pressure
     and experiment type, and plot for it the true and predicted macroscopic
     features.
 
-    Args:
-        model: Model to perform predictions with.
-        data: Tensorflow dataset to predict on.
-        train_stats: Dictionary containing training set statistics.
-        config: Dictionary containing the configuration with which the model was trained.
+    :param model: Model to perform predictions with.
+    :param data: Tensorflow dataset to predict on.
+    :param train_stats: Dictionary containing training set statistics.
+    :paramconfig: Dictionary containing the configuration with which the model was trained.
 
-    Returns:
-        figure
+    :return figure:
     """
     predictions = predict_macroscopics(model, data, train_stats, config,
             batch_size=256, single_batch=True)
@@ -57,7 +54,6 @@ def plot_predictions(model, data, train_stats, config):
             x_p = predictions[i_s, :, ids[x_key]]
         y = labels[i_s, :, ids[y_key]]
         y_p = predictions[i_s, :, ids[y_key]]
-
         fill_ax(ax[i, j], x, y, x_p, y_p, x_label=x_key, y_label=y_key, color=color)
 
     def extract_combination_inv(data, i_s=0):
@@ -90,7 +86,6 @@ def plot_predictions(model, data, train_stats, config):
         _plot_sequence(1, 2, 'a_t', i_s=i_s, color=color)
         _plot_sequence(2, 1, 'p', i_s=i_s, color=color)
         _plot_sequence(2, 2, 'q', i_s=i_s, color=color)
-
         fill_ax(ax[2, 0],
                 steps, extract_combination_inv(labels, i_s=i_s),
                 steps_predicted, extract_combination_inv(predictions, i_s=i_s),
@@ -100,20 +95,21 @@ def plot_predictions(model, data, train_stats, config):
     return fig
 
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
-        title='', x_label='', y_label='', color='blue', ylim=None):
+        title: str='', x_label: str='', y_label: str='', color: str='blue', ylim=None):
+    """
+    Configures the plot: data, title and axis label
+    """
     ax.plot(x_labels, y_labels, label='truth', color=color)
     ax.plot(x_preds, y_preds, label='predictions', linestyle='dashed', color=color)
-    if title:
-        ax.set_title(title)
-    if x_label:
-        ax.set_xlabel(x_label)
-    if y_label:
-        ax.set_ylabel(y_label)
-    if ylim:
-        ax.set_ylim(ylim)
+    if title: ax.set_title(title)
+    if x_label: ax.set_xlabel(x_label)
+    if y_label: ax.set_ylabel(y_label)
+    if ylim: ax.set_ylim(ylim)
 
 def _find_representatives(input_data):
-    """Return a list of indices indicating samples each combination of pressure and experiment type."""
+    """
+    Return a list of indices indicating samples each combination of pressure and experiment type.
+    """
     representatives = []
     contact_params = input_data['contact_parameters']
     for pressure in PRESSURES:
@@ -130,7 +126,7 @@ def _find_representatives(input_data):
     return representatives
 
 
-def main():
+if __name__ == '__main__':
     data_dir = pathlib.Path('data/sequences.hdf5')
     plot_dir = pathlib.Path('plots/')
 
@@ -153,13 +149,8 @@ def main():
             add_e0=True,  # was used in the model that is tested with
             )
 
-    if not os.path.exists(plot_dir):
-        os.makedirs(plot_dir)
+    if not os.path.exists(plot_dir): os.makedirs(plot_dir)
 
     config = {'use_windows': True, 'window_size': train_stats['window_size'],
             'standardize_outputs': True}
     plot_predictions(model, split_data['test'], train_stats, config)
-
-
-if __name__ == '__main__':
-    main()

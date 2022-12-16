@@ -23,19 +23,18 @@ def rnn_model(
     In that case, contact parameters are used to intialize the hidden state of the LSTM.
 
     Args:
-        input_shapes (dict): Dictionary containing 'num_load_features', 'num_contact_params',
+        :param input_shapes: Dictionary containing 'num_load_features', 'num_contact_params',
             'num_labels'.
-        window_size (int): Length of time window.
-        lstm_units (int): Number of units of the hidden state of the LSTM.
-        dense_units (int): Number of units used in the dense layer after the LSTM.
-        use_windows (bool): Whether to use time windows (True, default)
+        :param window_size: Length of time window.
+        :param lstm_units: Number of units of the hidden state of the LSTM.
+        :param dense_units: Number of units used in the dense layer after the LSTM.
+        :param use_windows: Whether to use time windows (True, default)
             or process the entire sequence at once (False).
-        conditional (bool): Whether to use a conditional RNN (True),
+        :param conditional: Whether to use a conditional RNN (True),
             or to concatenate the contact parameters to the sequence (False, default).
-        seed (int): The random seed used to initialize the weights.
+        :param seed: The random seed used to initialize the weights.
 
-    Returns:
-        A Keras model.
+        :return: A Keras model.
     """
     # make initialization of weights reproducible
     tf.random.set_seed(seed)
@@ -71,13 +70,12 @@ def rnn_model(
 
     return model
 
-def _DynamicRepeatVector(contact_params, num_repeats):
+
+def _DynamicRepeatVector(contact_params, num_repeats: int):
     """
     To deal with repetitions of variable sequence lenghts.
-
     Adapted from https://github.com/keras-team/keras/issues/7949#issuecomment-383550274
-
-    NOTE: Can't get this to work when not using windows..
+    NOTE: Can't get this to work when not using windows ...
     """
     num_features = K.shape(contact_params)[1]  # contact_params.shape[1]
 

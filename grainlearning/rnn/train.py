@@ -18,7 +18,6 @@ def train(config=None):
     for example `example_sweep.yaml`, as:
         `wandb sweep example_sweep.yaml`
     And run with the line shown subsequently in the terminal.
-
     The config is loaded from the yaml file.
     """
     with wandb.init(config=config):
@@ -66,10 +65,6 @@ def train(config=None):
         wandb.log({"predictions": val_prediction_samples})
 
 
-def main(config):
-    train(config)
-
-
 if __name__ == '__main__':
     defaults = {
         'raw_data': 'data/sequences.hdf5',
@@ -87,4 +82,4 @@ if __name__ == '__main__':
         'add_e0': False,
     }
 
-    main(config=defaults)
+    train(config=defaults)

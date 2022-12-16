@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 
-def windowize_train_val(split_data:dict, train_stats: dict, window_size:int, window_step: int, **kwargs):
+def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, window_step: int, **kwargs):
     """
     Convert sequences into windows of given length. Leave test set untouched.
     Adds window_size and window_step to train_stats.
@@ -72,10 +72,12 @@ def _windowize_single_dataset(
     dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': Xs, 'contact_parameters': cs}, ys))
     return dataset
 
+
 def _shuffle(Xs, cs, ys, seed):
     np.random.seed(seed)
     inds = np.random.permutation(len(Xs))
     return Xs[inds], cs[inds], ys[inds]
+
 
 def predict_over_windows(
         data: dict,
@@ -85,7 +87,6 @@ def predict_over_windows(
         ):
     """
     Take a batch of full sequences, iterate over windows making predictions.
-
     It splits up the sequence into windows of given length, each offset by one timestep,
     uses the model to make predictions on all of those windows,
     and concatenates the result into a whole sequence again.
@@ -108,6 +109,7 @@ def predict_over_windows(
         return predictions
 
     return data.map(predict_windows)
+
 
 def extract_tensors(data: tf.dataset):
     """

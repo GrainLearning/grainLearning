@@ -1,7 +1,6 @@
 import wandb
 import tensorflow as tf
 
-
 from models import rnn_model
 from preprocessing import prepare_datasets
 from windows import predict_over_windows
@@ -9,13 +8,11 @@ from windows import predict_over_windows
 def get_best_run_from_sweep(entity_project_sweep_id: str):
     """
     Load the best performing model found with a weights and biases sweep.
-
     Also load the data splits it was trained on.
 
-    Args:
-        entity_project_sweep_id (str): string of form {user}/{project}/{sweep_id}
+    :param entity_project_sweep_id: string of form {user}/{project}/{sweep_id}
 
-    Returns:
+    :return: Tuple containing:
         model: The trained model with the lowest validation loss.
         data: The train, val, test splits as used during training.
         stats: Some statistics on the training set and configuration.
@@ -36,8 +33,8 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
 
 
 def predict_macroscopics(
-        model,
-        data,
+        model: tf.keras.Model,
+        data: tf.dataset,
         train_stats: dict,
         config: dict,
         batch_size: int = 256,
@@ -45,19 +42,16 @@ def predict_macroscopics(
         ):
     """
     Use the given model to predict the features of the given data.
-
     If standardized, rescale the predictions to their original units.
 
-    Args:
-        model:
-        data: Tensorflow dataset containing 'load_sequence' and 'contact_parameters' inputs.
-        train_stats: Dictionary containing statistics of the trainingset.
-        config: Dictionary containing the configuration with which the model was trained.
-        batch_size (int): Size of batches to use.
-        single_batch (bool): Whether to predict only a single batch (defaults to False).
+    :param model: Keras RNN model
+    :param data: Tensorflow dataset containing 'load_sequence' and 'contact_parameters' inputs.
+    :param train_stats: Dictionary containing statistics of the trainingset.
+    :param config: Dictionary containing the configuration with which the model was trained.
+    :param batch_size: Size of batches to use.
+    :param single_batch: Whether to predict only a single batch (defaults to False).
 
-    Returns:
-        predictions: Tensorflow dataset containing the predictions in original units.
+    :return: predictions: Tensorflow dataset containing the predictions in original units.
     """
     data = data.batch(batch_size)
     if single_batch:

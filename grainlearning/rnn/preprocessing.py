@@ -40,7 +40,7 @@ def prepare_datasets(
     :param add_e0: Whether to add the initial void ratio as a contact parameter.
     :param seed: Random seed used to split the datasets.
 
-    :return: (split_data, train_stats)
+    :return: Tuple (split_data, train_stats)
         split_data: Dictionary with keys 'train', 'val', 'test', and values the
         corresponding tensorflow Datasets.
         train_stats: Dictionary containing the shape of the data, and
