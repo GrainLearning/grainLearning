@@ -34,7 +34,7 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
 
 def predict_macroscopics(
         model: tf.keras.Model,
-        data: tf.dataset,
+        data: tf.data.Dataset,
         train_stats: dict,
         config: dict,
         batch_size: int = 256,

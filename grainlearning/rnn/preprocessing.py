@@ -219,7 +219,7 @@ def _pad_initial(array: np.array, pad_length: int, axis=1):
     padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
 
-def get_dimensions(data: tf.Dataset):
+def get_dimensions(data: tf.data.Dataset):
     """
     Extract dimensions of sample from a tensorflow dataset.
 

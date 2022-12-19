@@ -27,7 +27,7 @@ def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, w
 
 
 def _windowize_single_dataset(
-        data: tf.dataset,
+        data: tf.data.Dataset,
         window_size: int,
         window_step: int,
         seed: int = 42):
@@ -81,7 +81,7 @@ def _shuffle(Xs, cs, ys, seed):
 
 def predict_over_windows(
         data: dict,
-        model: tf.Keras.Model,
+        model: tf.keras.Model,
         window_size: int,
         sequence_length: int,
         ):
@@ -111,7 +111,7 @@ def predict_over_windows(
     return data.map(predict_windows)
 
 
-def extract_tensors(data: tf.dataset):
+def extract_tensors(data: tf.data.Dataset):
     """
     Given a tensorflow Dataset extract all tensors.
 

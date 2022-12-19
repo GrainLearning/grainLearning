@@ -10,6 +10,8 @@ coverage.xml
 cov.xml
 .pytest_cache
 
+./grainLearning/rnn/data/
+
 # Mac
 .DS_Store
 

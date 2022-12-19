@@ -1,6 +1,6 @@
 import os, pathlib
 from matplotlib import pyplot as plt
-from tensorflow import keras
+import tensorflow as tf
 import numpy as np
 
 from preprocessing import prepare_datasets
@@ -11,7 +11,7 @@ EXPERIMENT_TYPES = ['drained', 'undrained']
 P_INDEX = 5
 E_INDEX = 6
 
-def plot_predictions(model: keras.model, data: tf.dataset, train_stats: dict, config: dict):
+def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: dict, config: dict):
     """
     Take the first sample in the test set for each combination of pressure
     and experiment type, and plot for it the true and predicted macroscopic
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     saved_model_name = f'{model_name}_{pressure}_{experiment_type}_conditional'
     model_directory = pathlib.Path('trained_models/' + saved_model_name)
 
-    model = keras.models.load_model(model_directory)
+    model = tf.keras.models.load_model(model_directory)
     train_stats = np.load(model_directory / 'train_stats.npy', allow_pickle=True).item()
     losses = np.load(model_directory / 'losses.npy', allow_pickle=True).item()
 
