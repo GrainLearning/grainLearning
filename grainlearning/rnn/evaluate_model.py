@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 
 from preprocessing import prepare_datasets
-from predict import predict_macroscopics
+import predict as predict
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
 EXPERIMENT_TYPES = ['drained', 'undrained']
@@ -20,12 +20,12 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     :param model: Model to perform predictions with.
     :param data: Tensorflow dataset to predict on.
     :param train_stats: Dictionary containing training set statistics.
-    :paramconfig: Dictionary containing the configuration with which the model was trained.
+    :param config: Dictionary containing the configuration with which the model was trained.
 
     :return figure:
     """
-    predictions = predict_macroscopics(model, data, train_stats, config,
-            batch_size=256, single_batch=True)
+    predictions = predict.predict_macroscopics(model, data, train_stats, config,
+                                       batch_size=256, single_batch=True)
     # extract tensors from dataset
     predictions = next(iter(predictions))
     test_inputs, labels = next(iter(data.batch(256)))
@@ -45,40 +45,14 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     ids = {'e': 0, 'f_0': 3, 'a_c': 4, 'a_n': 5, 'a_t': 6, 'p': 1, 'q': 2}
     representative_idxs = _find_representatives(test_inputs)
 
-    def _plot_sequence(i, j, y_key, i_s=0, x_key='steps', color='blue'):
-        if x_key == 'steps':
-            x = steps
-            x_p = steps_predicted
-        else:
-            x = labels[i_s, :, ids[x_key]]
-            x_p = predictions[i_s, :, ids[x_key]]
-        y = labels[i_s, :, ids[y_key]]
-        y_p = predictions[i_s, :, ids[y_key]]
-        fill_ax(ax[i, j], x, y, x_p, y_p, x_label=x_key, y_label=y_key, color=color)
-
-    def extract_combination_inv(data, i_s=0):
-        """Combine parameters in way that is supposed to be zero."""
-        q = data[i_s, :, ids['q']]
-        p = data[i_s, :, ids['p']]
-        a_c = data[i_s, :, ids['a_c']]
-        a_n = data[i_s, :, ids['a_n']]
-        a_t = data[i_s, :, ids['a_t']]
-        comb = q / p - 2 / 5 * (a_c + a_n + 3 / 2 * a_t)
-        return comb
-
-    def extract_q_over_p(data, i_s=0):
-        q = data[i_s, :, ids['q']]
-        p = data[i_s, :, ids['p']]
-        return q / p
-
     ylim = [-3, 3]
     for i_s, color in zip(representative_idxs,
             ['blue', 'green', 'purple', 'darkgreen', 'navy', 'yellowgreen']):
         _plot_sequence(0, 0, 'e', i_s=i_s, color=color)
         _plot_sequence(0, 1, 'f_0', i_s=i_s, color=color)
         fill_ax(ax[0, 2],
-                steps, extract_q_over_p(labels, i_s=i_s),
-                steps_predicted, extract_q_over_p(predictions, i_s=i_s),
+                steps, _extract_q_over_p(labels, i_s=i_s),
+                steps_predicted, _extract_q_over_p(predictions, i_s=i_s),
                 y_label='q/p', x_label='steps', color=color,
                 ylim=ylim)
         _plot_sequence(1, 0, 'a_c', i_s=i_s, color=color)
@@ -87,8 +61,8 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
         _plot_sequence(2, 1, 'p', i_s=i_s, color=color)
         _plot_sequence(2, 2, 'q', i_s=i_s, color=color)
         fill_ax(ax[2, 0],
-                steps, extract_combination_inv(labels, i_s=i_s),
-                steps_predicted, extract_combination_inv(predictions, i_s=i_s),
+                steps, _extract_combination_inv(labels, i_s=i_s),
+                steps_predicted, _extract_combination_inv(predictions, i_s=i_s),
                 y_label='vanishing combination', x_label='steps', color=color,
                 ylim=ylim)
 
@@ -105,6 +79,34 @@ def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
     if x_label: ax.set_xlabel(x_label)
     if y_label: ax.set_ylabel(y_label)
     if ylim: ax.set_ylim(ylim)
+
+# Auxiliary functions to create plots
+
+def _plot_sequence(i, j, y_key, i_s=0, x_key='steps', color='blue'):
+    if x_key == 'steps':
+        x = steps
+        x_p = steps_predicted
+    else:
+        x = labels[i_s, :, ids[x_key]]
+        x_p = predictions[i_s, :, ids[x_key]]
+    y = labels[i_s, :, ids[y_key]]
+    y_p = predictions[i_s, :, ids[y_key]]
+    fill_ax(ax[i, j], x, y, x_p, y_p, x_label=x_key, y_label=y_key, color=color)
+
+def _extract_combination_inv(data, i_s=0):
+    """Combine parameters in way that is supposed to be zero."""
+    q = data[i_s, :, ids['q']]
+    p = data[i_s, :, ids['p']]
+    a_c = data[i_s, :, ids['a_c']]
+    a_n = data[i_s, :, ids['a_n']]
+    a_t = data[i_s, :, ids['a_t']]
+    comb = q / p - 2 / 5 * (a_c + a_n + 3 / 2 * a_t)
+    return comb
+
+def _extract_q_over_p(data, i_s=0):
+    q = data[i_s, :, ids['q']]
+    p = data[i_s, :, ids['p']]
+    return q / p
 
 def _find_representatives(input_data):
     """
@@ -133,24 +135,29 @@ if __name__ == '__main__':
     pressure = 'All'
     experiment_type = 'All'
     model_name = 'simple_rnn'
-    saved_model_name = f'{model_name}_{pressure}_{experiment_type}_conditional'
+    saved_model_name = f'{model_name}_{pressure}_{experiment_type}'
     model_directory = pathlib.Path('trained_models/' + saved_model_name)
 
+    # Loading a complete model
     model = tf.keras.models.load_model(model_directory)
-    train_stats = np.load(model_directory / 'train_stats.npy', allow_pickle=True).item()
-    losses = np.load(model_directory / 'losses.npy', allow_pickle=True).item()
 
+    #Alternative (model trained with wandb): load the weights of a model
+    #   TODO
+
+    train_stats = np.load(model_directory / 'train_stats.npy', allow_pickle=True).item()
+    #window_size = train_stats['window_size']
     split_data, _ = prepare_datasets(
             raw_data=data_dir,
             pressure=pressure,
             experiment_type=experiment_type,
-            pad_length=train_stats['window_size'],
+            pad_length=window_size,
             use_windows=False,
             add_e0=True,  # was used in the model that is tested with
             )
 
     if not os.path.exists(plot_dir): os.makedirs(plot_dir)
 
-    config = {'use_windows': True, 'window_size': train_stats['window_size'],
+    config = {'use_windows': True, 'window_size': window_size,
             'standardize_outputs': True}
+
     plot_predictions(model, split_data['test'], train_stats, config)
