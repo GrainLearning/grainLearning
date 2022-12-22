@@ -34,4 +34,6 @@ parameters:
     values: [128, 256, 512]
   patience:
     value: 5
+  save_weights_only:
+    value: False
 
