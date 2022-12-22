@@ -1,4 +1,4 @@
-import wandb, yaml
+import wandb, yaml, os
 import tensorflow as tf
 import numpy as np
 from pathlib import Path
@@ -38,15 +38,13 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
     model.load_weights(best_model.name)
     return model, data, train_stats, config
 
-def get_pretrained_model(path_to_model: str, name_model_file: str):
+def get_pretrained_model(path_to_model: str):
     """
     Loads configuration, training statistics and model of a pretrained model.
 
     Reads train_stats, and creates dataset.
 
     :param path_to_model: str or pathlib.Path to the folder where is stored.
-    :param name_model_file: str or pathlib.Path of the file containing the model.
-    the model, config.yaml, and train_stats.npy
 
     :returns:
         model: keras model ready to use
@@ -76,11 +74,21 @@ def get_pretrained_model(path_to_model: str, name_model_file: str):
     else: raise FileNotFoundError('train_stats.npy was not found')
 
     # Load model
-    try:
-        model = tf.keras.models.load_model(path_to_trained_model/'model-best.h5') # whole model was saved
-    except ValueError:
+    if os.path.exists(path_to_trained_model/'model-best.h5'): # Model has been trained using wandb
+        try:
+            model = tf.keras.models.load_model(path_to_trained_model/'model-best.h5') # whole model was saved
+        except ValueError:
+            model = rnn_model(train_stats, **config)
+            model.load_weights(path_to_trained_model/'model-best.h5') # only weights were saved
+
+    elif os.path.exists(path_to_trained_model/'save_model.pb'): # Model has been saved directly using tf.keras
+        model = tf.keras.model.load_model(path_to_trained_model)
+
+    elif os.path.exists(path_to_trained_model/'weights.h5'): # Model's weights have been saved directly using tf.keras
         model = rnn_model(train_stats, **config)
-        model.load_weights(path_to_trained_model/'model-best.h5') # only weights were saved
+        model.load_weights(path_to_trained_model/'weights.h5')
+
+    else: raise FileNotFoundError("Couldnt find a model to load")
 
     return model, train_stats, config
 
@@ -124,8 +132,8 @@ def predict_macroscopics(
 
 if __name__ == '__main__':
     # 1. Chossing the best model from a sweep (Aron)
-    entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
-    model, data, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
+    #entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
+    #model, data, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
 
     # 2. Chossing a model that has been trained using wandb
     path_to_trained_model = Path('trained_models/Luisas_model')
@@ -136,4 +144,3 @@ if __name__ == '__main__':
 
     predictions = predict_macroscopics(model, data['test'], train_stats, config,
             batch_size=256, single_batch=True)
-    for i in predictions: print(i)
