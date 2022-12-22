@@ -1,5 +1,7 @@
-import wandb
+import wandb, yaml
 import tensorflow as tf
+import numpy as np
+from pathlib import Path
 
 from models import rnn_model
 from preprocessing import prepare_datasets
@@ -12,7 +14,7 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
 
     :param entity_project_sweep_id: string of form {user}/{project}/{sweep_id}
 
-    :return: Tuple containing:
+    :return:
         model: The trained model with the lowest validation loss.
         data: The train, val, test splits as used during training.
         stats: Some statistics on the training set and configuration.
@@ -26,10 +28,61 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
             replace=True,
         )
     config = best_run.config
-    data, stats = prepare_datasets(**config)
+    if os.path.exists(Path(best_model.dir)/'train_stats.npy'):
+        train_stats = np.load(Path(path_to_model)/'train_stats.npy', allow_pickle=True).item()
+        data, _ = prepare_datasets(**config)
+    else:
+        data, train_stats = prepare_datasets(**config)
+
     model = rnn_model(stats, **config)
     model.load_weights(best_model.name)
-    return model, data, stats, config
+    return model, data, train_stats, config
+
+def get_pretrained_model(path_to_model: str, name_model_file: str):
+    """
+    Loads configuration, training statistics and model of a pretrained model.
+
+    Reads train_stats, and creates dataset.
+
+    :param path_to_model: str or pathlib.Path to the folder where is stored.
+    :param name_model_file: str or pathlib.Path of the file containing the model.
+    the model, config.yaml, and train_stats.npy
+
+    :returns:
+        model: keras model ready to use
+        train_stats: Array containing the values used to standardize the data (if config.standardize_outputs = True),
+                     and lenghts of sequences, load_features, contact_params, labels, window_size and window_step.
+        config: dictionary with the model configuration
+    """
+
+    # Read config.yaml into a python dictionary equivalent to config.
+    # config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
+    if os.path.exists(Path(path_to_model)/'config.yaml'): # Model has been trained using wandb
+        file = open(Path(path_to_model)/'config.yaml', 'r')
+        config = yaml.load(file, Loader=yaml.FullLoader)
+        del config['wandb_version']; del config['_wandb']
+        for key in config.keys():
+            del config[key]['desc']
+            config[key] = config[key]['value']
+    elif os.path.exists(Path(path_to_model)/'config.npy'): # Model has been trained without wandb and config saved as .npy
+        config = np.load(Path(path_to_model)/'config.npy', allow_pickle=True).item()
+    elif os.path.exists(Path(path_to_model)/'config.h5'): # Model has been trained without wandb and config saved as .h5
+        config = h5py.File(Path(path_to_model)/'config.h5', 'r')
+    else: raise FileNotFoundError('config was not found we tried formats (.yaml, .npy, .h5)')
+
+    # Load train_stats
+    if os.path.exists(Path(path_to_model)/'train_stats.npy'):
+        train_stats = np.load(Path(path_to_model)/'train_stats.npy', allow_pickle=True).item()
+    else: raise FileNotFoundError('train_stats.npy was not found')
+
+    # Load model
+    try:
+        model = tf.keras.models.load_model(path_to_trained_model/'model-best.h5') # whole model was saved
+    except ValueError:
+        model = rnn_model(train_stats, **config)
+        model.load_weights(path_to_trained_model/'model-best.h5') # only weights were saved
+
+    return model, train_stats, config
 
 
 def predict_macroscopics(
@@ -70,7 +123,17 @@ def predict_macroscopics(
 
 
 if __name__ == '__main__':
+    # 1. Chossing the best model from a sweep (Aron)
     entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
-    model, data, stats, config = get_best_run_from_sweep(entity_project_sweep_id)
-    predictions = predict_macroscopics(model, data['test'], stats, config,
+    model, data, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
+
+    # 2. Chossing a model that has been trained using wandb
+    path_to_trained_model = Path('trained_models/Luisas_model')
+    model, train_stats, config = get_pretrained_model(path_to_trained_model)
+
+    # load input data for the model to predict. Here hook your load sequence, contact_params
+    data, _ = prepare_datasets(**config)
+
+    predictions = predict_macroscopics(model, data['test'], train_stats, config,
             batch_size=256, single_batch=True)
+    for i in predictions: print(i)

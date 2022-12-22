@@ -145,7 +145,7 @@ if __name__ == '__main__':
     #   TODO
 
     train_stats = np.load(model_directory / 'train_stats.npy', allow_pickle=True).item()
-    #window_size = train_stats['window_size']
+    window_size = train_stats['window_size']
     split_data, _ = prepare_datasets(
             raw_data=data_dir,
             pressure=pressure,
