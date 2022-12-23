@@ -50,7 +50,7 @@ def train(config=None):
             )
         wandb_callback = wandb.keras.WandbCallback(
                 monitor='val_loss',
-                save_model=(not config.save_weights_only),
+                save_model=True,
                 save_weights_only=config.save_weights_only,
                 validation_data=split_data['val'],
             )
@@ -63,9 +63,6 @@ def train(config=None):
                 validation_data=split_data['val'],
                 callbacks=callbacks,
             )
-        # do some predictions on test data and save plots to wandb.
-        #val_prediction_samples = plot_predictions(model, split_data['test'], train_stats, config)
-        #wandb.log({"predictions": val_prediction_samples})
 
 def train_without_wandb(config=None):
     """
@@ -144,6 +141,6 @@ if __name__ == '__main__':
         'save_weights_only':True,
     }
 
-    #train(config=defaults)
-    train_without_wandb(config=defaults)
+    train(config=defaults)
+    #train_without_wandb(config=defaults)
 

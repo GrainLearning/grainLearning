@@ -38,6 +38,7 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
     model.load_weights(best_model.name)
     return model, data, train_stats, config
 
+
 def get_pretrained_model(path_to_model: str):
     """
     Loads configuration, training statistics and model of a pretrained model.
@@ -52,41 +53,41 @@ def get_pretrained_model(path_to_model: str):
                      and lenghts of sequences, load_features, contact_params, labels, window_size and window_step.
         config: dictionary with the model configuration
     """
-
     # Read config.yaml into a python dictionary equivalent to config.
     # config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
-    if os.path.exists(Path(path_to_model)/'config.yaml'): # Model has been trained using wandb
-        file = open(Path(path_to_model)/'config.yaml', 'r')
+    path_to_model = Path(path_to_model)
+    if os.path.exists(path_to_model / 'config.yaml'): # Model has been trained using wandb
+        file = open(path_to_model / 'config.yaml', 'r')
         config = yaml.load(file, Loader=yaml.FullLoader)
         del config['wandb_version']; del config['_wandb']
         for key in config.keys():
             del config[key]['desc']
             config[key] = config[key]['value']
-    elif os.path.exists(Path(path_to_model)/'config.npy'): # Model has been trained without wandb and config saved as .npy
-        config = np.load(Path(path_to_model)/'config.npy', allow_pickle=True).item()
-    elif os.path.exists(Path(path_to_model)/'config.h5'): # Model has been trained without wandb and config saved as .h5
-        config = h5py.File(Path(path_to_model)/'config.h5', 'r')
+    elif os.path.exists(path_to_model / 'config.npy'): # Model has been trained without wandb and config saved as .npy
+        config = np.load(path_to_model / 'config.npy', allow_pickle=True).item()
+    elif os.path.exists(path_to_model / 'config.h5'): # Model has been trained without wandb and config saved as .h5
+        config = h5py.File(path_to_model / 'config.h5', 'r')
     else: raise FileNotFoundError('config was not found we tried formats (.yaml, .npy, .h5)')
 
     # Load train_stats
-    if os.path.exists(Path(path_to_model)/'train_stats.npy'):
-        train_stats = np.load(Path(path_to_model)/'train_stats.npy', allow_pickle=True).item()
+    if os.path.exists(path_to_model / 'train_stats.npy'):
+        train_stats = np.load(path_to_model / 'train_stats.npy', allow_pickle=True).item()
     else: raise FileNotFoundError('train_stats.npy was not found')
 
     # Load model
-    if os.path.exists(path_to_trained_model/'model-best.h5'): # Model has been trained using wandb
+    if os.path.exists(path_to_model / 'model-best.h5'): # Model has been trained using wandb
         try:
-            model = tf.keras.models.load_model(path_to_trained_model/'model-best.h5') # whole model was saved
+            model = tf.keras.models.load_model(path_to_model / 'model-best.h5') # whole model was saved
         except ValueError:
             model = rnn_model(train_stats, **config)
-            model.load_weights(path_to_trained_model/'model-best.h5') # only weights were saved
+            model.load_weights(path_to_model / 'model-best.h5') # only weights were saved
 
-    elif os.path.exists(path_to_trained_model/'save_model.pb'): # Model has been saved directly using tf.keras
-        model = tf.keras.model.load_model(path_to_trained_model)
+    elif os.path.exists(path_to_model / 'save_model.pb'): # Model has been saved directly using tf.keras
+        model = tf.keras.model.load_model(path_to_model)
 
-    elif os.path.exists(path_to_trained_model/'weights.h5'): # Model's weights have been saved directly using tf.keras
+    elif os.path.exists(path_to_model / 'weights.h5'): # Model's weights have been saved directly using tf.keras
         model = rnn_model(train_stats, **config)
-        model.load_weights(path_to_trained_model/'weights.h5')
+        model.load_weights(path_to_model / 'weights.h5')
 
     else: raise FileNotFoundError("Couldnt find a model to load")
 
@@ -131,6 +132,9 @@ def predict_macroscopics(
 
 
 if __name__ == '__main__':
+
+    # TODO: Put these possibilitites in docs
+
     # 1. Chossing the best model from a sweep (Aron)
     #entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
     #model, data, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
