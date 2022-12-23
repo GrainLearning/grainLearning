@@ -70,7 +70,7 @@ of no less than 30%. This is achieved by assigning `ess_target = 0.3` when initi
 until the termination criterion is met.
 By default, no plots are created unless the flag :attr:`.CalibrationToolbox.save_fig` is non-negative.
 
-Click :download:`here <../../tutorials/linear_regression/python_lenreg.py>` to download the full script.
+Click :download:`here <../../tutorials/linear_regression/python_linear_regression_solve.py>` to download the full script.
 
 Linear regression with a "software" model
 -----------------------------------------
@@ -182,7 +182,7 @@ In these subdirectories, you find
 where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.CalibrationToolbox.curr_iter`,
 and <sample_ID> is the index of the :attr:`.IOModel.param_data` sequence.
 
-Click :download:`here <../../tutorials/linear_regression/linear_reg_solve.py>` to download the full script.
+Click :download:`here <../../tutorials/linear_regression/linear_regression_solve.py>` to download the full script.
 
 GrainingLearning as a postprocessing tool
 -----------------------------------------

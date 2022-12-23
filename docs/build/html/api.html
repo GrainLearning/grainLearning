@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Python API &mdash; GrainLearning  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -207,9 +206,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="python-api">
+  <div class="section" id="python-api">
 <h1>Python API<a class="headerlink" href="#python-api" title="Permalink to this heading"></a></h1>
-<section id="module-grainlearning.calibrationtoolbox">
+<div class="section" id="module-grainlearning.calibrationtoolbox">
 <span id="calibrationtoolbox"></span><h2><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code><a class="headerlink" href="#module-grainlearning.calibrationtoolbox" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.calibrationtoolbox.CalibrationToolbox">
@@ -353,8 +352,8 @@ TODO: more docu needed</p>
 
 </dd></dl>
 
-</section>
-<section id="module-grainlearning.models">
+</div>
+<div class="section" id="module-grainlearning.models">
 <span id="models"></span><h2><code class="docutils literal notranslate"><span class="pre">Models</span></code><a class="headerlink" href="#module-grainlearning.models" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.models.IOModel">
@@ -616,7 +615,9 @@ and generate new parameter values for additional simulation runs.</p>
 <dt class="sig sig-object py" id="grainlearning.models.Model">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_mins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_maxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctrl_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_obs_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.models.Model" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the probabalistic model class. It contains information on the observation (or reference) data, simulation data, parameters and reference. It is also used to run a callback for the simulations.</p>
+<p>This is the probabalistic model class.
+It contains information on the observation (or reference) data, simulation data, parameters and reference.
+It is also used to run a callback for the simulations.</p>
 <p>There are two ways of initializing the class.</p>
 <p>Method 1 - dictionary style</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_cls</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
@@ -815,8 +816,8 @@ and generate new parameter values for additional simulation runs.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-grainlearning.iterativebayesianfilter">
+</div>
+<div class="section" id="module-grainlearning.iterativebayesianfilter">
 <span id="iterative-bayesian-filter"></span><h2><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code><a class="headerlink" href="#module-grainlearning.iterativebayesianfilter" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.iterativebayesianfilter.IterativeBayesianFilter">
@@ -954,8 +955,8 @@ and generate new parameter values for additional simulation runs.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-grainlearning.inference">
+</div>
+<div class="section" id="module-grainlearning.inference">
 <span id="inference"></span><h2><code class="docutils literal notranslate"><span class="pre">Inference</span></code><a class="headerlink" href="#module-grainlearning.inference" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC">
@@ -1167,8 +1168,8 @@ update the model state and model parameters based on Bayes’ theorem</p>
 
 </dd></dl>
 
-</section>
-<section id="module-grainlearning.sampling">
+</div>
+<div class="section" id="module-grainlearning.sampling">
 <span id="sampling"></span><h2><code class="docutils literal notranslate"><span class="pre">Sampling</span></code><a class="headerlink" href="#module-grainlearning.sampling" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel">
@@ -1303,8 +1304,8 @@ a low-discrepancy sequence or a Latin hypercube.</p>
 </dl>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

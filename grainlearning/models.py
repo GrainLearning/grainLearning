@@ -459,10 +459,10 @@ class IOModel(Model):
 
         for i in range(self.num_samples):
             if self.sim_data_file_ext != '.npy':
-                sim_data_file_ext = '_sim*' + self.sim_data_file_ext
+                sim_data_file_ext = '_sim' + self.sim_data_file_ext
             else:
                 sim_data_file_ext = self.sim_data_file_ext
-            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*' \
+            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*' \
                         + str(i).zfill(magn) + '*' + sim_data_file_ext
             files = glob(file_name)
 
