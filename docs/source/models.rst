@@ -65,7 +65,7 @@ to write samples in a text file and run the :attr:`.IOModel.callback` to execute
 Below is an example of the callback where parameter samples are passed as command-line arguments to an external executable.
 
 .. code-block:: python
-   :caption: A callback function that interact with external software
+   :caption: A callback function that interacts with external software
 
    executable = './software'
 

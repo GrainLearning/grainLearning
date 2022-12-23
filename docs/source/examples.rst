@@ -13,7 +13,7 @@ ranging from trials and errors to sophisticated statistical inference.
 Solving an inverse problem that involves nonlinearity and/or discontinuity
 in the `forward` model (DEM or constitutive) is very challenging.
 Furthermore, because of the potentially large computational cost
-for running the simulations, the "trials" have to be selected with an optimized strategy to boost the efficiency.
+for running the simulations, the "trials" have to be selected with an optimized strategy to boost efficiency.
 
 Bayesian calibration of DEM models
 ----------------------------------
@@ -75,9 +75,9 @@ that are progressively localized near the posterior modes over the iterations.
 
   Localization of resampled parameter values over a few iterations.
 
-Because the closer to a posterior distribution mode the higher the sample density, resampling from the repeatedly updated proposal density allows to zoom into highly probable parameter subspace in very few iterations.
+Because the closer to a posterior distribution mode the higher the sample density, resampling from the repeatedly updated proposal density allows zooming into highly probable parameter subspace in very few iterations.
 The iterative (re)sampling scheme brings three major advantages to Bayesian filtering:
 
-1. The posterior distribution is iteratively estimated with an increasing resolution on the posterior landscape.
+1. The posterior distribution is iteratively estimated with an increased resolution on the posterior landscape.
 2. The multi-level sampling algorithm keeps allocating model evaluations in parameter subspace where the posterior probabilities are expected to be high, thus significantly improving computational efficiency.
-3. Resampling that takes place between two consecutive iterations can effectively overcome weight degeneracy problem while keeping sample trajectories intact within the time/load history.
+3. Resampling that takes place between two consecutive iterations can effectively overcome the weight degeneracy problem while keeping sample trajectories intact within the time/load history.

@@ -60,7 +60,7 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 
 ### One command installation
 
-Stable versions of GrainLearning can be installed via pip `pip install grainlearning`
+Stable versions of GrainLearning can be installed via `pip install grainlearning`
 However, you still need to clone the GrainLearning repository to run the tutorials.
 
 ## Tutorials

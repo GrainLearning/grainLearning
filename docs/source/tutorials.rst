@@ -9,7 +9,7 @@ GrainLearning to Python or third-party software models,
 Linear regression with a Python model
 -------------------------------------
 
-For demonstrative purpose, we use a linear function :math:`y = a\times{x}+b` as the numerical model,
+For demonstrative purposes, we use a linear function :math:`y = a\times{x}+b` as the numerical model,
 implemented as the callback function of the :class:`.Model`.
 
 First, we create a synthetic dataset from this linear equation.
@@ -31,7 +31,7 @@ First, we create a synthetic dataset from this linear equation.
         model.sim_data = np.array(data)
 
 A calibration tool can be initialized by defining all the necessary input in a dictionary
-and pass it to the constructor of :class:`.CalibrationToolbox`.
+and passing it to the constructor of :class:`.CalibrationToolbox`.
 
 .. code-block:: python
 
