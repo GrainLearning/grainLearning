@@ -6,19 +6,18 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-from .preprocessing import prepare_datasets
 from .models import rnn_model
-from .evaluate_model import plot_predictions
+from .preprocessing import prepare_datasets
 
 def train(config=None):
     """
     Train a model and report to weights and biases.
+
     :param config: dictionary containing model and training configurations.
 
     If called in the framewrok of a sweep:
     A sweep can be created from the command line using a configuration file,
-    for example `example_sweep.yaml`, as:
-        `wandb sweep example_sweep.yaml`
+    for example `example_sweep.yaml`, as: ``wandb sweep example_sweep.yaml``
     And run with the line shown subsequently in the terminal.
     The config is loaded from the yaml file.
     """
@@ -123,34 +122,33 @@ def train_without_wandb(config=None):
         )
 
 def get_default_dict():
-    """
-    Returns a dictionary with default values for the configuration of
-    RNN model and training procedure.
+    """Returns a dictionary with default values for the configuration of
+    RNN model and training procedure. Possible fields are:
 
-    Possible fields are:
     * RNN model
-    'raw_data': Path to hdf5 file generated using parse_data_YADE.py
-    'pressure' and 'experiment_type': Name of the subfield of dataset to consider.
-                                      It can also be 'All'.
-    'conditional': - True: Create a conditional RNN. The contact parameters vector doesn't have
-                           to be copied multiple times into the strain sequence.
-                   - False: Concatenate copies of contact_params to each one of the inputs steps.
-    'use_windows': Boolean. False: not implemented.
-                   At the moment the model only works if windows are considered.
-    'window_size': int, number of steps composing a window.
+        - 'raw_data': Path to hdf5 file generated using parse_data_YADE.py
+        - 'pressure' and 'experiment_type': Name of the subfield of dataset to consider. It can also be 'All'.
+        - 'conditional':
+         - True: Create a conditional RNN. The contact parameters vector doesn't have
+           to be copied multiple times into the strain sequence.
+         - False: Concatenate copies of contact_params to each one of the inputs steps.
+        - 'use_windows': At the moment the model only works if windows are considered.
+        - 'window_size': int, number of steps composing a window.
 
     * Training procedure
-    'patience': patience of tf.keras.callbacks.EarlyStopping
-    'epochs': Maximum number of epochs
-    'learning_rate': double, learning_rate of tf.keras.optimizers.Adam
-    'batch_size': Size of the data batches per training step.
-    'standardize_outputs': If True transform the data labels to have zero mean and unit variance.
-                           Also, in train_stats the mean and variance of each label will be stored,
-                           so that can be used to transform predicitons.
-                           (This is very usful if the labels are not between [0,1])
-    'add_e0': Whether to add the initial void ratio (output) as a contact parameter.
-    'save_weights_only': - True: Only the weights will be saved.
-                         - False: The whole model will be savved (Recommended)
+        - 'patience': patience of `tf.keras.callbacks.EarlyStopping`.
+        - 'epochs': Maximum number of epochs.
+        - 'learning_rate': double, learning_rate of `tf.keras.optimizers.Adam`.
+        - 'batch_size': Size of the data batches per training step.
+        - 'standardize_outputs': If True transform the data labels to have zero mean and unit variance.
+          Also, in train_stats the mean and variance of each label will be stored,
+          so that can be used to transform predicitons.
+          (This is very usful if the labels are not between [0,1])
+        - 'add_e0': Whether to add the initial void ratio (output) as a contact parameter.
+        - 'save_weights_only':
+         * True: Only the weights will be saved.
+         * False: The whole model will be saved **(Recommended)**.
+
     """
     defaults = {
         'raw_data': 'data/sequences.hdf5',

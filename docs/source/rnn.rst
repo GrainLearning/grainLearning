@@ -3,7 +3,7 @@ RNN Module
 
 We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model in tensorflow framework.
 
-The RNN takes as inputs a vector of *parameters* (i.g. contact parameters) and a sequence of size :math:`mathcal{N}` (i.g. applied strain). The model returns a sequence of size :math:`\mathcal{N}`
+The RNN takes as inputs a vector of *parameters* (i.g. contact parameters) and a sequence of size :math:`mathcal{N}` (i.g. applied strain). The model returns a sequence of size :math:`\mathcal{N}`.
 
 There are three main usages of RNN module:
 
@@ -84,6 +84,15 @@ This instructions assume that your HPC platform uses job scheduler slurm. `run_s
 
 Make a prediction with a pre-trained model
 ------------------------------------------
+
+You can load a pre-trained model from:
+1. A wandb sweep:
+   - You need have access to the sweep and know its ID.
+   - 
+3. Saved models in `rnn/train_models`.
+
+
+
 
 Use a trained RNN in grainLearning calibration process
 ------------------------------------------------------

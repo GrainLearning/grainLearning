@@ -139,7 +139,7 @@ if __name__ == '__main__':
     #entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
     #model, data, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
 
-    # 2. Chossing a model that has been trained using wandb
+    # 2. Chossing a model saved to trained_models folder
     path_to_trained_model = Path('trained_models/Luisas_model')
     model, train_stats, config = get_pretrained_model(path_to_trained_model)
 

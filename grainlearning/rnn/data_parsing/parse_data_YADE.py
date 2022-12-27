@@ -3,6 +3,7 @@ Preprocess DEM data so that it can be used as input in an RNN.
 In YADE data is stored to .npy files every interval of time steps.
 
 Data consists of:
+
 * contact_params (samples, 5).
 * input_params (samples, sequence_length, x).
 * output_params (samples, sequence_length, y).
@@ -68,7 +69,7 @@ def convert_all_to_hdf5(
     :param target_file: Path to hdf5 file to be created.
     :param sequence_length: Expected number of time steps in sequences.
 
-    .. warning:: Will remove the target_file if it already existed.
+    .. warning:: Will remove `target_file` if already exists.
     """
     if os.path.exists(target_file):
         os.remove(target_file)
