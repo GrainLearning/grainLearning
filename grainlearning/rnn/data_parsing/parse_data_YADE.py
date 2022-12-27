@@ -3,9 +3,9 @@ Preprocess DEM data so that it can be used as input in an RNN.
 In YADE data is stored to .npy files every interval of time steps.
 
 Data consists of:
-- contact_params (samples, 5)
-- input_params (samples, sequence_length, x)
-- output_params (samples, sequence_length, y)
+* contact_params (samples, 5).
+* input_params (samples, sequence_length, x).
+* output_params (samples, sequence_length, y).
 
 This example considers DEM simulations of Triaxial compressions
 at different confinments (pressures), in drain and undrained conditions.
@@ -61,13 +61,14 @@ def convert_all_to_hdf5(
     """
     Merge data of experiments of different pressures and types into a single
     hdf5 file.
-    Note: Will remove the target_file if it already existed.
 
-    :params pressures: List of strings of pressures available.
-    :params experiment_types: List of strings of experiment types available.
-    :params data_dir: Root directory containing all the data.
-    :params target_file: Path to hdf5 file to be created.
-    :params sequence_length: Expected number of time steps in sequences.
+    :param pressures: List of strings of pressures available.
+    :param experiment_types: List of strings of experiment types available.
+    :param data_dir: Root directory containing all the data.
+    :param target_file: Path to hdf5 file to be created.
+    :param sequence_length: Expected number of time steps in sequences.
+
+    .. warning:: Will remove the target_file if it already existed.
     """
     if os.path.exists(target_file):
         os.remove(target_file)
@@ -102,14 +103,16 @@ def convert_to_arrays(
     For a given pressure and experiment type, read all the files in the corresponding
     directory and concatenate those with the expected sequence length together
     into numpy arrays.
-    Note: longer and shorter sequences are ignored.
 
-    :params pressure: String indicating the pressure used.
-    :params experiment_type: String indicating the experiment type ('drained', 'undrained')
-    :params sequence_length: Expected number of timesteps in sequence.
-    :params data_dir: The root directory of the data.
+
+    :param pressure: String indicating the pressure used.
+    :param experiment_type: String indicating the experiment type ('drained', 'undrained')
+    :param sequence_length: Expected number of timesteps in sequence.
+    :param data_dir: The root directory of the data.
 
     :returns: Tuple of arrays of inputs, contacts, outputs
+
+    .. warning:: sequences longer and shorter than `sequence_length` are ignored.
     """
     data_dir = data_dir + f'{pressure}/{experiment_type}/'
     if not os.listdir(data_dir):

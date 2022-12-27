@@ -29,6 +29,7 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
    inference
    sampling
    iterative_bayesian_filter
+   rnn
    tutorials
    examples
    api

@@ -22,19 +22,18 @@ def rnn_model(
     This can be changed into a conditional RNN by setting `conditional=True`.
     In that case, contact parameters are used to intialize the hidden state of the LSTM.
 
-    Args:
-        :param input_shapes: Dictionary containing 'num_load_features', 'num_contact_params',
-            'num_labels'.
-        :param window_size: Length of time window.
-        :param lstm_units: Number of units of the hidden state of the LSTM.
-        :param dense_units: Number of units used in the dense layer after the LSTM.
-        :param use_windows: Whether to use time windows (True, default)
-            or process the entire sequence at once (False).
-        :param conditional: Whether to use a conditional RNN (True),
-            or to concatenate the contact parameters to the sequence (False, default).
-        :param seed: The random seed used to initialize the weights.
+    :param input_shapes: Dictionary containing 'num_load_features', 'num_contact_params',
+        'num_labels'.
+    :param window_size: Length of time window.
+    :param lstm_units: Number of units of the hidden state of the LSTM.
+    :param dense_units: Number of units used in the dense layer after the LSTM.
+    :param use_windows: Whether to use time windows (True, default)
+        or process the entire sequence at once (False).
+    :param conditional: Whether to use a conditional RNN (True),
+        or to concatenate the contact parameters to the sequence (False, default).
+    :param seed: The random seed used to initialize the weights.
 
-        :return: A Keras model.
+    :return: A Keras model.
     """
     # make initialization of weights reproducible
     tf.random.set_seed(seed)

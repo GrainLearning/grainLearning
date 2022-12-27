@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import h5py
 
-from windows import windowize_train_val
+from .windows import windowize_train_val
 
 # full lists of pressures and experiment types
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
@@ -27,7 +27,7 @@ def prepare_datasets(
     Convert raw data into preprocessed split datasets.
 
     :param raw_data: Path to hdf5 file containing the data.
-    :param pressure: Transverse pressure as a string in format '0.xe6'.
+    :param pressure: Experiment confining Pressure as a string in format '0.xe6' or 'All'.
     :param experiment_type: Either 'drained', 'undrained' or 'All'.
     :param train_frac: Fraction of data used in the training set.
     :param val_frac: Fraction of the data used in the validation set.

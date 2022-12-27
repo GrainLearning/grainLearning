@@ -1,21 +1,21 @@
 """
 Script to train a model to predict macroscopic features of a DEM simulation.
-
-Tracked using weights and biases.
 """
 import wandb, os, shutil
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-from preprocessing import prepare_datasets
-from models import rnn_model
-from evaluate_model import plot_predictions
+from .preprocessing import prepare_datasets
+from .models import rnn_model
+from .evaluate_model import plot_predictions
 
 def train(config=None):
     """
     Train a model and report to weights and biases.
+    :param config: dictionary containing model and training configurations.
 
+    If called in the framewrok of a sweep:
     A sweep can be created from the command line using a configuration file,
     for example `example_sweep.yaml`, as:
         `wandb sweep example_sweep.yaml`
@@ -69,11 +69,12 @@ def train_without_wandb(config=None):
     Train a model locally: no report to wandb.
     Saves either the model or its weight to folder outputs.
 
-    :params config: dictionary containing taining hyperparameters and some model parameters
+    :param config: dictionary containing taining hyperparameters and some model parameters
     """
     path_save_data = Path('outputs')
     if os.path.exists(path_save_data):
-        delete_outputs = input(f"The contents of {path_save_data} will be permanently deleted, do you want to proceed? [y/n]: ")
+        delete_outputs = input(f"The contents of {path_save_data} will be permanently deleted,\
+                                 do you want to proceed? [y/n]: ")
         if delete_outputs == "y": shutil.rmtree(path_save_data)
         else:
             print("Cancelling training")
@@ -121,14 +122,41 @@ def train_without_wandb(config=None):
             callbacks=callbacks,
         )
 
+def get_default_dict():
+    """
+    Returns a dictionary with default values for the configuration of
+    RNN model and training procedure.
 
-if __name__ == '__main__':
+    Possible fields are:
+    * RNN model
+    'raw_data': Path to hdf5 file generated using parse_data_YADE.py
+    'pressure' and 'experiment_type': Name of the subfield of dataset to consider.
+                                      It can also be 'All'.
+    'conditional': - True: Create a conditional RNN. The contact parameters vector doesn't have
+                           to be copied multiple times into the strain sequence.
+                   - False: Concatenate copies of contact_params to each one of the inputs steps.
+    'use_windows': Boolean. False: not implemented.
+                   At the moment the model only works if windows are considered.
+    'window_size': int, number of steps composing a window.
+
+    * Training procedure
+    'patience': patience of tf.keras.callbacks.EarlyStopping
+    'epochs': Maximum number of epochs
+    'learning_rate': double, learning_rate of tf.keras.optimizers.Adam
+    'batch_size': Size of the data batches per training step.
+    'standardize_outputs': If True transform the data labels to have zero mean and unit variance.
+                           Also, in train_stats the mean and variance of each label will be stored,
+                           so that can be used to transform predicitons.
+                           (This is very usful if the labels are not between [0,1])
+    'add_e0': Whether to add the initial void ratio (output) as a contact parameter.
+    'save_weights_only': - True: Only the weights will be saved.
+                         - False: The whole model will be savved (Recommended)
+    """
     defaults = {
         'raw_data': 'data/sequences.hdf5',
         'pressure': 'All',
         'experiment_type': 'All',
-        'model': 'conditional',
-        'conditional': True,
+        'conditional': False,
         'use_windows': True,
         'window_size': 10,
         'window_step': 1,
@@ -138,9 +166,13 @@ if __name__ == '__main__':
         'batch_size': 256,
         'standardize_outputs': True,
         'add_e0': False,
-        'save_weights_only':True,
+        'save_weights_only':False,
     }
+    return defaults
 
+if __name__ == '__main__':
+
+    defaults = get_default_dict()
     train(config=defaults)
     #train_without_wandb(config=defaults)
 

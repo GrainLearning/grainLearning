@@ -176,7 +176,7 @@ if __name__ == '__main__':
             'standardize_outputs': True}
     """
 
-    path_to_trained_model = Path('trained_models/Luisas_model')
+    path_to_trained_model = Path('trained_models/Luisas_non_conditional')
     model, train_stats, config = predict.get_pretrained_model(path_to_trained_model)
     data, _ = prepare_datasets(**config)
 

@@ -3,22 +3,22 @@ import tensorflow as tf
 import numpy as np
 from pathlib import Path
 
-from models import rnn_model
-from preprocessing import prepare_datasets
-from windows import predict_over_windows
+from .models import rnn_model
+from .preprocessing import prepare_datasets
+from .windows import predict_over_windows
 
 def get_best_run_from_sweep(entity_project_sweep_id: str):
     """
     Load the best performing model found with a weights and biases sweep.
     Also load the data splits it was trained on.
 
-    :param entity_project_sweep_id: string of form {user}/{project}/{sweep_id}
+    :param entity_project_sweep_id: string of form <user>/<project>/<sweep_id>
 
     :return:
-        model: The trained model with the lowest validation loss.
-        data: The train, val, test splits as used during training.
-        stats: Some statistics on the training set and configuration.
-        config: The configuration dictionary used to train the model.
+        - model: The trained model with the lowest validation loss.
+        - data: The train, val, test splits as used during training.
+        - stats: Some statistics on the training set and configuration.
+        - config: The configuration dictionary used to train the model.
     """
     sweep = wandb.Api().sweep(entity_project_sweep_id)
     best_run = sweep.best_run()
@@ -48,10 +48,10 @@ def get_pretrained_model(path_to_model: str):
     :param path_to_model: str or pathlib.Path to the folder where is stored.
 
     :returns:
-        model: keras model ready to use
-        train_stats: Array containing the values used to standardize the data (if config.standardize_outputs = True),
-                     and lenghts of sequences, load_features, contact_params, labels, window_size and window_step.
-        config: dictionary with the model configuration
+        - model: keras model ready to use.
+        - train_stats: Array containing the values used to standardize the data (if config.standardize_outputs = True),
+          and lenghts of sequences, load_features, contact_params, labels, window_size and window_step.
+        - config: dictionary with the model configuration
     """
     # Read config.yaml into a python dictionary equivalent to config.
     # config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
