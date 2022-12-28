@@ -92,19 +92,17 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
     'metric': {'goal': 'maximize', 'name': 'val_acc'},
     'parameters':
       {
-    	'raw_data': {'value': 'data/sequences.hdf5'},
-    	'use_windows': {'value': True},
-  		'window_size': {'values': [5, 10, 20, 30]},
-  		'window_step': {'value': 1},
-  		'conditional': {'value': True},
-  		'standardize_outputs': {'value': True},
-    	'lstm_units': {'values': [50, 100, 150, 200]},
-    	'dense_units': {'values': [20, 50, 100, 150]},
-        'batch_size': {'values': [128, 256, 512]},
-        'epochs': {'value': 2},
-        'learning_rate': {'max': 0.1, 'min': 0.0001},
-        'patience': {'value': 5},
-        'save_weights_only': {'value': False}
+      'raw_data': {'value': 'data/sequences.hdf5'},
+      'use_windows': {'value': True},
+      'window_size': {'values': [5, 10, 20, 30]},'window_step': {'value': 1},
+      'conditional': {'value': True},'standardize_outputs': {'value': True},
+      'lstm_units': {'values': [50, 100, 150, 200]},
+      'dense_units': {'values': [20, 50, 100, 150]},
+      'batch_size': {'values': [128, 256, 512]},
+      'epochs': {'value': 2},
+      'learning_rate': {'max': 0.1, 'min': 0.0001},
+      'patience': {'value': 5},
+      'save_weights_only': {'value': False}
       }
    }
    
@@ -122,12 +120,15 @@ From the command line
 '''''''''''''''''''''
 
 1. Configure your sweep:
-   In folder *sweep* you can find an example of the configuration file `example_sweep.yaml` containing the sweep configuration values and/or range of values per each hyperparameter. Here you have complete freedom to chose as many values and in which ranges wandb will search for the optimal combination.
+   
+   In folder *sweep* `example_sweep.yaml` contains the sweep configuration values and/or range of values per each hyperparameter. You can choose as many values and in which ranges wandb will search for the optimal combination.
+
    Don't forget to put your own project and entity to get the results in your wandb dashboard. For more information about how to configure the .yaml file see `this <https://docs.wandb.ai/guides/sweeps/define-sweep-configuration>`_. 
 
    .. note:: The combination of values of the parameter that wandb is going to draw for each run will override those of the `default` dictionary in `train.py`.
-2. Create a copy of this file outside grainlearning package and rnn module, in the folder where you want to run your sweep. `wandb`` folder containing the runs information an model data will be automatically created in this folder. Change ``raw_data`` value accordingly.  
-3. Create python file `my_sweep_CL.py` and in `example_sweep.yaml` set ``program: my_sweep_CL.py``.
+2. Create a copy of `example_sweep.yaml` outside grainlearning package and rnn module, in the folder where you want to run your sweep. 
+3. `wandb`` folder containing the runs information an model data will be automatically created in this folder. Change ``raw_data`` value accordingly.  
+4. Create python file `my_sweep_CL.py` and in `example_sweep.yaml` set ``program: my_sweep_CL.py``.
     
 .. _my sweep CL:
 .. code-block:: python
@@ -147,7 +148,7 @@ From the command line
 
 Running a Sweep on HPC
 ''''''''''''''''''''''
-This instructions assume that your HPC platform uses job scheduler slurm. `run_sweep.sh` configures the job and loads modules from **Snellius**, these can be different in other supercomputers.
+.. warning:: This instructions assume that your HPC platform uses job scheduler slurm. `run_sweep.sh` configures the job and loads modules from **Snellius**, these can be different in other supercomputers.
 
 1. Install grainLearning and rnn dependencies.  
 2. Create the folder containing your data, `run_sweep.sh`, file :ref:`my_sweep_CL.py <my sweep CL>` and `example_sweep.yaml`, make sure to modify the last one accordingly.

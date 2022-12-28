@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import tensorflow as tf
 
-from .windows import windowize_train_val
+from grainlearning.rnn.windows import windowize_train_val
 
 # full lists of pressures and experiment types
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']

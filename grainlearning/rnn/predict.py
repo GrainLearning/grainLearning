@@ -8,9 +8,9 @@ from pathlib import Path
 import tensorflow as tf
 import wandb
 
-from .models import rnn_model
-from .preprocessing import prepare_datasets
-from .windows import predict_over_windows
+from grainlearning.rnn.models import rnn_model
+from grainlearning.rnn.preprocessing import prepare_datasets
+from grainlearning.rnn.windows import predict_over_windows
 
 def get_best_run_from_sweep(entity_project_sweep_id: str):
     """
