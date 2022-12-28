@@ -118,7 +118,7 @@ def predict_macroscopics(
     :param batch_size: Size of batches to use.
     :param single_batch: Whether to predict only a single batch (defaults to False).
 
-    :return: predictions: Tensorflow dataset containing the predictions in original units.
+    :return: predictions: tf.Tensor containing the predictions in original units.
     """
     data = data.batch(batch_size)
     if single_batch:
@@ -133,23 +133,5 @@ def predict_macroscopics(
         mean = tf.cast(train_stats['mean'], tf.float32)
         std = tf.cast(train_stats['std'], tf.float32)
         predictions = predictions.map(lambda y: std * y + mean)
-    return predictions
 
-
-if __name__ == '__main__':
-
-    # TODO: Put these possibilitites in docs
-
-    # 1. Chossing the best model from a sweep (Aron)
-    #entity_project_sweep_id = 'apjansen/grain_sequence/xyln7qwp/'
-    #model, data, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
-
-    # 2. Chossing a model saved to trained_models folder
-    path_to_trained_model = Path('trained_models/Luisas_model')
-    model, train_stats, config = get_pretrained_model(path_to_trained_model)
-
-    # load input data for the model to predict. Here hook your load sequence, contact_params
-    data, _ = prepare_datasets(**config)
-
-    predictions = predict_macroscopics(model, data['test'], train_stats, config,
-            batch_size=256, single_batch=True)
+    return next(iter(predictions))

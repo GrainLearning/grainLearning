@@ -3,6 +3,10 @@ RNN Module
 
 We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model in tensorflow framework.
 
+The RNN model
+-------------
+
+
 The RNN takes as inputs a vector of *parameters* (i.g. contact parameters) and a sequence of size :math:`\mathcal{N}` (i.g. applied strain). The model returns a sequence of size :math:`\mathcal{N}`.
 
 There are three main usages of RNN module:
@@ -176,11 +180,68 @@ Make a prediction with a pre-trained model
 ------------------------------------------
 
 You can load a pre-trained model from:
-1. A wandb sweep: You need to have access to the sweep and know its ID.
-2. Saved models in `rnn/train_models`.
 
+- `Saved model`_. 
+- `A wandb sweep`_.
 
+Saved model
+```````````
 
+You can find some pre-trained models in in `rnn/train_models` and you can also load a model that you have trained. The function ``get_pretrained_model()`` will take care of checking if your model was trained via wandb or outside of it, as well as if only the weights were saved or the entire model.
+
+In this example, we are going to load the same dataset that we used for training, but we are going to predict from the `test` sub-dataset. Here you're free to pass any data having the same format (tf.data.Dataset) and input dimensions to the model: () 
+
+.. code-block:: python
+   :caption: predict_from_pre-trained.py
+
+   from pathlib import Path
+
+   import grainlearning.rnn.predict as predict_rnn
+   from grainlearning.rnn.preprocessing import prepare_datasets
+
+   # 1. Define the location of the model to use
+   path_to_trained_model = Path('C:/GrainLearning/grainLearning/grainlearning/rnn/trained_models/My_model_1')
+
+   # 2. Get the model information
+   model, train_stats, config = predict_rnn.get_pretrained_model(path_to_trained_model)
+
+   # 3. Load input data to predict from
+   config['raw_data'] = '../train/data/sequences.hdf5'
+   data, _ = prepare_datasets(**config)
+
+   #4. Make a prediction
+   predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
+
+If the model was trained with ``standardize_outputs = True``, ``predictions`` are going to be unstandardized (i.e. no values between [0,1] but with the original scale). 
+In our example, ``predictions`` is a tensorflow tensor of size ``(batch_size, length_sequences - window_size, 7)``.
+
+A wandb sweep
+`````````````
+You need to have access to the sweep and know its ID.
+Often this looks like `<entity>/<project>/<sweep_id>`.
+
+.. code-block:: python
+   :caption: predict_from_sweep.py
+
+   from pathlib import Path
+
+   import grainlearning.rnn.predict as predict_rnn
+   from grainlearning.rnn.preprocessing import prepare_datasets
+
+   # 1. Define which sweep to look into
+   entity_project_sweep_id = 'grainlearning-escience/grainLearning-grainlearning_rnn/6zrc0vjb'
+
+   # 2. Chose the best model from a sweep, and get the model information
+   model, data, train_stats, config = predict_rnn.get_best_run_from_sweep(entity_project_sweep_id)
+
+   # 3. Load input data to predict from
+   config['raw_data'] = '../train/data/sequences.hdf5'
+   data, _ = prepare_datasets(**config)
+
+   #4. Make a prediction
+   predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
+
+This can fail if you have deleted some runs or if your wandb folder is not present in this folder. We advise to copy `config.yaml`, `train_stats.py` and `model_best.h5` from `wandb/runXXX/files` to another location and follow `Saved model`_ instructions. These files can also be downloaded from the wandb dashboard.
 
 Use a trained RNN in grainLearning calibration process
 ------------------------------------------------------
