@@ -11,8 +11,8 @@ Data consists of:
 This example considers DEM simulations of Triaxial compressions
 at different confinments (pressures), in drain and undrained conditions.
 """
-import numpy as np
 import os, h5py
+import numpy as np
 
 CONTACT_KEYS = [
     'E',   # young's modulus  = 10^E

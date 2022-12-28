@@ -1,7 +1,12 @@
-import wandb, yaml, os
-import tensorflow as tf
+"""
+Module containing functions to load a trained RNN model and make a prediction.
+"""
+import yaml, os
+
 import numpy as np
 from pathlib import Path
+import tensorflow as tf
+import wandb
 
 from .models import rnn_model
 from .preprocessing import prepare_datasets

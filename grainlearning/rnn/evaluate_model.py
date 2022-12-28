@@ -4,8 +4,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pathlib import Path
 
-from preprocessing import prepare_datasets
-import predict as predict
+import predict
+from .preprocessing import prepare_datasets
+
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
 EXPERIMENT_TYPES = ['drained', 'undrained']

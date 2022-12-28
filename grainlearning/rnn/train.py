@@ -1,10 +1,12 @@
 """
 Script to train a model to predict macroscopic features of a DEM simulation.
 """
-import wandb, os, shutil
+import os, shutil
+
 import numpy as np
-import tensorflow as tf
 from pathlib import Path
+import tensorflow as tf
+import wandb
 
 from .models import rnn_model
 from .preprocessing import prepare_datasets
@@ -154,7 +156,7 @@ def get_default_dict():
         'raw_data': 'data/sequences.hdf5',
         'pressure': 'All',
         'experiment_type': 'All',
-        'conditional': False,
+        'conditional': True,
         'use_windows': True,
         'window_size': 10,
         'window_step': 1,
@@ -164,13 +166,6 @@ def get_default_dict():
         'batch_size': 256,
         'standardize_outputs': True,
         'add_e0': False,
-        'save_weights_only':False,
+        'save_weights_only': False,
     }
     return defaults
-
-if __name__ == '__main__':
-
-    defaults = get_default_dict()
-    train(config=defaults)
-    #train_without_wandb(config=defaults)
-
