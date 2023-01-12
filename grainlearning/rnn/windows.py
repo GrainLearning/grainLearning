@@ -29,7 +29,7 @@ def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, w
 def _windowize_single_dataset(
         data: tf.data.Dataset,
         window_size: int,
-        window_step: int,
+        window_step: int = 1,
         seed: int = 42):
     """
     Take a dataset of sequences of shape N, S, L and output another dataset
@@ -48,7 +48,7 @@ def _windowize_single_dataset(
 
     # For brevity denote load_sequence, contacts, outputs as X, c, y
     Xs, cs, ys = [], [], []
-    for end in range(window_size, sequence_length + 1):
+    for end in range(window_size, sequence_length + 1, window_step):
         input_window = load_sequences[:, end - window_size:end]
         final_output = outputs[:, end - 1]
         Xs.append(input_window)
@@ -100,7 +100,7 @@ def predict_over_windows(
 
     :return: Tensor of predicted sequences.
     """
-    def predict_windows(inputs, outputs):
+    def _predict_windows(inputs, outputs):
         predictions = [
             model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
             for end in range(window_size, sequence_length)
@@ -108,7 +108,7 @@ def predict_over_windows(
         predictions = tf.stack(predictions, axis=1)
         return predictions
 
-    return data.map(predict_windows)
+    return data.map(_predict_windows)
 
 
 def extract_tensors(data: tf.data.Dataset):
@@ -117,7 +117,7 @@ def extract_tensors(data: tf.data.Dataset):
 
     :param data: Tensorflow dataset.
 
-    :return: Tuple of numpy arrays: inputs, contacts, outputs.
+    :return: 3 numpy arrays: inputs, contacts, outputs.
     """
     inputs, contacts, outputs = [], [], []
     for _inputs, _outputs in iter(data):
