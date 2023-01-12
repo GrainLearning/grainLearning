@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pathlib import Path
 
-import grainlearning.rnn.predict
+import grainlearning.rnn.predict as predict
 from grainlearning.rnn.preprocessing import prepare_datasets
 
 
@@ -34,7 +34,6 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     predictions = predict.predict_macroscopics(model, data, train_stats, config,
                                        batch_size=256, single_batch=True)
     # extract tensors from dataset
-    predictions = next(iter(predictions))
     test_inputs, labels = next(iter(data.batch(256)))
 
     window_size = train_stats['window_size']
