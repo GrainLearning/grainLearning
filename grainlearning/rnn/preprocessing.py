@@ -20,6 +20,8 @@ def prepare_datasets(
         window_step: int = -1,
         standardize_outputs: bool = True,
         add_e0: bool = False,
+        add_pressure: bool = True,
+        add_experiment_type: bool = True,
         seed: int = 42,
         **kwargs,
         ):
@@ -38,6 +40,8 @@ def prepare_datasets(
     :param standardize_outputs: Whether to transform the training set labels
             to have zero mean and unit variance.
     :param add_e0: Whether to add the initial void ratio as a contact parameter.
+    :param add_pressure: Wheter to add the pressure to contact parameters.
+    :param add_experiment_type: Wheter to add the experiment type to contact parameters.
     :param seed: Random seed used to split the datasets.
 
     :return: Tuple (split_data, train_stats)
@@ -48,7 +52,7 @@ def prepare_datasets(
     """
     datafile = h5py.File(raw_data, 'r')
 
-    inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type)
+    inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type, add_pressure, add_experiment_type)
     if add_e0:
         contacts = _add_e0_to_contacts(contacts, inputs)
 
@@ -73,7 +77,8 @@ def prepare_datasets(
 
     return split_data, train_stats
 
-def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_type: str):
+def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_type: str,
+                    add_pressure: bool = True , add_experiment_type: bool = True):
     """
     Merge the datasets with different pressures and experiment types.
     If `pressure` or `experiment_type` is 'All'.
@@ -82,6 +87,8 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     :param datafile: h5py file containing the dataset.
     :param pressure: Experiment confining pressure, 'All' will take all pressures available.
     :param experiment_type: 'drained', 'undrained' or 'All'
+    :param add_pressure: Wheter to add the pressure to contact parameters.
+    :param add_experiment_type: Wheter to add the experiment type to contact parameters.
 
     :return: input, output and contact_params arrays merged for the given pressures and expriment_types.
     """
@@ -101,8 +108,8 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
             cps = data['contact_params'][:]
             cps = _augment_contact_params(
                     cps, pres, exp_type,
-                    pressure == 'All',
-                    experiment_type == 'All')
+                    add_pressure,
+                    add_experiment_type)
             contact_params.append(cps)
 
     input_sequences = np.concatenate(input_sequences, axis=0)
@@ -114,8 +121,10 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
 def _add_e0_to_contacts(contacts: np.array, inputs: np.array):
     """
     Add the initial void ratio e_0 as an extra contact parameter at the end.
+
     :param contacts: List of contact parameters
     :param inputs: List of input parameters
+
     :return: Modified contacts list with e_0 added at the end.
     """
     e0s = inputs[:, 0, 0]  # first element in series, 0th feature == e_0
@@ -172,15 +181,15 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     inds = np.random.permutation(np.arange(n_tot))
     i_train, i_val, i_test = inds[:n_train], inds[n_train:n_train + n_val], inds[-n_val:]
 
-    def get_split(dataset, inds):
+    def _get_split(dataset, inds):
         X = {key: tf.gather(val, inds) for key, val in dataset[0].items()}
         y = tf.gather(dataset[1], inds)
         return X, y
 
     split_data = {
-            'train': get_split(dataset, i_train),
-            'val': get_split(dataset, i_val),
-            'test': get_split(dataset, i_test),
+            'train': _get_split(dataset, i_train),
+            'val': _get_split(dataset, i_val),
+            'test': _get_split(dataset, i_test),
             }
     return split_data
 
