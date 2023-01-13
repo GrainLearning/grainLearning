@@ -4,13 +4,12 @@ import tensorflow as tf
 
 from grainlearning.rnn.windows import windowize_train_val
 
-# full lists of pressures and experiment types
-PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
+# full list of experiment types
 EXPERIMENT_TYPES = ['drained', 'undrained']
 
 def prepare_datasets(
         raw_data: str,
-        pressure: str = '0.2e6',
+        pressure: str = 'All',
         experiment_type: str = 'drained',
         train_frac: float = 0.7,
         val_frac: float = 0.15,
@@ -29,7 +28,7 @@ def prepare_datasets(
     Convert raw data into preprocessed split datasets.
 
     :param raw_data: Path to hdf5 file containing the data.
-    :param pressure: Experiment confining Pressure as a string in format '0.xe6' or 'All'.
+    :param pressure: Experiment confining Pressure as a string in format 'x.ye6' or 'All'.
     :param experiment_type: Either 'drained', 'undrained' or 'All'.
     :param train_frac: Fraction of data used in the training set.
     :param val_frac: Fraction of the data used in the validation set.
@@ -92,7 +91,7 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
 
     :return: input, output and contact_params arrays merged for the given pressures and expriment_types.
     """
-    if pressure == 'All': pressures = PRESSURES
+    if pressure == 'All': pressures = list(datafile.keys()) # this considers pressure as the first group of the dataset.
     else: pressures = [pressure]
 
     if experiment_type == 'All': experiment_types = EXPERIMENT_TYPES
@@ -169,7 +168,7 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     :param dataset: Full dataset to split on, in form of a tuple (inputs, outputs),
             where inputs is a dictionary and its keys and the outputs are numpy arrays.
     :param train_frac: Fraction of data used for training set.
-    :param val_frac: Fraction of data used for validation set.
+    :param val_frac: Fraction of data used for validation set. Test fraction is the remaining.
     :param seed: Random seed used to make the split.
     :return: Dictionary containing 'train', 'val', and 'test' datasets.
     """
@@ -179,7 +178,7 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
 
     np.random.seed(seed=seed)
     inds = np.random.permutation(np.arange(n_tot))
-    i_train, i_val, i_test = inds[:n_train], inds[n_train:n_train + n_val], inds[-n_val:]
+    i_train, i_val, i_test = inds[:n_train], inds[n_train:n_train + n_val], inds[n_train + n_val:]
 
     def _get_split(dataset, inds):
         X = {key: tf.gather(val, inds) for key, val in dataset[0].items()}
