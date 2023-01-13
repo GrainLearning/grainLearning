@@ -77,7 +77,7 @@ def convert_all_to_hdf5(
     with h5py.File(target_file, 'a') as f:
         f.attrs['inputs'] = INPUT_KEYS
         f.attrs['outputs'] = OUTPUT_KEYS
-        f.attrs['contact_params'] = CONTACT_KEYS + ['e_0']
+        f.attrs['contact_params'] = CONTACT_KEYS
         f.attrs['unused_keys_sequence'] = UNUSED_KEYS_SEQUENCE
         f.attrs['unused_keys_constant'] = UNUSED_KEYS_CONSTANT
 
@@ -126,14 +126,11 @@ def convert_to_arrays(
     scalings = {key: 1. for key in OUTPUT_KEYS}
     scalings['p'] = scalings['q'] = 1.e6
 
-    contact_list = []
-    inputs_list = []
-    outputs_list = []
-    other_lengths = []
+    contact_list, inputs_list, outputs_list, other_lengths = ([] for i in range(4))
     for f in file_names:
         try:
             sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
-        except IOError:
+        except:
             print('IOError', f, pressure)
             continue
         # test if sequence is of full length
