@@ -89,7 +89,7 @@ def train_without_wandb(config=None):
 
     # set up the model
     model = rnn_model(train_stats, **config)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=config["learning_rate"])
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config["learning_rate"], **config)
     model.compile(
             optimizer=optimizer,
             loss='mse',

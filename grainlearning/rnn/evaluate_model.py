@@ -50,7 +50,9 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     fig, ax = plt.subplots(3, 3, figsize=(20, 20))
     ids = {'e': 0, 'f_0': 3, 'a_c': 4, 'a_n': 5, 'a_t': 6, 'p': 1, 'q': 2}
     label_combination_inv = "$\\frac{q}{p} - \\frac{2}{5} (a_c + a_n + \\frac{3}{2} a_t)$"
-    representative_idxs = _find_representatives(test_inputs)
+
+    add_e0 = config['add_e0'] if 'add_e0' in config else False
+    representative_idxs = _find_representatives(test_inputs, add_e0)
 
     def _plot_sequence(i, j, y_key, i_s=0, x_key='steps', color='blue'):
         if x_key == 'steps':
@@ -122,12 +124,17 @@ def _extract_q_over_p(data, ids, i_s=0):
     p = data[i_s, :, ids['p']]
     return q / p
 
-def _find_representatives(input_data):
+def _find_representatives(input_data, add_e0):
     """
     Return a list of indices indicating samples each combination of pressure and experiment type.
     """
+    global P_INDEX, E_INDEX
+
     representatives = []
     contact_params = input_data['contact_parameters']
+    if add_e0:
+        P_INDEX -= 1
+        E_INDEX -= 1
 
     for pressure in PRESSURES:
         for experiment_type in EXPERIMENT_TYPES:

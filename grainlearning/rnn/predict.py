@@ -61,13 +61,18 @@ def get_pretrained_model(path_to_model: str):
     # Read config.yaml into a python dictionary equivalent to config.
     # config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
     path_to_model = Path(path_to_model)
-    if os.path.exists(path_to_model / 'config.yaml'): # Model has been trained using wandb
-        file = open(path_to_model / 'config.yaml', 'r')
+    if os.path.exists(path_to_model / 'config.yaml') or os.path.exists(path_to_model / 'config.yml'): # Model has been trained using wandb
+
+        if os.path.exists(path_to_model / 'config.yaml'): file = open(path_to_model / 'config.yaml', 'r')
+        else: file = open(path_to_model / 'config.yml', 'r')
+
         config = yaml.load(file, Loader=yaml.FullLoader)
         del config['wandb_version']; del config['_wandb']
+
         for key in config.keys():
             del config[key]['desc']
             config[key] = config[key]['value']
+
     elif os.path.exists(path_to_model / 'config.npy'): # Model has been trained without wandb and config saved as .npy
         config = np.load(path_to_model / 'config.npy', allow_pickle=True).item()
     elif os.path.exists(path_to_model / 'config.h5'): # Model has been trained without wandb and config saved as .h5
@@ -89,11 +94,9 @@ def get_pretrained_model(path_to_model: str):
 
     elif os.path.exists(path_to_model / 'save_model.pb'): # Model has been saved directly using tf.keras
         model = tf.keras.model.load_model(path_to_model)
-
     elif os.path.exists(path_to_model / 'weights.h5'): # Model's weights have been saved directly using tf.keras
         model = rnn_model(train_stats, **config)
         model.load_weights(path_to_model / 'weights.h5')
-
     else: raise FileNotFoundError("Couldnt find a model to load")
 
     return model, train_stats, config
