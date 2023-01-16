@@ -4,8 +4,6 @@ import tensorflow as tf
 
 from grainlearning.rnn.windows import windowize_train_val
 
-# full list of experiment types
-EXPERIMENT_TYPES = ['drained', 'undrained']
 
 def prepare_datasets(
         raw_data: str,
@@ -94,11 +92,13 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     if pressure == 'All': pressures = list(datafile.keys()) # this considers pressure as the first group of the dataset.
     else: pressures = [pressure]
 
-    if experiment_type == 'All': experiment_types = EXPERIMENT_TYPES
-    else: experiment_types = [experiment_type]
+
 
     input_sequences,output_sequences,contact_params = ([] for _ in range(3))
     for pres in pressures:
+        if experiment_type == 'All': experiment_types = list(datafile[pres].keys())
+        else: experiment_types = [experiment_type]
+
         for exp_type in experiment_types:
             data = datafile[pres][exp_type]
             input_sequences.append(data['inputs'][:])
