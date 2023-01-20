@@ -156,7 +156,10 @@ def get_default_dict():
 
       * `'use_windows'`: At the moment the model only works if windows are considered.
       * `'window_size'`: int, number of steps composing a window.
+      * `'window_step'`: int, number of steps between consecutive windows (default = 1).
       * `'pad_length'`: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
+      * `'lstm_units'`: int, number of neurons or units in LSTM layer.
+      * `'dense_units'`: int, number of neurons or units of dense layer.
 
     * Training procedure
 
@@ -176,21 +179,23 @@ def get_default_dict():
         'raw_data': 'data/sequences.hdf5',
         'pressure': 'All',
         'experiment_type': 'All',
+        'add_e0': False,
+        'add_pressure': True,
+        'add_experiment_type': True,
+        'train_frac': 0.7,
+        'val_frac': 0.15,
         'conditional': True,
         'use_windows': True,
         'window_size': 10,
         'window_step': 1,
         'pad_length': 0,
+        'lstm_units': 200,
+        'dense_units': 200,
         'patience': 5,
         'epochs': 100,
         'learning_rate': 1e-3,
         'batch_size': 256,
-        'train_frac': 0.7,
-        'val_frac': 0.15,
         'standardize_outputs': True,
-        'add_e0': False,
-        'add_pressure': True,
-        'add_experiment_type': True,
         'save_weights_only': False
     }
 
