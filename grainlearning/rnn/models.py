@@ -22,11 +22,11 @@ def rnn_model(
     Takes in a load sequence and contact parameters, and outputs the macroscopic responses.
     Default settings are based on Ma et al. and simply concatenate the contact parameters
     to the load sequence.
-    This can be changed into a conditional RNN by setting `conditional=True`.
+    This can be changed into a conditional RNN by setting ``conditional=True``.
     In that case, contact parameters are used to intialize the hidden state of the LSTM.
 
-    :param input_shapes: Dictionary containing 'num_load_features', 'num_contact_params',
-        'num_labels'.
+    :param input_shapes: Dictionary containing `'num_load_features'`, `'num_contact_params'`,
+        `'num_labels'`.
     :param window_size: Length of time window.
     :param lstm_units: Number of units of the hidden state of the LSTM.
     :param dense_units: Number of units used in the dense layer after the LSTM.

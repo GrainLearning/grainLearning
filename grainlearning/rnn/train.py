@@ -1,7 +1,7 @@
 """
 Script to train a model to predict macroscopic features of a DEM simulation.
 """
-import os, shutil
+import os, shutil, warnings
 
 import numpy as np
 from pathlib import Path
@@ -17,12 +17,13 @@ def train(config=None):
 
     :param config: dictionary containing model and training configurations.
 
-    If called in the framewrok of a sweep:
+    If called in the framework of a sweep:
     A sweep can be created from the command line using a configuration file,
     for example `example_sweep.yaml`, as: ``wandb sweep example_sweep.yaml``
     And run with the line shown subsequently in the terminal.
     The config is loaded from the yaml file.
     """
+    config = _check_config(config)
     with wandb.init(config=config):
         config = wandb.config
 
@@ -32,7 +33,7 @@ def train(config=None):
 
         # set up the model
         model = rnn_model(train_stats, **config)
-        optimizer = tf.keras.optimizers.Adam(learning_rate=config.learning_rate)
+        optimizer = tf.keras.optimizers.Adam(**_get_optimizer_config(config))
         model.compile(
                 optimizer=optimizer,
                 loss='mse',
@@ -72,6 +73,7 @@ def train_without_wandb(config=None):
 
     :param config: dictionary containing taining hyperparameters and some model parameters
     """
+    config = _check_config(config)
     path_save_data = Path('outputs')
     if os.path.exists(path_save_data):
         delete_outputs = input(f"The contents of {path_save_data} will be permanently deleted,\
@@ -80,6 +82,7 @@ def train_without_wandb(config=None):
         else:
             print("Cancelling training")
             return
+
     os.mkdir(path_save_data)
 
     # preprocess data
@@ -89,7 +92,7 @@ def train_without_wandb(config=None):
 
     # set up the model
     model = rnn_model(train_stats, **config)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=config["learning_rate"], **config)
+    optimizer = tf.keras.optimizers.Adam(**_get_optimizer_config(config))
     model.compile(
             optimizer=optimizer,
             loss='mse',
@@ -124,35 +127,52 @@ def train_without_wandb(config=None):
         )
 
 def get_default_dict():
-    """Returns a dictionary with default values for the configuration of
+    """
+    Returns a dictionary with default values for the configuration of data preparation,
     RNN model and training procedure. Possible fields are:
 
+    * Data preparation
+
+      * `'raw_data'`: Path to hdf5 file generated using parse_data_YADE.py
+      * `'pressure'` and `'experiment_type'`: Name of the subfield of dataset to consider. It can also be 'All'.
+      * `'standardize_outputs'`: If True transform the data labels to have zero mean and unit variance.
+        Also, in train_stats the mean and variance of each label will be stored,
+        so that can be used to transform predicitons.
+        (This is very usful if the labels are not between [0,1])
+      * `'add_e0'`: Whether to add the initial void ratio (output) as a contact parameter.
+      * `'add_pressure'`: Wether to add the pressure to contact_parameters.
+      * `'add_experiment_type'`: Wether to add the experiment type to contact_parameters.
+      * `'train_frac'`: Fraction of the data used for training, between [0,1].
+      * `'val_frac'`: Fraction of the data used for validation, between [0,1].
+        The fraction of the data used for test is then ``1 - train_frac - val_frac``.
+
     * RNN model
-        - 'raw_data': Path to hdf5 file generated using parse_data_YADE.py
-        - 'pressure' and 'experiment_type': Name of the subfield of dataset to consider. It can also be 'All'.
-        - 'conditional':
-         - True: Create a conditional RNN. The contact parameters vector doesn't have
-           to be copied multiple times into the strain sequence.
-         - False: Concatenate copies of contact_params to each one of the inputs steps.
-        - 'use_windows': At the moment the model only works if windows are considered.
-        - 'window_size': int, number of steps composing a window.
+
+      * `'conditional'`:
+
+        * True: Create a conditional RNN. The contact parameters vector doesn't have
+          to be copied multiple times into the strain sequence.
+        * False: Concatenate copies of contact_params to each one of the inputs steps.
+
+      * `'use_windows'`: At the moment the model only works if windows are considered.
+      * `'window_size'`: int, number of steps composing a window.
+      * `'pad_length'`: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
 
     * Training procedure
-        - 'patience': patience of `tf.keras.callbacks.EarlyStopping`.
-        - 'epochs': Maximum number of epochs.
-        - 'learning_rate': double, learning_rate of `tf.keras.optimizers.Adam`.
-        - 'batch_size': Size of the data batches per training step.
-        - 'standardize_outputs': If True transform the data labels to have zero mean and unit variance.
-          Also, in train_stats the mean and variance of each label will be stored,
-          so that can be used to transform predicitons.
-          (This is very usful if the labels are not between [0,1])
-        - 'add_e0': Whether to add the initial void ratio (output) as a contact parameter.
-        - 'save_weights_only':
-         * True: Only the weights will be saved.
-         * False: The whole model will be saved **(Recommended)**.
 
+      * `'patience'`: patience of `tf.keras.callbacks.EarlyStopping`.
+      * `'epochs'`: Maximum number of epochs.
+      * `'learning_rate'`: double, learning_rate of `tf.keras.optimizers.Adam`.
+      * `'batch_size'`: Size of the data batches per training step.
+      * `'save_weights_only'`:
+
+        * True: Only the weights will be saved.
+        * False: The whole model will be saved **(Recommended)**.
+
+
+    :return: Dictionary containing default values of the arguments that the user can set.
     """
-    defaults = {
+    return {
         'raw_data': 'data/sequences.hdf5',
         'pressure': 'All',
         'experiment_type': 'All',
@@ -160,12 +180,69 @@ def get_default_dict():
         'use_windows': True,
         'window_size': 10,
         'window_step': 1,
-        'patience': 50,
-        'epochs': 2,
+        'pad_length': 0,
+        'patience': 5,
+        'epochs': 100,
         'learning_rate': 1e-3,
         'batch_size': 256,
+        'train_frac': 0.7,
+        'val_frac': 0.15,
         'standardize_outputs': True,
         'add_e0': False,
-        'save_weights_only': False,
+        'add_pressure': True,
+        'add_experiment_type': True,
+        'save_weights_only': False
     }
-    return defaults
+
+def _check_config(config):
+    """
+    Checks that values requiring an input from the user would be specified in config.
+    :param config: Dictionary containing the values of different arguments.
+    :return: Updated config dictionary.
+    """
+    # Necessary keys
+    if not 'raw_data' in config.keys():
+        raise ValueError("raw_data has not been defined in config")
+
+    # Warning that defaults would be used if not defined.
+    # Adding the default to config because is required in other functions.
+    keys_to_check = ['window_size', 'save_weights_only', 'batch_size', 'epochs', 'learning_rate', 'patience']
+    defaults = get_default_dict()
+    for key in keys_to_check:
+        config = _warning_config_field(key, config, defaults[key], add_default_to_config=True)
+
+    # Warning that defaults would be used if not defined
+    keys_to_check = ['pressure', 'experiment_type', 'standardize_outputs', 'add_e0',
+                     'pad_length', 'train_frac', 'val_frac', 'add_pressure', 'add_experiment_type']
+    for key in keys_to_check:
+        _warning_config_field(key, config, defaults[key])
+
+    # Warning for an unexpected key value
+    for key in config.keys():
+        if key not in defaults:
+            warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
+
+    return config
+
+def _warning_config_field(key, config, default, add_default_to_config=False):
+    """
+    Raises a warning if key is not included in config dictionary.
+    Also informs the default value that will be used.
+    If add_default_to_config=True, then it adds the key and its default value to config.
+    """
+    if not key in config.keys():
+        if add_default_to_config: config[key] = default
+        warnings.warn(f"No {key} specified in config, using default {default}.")
+
+    return config
+
+def _get_optimizer_config(config):
+
+    config_optimizer = dict()
+    keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
+    for key in config.keys():
+        if key in keys_optimizer and not (key == 'self' or key == 'kwargs' or key == 'name'):
+            config_optimizer[key] = config[key]
+
+    return config_optimizer
+

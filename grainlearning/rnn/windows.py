@@ -7,7 +7,7 @@ def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, w
     Convert sequences into windows of given length. Leave test set untouched.
     Adds window_size and window_step to train_stats.
 
-    :param split_data: Dictionary with keys 'train', 'val', 'test' pointing to
+    :param split_data: Dictionary with keys `'train'`, `'val'`, `'test'` pointing to
             tensorflow datasets.
     :param train_stats: Dictionary storing statistics of the training data.
     :param window_size: Number of timesteps to include in a window.
@@ -33,7 +33,7 @@ def _windowize_single_dataset(
         seed: int = 42):
     """
     Take a dataset of sequences of shape N, S, L and output another dataset
-    of shorter sequences of size `window_size`, taken at intervals `window_step`
+    of shorter sequences of size ``window_size``, taken at intervals ``window_step``
     so of shape M, window_size, L, with M >> N.
     Also shuffle the data.
 
@@ -93,7 +93,7 @@ def predict_over_windows(
     Note the length of the output sequence will be shorter by the window_size than
     the input sequence.
 
-    :param data: Dictionary of data containing 'load_sequence' and 'contact_parameters'.
+    :param data: Dictionary of data containing `'load_sequence'` and `'contact_parameters'`.
     :param model: The model to predict with.
     :param window_size: Number of timesteps in a single window.
     :param sequence_length: Number of timesteps in a full sequence.

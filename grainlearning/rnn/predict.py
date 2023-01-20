@@ -77,7 +77,7 @@ def get_pretrained_model(path_to_model: str):
         config = np.load(path_to_model / 'config.npy', allow_pickle=True).item()
     elif os.path.exists(path_to_model / 'config.h5'): # Model has been trained without wandb and config saved as .h5
         config = h5py.File(path_to_model / 'config.h5', 'r')
-    else: raise FileNotFoundError('config was not found we tried formats (.yaml, .npy, .h5)')
+    else: raise FileNotFoundError('config was not found we tried formats (.yaml, .yml, .npy, .h5)')
 
     # Load train_stats
     if os.path.exists(path_to_model / 'train_stats.npy'):
@@ -116,7 +116,7 @@ def predict_macroscopics(
 
     :param model: Keras RNN model
     :param data: Tensorflow dataset containing 'load_sequence' and 'contact_parameters' inputs.
-    :param train_stats: Dictionary containing statistics of the trainingset.
+    :param train_stats: Dictionary containing statistics of the training set.
     :param config: Dictionary containing the configuration with which the model was trained.
     :param batch_size: Size of batches to use.
     :param single_batch: Whether to predict only a single batch (defaults to False).
@@ -126,6 +126,17 @@ def predict_macroscopics(
     data = data.batch(batch_size)
     if single_batch:
         data = tf.data.Dataset.from_tensor_slices(next(iter(data))).batch(batch_size)
+
+    # Check that input sizes of data correspond to those of the pre-trained model
+    inputs, labels = next(iter(data))
+    if not inputs['load_sequence'].shape[2] == train_stats['num_load_features']:
+        raise ValueError(f"Number of elements in load_sequence of data does not match the model load_sequence shape. \
+            Got {inputs['load_sequence'].shape[2]}, expected {train_stats['num_load_features']}.")
+
+    if not inputs['contact_parameters'].shape[1] == train_stats['num_contact_params']:
+        raise ValueError(f"Number of elements in contact_parameters of data does not match the model \
+            contact_parameters shape. \
+            Got {inputs['contact_parameters'].shape[2]}, expected {train_stats['num_contact_params']}.")
 
     if config['use_windows']:
         predictions = predict_over_windows(data, model, config['window_size'], train_stats['sequence_length'])
