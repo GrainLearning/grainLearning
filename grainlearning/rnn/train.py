@@ -23,9 +23,9 @@ def train(config=None):
     And run with the line shown subsequently in the terminal.
     The config is loaded from the yaml file.
     """
-    config = _check_config(config)
     with wandb.init(config=config):
         config = wandb.config
+        config = _check_config(config)
 
         # preprocess data
         split_data, train_stats = prepare_datasets(**config)
@@ -218,8 +218,9 @@ def _check_config(config):
         _warning_config_field(key, config, defaults[key])
 
     # Warning for an unexpected key value
+    config_optimizer = _get_optimizer_config(config)
     for key in config.keys():
-        if key not in defaults:
+        if key not in defaults and key not in config_optimizer.keys():
             warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
 
     return config

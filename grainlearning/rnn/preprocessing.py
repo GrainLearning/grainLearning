@@ -8,7 +8,7 @@ from grainlearning.rnn.windows import windowize_train_val
 def prepare_datasets(
         raw_data: str,
         pressure: str = 'All',
-        experiment_type: str = 'drained',
+        experiment_type: str = 'All',
         train_frac: float = 0.7,
         val_frac: float = 0.15,
         pad_length: int = 0,
@@ -26,8 +26,8 @@ def prepare_datasets(
     Convert raw data into preprocessed split datasets.
 
     :param raw_data: Path to hdf5 file containing the data.
-    :param pressure: Experiment confining Pressure as a string in format 'x.ye6' or 'All'.
-    :param experiment_type: Either 'drained', 'undrained' or 'All'.
+    :param pressure: Experiment confining Pressure as a string or `'All'`.
+    :param experiment_type: Either `'drained'`, `'undrained'` or `'All'`.
     :param train_frac: Fraction of data used in the training set.
     :param val_frac: Fraction of the data used in the validation set.
     :param pad_length: Amount by which to pad the sequences from the start.
@@ -35,17 +35,20 @@ def prepare_datasets(
     :param window_size: Number of timesteps to include in a window.
     :param window_step: Offset between subsequent windows.
     :param standardize_outputs: Whether to transform the training set labels
-            to have zero mean and unit variance.
+                                to have zero mean and unit variance.
     :param add_e0: Whether to add the initial void ratio as a contact parameter.
     :param add_pressure: Wheter to add the pressure to contact parameters.
     :param add_experiment_type: Wheter to add the experiment type to contact parameters.
     :param seed: Random seed used to split the datasets.
 
     :return: Tuple (split_data, train_stats)
-        split_data: Dictionary with keys 'train', 'val', 'test', and values the
-        corresponding tensorflow Datasets.
-        train_stats: Dictionary containing the shape of the data, and
-        'mean' and 'std' of the training set, in case `standardize_outputs` is True.
+
+            * ``split_data``: Dictionary with keys `'train'`, `'val'`, `'test'`, and values the
+              corresponding tensorflow Datasets.
+
+            * ``train_stats``: Dictionary containing the shape of the data:
+              ``sequence_length``, ``num_load_features``, ``num_contact_params``, ``num_labels``,
+              and `'mean'` and `'std'` of the training set, in case ``standardize_outputs`` is True.
     """
     datafile = h5py.File(raw_data, 'r')
 
@@ -78,12 +81,12 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
                     add_pressure: bool = True , add_experiment_type: bool = True):
     """
     Merge the datasets with different pressures and experiment types.
-    If `pressure` or `experiment_type` is 'All'.
+    If ``pressure`` or ``experiment_type`` is `'All'`.
     Otherwise just return the inputs, outputs and contact_params for the given pressure and experimen_type.
 
     :param datafile: h5py file containing the dataset.
-    :param pressure: Experiment confining pressure, 'All' will take all pressures available.
-    :param experiment_type: 'drained', 'undrained' or 'All'
+    :param pressure: Experiment confining pressure, `'All'` will take all pressures available.
+    :param experiment_type: `'drained'`, `'undrained'` or `'All'`.
     :param add_pressure: Wheter to add the pressure to contact parameters.
     :param add_experiment_type: Wheter to add the experiment type to contact parameters.
 
@@ -91,8 +94,6 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     """
     if pressure == 'All': pressures = list(datafile.keys()) # this considers pressure as the first group of the dataset.
     else: pressures = [pressure]
-
-
 
     input_sequences,output_sequences,contact_params = ([] for _ in range(3))
     for pres in pressures:
@@ -142,7 +143,7 @@ def _augment_contact_params(
     :param contact_params: Array containing contact parameters for all the
             samples with the given pressure and experiment type
     :param pressure: The corresponding pressure.
-    :param experiment_type: The corresponding experiment type, 'drained' or 'undrained'.
+    :param experiment_type: The corresponding experiment type, `'drained'` or `'undrained'`.
     :param add_pressure: Whether to add pressure to contact parameters.
     :param add_type: Whether to add experiment type to contact parameters.
 
@@ -170,7 +171,7 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     :param train_frac: Fraction of data used for training set.
     :param val_frac: Fraction of data used for validation set. Test fraction is the remaining.
     :param seed: Random seed used to make the split.
-    :return: Dictionary containing 'train', 'val', and 'test' datasets.
+    :return: Dictionary containing `'train'`, `'val'`, and `'test'` datasets.
     """
     n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
@@ -213,12 +214,12 @@ def _standardize_outputs(split_data):
 
 def _pad_initial(array: np.array, pad_length: int, axis=1):
     """
-    Add `pad_length` copies of the initial state in the sequence to the start.
+    Add ``pad_length`` copies of the initial state in the sequence to the start.
     This is used to be able to predict also the first timestep from a window
     of the same size.
 
     :param array: Array that is going to be modified
-    :param pad_lenght: number of copies of the initial state to be added at the beggining of `array`.
+    :param pad_lenght: number of copies of the initial state to be added at the beggining of ``array``.
 
     :return: Modified array
     """
