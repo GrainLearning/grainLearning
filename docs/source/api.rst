@@ -51,7 +51,7 @@ Python API
 data parsing
 ++++++++++++
 
-.. automodule:: grainlearning.rnn.data_parsing.parse_data_YADE
+.. automodule:: grainlearning.rnn.data_parsing.triaxial_YADE
     :members:
     :show-inheritance:
     :inherited-members:

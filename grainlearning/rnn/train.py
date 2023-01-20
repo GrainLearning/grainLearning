@@ -11,6 +11,7 @@ import wandb
 from grainlearning.rnn.models import rnn_model
 from grainlearning.rnn.preprocessing import prepare_datasets
 
+
 def train(config=None):
     """
     Train a model and report to weights and biases.
@@ -65,6 +66,7 @@ def train(config=None):
                 validation_data=split_data['val'],
                 callbacks=callbacks,
             )
+
 
 def train_without_wandb(config=None):
     """
@@ -125,6 +127,7 @@ def train_without_wandb(config=None):
             validation_data=split_data['val'],
             callbacks=callbacks,
         )
+
 
 def get_default_dict():
     """
@@ -199,6 +202,7 @@ def get_default_dict():
         'save_weights_only': False
     }
 
+
 def _check_config(config):
     """
     Checks that values requiring an input from the user would be specified in config.
@@ -206,8 +210,7 @@ def _check_config(config):
     :return: Updated config dictionary.
     """
     # Necessary keys
-    if not 'raw_data' in config.keys():
-        raise ValueError("raw_data has not been defined in config")
+    if not 'raw_data' in config.keys(): raise ValueError("raw_data has not been defined in config")
 
     # Warning that defaults would be used if not defined.
     # Adding the default to config because is required in other functions.
@@ -230,20 +233,32 @@ def _check_config(config):
 
     return config
 
+
 def _warning_config_field(key, config, default, add_default_to_config=False):
     """
     Raises a warning if key is not included in config dictionary.
     Also informs the default value that will be used.
     If add_default_to_config=True, then it adds the key and its default value to config.
     """
+    # customized warning to print -only- the warning message
+    def _custom_format_warning(msg, *args, **kwargs):
+        return str(msg) + '\n' # ignore everything except the message
+
+    warnings.formatwarning = _custom_format_warning
+
     if not key in config.keys():
         if add_default_to_config: config[key] = default
         warnings.warn(f"No {key} specified in config, using default {default}.")
 
     return config
 
-def _get_optimizer_config(config):
 
+def _get_optimizer_config(config):
+    """
+    Returns a dictionary with the keys and values of the intersection
+    between config and possible parameters of the optimizer.
+    :param config: Dictionary containing the values of different arguments.
+    """
     config_optimizer = dict()
     keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
     for key in config.keys():

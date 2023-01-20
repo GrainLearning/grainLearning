@@ -1,41 +1,69 @@
 RNN Module
 ==========
 
-We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model in tensorflow framework.
+We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model in the tensorflow framework. For more information about the model go to section `The RNN model`_.
 
-The RNN model
--------------
-
-
-The RNN takes as inputs a vector of *parameters* (i.g. contact parameters) and a sequence of size :math:`\mathcal{N}` (i.g. applied strain). The model returns a sequence of size :math:`\mathcal{N}`.
-
-There are three main usages of RNN module:
+There are four main usages of RNN module:
 
 1. `Train a RNN with your own data`_.
 2. `Make a prediction with a pre-trained model`_.
 3. `Use a trained RNN in grainLearning calibration process`_.
 4. Train a RNN model during the grainLearning calibration process.
-
+   
 Train a RNN with your own data
 ------------------------------
 
-Get your data
-`````````````
-The RNN model of this module considers a specific data format and organization. Our example of data consists of several DEM simulations of Triaxial Compressions of samples having different contact parameters. Such simulations were performed using `YADE <http://yade-dem.org/>`_ that outputs the simulation state to a .npy file every given amount of time steps.
+Get your data to our format
+```````````````````````````
+The RNN model of this module considers a specific data format and organization. Our example of data consists of several DEM simulations of Triaxial Compressions of samples having different contact parameters. Such simulations were performed using `YADE <http://yade-dem.org/>`_ that outputs the simulation state to a .npy file every given amount of time steps. The files are stored under the folder structure pressure/experiment_type.
 
-* Run `rnn/data_parsing/parse_data_YADE.py` to read the .npy files in ``data_dir`` and create ``target_file`` with format hdf5. The ``target_file`` can be placed to folder `rnn/data`.
+* Run `rnn/data_parsing/triaxial_YADE.py` to read the .npy files in ``data_dir`` and create ``target_file`` with format hdf5.
    
-* ``pressures`` and ``experiment_types`` are subfolders of our database and they will become fields in ``target_file``. For more information about the parameters take a look at the API documentation. TODO
+* ``pressures`` and ``experiment_types`` are subfolders of our database and they will become fields in ``target_file``. For more information about the parameters take a look at the dataset attributes API documentation [TODO] . This information will also be stored as :ref:`dataset attributes <linkDatasetAttributes>`.
 
 * If your data comes from another software or is stored differently please write your own parser such that the format of ``target_file`` has the same structure as the one given as example.
 
-* Finally, copy or move the generated hdf5 file to the folder `rnn/data`, if it is not already there.
+Structure of the generated hdf5 file
+::::::::::::::::::::::::::::::::::::
+* **Database groups**
+  
+  The data is organized in `HDF5 groups <https://docs.h5py.org/en/stable/high/group.html>`_ with the following hierarchy:
 
-Configuration of your model and training procedure
-``````````````````````````````````````````````````
+.. code-block:: bash
 
-In the main function of `train.py` there is a dictionary `defaults` containing several values that configure the model and training procedure. We encourage you to define them all, otherwise default values defined in each function will be used.
-Check these API docs to understand the meaning of each entry. TODO
+   |-- triaxial_compression.hdf5  # root
+       |-- pressure               # confinement pressure
+           |-- experiment_type    # drained/undrained
+               |-- contact_params # dataset: no subgroup
+               |-- inputs         # dataset: no subgroup
+               |-- outputs        # dataset: no subgroup
+  
+You can access groups and datasets:
+
+.. code-block:: python
+
+   >>> import h5py
+   >>> your_hdf5_file_loaded_in_python = h5py.File('triaxial_compression.hdf5', 'r')
+   >>> contact_params = your_hdf5_file_loaded_in_python['0.2e6/drained/contact_params'] # HDF5 dataset
+   >>> contact_params = your_hdf5_file_loaded_in_python['0.2e6']['drained']['contact_params'] # HDF5 dataset, equivalent to the line above
+   >>> list(contact_params) # convert it to a python list
+   >>> contact_params[:]    # equivalent code to the line above
+
+
+* **Dataset attributes**
+
+  `Attributes <https://docs.h5py.org/en/stable/high/attr.html>`_ are self-explanatory strings of the meaning of each field in a dataset.
+
+.. _linkDatasetAttributes:
+.. code-block:: python
+
+   >>> import h5py
+   >>> your_hdf5_file_loaded_in_python = h5py.File('triaxial_compression.hdf5', 'r')
+   >>> attributes = your_hdf5_file_loaded_in_python.attrs
+   >>> attributes.keys()
+   >>> <KeysViewHDF5 ['contact_params', 'inputs', 'outputs', 'unused_keys_constant', 'unused_keys_sequence']>
+   >>> attributes['contact_params']
+   >>> array(['E', 'v', 'kr', 'eta', 'mu'], dtype=object)
 
 **Option 1:** Train using wandb
 ```````````````````````````````
@@ -173,7 +201,7 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
 
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_train.py``
 
-The folder `outputs` is created and contains `config.npy`, `train_Stats.npy` and  either `saved_model.pb` or `weights.h5` depending if you choose to save the entire model or only its weights. The contents of this directory will be necessary to load the trained model in the future.
+The folder `outputs` is created containing `config.npy`, `train_stats.npy` and  either `saved_model.pb` or `weights.h5` depending if you choose to save the entire model or only its weights. The contents of this directory will be necessary to load the trained model in the future.
 
 .. warning:: Every time you run a new experiment  the files in `outputs` will be override. If you want to save them, copy them to another location once the run is finished.
   
@@ -190,7 +218,7 @@ Saved model
 
 You can find some pre-trained models in in `rnn/train_models` and you can also load a model that you have trained. The function ``get_pretrained_model()`` will take care of checking if your model was trained via wandb or outside of it, as well as if only the weights were saved or the entire model.
 
-In this example, we are going to load the same dataset that we used for training, but we are going to predict from the `test` sub-dataset. Here you're free to pass any data having the same format (tf.data.Dataset) and input dimensions to the model: () 
+In this example, we are going to load the same dataset that we used for training, but we are going to predict from the `test` sub-dataset. Here you're free to pass any data having the same format (tf.data.Dataset) and respecting the input dimensions of the model: 
 
 .. code-block:: python
    :caption: predict_from_pre-trained.py
@@ -214,7 +242,7 @@ In this example, we are going to load the same dataset that we used for training
    predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
 
 If the model was trained with ``standardize_outputs = True``, ``predictions`` are going to be unstandardized (i.e. no values between [0,1] but with the original scale). 
-In our example, ``predictions`` is a tensorflow tensor of size ``(batch_size, length_sequences - window_size, 7)``.
+In our example, ``predictions`` is a tensorflow tensor of size ``(batch_size, length_sequences - window_size, num_labels)``.
 
 A wandb sweep
 `````````````
@@ -246,3 +274,49 @@ This can fail if you have deleted some runs or if your wandb folder is not prese
 
 Use a trained RNN in grainLearning calibration process
 ------------------------------------------------------
+
+The RNN model
+-------------
+
+The RNN model is a Neural Network with RNN layer implemented in Tensorflow. We consider the case of a Triaxial compressions of granular materials simulated using DEM. 
+
+* **Inputs:** Load time sequence of size ``(sequence_length, num_load_features)`` (e.g. strains in x, y, z) and ``num_contact_params`` contact parameters.
+* **Outputs:** Time sequences of ``num_labels`` macroscopic variables such as the stress and void ratio. 
+
+.. image:: ./figs/rnn_architecture.png
+   :width: 400
+   :align: center
+   :alt: RNN architecture
+
+.. note::
+   - ``lstm_units, dense_units``: Hyperparameters requiring tuning when training a model.
+   - ``sequence_length, num_load_features, num_contact_params, num_labels``: sizes determined by the data.
+
+The contact parameters are first passed through 2 trainable dense layers whose outputs are ``state_h`` and ``state_c``. Such outputs are the initial state of the LSTM layer.
+
+.. note:: ``add_pressure`` and ``add_experiment_type`` (booleans in config dictionary) define wether the confinement pressure and type of experiment are added at the end of the defined contact parameters.
+
+Sliding windows
+```````````````
+We split the data along the temporal dimension in sliding windows of fixed length ``window_size``. In essence, the input for the RNN model is a window (``window_i`` in the figure below) and the prediction is the next element in the sequence (``output_i`` in the figure below).
+
+.. image:: ./figs/rnn_window.png
+   :alt: Windows used for sequence splitting and model prediction
+
+The module, takes care of splitting the data into windows and stacking the predictions for each step of the sequence.
+With this configuration, the first ``window_size`` points are not predicted by the model. To predict those too, add ``pad_length`` equals to ``window_size`` to the config dictionary.
+
+.. note:: 
+   - ``window_size`` is a hyperparameter requiring tuning when training a model. 
+   - ``sequence_length`` is fixed by the user. All sequences in a dataset must have the same length. 
+
+Loss and metrics
+`````````````````
+* **Loss**: `tensorflow MSE <https://www.tensorflow.org/api_docs/python/tf/keras/losses/MeanSquaredError>`_ for train and validation datasets.
+* **Metric**: `tensor flow MAE <https://www.tensorflow.org/api_docs/python/tf/keras/metrics/mean_absolute_error>`_ is logged for train and validation datasets.
+*  **Optimizer**: `tensorflow Adam <https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/Adam>`_ requiring the ``learning_rate``.   Other additional parameters for the optimizer can be defined ``config`` dictionary.
+* **Callbacks**:
+  
+  * `tensorflow EarlyStopping <https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/EarlyStopping>`_: Using ``patience`` defined in ``config`` dictionary and ``val_loss`` as monitoring metric.
+  * `tensorflow ModelCheckpoint <https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/ModelCheckpoint>`_: Using ``save_weights_only`` defined in ``config`` dictionary and saving best only. 
+  

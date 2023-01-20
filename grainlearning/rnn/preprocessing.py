@@ -77,6 +77,7 @@ def prepare_datasets(
 
     return split_data, train_stats
 
+
 def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_type: str,
                     add_pressure: bool = True , add_experiment_type: bool = True):
     """
@@ -118,6 +119,7 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
 
     return input_sequences, output_sequences, contact_params
 
+
 def _add_e0_to_contacts(contacts: np.array, inputs: np.array):
     """
     Add the initial void ratio e_0 as an extra contact parameter at the end.
@@ -131,6 +133,7 @@ def _add_e0_to_contacts(contacts: np.array, inputs: np.array):
     e0s = np.expand_dims(e0s, axis=1)
     contacts = np.concatenate([contacts, e0s], axis=1)
     return contacts
+
 
 def _augment_contact_params(
         contact_params: np.array, pressure: str, experiment_type: str,
@@ -159,6 +162,7 @@ def _augment_contact_params(
     new_info = np.repeat(new_info, num_samples, axis=0)
 
     return np.concatenate([contact_params, new_info], axis=1)
+
 
 def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     """
@@ -193,6 +197,7 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
             }
     return split_data
 
+
 def _standardize_outputs(split_data):
     """
     Standardize outputs of split_data using the mean and std of the training data
@@ -212,6 +217,7 @@ def _standardize_outputs(split_data):
 
     return standardized_splits, train_stats
 
+
 def _pad_initial(array: np.array, pad_length: int, axis=1):
     """
     Add ``pad_length`` copies of the initial state in the sequence to the start.
@@ -227,6 +233,7 @@ def _pad_initial(array: np.array, pad_length: int, axis=1):
     padding = tf.repeat(starts, pad_length, axis=axis)
     padded_array = tf.concat([padding, array], axis=axis)
     return padded_array
+
 
 def get_dimensions(data: tf.data.Dataset):
     """
