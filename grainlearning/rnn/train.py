@@ -151,12 +151,6 @@ def get_default_dict():
 
     * RNN model
 
-      * `'conditional'`:
-
-        * True: Create a conditional RNN. The contact parameters vector doesn't have
-          to be copied multiple times into the strain sequence.
-        * False: Concatenate copies of contact_params to each one of the inputs steps.
-
       * `'use_windows'`: At the moment the model only works if windows are considered.
       * `'window_size'`: int, number of steps composing a window.
       * `'window_step'`: int, number of steps between consecutive windows (default = 1).
@@ -187,7 +181,6 @@ def get_default_dict():
         'add_experiment_type': True,
         'train_frac': 0.7,
         'val_frac': 0.15,
-        'conditional': True,
         'use_windows': True,
         'window_size': 10,
         'window_step': 1,

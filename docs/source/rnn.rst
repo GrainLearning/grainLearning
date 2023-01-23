@@ -120,17 +120,26 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
     'metric': {'goal': 'maximize', 'name': 'val_acc'},
     'parameters':
       {
-      'raw_data': {'value': 'data/sequences.hdf5'},
-      'use_windows': {'value': True},
-      'window_size': {'values': [5, 10, 20, 30]},'window_step': {'value': 1},
-      'conditional': {'value': True},'standardize_outputs': {'value': True},
-      'lstm_units': {'values': [50, 100, 150, 200]},
-      'dense_units': {'values': [20, 50, 100, 150]},
-      'batch_size': {'values': [128, 256, 512]},
-      'epochs': {'value': 2},
-      'learning_rate': {'max': 0.1, 'min': 0.0001},
-      'patience': {'value': 5},
-      'save_weights_only': {'value': False}
+        'raw_data': 'data/sequences.hdf5',
+        'pressure': 'All',
+        'experiment_type': 'All',
+        'add_e0': False,
+        'add_pressure': True,
+        'add_experiment_type': True,
+        'train_frac': 0.7,
+        'val_frac': 0.15,
+        'use_windows': True,
+        'window_size': 10,
+        'window_step': 1,
+        'pad_length': 0,
+        'lstm_units': 200,
+        'dense_units': 200,
+        'patience': 5,
+        'epochs': 100,
+        'learning_rate': 1e-3,
+        'batch_size': 256,
+        'standardize_outputs': True,
+        'save_weights_only': False
       }
    }
    
