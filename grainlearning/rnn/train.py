@@ -203,7 +203,7 @@ def _check_config(config):
     :return: Updated config dictionary.
     """
     # Necessary keys
-    if not 'raw_data' in config.keys(): raise ValueError("raw_data has not been defined in config")
+    if not 'raw_data' in config: raise ValueError("raw_data has not been defined in config")
 
     # Warning that defaults would be used if not defined.
     # Adding the default to config because is required in other functions.
@@ -220,8 +220,8 @@ def _check_config(config):
 
     # Warning for an unexpected key value
     config_optimizer = _get_optimizer_config(config)
-    for key in config.keys():
-        if key not in defaults and key not in config_optimizer.keys():
+    for key in config:
+        if key not in defaults and key not in config_optimizer:
             warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
 
     return config
@@ -239,7 +239,7 @@ def _warning_config_field(key, config, default, add_default_to_config=False):
 
     warnings.formatwarning = _custom_format_warning
 
-    if not key in config.keys():
+    if not key in config:
         if add_default_to_config: config[key] = default
         warnings.warn(f"No {key} specified in config, using default {default}.")
 
@@ -254,7 +254,7 @@ def _get_optimizer_config(config):
     """
     config_optimizer = dict()
     keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
-    for key in config.keys():
+    for key in config:
         if key in keys_optimizer and not (key == 'self' or key == 'kwargs' or key == 'name'):
             config_optimizer[key] = config[key]
 

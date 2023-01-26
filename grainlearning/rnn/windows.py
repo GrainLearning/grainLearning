@@ -46,6 +46,12 @@ def _windowize_single_dataset(
     num_samples, sequence_length, num_labels = outputs.shape
     start, end = 0, window_size
 
+    if sequence_length % window_size != 0:
+        raise ValueError("windows_size is not a multiple of sequence_length. \
+                          sequence_length%window_size should be 0.")
+    if window_size > sequence_length:
+        raise ValueError("window_size bigger than sequence_length.")
+
     # For brevity denote load_sequence, contacts, outputs as X, c, y
     Xs, cs, ys = [], [], []
     for end in range(window_size, sequence_length + 1, window_step):
