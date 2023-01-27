@@ -1,10 +1,10 @@
 """
-Preprocess DEM data so that it can be used as input in an RNN.
+Script to preprocess DEM data so that it can be used as input in an RNN.
 In YADE data is stored to .npy files every interval of time steps.
 
 Data consists of:
 
-* contact_params (samples, 5).
+* contact_params (samples, c).
 * input_params (samples, sequence_length, x).
 * output_params (samples, sequence_length, y).
 
@@ -15,7 +15,7 @@ import os, h5py
 import numpy as np
 
 CONTACT_KEYS = [
-    'E',   # young's modulus  = 10^E
+    'E',   # young's modulus  = log_10(E) with E in Pa
     'v',   # poisson's ratio
     'kr',  # rolling stiffness
     'eta', # rolling friction
@@ -47,9 +47,9 @@ UNUSED_KEYS_SEQUENCE = [
 ]
 
 UNUSED_KEYS_CONSTANT = [
-    'conf',# confining pressure (stored as group name already)
-    'mode',# drained/undrained (also stored as group name)
-    'num', # number of particles (always 10_000)
+    'conf',# confining pressure (stored as group name) = log_10(confinement_pressure)
+    'mode',# drained/undrained (stored as group name)
+    'num', # number of particles
 ]
 
 def convert_all_to_hdf5(
@@ -58,6 +58,7 @@ def convert_all_to_hdf5(
         data_dir: str,
         target_file: str,
         sequence_length: int,
+        stored_in_subfolders: bool
         ):
     """
     Merge data of experiments of different pressures and types into a single
@@ -67,7 +68,10 @@ def convert_all_to_hdf5(
     :param experiment_types: List of strings of experiment types available.
     :param data_dir: Root directory containing all the data.
     :param target_file: Path to hdf5 file to be created.
-    :param sequence_length: Expected number of time steps in sequences.
+    :param sequence_length: Expected number of time steps in sequences. If the sequence is
+      longer, only the first ``sequence_length`` element will be considered.
+    :param stored_in_subfolders: True if yade .npy files are stored in pressure/experiment_type
+      tree structure. False if all files are in a single folder `data_dir`.
 
     .. warning:: Will remove `target_file` if already exists.
     """
@@ -99,23 +103,26 @@ def convert_to_arrays(
         experiment_type: str,
         sequence_length: int,
         data_dir: str,
+        stored_in_subfolders: bool
         ):
     """
     For a given pressure and experiment type, read all the files in the corresponding
     directory and concatenate those with the expected sequence length together
     into numpy arrays.
 
-
     :param pressure: String indicating the pressure used.
     :param experiment_type: String indicating the experiment type ('drained', 'undrained')
-    :param sequence_length: Expected number of timesteps in sequence.
+    :param sequence_length: Expected number of timesteps in sequence. If the sequence is
+      longer, only the first ``sequence_length`` element will be considered.
     :param data_dir: The root directory of the data.
+    :param stored_in_subfolders: True if yade .npy files are stored in pressure/experiment_type
+      tree structure. False if all files are in a single folder `data_dir`.
 
-    :returns: Tuple of arrays of inputs, contacts, outputs
+    :return: Tuple of arrays of inputs, contacts, outputs
 
     .. warning:: sequences longer and shorter than `sequence_length` are ignored.
     """
-    data_dir = data_dir + f'{pressure}/{experiment_type}/'
+    if stored_in_subfolders: data_dir = data_dir + f'{pressure}/{experiment_type}/'
     if not os.listdir(data_dir):
         print(f"Directory {data_dir} is empty.")
         return
@@ -133,14 +140,19 @@ def convert_to_arrays(
         except:
             print('IOError', f, pressure)
             continue
+
+        if not stored_in_subfolders:
+            if (str(10**sim_params['conf']) != pressure) or (sim_params['mode'] != experiment_type):
+                continue
+
         # test if sequence is of full length
         test_features = sim_features[OUTPUT_KEYS[0]]
-        if len(test_features) == sequence_length:
+        if len(test_features) >= sequence_length:
             contact_params = [sim_params[key] for key in CONTACT_KEYS]
             contact_list.append(contact_params)
-            inputs_list.append([sim_features[key] for key in INPUT_KEYS])
-            outputs_list.append([np.array(sim_features[key]) / scalings[key] for key in OUTPUT_KEYS])
-        else:
+            inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS])
+            outputs_list.append([np.array(sim_features[key][:sequence_length]) / scalings[key] for key in OUTPUT_KEYS])
+       else:
             other_lengths.append(len(test_features))
 
     print(f'At confining pressure {pressure}, for the {experiment_type} case, '
@@ -161,11 +173,53 @@ def convert_to_arrays(
     return inputs_array, contact_array, outputs_array
 
 
-if __name__ == '__main__':
+def get_pressures(data_dir: str):
+    """
+    From a list of .npy YADE files get the confinement pressures, existing in the dataset.
+
+    :param data_dir: Path to the data (YADE .npy files)
+
+    :return: List of confinement pressures present in the dataset.
+    """
+    if not os.listdir(data_dir):
+        print(f"Directory {data_dir} is empty.")
+        return
+
+    pressures = []
+    file_names = [fn for fn in os.listdir(data_dir) if fn.endswith('.npy')]
+    for f in file_names:
+        try:
+            sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
+        except:
+            print('IOError', f, pressure)
+            continue
+        pressure = str(10**sim_params['conf'])
+        if not (pressure in pressures): pressures.append(pressure)
+
+    return pressures
+
+
+def main():
+    # Option 1: YADE .npy files stored in subfolders pressure/experiment_type
+    pressures = ['0.2e6', '0.5e6', '1.0e6']
+    experiment_types = ['undrained','drained']
+    stored_in_subfolders = True
+
+    # Option 2: YADE .npy files are stored in a single folder.
+    pressures = get_pressures('./')
+    experiment_types = ['drained']
+    stored_in_subfolders = False
+
+    # Call main function
     convert_all_to_hdf5(
-            pressures=['0.2e6', '0.5e6', '1.0e6'],
-            experiment_types=['drained', 'undrained'],
+            pressures=pressures,
+            experiment_types=experiment_types,
             data_dir='/Users/aronjansen/Documents/grainsData/TriaxialCompression/',
             sequence_length=200,
             target_file='data/sequences.hdf5',
+            stored_in_subfolders=stored_in_subfolders
         )
+
+
+if __name__ == '__main__':
+    main()

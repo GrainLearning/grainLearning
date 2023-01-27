@@ -17,11 +17,22 @@ Get your data to our format
 ```````````````````````````
 The RNN model of this module considers a specific data format and organization. Our example of data consists of several DEM simulations of Triaxial Compressions of samples having different contact parameters. Such simulations were performed using `YADE <http://yade-dem.org/>`_ that outputs the simulation state to a .npy file every given amount of time steps. The files are stored under the folder structure pressure/experiment_type.
 
-* Run `rnn/data_parsing/triaxial_YADE.py` to read the .npy files in ``data_dir`` and create ``target_file`` with format hdf5.
+* Prepare your parsing script. We recommend to copy this script locally. 
+* Use ``CONTACT_KEYS``, ``INPUT_KEYS`` and ``OUTPUT_KEYS`` consistent with your dataset. You can modify, add or remove elements of such dictionaries. These will also be stored as :ref:`dataset attributes <linkDatasetAttributes>`.
+  
+* Go to function ``main()`` and adapt the parameters to your own case.
+  
+  * ``sequence_length``: The model will only work with sequences of the same size. Shorter sequences in the dataset will not be considered and longer will be trimmed to ``sequence_length``.
+  * ``stored_in_subfolders = True``: YADE files (.npy)  stored in subfolders *pressure/experiment_type*. 
+    The elements in lists ``pressure`` and ``experiment_types`` should be the same of your folders.
+  * ``stored_in_subfolders = False``: All your data (YADE .npy files) is stored in a single folder.
+    You can define the pressures manually as list, such as for the first option. Or you can gather all confining pressures in your dataset via ``get_pressures()``.
    
-* ``pressures`` and ``experiment_types`` are subfolders of our database and they will become fields in ``target_file``. For more information about the parameters take a look at the dataset attributes API documentation [TODO] . This information will also be stored as :ref:`dataset attributes <linkDatasetAttributes>`.
+  The *.hdf5* file is generated with groups of *pressure* and *experiment_type* combinations. For more information about the parameters take a look at the dataset attributes API documentation [TODO]. 
 
-* If your data comes from another software or is stored differently please write your own parser such that the format of ``target_file`` has the same structure as the one given as example.
+* Use the script `rnn/data_parsing/triaxial_YADE.py` to read the .npy files in ``data_dir`` and create ``target_file`` with *hdf5* format.
+  
+* If your data comes from another software or is stored differently please write your own parser such that the format of ``target_file`` has the structure of the one given as example.
 
 Structure of the generated hdf5 file
 ::::::::::::::::::::::::::::::::::::
