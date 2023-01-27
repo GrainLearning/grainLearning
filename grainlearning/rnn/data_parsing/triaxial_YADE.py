@@ -90,7 +90,7 @@ def convert_all_to_hdf5(
                 grp = f.require_group(f'{pressure}/{experiment_type}')
                 inputs_tensor, contact_tensor, outputs_tensor = \
                         convert_to_arrays(pressure, experiment_type,
-                                sequence_length, data_dir)
+                                sequence_length, data_dir, stored_in_subfolders)
                 grp['contact_params'] = contact_tensor
                 grp['inputs'] = inputs_tensor
                 grp['outputs'] = outputs_tensor
@@ -152,7 +152,7 @@ def convert_to_arrays(
             contact_list.append(contact_params)
             inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS])
             outputs_list.append([np.array(sim_features[key][:sequence_length]) / scalings[key] for key in OUTPUT_KEYS])
-       else:
+        else:
             other_lengths.append(len(test_features))
 
     print(f'At confining pressure {pressure}, for the {experiment_type} case, '
