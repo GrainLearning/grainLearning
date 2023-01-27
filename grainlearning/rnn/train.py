@@ -151,7 +151,6 @@ def get_default_dict():
 
     * RNN model
 
-      * `'use_windows'`: At the moment the model only works if windows are considered.
       * `'window_size'`: int, number of steps composing a window.
       * `'window_step'`: int, number of steps between consecutive windows (default = 1).
       * `'pad_length'`: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
@@ -181,7 +180,6 @@ def get_default_dict():
         'add_experiment_type': True,
         'train_frac': 0.7,
         'val_frac': 0.15,
-        'use_windows': True,
         'window_size': 10,
         'window_step': 1,
         'pad_length': 0,

@@ -12,7 +12,6 @@ def prepare_datasets(
         train_frac: float = 0.7,
         val_frac: float = 0.15,
         pad_length: int = 0,
-        use_windows: bool = True,
         window_size: int = 1,
         window_step: int = 1,
         standardize_outputs: bool = True,
@@ -31,7 +30,6 @@ def prepare_datasets(
     :param train_frac: Fraction of data used in the training set.
     :param val_frac: Fraction of the data used in the validation set.
     :param pad_length: Amount by which to pad the sequences from the start.
-    :param use_windows: Whether to split up the time series into windows.
     :param window_size: Number of timesteps to include in a window.
     :param window_step: Offset between subsequent windows.
     :param standardize_outputs: Whether to transform the training set labels
@@ -69,11 +67,8 @@ def prepare_datasets(
         train_stats = {}
 
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
-
     train_stats.update(get_dimensions(split_data['train']))
-
-    if use_windows:
-        split_data = windowize_train_val(split_data, train_stats, window_size, window_step)
+    split_data = windowize_train_val(split_data, train_stats, window_size, window_step)
 
     return split_data, train_stats
 

@@ -139,7 +139,6 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
         'add_experiment_type': True,
         'train_frac': 0.7,
         'val_frac': 0.15,
-        'use_windows': True,
         'window_size': 10,
         'window_step': 1,
         'pad_length': 0,

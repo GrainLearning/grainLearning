@@ -138,10 +138,7 @@ def predict_macroscopics(
             contact_parameters shape. \
             Got {inputs['contact_parameters'].shape[2]}, expected {train_stats['num_contact_params']}.")
 
-    if config['use_windows']:
-        predictions = predict_over_windows(data, model, config['window_size'], train_stats['sequence_length'])
-    else:
-        raise NotImplementedError()
+    predictions = predict_over_windows(data, model, config['window_size'], train_stats['sequence_length'])
 
     if config['standardize_outputs']:
         mean = tf.cast(train_stats['mean'], tf.float32)
