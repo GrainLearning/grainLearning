@@ -48,9 +48,9 @@ def prepare_datasets(
               ``sequence_length``, ``num_load_features``, ``num_contact_params``, ``num_labels``,
               and `'mean'` and `'std'` of the training set, in case ``standardize_outputs`` is True.
     """
-    datafile = h5py.File(raw_data, 'r')
-
-    inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type, add_pressure, add_experiment_type)
+    with h5py.File(raw_data, 'r') as datafile: # Will raise an exception in File doesn't exists
+        inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type,
+                                                    add_pressure, add_experiment_type)
     if add_e0:
         contacts = _add_e0_to_contacts(contacts, inputs)
 
@@ -59,7 +59,7 @@ def prepare_datasets(
         outputs = _pad_initial(outputs, pad_length)
 
     dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
-    split_data = _make_splits(dataset, train_frac, val_frac, seed)
+    split_data = make_splits(dataset, train_frac, val_frac, seed)
 
     if standardize_outputs:
         split_data, train_stats = _standardize_outputs(split_data)
@@ -159,7 +159,7 @@ def _augment_contact_params(
     return np.concatenate([contact_params, new_info], axis=1)
 
 
-def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
+def make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     """
     Split data into training, validation, and test sets.
     The split is done on a sample by sample basis, so sequences are not broken up.
@@ -175,6 +175,15 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
     n_val = int(val_frac * n_tot)
+
+
+    if train_frac + val_frac > 1:
+        raise ValueError(f"Fractions of training {train_frac} and validation {val_frac} are together bigger than 1.")
+    if n_val <= 0: # error if not enough samples in validation dataset
+        raise ValueError(f"Fractions of training and validation lead to have {n_val} samples in validation dataset.")
+    if n_train + n_val >= n_tot:
+        raise ValueError(f"Fractions of training {train_frac} and validation {val_frac} \
+                        lead to have {n_tot - n_train - n_val} samples in test dataset.")
 
     np.random.seed(seed=seed)
     inds = np.random.permutation(np.arange(n_tot))
