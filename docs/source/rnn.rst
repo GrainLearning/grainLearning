@@ -317,17 +317,19 @@ The contact parameters are first passed through 2 trainable dense layers whose o
 
 Sliding windows
 ```````````````
-We split the data along the temporal dimension in sliding windows of fixed length ``window_size``. In essence, the input for the RNN model is a window (``window_i`` in the figure below) and the prediction is the next element in the sequence (``output_i`` in the figure below).
+
+The data is split along the temporal dimension in sliding windows of fixed length ``window_size``. In essence, the input for the RNN model is a window of inputs (``window_i`` in the figure below) and the prediction is the last element in the equivalent window in the sequence of outputs (``output_i`` in the figure below).
 
 .. image:: ./figs/rnn_window.png
    :alt: Windows used for sequence splitting and model prediction
 
-The module, takes care of splitting the data into windows and stacking the predictions for each step of the sequence.
+The module,takes care of splitting the data into windows and stacking the predictions for each step of the sequence.
 With this configuration, the first ``window_size`` points are not predicted by the model. To predict those too, add ``pad_length`` equals to ``window_size`` to the config dictionary.
 
 .. note:: 
    - ``window_size`` is a hyperparameter requiring tuning when training a model. 
-   - ``sequence_length`` is fixed by the user. All sequences in a dataset must have the same length. 
+   - ``sequence_length`` is fixed by the user. All sequences in a dataset must have the same length.
+   -  ``window_step`` is the distance (in position) between the start (or end) of consecutive windows. In general ``window_step = 1``.
 
 Loss and metrics
 `````````````````
