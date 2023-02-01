@@ -31,6 +31,7 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
    iterative_bayesian_filter
    tutorials
    examples
+   how_to_contribute
    api
 
 Indices and tables
