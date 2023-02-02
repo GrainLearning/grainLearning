@@ -4,7 +4,7 @@ Python API
 ``CalibrationToolBox``
 *****************************
 
-.. automodule:: grainlearning.calibrationtoolbox
+.. automodule:: grainlearning.grainlearning
     :members:
     :show-inheritance:
     :inherited-members:
@@ -22,7 +22,7 @@ Python API
 ``Iterative Bayesian Filter``
 *****************************
 
-.. automodule:: grainlearning.iterativebayesianfilter
+.. automodule:: grainlearning.iterative_bayesian_filter
     :members:
     :show-inheritance:
     :inherited-members:

@@ -207,7 +207,7 @@ class Model:
         self.get_inv_normalized_sigma()
 
     @classmethod
-    def from_dict(cls: Type["Model"], obj: dict) -> Type["Model"]:
+    def from_dict(cls: Type["Model"], obj: dict):
         """ Initialize the class using a dictionary style"""
 
         # TODO do proper error checking on the input
@@ -414,7 +414,7 @@ class IOModel(Model):
         self.get_inv_normalized_sigma()
 
     @classmethod
-    def from_dict(cls: Type["IOModel"], obj: dict) -> Type["IOModel"]:
+    def from_dict(cls: Type["IOModel"], obj: dict):
         """ Initialize the class using a dictionary style"""
 
         # TODO do proper error checking on the input
