@@ -183,7 +183,7 @@ class SMC:
 
         return ips, covs
 
-    def give_posterior(self, loading_step=-1):
+    def give_posterior(self, loading_step: int = -1):
         """Give posterior distribution of a loading step
 
         :param loading_step: Optional input loading step, defaults to -1 (last value)

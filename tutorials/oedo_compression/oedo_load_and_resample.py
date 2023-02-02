@@ -1,10 +1,10 @@
-from grainlearning import CalibrationToolbox
+from grainlearning import GrainLearning
 from grainlearning.models import IOModel
 
 curr_iter = 1
 sim_data_dir = "./tests/data/oedo_sim_data"
 
-calibration = CalibrationToolbox.from_dict(
+calibration = GrainLearning.from_dict(
     {
         "curr_iter": curr_iter,
         "num_iter": 0,
@@ -41,4 +41,4 @@ _ = calibration.resample()
 
 # %%
 # plot the uncertainty evolution
-calibration.plot_UQ_in_time()
+calibration.plot_uq_in_time()

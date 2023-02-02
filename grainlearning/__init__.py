@@ -1,6 +1,6 @@
 from .models import Model, IOModel
-from .calibrationtoolbox import CalibrationToolbox
-from .iterativebayesianfilter import IterativeBayesianFilter
+from .grainlearning import GrainLearning
+from .iterative_bayesian_filter import IterativeBayesianFilter
 from .sampling import GaussianMixtureModel, generate_params_qmc
 from .inference import SMC
 from .tools import (

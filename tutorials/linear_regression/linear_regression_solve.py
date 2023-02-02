@@ -1,4 +1,4 @@
-from grainlearning import CalibrationToolbox
+from grainlearning import GrainLearning
 from grainlearning.models import IOModel
 
 executable = 'python ./tutorials/linear_regression/LinearModel.py'
@@ -19,7 +19,7 @@ def run_sim(model, **kwargs):
         os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
 
 
-calibration = CalibrationToolbox.from_dict(
+calibration = GrainLearning.from_dict(
     {
         "num_iter": 10,
         "model": {

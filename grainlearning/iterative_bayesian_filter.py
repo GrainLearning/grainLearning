@@ -49,9 +49,9 @@ class IterativeBayesianFilter:
     :param inference: Sequential Monte Carlo class (SMC)
     :param sampling: Gaussian Mixture Model class (GMM)
     :param initial_sampling: the initial sampling method, defaults to Halton
-    :param num_samples: Number of samples within a user model
     :param ess_tol: Tolerance for the effective sample size to converge, defaults to 1.0e-2
     :param proposal_ibf: User defined proposal distribution for the data assimilation loop, defaults to None
+    :param proposal_data_file: Pickle that stores the previously trained posterior distribution
     """
 
     #: The inference class is a member variable of the particle filter which is used to generate the likelihood
@@ -62,6 +62,9 @@ class IterativeBayesianFilter:
 
     #: list of parameter data of shape (num_samples, num_params) from all iterations
     param_data_list: List = []
+
+    #: List of sigmas
+    sigma_list: List = []
 
     #: This a tolerance to which the optimization algorithm converges.
     ess_tol: float = 1.0e-2

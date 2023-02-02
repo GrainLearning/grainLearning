@@ -1,5 +1,5 @@
 import numpy as np
-from grainlearning import CalibrationToolbox
+from grainlearning import GrainLearning
 from sklearn.metrics import mean_squared_error as mse
 
 p1 = 0.2
@@ -18,7 +18,7 @@ def run_sim(model, **kwargs):
 
 
 def test_smc_mse():
-    calibration = CalibrationToolbox.from_dict(
+    calibration = GrainLearning.from_dict(
         {
             "num_iter": 0,
             "model": {

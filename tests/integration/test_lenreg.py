@@ -1,8 +1,10 @@
 import numpy as np
-from grainlearning import CalibrationToolbox
+from grainlearning import GrainLearning
 
 x_obs = np.arange(100)
 y_obs = 0.2 * x_obs + 5.0
+
+
 # y_obs += np.random.rand(100) * 2.5
 
 def run_sim(model, **kwargs):
@@ -13,8 +15,9 @@ def run_sim(model, **kwargs):
 
     model.sim_data = np.array(data)
 
+
 def test_lenreg():
-    calibration = CalibrationToolbox.from_dict(
+    calibration = GrainLearning.from_dict(
         {
             "num_iter": 10,
             "model": {
@@ -71,7 +74,7 @@ def test_lenreg():
                    1]) / 5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
 
     # 2. Checking sigma
-    assert calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
+    assert calibration.calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
 
 
 # %%

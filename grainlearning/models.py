@@ -247,6 +247,22 @@ class Model:
             -1.0 / inv_obs_mat.shape[0]
         )
 
+    @classmethod
+    def load_param_data(cls, curr_iter):
+        pass
+
+    @classmethod
+    def get_sim_data_files(cls, curr_iter):
+        pass
+
+    @classmethod
+    def load_sim_data(cls):
+        pass
+
+    @classmethod
+    def write_to_table(cls, param):
+        pass
+
 
 class IOModel(Model):
     """

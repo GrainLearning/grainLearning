@@ -1,5 +1,5 @@
 import numpy as np
-from grainlearning import CalibrationToolbox
+from grainlearning import GrainLearning
 
 x_obs = np.arange(100)
 y_obs = 0.2 * x_obs + 5.0
@@ -13,7 +13,7 @@ def run_sim(model, **kwargs):
     model.sim_data = np.array(data)
 
 
-calibration = CalibrationToolbox.from_dict(
+calibration = GrainLearning.from_dict(
     {
         "num_iter": 10,
         "model": {
