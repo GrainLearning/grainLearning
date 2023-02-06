@@ -13,12 +13,12 @@ def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, w
     :param window_size: Number of timesteps to include in a window.
     :param window_step: Offset between subsequent windows.
 
-    :return windows: Dictionary of dataset splits, where the training split has been
+    :return: windows: Dictionary of dataset splits, where the training split has been
             modified into windows
     """
     windows = split_data
-    windows['train'] = _windowize_single_dataset(split_data['train'], window_size, window_step)
-    windows['val'] = _windowize_single_dataset(split_data['val'], window_size, window_step)
+    windows['train'] = windowize_single_dataset(split_data['train'], window_size, window_step)
+    windows['val'] = windowize_single_dataset(split_data['val'], window_size, window_step)
 
     train_stats['window_size'] = window_size
     train_stats['window_step'] = window_step
@@ -32,25 +32,32 @@ def _windowize_single_dataset(
         window_step: int = 1,
         seed: int = 42):
     """
-    Take a dataset of sequences of shape N, S, L and output another dataset
-    of shorter sequences of size ``window_size``, taken at intervals ``window_step``
-    so of shape M, window_size, L, with M >> N.
-    Also shuffle the data.
+    Take a dataset ((inputs, contact_params),outputs) of sequences of shape N, S, L and output
+    another dataset of shorter sequences of size ``window_size``, taken at intervals ``window_step``.
+    The resulting dataset will have ``M=((sequence_length - window_size)/window_step) + 1)`` samples,
+    corresponding to independent windows in the given dataset.
+    For a given window taken from inputs, the output is the element of outputs sequence at the
+    last position of the window.
 
-    :param data: dataset of sequences of shape N, S, L
-    :param window_size: size of the window
-    :param window_step:
-    :param seed: Random seed
+    .. note::
+      For a clear picture of what goes on here check `Sliding windows` section in the documentation.
+
+    Data is shuffled.
+
+    :param data: dataset of sequences of shape N, S, L.
+    :param window_size: Size of the window.
+    :param window_step: Offset between subsequent windows.
+    :param seed: Random seed.
+
+    :return:
+      * ``inputs`` of shape: (M, window_size, ``num_load_features``), with M >> N.
+      * ``outputs`` of shape: (M, L_outputs)
     """
     load_sequences, contact_parameters, outputs = extract_tensors(data)
     num_samples, sequence_length, num_labels = outputs.shape
-    start, end = 0, window_size
 
-    if sequence_length % window_size != 0:
-        raise ValueError("windows_size is not a multiple of sequence_length. \
-                          sequence_length%window_size should be 0.")
-    if window_size > sequence_length:
-        raise ValueError("window_size bigger than sequence_length.")
+    if window_size >= sequence_length:
+        raise ValueError(f"window_size {window_size} >= sequence_length {sequence_length}.")
 
     # For brevity denote load_sequence, contacts, outputs as X, c, y
     Xs, cs, ys = [], [], []

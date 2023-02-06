@@ -23,6 +23,9 @@ def prepare_datasets(
         ):
     """
     Convert raw data into preprocessed split datasets.
+    First split the data into `train`, `val` and `test` datasets
+    and then apply the `Sliding windows` transformation.
+    This is to avoid having some parts of a dataset in `train` and some in `val` and/or in `test` (i.e. data leak).
 
     :param raw_data: Path to hdf5 file containing the data.
     :param pressure: Experiment confining Pressure as a string or `'All'`.
@@ -59,7 +62,7 @@ def prepare_datasets(
         outputs = _pad_initial(outputs, pad_length)
 
     dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
-    split_data = make_splits(dataset, train_frac, val_frac, seed)
+    split_data = _make_splits(dataset, train_frac, val_frac, seed)
 
     if standardize_outputs:
         split_data, train_stats = _standardize_outputs(split_data)
@@ -159,7 +162,7 @@ def _augment_contact_params(
     return np.concatenate([contact_params, new_info], axis=1)
 
 
-def make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
+def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     """
     Split data into training, validation, and test sets.
     The split is done on a sample by sample basis, so sequences are not broken up.
@@ -175,7 +178,6 @@ def make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     n_tot = dataset[1].shape[0]
     n_train = int(train_frac * n_tot)
     n_val = int(val_frac * n_tot)
-
 
     if train_frac + val_frac > 1:
         raise ValueError(f"Fractions of training {train_frac} and validation {val_frac} are together bigger than 1.")
