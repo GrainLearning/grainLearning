@@ -17,12 +17,8 @@ def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, w
             modified into windows
     """
     windows = split_data
-    windows['train'] = windowize_single_dataset(split_data['train'], window_size, window_step)
-    windows['val'] = windowize_single_dataset(split_data['val'], window_size, window_step)
-
-    train_stats['window_size'] = window_size
-    train_stats['window_step'] = window_step
-
+    windows['train'] = _windowize_single_dataset(split_data['train'], window_size, window_step)
+    windows['val'] = _windowize_single_dataset(split_data['val'], window_size, window_step)
     return windows
 
 
