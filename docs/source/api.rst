@@ -1,10 +1,10 @@
 Python API
 ==================
 
-``CalibrationToolBox``
+``Calibration toolbox``
 *****************************
 
-.. automodule:: grainlearning.grainlearning
+.. automodule:: grainlearning.bayesian_calibration
     :members:
     :show-inheritance:
     :inherited-members:

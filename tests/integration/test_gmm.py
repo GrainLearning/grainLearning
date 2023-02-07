@@ -1,7 +1,7 @@
 import numpy as np
 import os, sys
 
-from grainlearning import GrainLearning
+from grainlearning import BayesianCalibration
 from grainlearning.models import IOModel
 
 sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
@@ -9,11 +9,12 @@ sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
 def test_gmm():
-    calibration = GrainLearning.from_dict(
+    calibration = BayesianCalibration.from_dict(
         {
             "curr_iter": curr_iter,
             "num_iter": 0,
             "model": {
+                "model_type": IOModel,
                 "obs_data_file": 'linearObs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
@@ -30,7 +31,6 @@ def test_gmm():
                     "seed": 0,
                 },
             },
-            "model_type": IOModel
         }
     )
 

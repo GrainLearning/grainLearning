@@ -1,17 +1,18 @@
 import numpy as np
 
-from grainlearning import GrainLearning
+from grainlearning import BayesianCalibration
 from grainlearning.models import IOModel
 
 sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
 def test_smc():
-    calibration = GrainLearning.from_dict(
+    calibration = BayesianCalibration.from_dict(
         {
             "curr_iter": curr_iter,
             "num_iter": 0,
             "model": {
+                "model_type": IOModel,
                 "obs_data_file": 'linearObs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
@@ -24,7 +25,6 @@ def test_smc():
                 "inference": {"ess_target": 0.3},
                 "sampling": {"max_num_components": 1},
             },
-            "model_type": IOModel
         }
     )
 

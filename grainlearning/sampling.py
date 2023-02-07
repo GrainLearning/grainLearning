@@ -169,7 +169,7 @@ class GaussianMixtureModel:
 
         # resample until all parameters are within the upper and lower bounds
         test_num = model.num_samples
-        while model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples:
+        while model.param_min and model.param_max and len(new_params) < minimum_num_samples:
             test_num = int(np.ceil(1.1 * test_num))
             new_params = self.get_samples_within_bounds(model, test_num)
 
@@ -193,9 +193,9 @@ class GaussianMixtureModel:
 
         new_params *= self.max_params
 
-        if model.param_mins and model.param_maxs:
-            params_above_min = new_params > np.array(model.param_mins)
-            params_below_max = new_params < np.array(model.param_maxs)
+        if model.param_min and model.param_max:
+            params_above_min = new_params > np.array(model.param_min)
+            params_below_max = new_params < np.array(model.param_max)
             bool_array = params_above_min & params_below_max
             indices = bool_array[:, 0]
             for i in range(model.num_params - 1):
@@ -222,8 +222,8 @@ class GaussianMixtureModel:
             self.prior_weight,
             self.cov_type,
             unweighted_resample,
-            model.param_mins,
-            model.param_maxs,
+            model.param_min,
+            model.param_max,
             self.n_init,
             self.tol,
             self.max_iter,
@@ -259,8 +259,8 @@ def generate_params_qmc(model: Type["Model"], num_samples: int, method: str = "h
 
     for param_i in range(model.num_params):
         for sim_i in range(num_samples):
-            mean = 0.5 * (model.param_maxs[param_i] + model.param_mins[param_i])
-            std = 0.5 * (model.param_maxs[param_i] - model.param_mins[param_i])
+            mean = 0.5 * (model.param_max[param_i] + model.param_min[param_i])
+            std = 0.5 * (model.param_max[param_i] - model.param_min[param_i])
             param_table[sim_i][param_i] = (
                 mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
             )

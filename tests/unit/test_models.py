@@ -5,8 +5,8 @@ from grainlearning import Model
 def test_init():
     """Test if models are initialized correctly"""
     model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=10,
@@ -15,8 +15,8 @@ def test_init():
     assert isinstance(model_cls, Model)
 
     config = {
-        "param_mins": [1, 2],
-        "param_maxs": [3, 4],
+        "param_min": [1, 2],
+        "param_max": [3, 4],
         "obs_data": [[12, 3, 4, 4], [12, 4, 5, 4]],
         "ctrl_data": [1, 2, 3, 4],
         "num_samples": 10,
@@ -47,8 +47,8 @@ def test_run_model():
         ]  # must be of shape (num_samples,num_obs,num_steps), thus addinga dummy dimension
 
     config = {
-        "param_mins": [1, 2],
-        "param_maxs": [3, 4],
+        "param_min": [1, 2],
+        "param_max": [3, 4],
         "obs_data": [2, 4, 6, 7],
         "ctrl_data": [1, 2, 3, 4],
         "inv_obs_weigh": [0.5, 0.25],

@@ -21,8 +21,8 @@ def test_expand_proposal_to_normalized_params():
     proposal = np.array([0.25, 0.25, 0.25, 0.25])
 
     model_cls = Model(
-        param_mins=[1e6, 0.19],
-        param_maxs=[1e7, 0.5],
+        param_min=[1e6, 0.19],
+        param_max=[1e7, 0.5],
         obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=4,
@@ -59,8 +59,8 @@ def test_regenerate_params():
     proposal = np.array([0.2, 0.3, 0.3, 0.2])
 
     model_cls = Model(
-        param_mins=[1e6, 0.19],
-        param_maxs=[1e7, 0.5],
+        param_min=[1e6, 0.19],
+        param_max=[1e7, 0.5],
         obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=4,
@@ -90,8 +90,8 @@ def test_generate_halton():
     """Test the Parameters class if the generated halton sequence is between mins and maxs"""
     model_cls = Model.from_dict(
         {
-            "param_mins": [1, 2],
-            "param_maxs": [3, 4],
+            "param_min": [1, 2],
+            "param_max": [3, 4],
             "obs_data": [2, 4, 6, 7],
             "ctrl_data": [1, 2, 3, 4],
             "num_samples": 2,

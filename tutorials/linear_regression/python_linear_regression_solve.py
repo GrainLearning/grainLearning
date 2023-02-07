@@ -1,5 +1,5 @@
 import numpy as np
-from grainlearning import GrainLearning
+from grainlearning import BayesianCalibration
 
 x_obs = np.arange(100)
 y_obs = 0.2 * x_obs + 5.0
@@ -13,12 +13,12 @@ def run_sim(model, **kwargs):
     model.sim_data = np.array(data)
 
 
-calibration = GrainLearning.from_dict(
+calibration = BayesianCalibration.from_dict(
     {
         "num_iter": 10,
         "model": {
-            "param_mins": [0.001, 0.001],
-            "param_maxs": [1, 10],
+            "param_min": [0.001, 0.001],
+            "param_max": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
             "obs_names": ['f'],

@@ -167,9 +167,9 @@ class IterativeBayesianFilter:
 
         from .tools import voronoi_vols
         from pickle import load
-        param_maxs, gmm = load(open(model.sim_data_dir + '/' + self.proposal_data_file, 'rb'), encoding='latin1')
+        param_max, gmm = load(open(model.sim_data_dir + '/' + self.proposal_data_file, 'rb'), encoding='latin1')
         samples = np.copy(model.param_data)
-        samples /= param_maxs
+        samples /= param_max
 
         proposal = np.exp(gmm.score_samples(samples))
         proposal *= voronoi_vols(samples)

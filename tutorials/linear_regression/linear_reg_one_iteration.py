@@ -1,4 +1,4 @@
-from grainlearning import GrainLearning
+from grainlearning import BayesianCalibration
 from grainlearning.models import IOModel
 import os, sys
 
@@ -7,13 +7,14 @@ sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
 sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
-calibration = GrainLearning.from_dict(
+calibration = BayesianCalibration.from_dict(
     {
         "curr_iter": curr_iter,
         "num_iter": 0,
         "model": {
-            "param_mins": [0.001, 0.001],
-            "param_maxs": [1, 10],
+            "model_type": IOModel,
+            "param_min": [0.001, 0.001],
+            "param_max": [1, 10],
             "obs_data_file": 'linearObs.dat',
             "obs_names": ['f'],
             "ctrl_name": 'u',
@@ -30,7 +31,6 @@ calibration = GrainLearning.from_dict(
             },
         },
         "save_fig": 0,
-        "model_type": IOModel,
     }
 )
 

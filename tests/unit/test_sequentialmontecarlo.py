@@ -17,8 +17,8 @@ def test_get_covariance_matrix():
     """Test to see if covariance matrix is generated as expected"""
 
     model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[12, 3, 4], [12, 4, 5]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=3,
@@ -59,8 +59,8 @@ def test_get_likelihood():
     )
 
     model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=5,
@@ -86,8 +86,8 @@ def test_get_posterior():
     )
 
     model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=5,
@@ -118,8 +118,8 @@ def test_ips_covs():
     )
 
     model_cls = Model(
-        param_mins=[2, 2],
-        param_maxs=[10, 10],
+        param_min=[2, 2],
+        param_max=[10, 10],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         num_samples=5,
     )

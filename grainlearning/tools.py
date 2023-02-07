@@ -107,8 +107,8 @@ def regenerate_params_with_gmm(
     prior_weight: float,
     cov_type: str = "full",
     resample_to_unweighted: Callable = None,
-    param_mins: List[float] = None,
-    param_maxs: List[float] = None,
+    param_min: List[float] = None,
+    param_max: List[float] = None,
     n_init=1,
     tol=0.001,
     max_iter=100,
@@ -148,10 +148,10 @@ def regenerate_params_with_gmm(
     :param resample_to_unweighted: Callable
         Function to expand samples from weighted to unweighted
 
-    :param param_mins: list
+    :param param_min: list
         lower bound of the parameter values
 
-    :param param_maxs: list
+    :param param_max: list
         uper bound of the parameter values
 
     :param seed: int

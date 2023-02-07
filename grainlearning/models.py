@@ -20,8 +20,8 @@ class Model:
         model_cls = Model.from_dict(
             {
 
-                "param_mins": [0, 0],
-                "param_maxs": [1, 10],
+                "param_min": [0, 0],
+                "param_max": [1, 10],
                 "num_samples": 14,
                 "obs_data": y_obs,
                 "ctrl_data": x_ctrl,
@@ -37,8 +37,8 @@ class Model:
     .. code-block:: python
 
         model_cls = Model(
-                param_mins = [0, 0],
-                param_maxs = [1, 10],
+                param_min = [0, 0],
+                param_max = [1, 10],
                 num_samples = 14,
                 obs_data = y_obs,
                 ctrl_data = x_ctrl,
@@ -49,8 +49,8 @@ class Model:
 
     :param obs_data: Observation or reference data
     :param num_samples: Sample size
-    :param param_mins: List of parameter lower bounds
-    :param param_maxs: List of parameter Upper bounds
+    :param param_min: List of parameter lower bounds
+    :param param_max: List of parameter Upper bounds
     :param ctrl_data: Optional control data (e.g, time), defaults to None
     :param obs_names: Column names of the observation data, defaults to None
     :param ctrl_name: Coloumn name of the control data, defaults to None
@@ -74,10 +74,10 @@ class Model:
     num_params: int
 
     #: Minimum values of the parameters
-    param_mins: List
+    param_min: List
 
     #: Maximum number of parameters
-    param_maxs: List
+    param_max: List
 
     #: Names of the parameters.
     param_names: List[str]
@@ -140,8 +140,8 @@ class Model:
         self,
         obs_data: np.ndarray,
         num_samples: int,
-        param_mins: List[float],
-        param_maxs: List[float],
+        param_min: List[float],
+        param_max: List[float],
         ctrl_data: np.ndarray = None,
         obs_names: List[str] = None,
         ctrl_name: str = None,
@@ -186,13 +186,13 @@ class Model:
 
         self.callback = callback
 
-        self.param_mins = param_mins
+        self.param_min = param_min
 
-        self.param_maxs = param_maxs
+        self.param_max = param_max
 
         #### Parameters ####
 
-        if param_mins: self.num_params = len(param_mins)
+        if param_min: self.num_params = len(param_min)
 
         self.param_data = param_data
 
@@ -213,14 +213,14 @@ class Model:
         # TODO do proper error checking on the input
         assert "obs_data" in obj.keys(), "Error no obs_data key found in input"
         assert "num_samples" in obj.keys(), "Error no num_samples key found in input"
-        assert "param_mins" in obj.keys(), "Error no param_mins key found in input"
-        assert "param_maxs" in obj.keys(), "Error no param_maxs key found in input"
+        assert "param_min" in obj.keys(), "Error no param_min key found in input"
+        assert "param_max" in obj.keys(), "Error no param_max key found in input"
 
         return cls(
             obs_data=obj["obs_data"],
             num_samples=obj["num_samples"],
-            param_mins=obj["param_mins"],
-            param_maxs=obj["param_maxs"],
+            param_min=obj["param_min"],
+            param_max=obj["param_max"],
             ctrl_data=obj.get("ctrl_data", None),
             obs_names=obj.get("obs_names", None),
             ctrl_name=obj.get("ctrl_name", None),
@@ -278,8 +278,8 @@ class IOModel(Model):
 
         model_cls = Model.from_dict(
             {
-                "param_mins": [0, 0],
-                "param_maxs": [1, 10],
+                "param_min": [0, 0],
+                "param_max": [1, 10],
                 "num_samples": 14,
                 "obs_data": y_obs,
                 "ctrl_data": x_ctrl,
@@ -295,8 +295,8 @@ class IOModel(Model):
     .. code-block:: python
 
         model_cls = Model(
-                param_mins = [0, 0],
-                param_maxs = [1, 10],
+                param_min = [0, 0],
+                param_max = [1, 10],
                 num_samples = 14,
                 obs_data = y_obs,
                 ctrl_data = x_ctrl,
@@ -307,8 +307,8 @@ class IOModel(Model):
 
     :param obs_data: Observation or reference data
     :param num_samples: Sample size
-    :param param_mins: List of parameter lower bounds
-    :param param_maxs: List of parameter Upper bounds
+    :param param_min: List of parameter lower bounds
+    :param param_max: List of parameter Upper bounds
     :param ctrl_data: Optional control data (e.g, time), defaults to None
     :param obs_names: Column names of the observation data, defaults to None
     :param ctrl_name: Coloumn name of the control data, defaults to None
@@ -353,8 +353,8 @@ class IOModel(Model):
         param_data_file: str,
         obs_data: np.ndarray,
         num_samples: int,
-        param_mins: List[float],
-        param_maxs: List[float],
+        param_min: List[float],
+        param_max: List[float],
         ctrl_data: np.ndarray = None,
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
@@ -369,8 +369,8 @@ class IOModel(Model):
         super().__init__(
             obs_data,
             num_samples,
-            param_mins,
-            param_maxs,
+            param_min,
+            param_max,
             ctrl_data,
             obs_names,
             ctrl_name,
@@ -435,8 +435,8 @@ class IOModel(Model):
             param_data_file=obj["param_data_file"],
             obs_data=obj.get("obs_data", None),
             num_samples=obj.get("num_samples", None),
-            param_mins=obj.get("param_mins", None),
-            param_maxs=obj.get("param_maxs", None),
+            param_min=obj.get("param_min", None),
+            param_max=obj.get("param_max", None),
             ctrl_data=obj.get("ctrl_data", None),
             inv_obs_weight=obj.get("inv_obs_weight", None),
             sim_data=obj.get("sim_data", None),

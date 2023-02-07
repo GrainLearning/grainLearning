@@ -4,7 +4,7 @@ from .iterative_bayesian_filter import IterativeBayesianFilter
 from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
 
 
-class GrainLearning:
+class BayesianCalibration:
     """This is the Bayesian calibration class
 
     A Bayesian calibration class consists of the inference class and the (re)sampling class.
@@ -19,12 +19,15 @@ class GrainLearning:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = GrainLearning.from_dict(
+        model_cls = BayesianCalibration.from_dict(
             {
                 "num_iter": 8,
                 "model": {
-                    "param_mins": [0, 0],
-                    "param_maxs": [1, 10],
+                    "model_type": Model,
+                    "model_name": "test",
+                    "param_names": ["a", "b"],
+                    "param_min": [0, 0],
+                    "param_max": [1, 10],
                     "num_samples": 10,
                     "obs_data": [2,4,8,16],
                     "ctrl_data": [1,2,3,4],
@@ -35,7 +38,6 @@ class GrainLearning:
                     "sampling": {"max_num_components": 1},
                 },
                 "save_fig": -1,
-                "model_type": Model,
             }
         )
 
@@ -46,7 +48,7 @@ class GrainLearning:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = GrainLearning(
+        model_cls = BayesianCalibration(
             num_iter = 10,
             model = Model(...),
             calibration = IterativeBayesianFilter(...)
@@ -235,16 +237,19 @@ class GrainLearning:
 
     @classmethod
     def from_dict(
-        cls: Type["GrainLearning"],
+        cls: Type["BayesianCalibration"],
         obj: Dict
     ):
         """An alternative constructor to allow choosing a model type (e.g., Model or IOModel)
-        :param obj: a dictionary containing the keys and values to construct a GrainLearning object
-        :return: A GrainLearning object
+        :param obj: a dictionary containing the keys and values to construct a BayesianCalibration object
+        :return: A BayesianCalibration object
         """
 
         # Get the model class, defaults to `Model`
-        model_type = obj.get("model_type", Model)
+        model_obj = obj["model"]
+        model_type = model_obj.get("model_type", Model)
+        # if the dictionary has the key "model_type", then delete it to avoid passing it to the constructor
+        model_obj.pop("model_type", None)
 
         # Create a model object
         model = model_type.from_dict(obj["model"])

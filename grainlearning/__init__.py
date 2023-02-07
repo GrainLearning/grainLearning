@@ -1,5 +1,5 @@
 from .models import Model, IOModel
-from .grainlearning import GrainLearning
+from .bayesian_calibration import BayesianCalibration
 from .iterative_bayesian_filter import IterativeBayesianFilter
 from .sampling import GaussianMixtureModel, generate_params_qmc
 from .inference import SMC

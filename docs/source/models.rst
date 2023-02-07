@@ -93,7 +93,7 @@ In these subdirectories, you find
 - simulation data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_sim.txt`
 - parameter data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_param.txt`,
 
-where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.CalibrationToolbox.curr_iter`,
+where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
 and <sample_ID> is the index of the :attr:`.IOModel.param_data` sequence.
 
 For example, the observation data stored in a text file :attr:`.IOModel.obs_data_file` should look like this.

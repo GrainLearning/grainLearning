@@ -39,8 +39,8 @@ def test_init():
 def test_run_inference():
     """Test if the inference runs"""
     model_cls = Model.from_dict({
-        "param_mins": [0, 10],
-        "param_maxs": [10, 100],
+        "param_min": [0, 10],
+        "param_max": [10, 100],
         "obs_data": np.random.uniform(0, 100, (3, 4)),
         "num_samples": 3,
 

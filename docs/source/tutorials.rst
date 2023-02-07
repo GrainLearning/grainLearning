@@ -3,7 +3,7 @@ Tutorials
 
 In this section, we demonstrate how to use GrainLearning through a simple example of linear regression.
 With :class:`.Model` and :class:`IOModel` and the utility functions defined in 
-:class:`.CalibrationToolBox`, we show different ways of connecting
+:class:`.BayesianCalibration`, we show different ways of connecting
 GrainLearning to Python or third-party software models,
 
 Linear regression with a Python model
@@ -31,7 +31,7 @@ First, we create a synthetic dataset from this linear equation.
         model.sim_data = np.array(data)
 
 A calibration tool can be initialized by defining all the necessary input in a dictionary
-and passing it to the constructor of :class:`.CalibrationToolbox`.
+and passing it to the constructor of :class:`.BayesianCalibration`.
 
 .. code-block:: python
 
@@ -43,8 +43,8 @@ and passing it to the constructor of :class:`.CalibrationToolbox`.
         {
             "num_iter": 10,
             "model": {
-                "param_mins": [0.1, 0.1],
-                "param_maxs": [1, 10],
+                "param_min": [0.1, 0.1],
+                "param_max": [1, 10],
                 "param_names": ['a', 'b'],
                 "num_samples": 20,
                 "obs_data": y_obs,
@@ -68,7 +68,7 @@ Note that we want the SMC algorithm to end with an effective sample size
 of no less than 30%. This is achieved by assigning `ess_target = 0.3` when initializing the inference method.
 `calibration.run()` will run the Bayesian calibration iteratively
 until the termination criterion is met.
-By default, no plots are created unless the flag :attr:`.CalibrationToolbox.save_fig` is non-negative.
+By default, no plots are created unless the flag :attr:`.BayesianCalibration.save_fig` is non-negative.
 
 Click :download:`here <../../tutorials/linear_regression/python_linear_regression_solve.py>` to download the full script.
 
@@ -147,8 +147,9 @@ and `sim_data_file_ext` is correct such that GrainLearning can find the data in 
         {
             "num_iter": 10,
             "model": {
-                "param_mins": [0.1, 0.1],
-                "param_maxs": [1, 10],
+                "model_type": IOModel,
+                "param_min": [0.1, 0.1],
+                "param_max": [1, 10],
                 "param_names": ['a', 'b'],
                 "num_samples": 20,
                 "obs_data_file": 'linearObs.dat',
@@ -167,7 +168,6 @@ and `sim_data_file_ext` is correct such that GrainLearning can find the data in 
                 }
             },
             "save_fig": 0,
-            "model_type": IOModel
         }
     )
     
@@ -179,7 +179,7 @@ In these subdirectories, you find
 - simulation data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_sim.txt`
 - parameter data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_param.txt`,
 
-where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.CalibrationToolbox.curr_iter`,
+where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
 and <sample_ID> is the index of the :attr:`.IOModel.param_data` sequence.
 
 Click :download:`here <../../tutorials/linear_regression/linear_regression_solve.py>` to download the full script.

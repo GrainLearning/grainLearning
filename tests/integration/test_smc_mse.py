@@ -1,5 +1,5 @@
 import numpy as np
-from grainlearning import GrainLearning
+from grainlearning import BayesianCalibration
 from sklearn.metrics import mean_squared_error as mse
 
 p1 = 0.2
@@ -18,12 +18,12 @@ def run_sim(model, **kwargs):
 
 
 def test_smc_mse():
-    calibration = GrainLearning.from_dict(
+    calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 0,
             "model": {
-                "param_mins": [0, 0],
-                "param_maxs": [1, 10],
+                "param_min": [0, 0],
+                "param_max": [1, 10],
                 "num_samples": 13,
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
