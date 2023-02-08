@@ -14,6 +14,8 @@ cov.xml
 ./grainLearning/rnn/outputs/
 ./grainLearning/rnn/wandb/
 
+tutorials/rnn/.ipynb_checkpoints/
+
 # Mac
 .DS_Store
 
