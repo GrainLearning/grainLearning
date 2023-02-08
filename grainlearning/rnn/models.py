@@ -11,7 +11,6 @@ def rnn_model(
         window_size: int = 20,
         lstm_units: int = 50,
         dense_units: int = 20,
-        use_windows: bool = True,
         seed: int = 42,
         **kwargs,
         ):
@@ -22,12 +21,10 @@ def rnn_model(
     The contact parameters are used to initialize the hidden state of the LSTM.
 
     :param input_shapes: Dictionary containing `'num_load_features'`, `'num_contact_params'`,
-        `'num_labels'`.
+        `'num_labels'`. It can contain other keys but hese are the ones used here.
     :param window_size: Length of time window.
     :param lstm_units: Number of units of the hidden state of the LSTM.
     :param dense_units: Number of units used in the dense layer after the LSTM.
-    :param use_windows: Whether to use time windows (True, default)
-        or process the entire sequence at once (False).
     :param seed: The random seed used to initialize the weights.
 
     :return: A Keras model.
@@ -35,7 +32,7 @@ def rnn_model(
     # make initialization of weights reproducible
     tf.random.set_seed(seed)
 
-    sequence_length = window_size if use_windows else None  # None means variable
+    sequence_length = window_size
     load_sequence = layers.Input(
             shape=(sequence_length, input_shapes['num_load_features']), name='load_sequence')
     contact_params = layers.Input(shape=(input_shapes['num_contact_params'],), name='contact_parameters')
@@ -46,7 +43,7 @@ def rnn_model(
     initial_state = [state_h, state_c]
 
     X = load_sequence
-    X = layers.LSTM(lstm_units, return_sequences=(not use_windows))(X,
+    X = layers.LSTM(lstm_units, return_sequences=False)(X,
             initial_state=initial_state)
 
     X = layers.Dense(dense_units, activation='relu')(X)

@@ -16,13 +16,18 @@ def train(config=None):
     """
     Train a model and report to weights and biases.
 
-    :param config: dictionary containing model and training configurations.
-
     If called in the framework of a sweep:
     A sweep can be created from the command line using a configuration file,
     for example `example_sweep.yaml`, as: ``wandb sweep example_sweep.yaml``
     And run with the line shown subsequently in the terminal.
     The config is loaded from the yaml file.
+
+    :param config: dictionary containing model and training configurations.
+
+    :return: Same as ``tf.keras.Model.fit()``: A History object.
+      Its History.history attribute is a record of training loss values and
+      metrics values at successive epochs, as well as
+      validation loss values and validation metrics values.
     """
     with wandb.init(config=config):
         config = wandb.config
@@ -61,7 +66,7 @@ def train(config=None):
         callbacks = [wandb_callback, early_stopping]
 
         # train
-        history = model.fit(
+        return model.fit(
                 split_data['train'],
                 epochs=config.epochs,
                 validation_data=split_data['val'],
@@ -75,6 +80,11 @@ def train_without_wandb(config=None):
     Saves either the model or its weight to folder outputs.
 
     :param config: dictionary containing taining hyperparameters and some model parameters
+
+    :return: Same as ``tf.keras.Model.fit()``: A History object.
+      Its History.history attribute is a record of training loss values and
+      metrics values at successive epochs, as well as
+      validation loss values and validation metrics values.
     """
     config = _check_config(config)
     config_optimizer = _get_optimizer_config(config)
@@ -123,7 +133,7 @@ def train_without_wandb(config=None):
     callbacks = [early_stopping, checkpoint]
 
     # train
-    history = model.fit(
+    return model.fit(
             split_data['train'],
             epochs=config["epochs"],
             validation_data=split_data['val'],
