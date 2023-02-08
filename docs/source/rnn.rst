@@ -82,7 +82,10 @@ You can access groups and datasets:
 
 To use it you have to create a free account. If you have installed grainLearning with rnn dependencies, ``wandb`` should be already in your system, otherwise, you can install it: ``pip install wandb``.
 
-For both single runs and sweeps, wandb will create a folder named `wandb` containing metadata and files generated during the run(s). In this same folder, per each run, you will find 3 files: `configuration.yaml`, `train_stats_npy` and `model-best.h5`. These files contain all the information required to load your model in the future. 
+For both single runs and sweeps, wandb will create a folder named `wandb` containing metadata and files generated during the run(s). In this same folder, per each run, you will find 3 files: `config.yaml`, `train_stats_npy` and `model-best.h5`. These files contain all the information required to load your model in the future. 
+
+.. warning::
+   You can run your training on `offline model with wandb <https://docs.wandb.ai/guides/technical-faq/setup#can-i-run-wandb-offline>`_, but in that case `config.yaml` will not be generated until you sync your files. If you don't want to sync the files or create an account on wandb, consider using `Option 2: Train using plain tensorflow`_.
 
 Experiment tracking: Single run
 ::::::::::::::::::::::::::::::::
@@ -324,7 +327,7 @@ The data is split along the temporal dimension in sliding windows of fixed lengt
    :alt: Windows used for sequence splitting and model prediction
 
 The module,takes care of splitting the data into windows and stacking the predictions for each step of the sequence.
-With this configuration, the first ``window_size`` points are not predicted by the model. To predict those too, add ``pad_length`` equals to ``window_size`` to the config dictionary.
+With this configuration, the first ``window_size`` points are not predicted by the model. To predict those too, add ``pad_length`` equals to ``window_size`` to the config dictionary. The trick here will be to add ``pad_length`` copies of the first element of `inputs` to the sequence that will be afterwards windowized.
 
 .. note:: 
    - ``window_size`` is a hyperparameter requiring tuning when training a model. 
