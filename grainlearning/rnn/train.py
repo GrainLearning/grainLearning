@@ -27,6 +27,7 @@ def train(config=None):
     with wandb.init(config=config):
         config = wandb.config
         config = _check_config(config)
+        config_optimizer = _get_optimizer_config(config)
 
         # preprocess data
         split_data, train_stats = prepare_datasets(**config)
@@ -34,7 +35,7 @@ def train(config=None):
 
         # set up the model
         model = rnn_model(train_stats, **config)
-        optimizer = tf.keras.optimizers.Adam(**_get_optimizer_config(config))
+        optimizer = tf.keras.optimizers.Adam(**config_optimizer)
         model.compile(
                 optimizer=optimizer,
                 loss='mse',
@@ -76,6 +77,7 @@ def train_without_wandb(config=None):
     :param config: dictionary containing taining hyperparameters and some model parameters
     """
     config = _check_config(config)
+    config_optimizer = _get_optimizer_config(config)
     path_save_data = Path('outputs')
     if os.path.exists(path_save_data):
         delete_outputs = input(f"The contents of {path_save_data} will be permanently deleted,\
@@ -94,7 +96,7 @@ def train_without_wandb(config=None):
 
     # set up the model
     model = rnn_model(train_stats, **config)
-    optimizer = tf.keras.optimizers.Adam(**_get_optimizer_config(config))
+    optimizer = tf.keras.optimizers.Adam(**config_optimizer)
     model.compile(
             optimizer=optimizer,
             loss='mse',
@@ -197,11 +199,15 @@ def get_default_dict():
 def _check_config(config):
     """
     Checks that values requiring an input from the user would be specified in config.
+
     :param config: Dictionary containing the values of different arguments.
+
     :return: Updated config dictionary.
     """
     # Necessary keys
-    if not 'raw_data' in config: raise ValueError("raw_data has not been defined in config")
+    if not 'raw_data' in config.keys(): raise ValueError("raw_data has not been defined in config")
+    # Note: I systematically use config.keys() instead of in config, because config can be a dict from wandb
+    # This object behaves differently than python dict (might be jsut the version), but this solves it.
 
     # Warning that defaults would be used if not defined.
     # Adding the default to config because is required in other functions.
@@ -218,8 +224,8 @@ def _check_config(config):
 
     # Warning for an unexpected key value
     config_optimizer = _get_optimizer_config(config)
-    for key in config:
-        if key not in defaults and key not in config_optimizer:
+    for key in config.keys():
+        if key not in defaults and key not in config_optimizer.keys():
             warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
 
     return config
@@ -252,7 +258,7 @@ def _get_optimizer_config(config):
     """
     config_optimizer = dict()
     keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
-    for key in config:
+    for key in config.keys():
         if key in keys_optimizer and not (key == 'self' or key == 'kwargs' or key == 'name'):
             config_optimizer[key] = config[key]
 
