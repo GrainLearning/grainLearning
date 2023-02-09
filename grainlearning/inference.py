@@ -1,7 +1,7 @@
 from typing import Type
 import numpy as np
 
-from .models import Model
+from .dynamic_systems import DynamicSystem
 
 from scipy.stats import multivariate_normal
 
@@ -17,7 +17,7 @@ class SMC:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = SMC.from_dict(
+        system_cls = SMC.from_dict(
             {
                 "ess_target": 0.3,
                 "scale_cov_with_max": True
@@ -31,7 +31,7 @@ class SMC:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = SMC(
+        system_cls = SMC(
                 ess_target = 0.3,
                 scale_cov_with_max = True
         )
@@ -82,46 +82,46 @@ class SMC:
         )
 
     def get_covariance_matrices(
-        self, sigma_guess: float, model: Type["Model"]
+        self, sigma_guess: float, system: Type["DynamicSystem"]
     ) -> np.array:
         """Compute the diagonal covariance matrices from a given input sigma.
 
         This function is vectorized for all loading steps
 
         :param sigma_guess: input sigma
-        :param model: Model class
+        :param system: Dynamic system class
         :return: Covariance matrices for all loading steps
         """
-        cov_matrix = sigma_guess * model._inv_normalized_sigma
+        cov_matrix = sigma_guess * system._inv_normalized_sigma
 
         # duplicated covariant matrix to loading step
-        cov_matrices = cov_matrix[None, :].repeat(model.num_steps, axis=0)
+        cov_matrices = cov_matrix[None, :].repeat(system.num_steps, axis=0)
 
         # scale with the maximum of the loading steps
         if self.scale_cov_with_max:
-            cov_matrices *= model.obs_data.max(axis=1)[:, None] ** 2
+            cov_matrices *= system.obs_data.max(axis=1)[:, None] ** 2
         else:
             # or element wise multiplication of covariant matrix with observables of all loading steps
-            cov_matrices *= model.obs_data.T[:, None] ** 2
+            cov_matrices *= system.obs_data.T[:, None] ** 2
 
         return cov_matrices
 
-    def get_likelihoods(self, model: Type["Model"], cov_matrices: np.array) -> np.array:
+    def get_likelihoods(self, system: Type["DynamicSystem"], cov_matrices: np.array) -> np.array:
         """Compute the likelihoods as a multivariate normal of the simulation data centered around the observations.
 
         This function is vectorized for all loading steps
 
-        :param model: Model class
+        :param system: Dynamic system class
         :param cov_matrices: covariance matricies
         :return: Likelihood matrices for all loading steps
         """
-        likelihoods = np.zeros((model.num_steps, model.num_samples))
+        likelihoods = np.zeros((system.num_steps, system.num_samples))
 
-        for stp_id in range(model.num_steps):
+        for stp_id in range(system.num_steps):
             # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multivariate_normal.html
             likelihood = multivariate_normal.pdf(
-                model.sim_data[:, :, stp_id],
-                mean=model.obs_data[:, stp_id],
+                system.sim_data[:, :, stp_id],
+                mean=system.obs_data[:, stp_id],
                 cov=cov_matrices[stp_id],
             )
             likelihoods[stp_id, :] = likelihood / likelihood.sum()
@@ -129,28 +129,28 @@ class SMC:
         return likelihoods
 
     def get_posterors(
-        self, model: Type["Model"], likelihoods: np.array, proposal_ibf: np.array = None
+        self, system: Type["DynamicSystem"], likelihoods: np.array, proposal_ibf: np.array = None
     ) -> np.array:
         """Compute the posteriors for all the loading steps
 
         This function is vectorized for all loading steps
 
-        :param model: Model class
+        :param system: Dynamic system class
         :param likelihoods: Likelihood matrices
         :param proposal_ibf: Optional input proposal
         :return: Posterior distributions for all loading steps
         """
-        posteriors = np.zeros((model.num_steps, model.num_samples))
+        posteriors = np.zeros((system.num_steps, system.num_samples))
 
         if proposal_ibf is None:
-            proposal = np.ones([model.num_samples]) / model.num_samples
+            proposal = np.ones([system.num_samples]) / system.num_samples
         else:
             proposal = proposal_ibf
 
         posteriors[0, :] = likelihoods[0, :] / proposal
         posteriors[0, :] /= posteriors[0, :].sum()
 
-        for stp_id in range(1, model.num_steps):
+        for stp_id in range(1, system.num_steps):
             posteriors[stp_id, :] = posteriors[stp_id - 1, :] * likelihoods[stp_id, :]
             posteriors[stp_id, :] /= posteriors[stp_id, :].sum()
 
@@ -158,25 +158,25 @@ class SMC:
 
     def get_ensemble_ips_covs(
         self,
-        model: Type["Model"],
+        system: Type["DynamicSystem"],
         posteriors: np.array,
     ) -> np.array:
         """Compute the ensemble averages for parameters. (Used for post-processing)
 
         This function is vectorized for all loading steps
 
-        :param model: Model class
+        :param system: Dynamic system class
         :param posteriors: Posterior distributions
         :return: Ensemble averages
         """
-        ips = np.zeros((model.num_steps, model.num_params))
-        covs = np.zeros((model.num_steps, model.num_params))
+        ips = np.zeros((system.num_steps, system.num_params))
+        covs = np.zeros((system.num_steps, system.num_params))
 
-        for stp_id in range(model.num_steps):
-            ips[stp_id, :] = posteriors[stp_id, :] @ model.param_data
+        for stp_id in range(system.num_steps):
+            ips[stp_id, :] = posteriors[stp_id, :] @ system.param_data
 
             covs[stp_id, :] = (
-                posteriors[stp_id, :] @ (ips[stp_id, :] - model.param_data) ** 2
+                posteriors[stp_id, :] @ (ips[stp_id, :] - system.param_data) ** 2
             )
 
             covs[stp_id, :] = np.sqrt(covs[stp_id, :]) / ips[stp_id, :]
@@ -192,28 +192,28 @@ class SMC:
         return self.posteriors[loading_step, :]
 
     def data_assimilation_loop(
-        self, sigma_guess: float, model: Type["Model"], proposal_ibf: np.ndarray = None
+        self, sigma_guess: float, system: Type["DynamicSystem"], proposal_ibf: np.ndarray = None
     ):
         """Perform data assimilation loop
 
         :param sigma_guess: Guess of sigma
         :param proposal_ibf: Input distribution
-        :param model: Model class
+        :param system: Dynamic system class
         :return: Result of the objective function which converges to a user defined effective sample size
         """
         self.cov_matrices = self.get_covariance_matrices(
-            sigma_guess=sigma_guess, model=model
+            sigma_guess=sigma_guess, system=system
         )
         self.likelihoods = self.get_likelihoods(
-            model=model, cov_matrices=self.cov_matrices
+            system=system, cov_matrices=self.cov_matrices
         )
 
         self.posteriors = self.get_posterors(
-            model=model, likelihoods=self.likelihoods, proposal_ibf=proposal_ibf
+            system=system, likelihoods=self.likelihoods, proposal_ibf=proposal_ibf
         )
 
         self.ips, self.covs = self.get_ensemble_ips_covs(
-            model=model, posteriors=self.posteriors
+            system=system, posteriors=self.posteriors
         )
 
         # TODO: I (Hongyang) would save the whole effective sample size sequence in time.
@@ -222,6 +222,6 @@ class SMC:
             self.posteriors[-1, :] ** 2,
         )
 
-        self.ess /= model.num_samples
+        self.ess /= system.num_samples
 
         return (self.ess - self.ess_target) ** 2

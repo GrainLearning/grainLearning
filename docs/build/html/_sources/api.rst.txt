@@ -13,7 +13,7 @@ Python API
 ``Models``
 *****************************
 
-.. automodule:: grainlearning.models
+.. automodule:: grainlearning.dynamic_systems
     :members:
     :show-inheritance:
     :inherited-members:

@@ -22,7 +22,7 @@ with the DEM and continuum constitutive models.
 GrainLearning can be used together with external DEM software packages, e.g., `YADE <http://yade-dem.org/>`_, and
 `MercuryDPM <https://www.mercurydpm.org/>`_, and other numerical methods beyond DEM.
 Integrating an external (software) model into GrainLearning can be easily done
-via the callback function :attr:`.IOModel.callback` of the :class:`.IOModel` class.
+via the callback function :attr:`.IODynamicSystem.callback` of the :class:`.IODynamicSystem` class.
 
 It is important to bear in mind the following definitions, as they will appear frequently in this documentation.
 

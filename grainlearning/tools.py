@@ -87,7 +87,7 @@ def get_keys_and_data(fileName, delimiters=['\t', ' ', ',']):
         keys = list(filter(None, keys))
         if len(keys) == ncols: break
 
-    # store data in a dictory
+    # store data in a dictionary
     keys_and_data = {}
     for key in keys:
         if '#' in key:

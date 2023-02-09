@@ -1,5 +1,5 @@
 from typing import Type, Dict
-from .models import Model, IOModel
+from .dynamic_systems import DynamicSystem, IODynamicSystem
 from .iterative_bayesian_filter import IterativeBayesianFilter
 from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
 
@@ -19,11 +19,11 @@ class BayesianCalibration:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = BayesianCalibration.from_dict(
+        system_cls = BayesianCalibration.from_dict(
             {
                 "num_iter": 8,
-                "model": {
-                    "model_type": Model,
+                "system": {
+                    "system_type": DynamicSystem,
                     "model_name": "test",
                     "param_names": ["a", "b"],
                     "param_min": [0, 0],
@@ -48,21 +48,21 @@ class BayesianCalibration:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = BayesianCalibration(
+        system_cls = BayesianCalibration(
             num_iter = 10,
-            model = Model(...),
+            model = DynamicSystem(...),
             calibration = IterativeBayesianFilter(...)
             save_fig = -1
         )
 
-    :param model: A `state-space model <https://en.wikipedia.org/wiki/Particle_filter#Approximate_Bayesian_computation_models>`_ (a Model or IOModel object)
+    :param system: A dynamic or `state-space system <https://en.wikipedia.org/wiki/Particle_filter#Approximate_Bayesian_computation_models>`_ (a DynamicSystem or IODynamicSystem object)
     :param calibration: An Iterative Bayesian Filter
     :param num_iter: Number of iteration steps
     :param curr_iter: Current iteration step
     :param save_fig: Flag for skipping (-1), showing (0), or saving (1) the figures
     """
-    #: Model being calibrated on
-    model: Type["Model"]
+    #: DynamicSystem being calibrated on
+    system: Type["DynamicSystem"]
 
     #: Calibration method (e.g, Iterative Bayesian Filter)
     calibration: Type["IterativeBayesianFilter"]
@@ -78,13 +78,14 @@ class BayesianCalibration:
 
     def __init__(
         self,
-        model: Type["Model"],
+        system: Type["DynamicSystem"],
         calibration: Type["IterativeBayesianFilter"],
         num_iter: int,
         curr_iter: int,
         save_fig: int
     ):
-        self.model = model
+        """Initialize the Bayesian calibration class"""
+        self.system = system
 
         self.calibration = calibration
 
@@ -108,7 +109,7 @@ class BayesianCalibration:
             self.curr_iter += 1
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
-            if self.model.sigma_max < self.model.sigma_tol:
+            if self.system.sigma_max < self.system.sigma_tol:
                 self.num_iter = self.curr_iter + 1
                 break
 
@@ -119,41 +120,41 @@ class BayesianCalibration:
         """
         # Initialize the samples if it is the first iteration
         if self.curr_iter == 0:
-            self.calibration.initialize(self.model)
+            self.calibration.initialize(self.system)
         # Fetch the parameter values from a stored list
-        self.model.param_data = self.calibration.param_data_list[index]
-        self.model.num_samples = self.model.param_data.shape[0]
+        self.system.param_data = self.calibration.param_data_list[index]
+        self.system.num_samples = self.system.param_data.shape[0]
 
         # Run the model instances
-        self.model.run(curr_iter=self.curr_iter)
+        self.system.run(curr_iter=self.curr_iter)
 
         # Load model data from disk
-        if type(self.model) is IOModel:
-            self.load_model()
+        if type(self.system) is IODynamicSystem:
+            self.load_system()
 
         # Estimate model parameters as a distribution
-        self.calibration.solve(self.model)
-        self.calibration.sigma_list.append(self.model.sigma_max)
+        self.calibration.solve(self.system, )
+        self.calibration.sigma_list.append(self.system.sigma_max)
 
         # Generate some plots
         self.plot_uq_in_time()
 
-    def load_model(self):
+    def load_system(self):
         """Load existing simulation data from disk into the state-space model
         """
-        self.model.load_param_data(self.curr_iter)
-        self.model.get_sim_data_files(self.curr_iter)
-        self.model.load_sim_data()
+        self.system.load_param_data(self.curr_iter)
+        self.system.get_sim_data_files(self.curr_iter)
+        self.system.load_sim_data()
 
     def load_and_run_one_iteration(self):
         """Load existing simulation data and run Bayesian calibration for one iteration
            Note the maximum uncertainty sigma_max is solved to reach a certain effective sample size ess_target,
            unlike being assumed as an input for `load_and_process(...)`
         """
-        self.load_model()
-        self.calibration.add_curr_param_data_to_list(self.model.param_data)
-        self.calibration.solve(self.model)
-        self.calibration.sigma_list.append(self.model.sigma_max)
+        self.load_system()
+        self.calibration.add_curr_param_data_to_list(self.system.param_data)
+        self.calibration.solve(self.system, )
+        self.calibration.sigma_list.append(self.system.sigma_max)
         self.plot_uq_in_time()
 
     def load_and_process(self, sigma: float = 0.1):
@@ -161,10 +162,10 @@ class BayesianCalibration:
 
         :param sigma: assumed uncertainty coefficient, defaults to 0.1
         """
-        self.load_model()
-        self.calibration.add_curr_param_data_to_list(self.model.param_data)
-        self.calibration.load_proposal_from_file(self.model)
-        self.calibration.inference.data_assimilation_loop(sigma, self.model)
+        self.load_system()
+        self.calibration.add_curr_param_data_to_list(self.system.param_data)
+        self.calibration.load_proposal_from_file(self.system)
+        self.calibration.inference.data_assimilation_loop(sigma, self.system)
 
     def resample(self):
         """Learn and resample from a proposal distribution
@@ -173,9 +174,9 @@ class BayesianCalibration:
         :return: Combinations of resampled parameter values
         """
         self.calibration.posterior_ibf = self.calibration.inference.give_posterior()
-        self.calibration.run_sampling(self.model)
+        self.calibration.run_sampling(self.system, )
         resampled_param_data = self.calibration.param_data_list[-1]
-        self.model.write_to_table(self.curr_iter + 1)
+        self.system.write_to_table(self.curr_iter + 1)
         return resampled_param_data
 
     def plot_uq_in_time(self):
@@ -185,16 +186,16 @@ class BayesianCalibration:
             return
 
         import os
-        path = f'{self.model.sim_data_dir}/iter{self.curr_iter}' \
-            if type(self.model) == IOModel \
-            else f'./{self.model.sim_name}/iter{self.curr_iter}'
+        path = f'{self.system.sim_data_dir}/iter{self.curr_iter}' \
+            if type(self.system) == IODynamicSystem \
+            else f'./{self.system.sim_name}/iter{self.curr_iter}'
 
         if not os.path.exists(path):
             os.makedirs(path)
 
-        fig_name = f'{path}/{self.model.sim_name}'
+        fig_name = f'{path}/{self.system.sim_name}'
         plot_param_stats(
-            fig_name, self.model.param_names,
+            fig_name, self.system.param_names,
             self.calibration.inference.ips,
             self.calibration.inference.covs,
             self.save_fig
@@ -202,26 +203,26 @@ class BayesianCalibration:
 
         plot_posterior(
             fig_name,
-            self.model.param_names,
-            self.model.param_data,
+            self.system.param_names,
+            self.system.param_data,
             self.calibration.inference.posteriors,
             self.save_fig
         )
 
         plot_param_data(
             fig_name,
-            self.model.param_names,
+            self.system.param_names,
             self.calibration.param_data_list,
             self.save_fig
         )
 
         plot_obs_and_sim(
             fig_name,
-            self.model.ctrl_name,
-            self.model.obs_names,
-            self.model.ctrl_data,
-            self.model.obs_data,
-            self.model.sim_data,
+            self.system.ctrl_name,
+            self.system.obs_names,
+            self.system.ctrl_data,
+            self.system.obs_data,
+            self.system.sim_data,
             self.calibration.inference.posteriors,
             self.save_fig
         )
@@ -233,32 +234,32 @@ class BayesianCalibration:
         """
         from numpy import argmax
         most_prob = argmax(self.calibration.posterior_ibf)
-        return self.model.param_data[most_prob]
+        return self.system.param_data[most_prob]
 
     @classmethod
     def from_dict(
         cls: Type["BayesianCalibration"],
         obj: Dict
     ):
-        """An alternative constructor to allow choosing a model type (e.g., Model or IOModel)
+        """An alternative constructor to allow choosing a model type (e.g., DynamicSystem or IODynamicSystem)
         :param obj: a dictionary containing the keys and values to construct a BayesianCalibration object
         :return: A BayesianCalibration object
         """
 
-        # Get the model class, defaults to `Model`
-        model_obj = obj["model"]
-        model_type = model_obj.get("model_type", Model)
-        # if the dictionary has the key "model_type", then delete it to avoid passing it to the constructor
-        model_obj.pop("model_type", None)
+        # Get the model class, defaults to `DynamicSystem`
+        system_obj = obj["system"]
+        system_type = system_obj.get("system_type", DynamicSystem)
+        # if the dictionary has the key "system_type", then delete it to avoid passing it to the constructor
+        system_obj.pop("system_type", None)
 
         # Create a model object
-        model = model_type.from_dict(obj["model"])
+        system = system_type.from_dict(obj["system"])
 
         # Create a calibration object
         calibration = IterativeBayesianFilter.from_dict(obj["calibration"])
 
         return cls(
-            model=model,
+            system=system,
             calibration=calibration,
             num_iter=obj["num_iter"],
             curr_iter=obj.get("curr_iter", 0),

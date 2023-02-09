@@ -13,14 +13,14 @@ def run_sim(model, **kwargs):
         y_sim = params[0] * model.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
 
-    model.sim_data = np.array(data)
+    model.set_sim_data(data)
 
 
 def test_lenreg():
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
-            "model": {
+            "system": {
                 "param_min": [0.1, 0.1],
                 "param_max": [1, 10],
                 "param_names": ['a', 'b'],
@@ -45,7 +45,7 @@ def test_lenreg():
     calibration.run()
 
     # %%
-    print(f'All parameter samples at the last iteration:\n {calibration.model.param_data}')
+    print(f'All parameter samples at the last iteration:\n {calibration.system.param_data}')
 
     # %%
     # plt.plot( np.arange(calibration.num_iter),calibration.sigma_list); plt.show()
@@ -58,7 +58,7 @@ def test_lenreg():
     most_prob = np.argmax(calibration.calibration.posterior_ibf)
 
     # %%
-    most_prob_params = calibration.model.param_data[most_prob]
+    most_prob_params = calibration.system.param_data[most_prob]
 
     print(f'Most probable parameter values: {most_prob_params}')
     # %%
@@ -69,9 +69,9 @@ def test_lenreg():
     # 1. Testing values of parameters
     error = most_prob_params - [0.2, 5.0]
     assert abs(error[
-                   0]) / 0.2 < error_tolerance, f"Model parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
+                   0]) / 0.2 < error_tolerance, f"StateSpaceModel parameters are not correct, expected 0.2 but got {most_prob_params[0]}"
     assert abs(error[
-                   1]) / 5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
+                   1]) / 5.0 < error_tolerance, f"StateSpaceModel parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
 
     # 2. Checking sigma
     assert calibration.calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."

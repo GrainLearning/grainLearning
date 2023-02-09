@@ -2,7 +2,7 @@ Tutorials
 =========
 
 In this section, we demonstrate how to use GrainLearning through a simple example of linear regression.
-With :class:`.Model` and :class:`IOModel` and the utility functions defined in 
+With :class:`.DynamicSystem` and :class:`IODynamicSystem` and the utility functions defined in 
 :class:`.BayesianCalibration`, we show different ways of connecting
 GrainLearning to Python or third-party software models,
 
@@ -10,7 +10,7 @@ Linear regression with a Python model
 -------------------------------------
 
 For demonstrative purposes, we use a linear function :math:`y = a\times{x}+b` as the numerical model,
-implemented as the callback function of the :class:`.Model`.
+implemented as the callback function of the :class:`.DynamicSystem`.
 
 First, we create a synthetic dataset from this linear equation.
 
@@ -76,8 +76,8 @@ Linear regression with a "software" model
 -----------------------------------------
 
 Because most likely the external software reads in and writes out text files,
-its interaction with GrainLearning has to be done with the :class:`.IOModel`
-Now let us look at the same example, with the :class:`.IOModel` and a linear function implemented in a separate file `LinearModel.py`.
+its interaction with GrainLearning has to be done with the :class:`.IODynamicSystem`
+Now let us look at the same example, with the :class:`.IODynamicSystem` and a linear function implemented in a separate file `LinearModel.py`.
 For simplicity, we implement this external "software" in Python, which takes the command line arguments as the model parameters.
 
 .. code-block:: python
@@ -134,20 +134,20 @@ This Python script is called by the callback `run_sim` from the command line.
             print(" ".join([executable, '%.8e %.8e' % tuple(params), description]))
             os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
 
-When initializing :class:`.IOModel`,
+When initializing :class:`.IODynamicSystem`,
 one has to make sure that `sim_data_dir` and `obs_data_file` exist, `sim_name`, `obs_names` and `ctrl_name` are given,
 and `sim_data_file_ext` is correct such that GrainLearning can find the data in the simulation directories.
 
 .. code-block:: python
 
     from grainlearning import CalibrationToolbox
-    from grainlearning.models import IOModel
+    from grainlearning.dynamic_systems import IODynamicSystem
 
     calibration = CalibrationToolbox.from_dict(
         {
             "num_iter": 10,
             "model": {
-                "model_type": IOModel,
+                "model_type": IODynamicSystem,
                 "param_min": [0.1, 0.1],
                 "param_max": [1, 10],
                 "param_names": ['a', 'b'],
@@ -173,14 +173,14 @@ and `sim_data_file_ext` is correct such that GrainLearning can find the data in 
     
     calibration.run()
 
-When running `calibration.run()`, subdirectories with the name `iter<curr_iter>` will be created in :attr:`.IOModel.sim_data_dir`.
+When running `calibration.run()`, subdirectories with the name `iter<curr_iter>` will be created in :attr:`.IODynamicSystem.sim_data_dir`.
 In these subdirectories, you find
 
 - simulation data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_sim.txt`
 - parameter data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_param.txt`,
 
-where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
-and <sample_ID> is the index of the :attr:`.IOModel.param_data` sequence.
+where <sim_name> is :attr:`.IODynamicSystem.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
+and <sample_ID> is the index of the :attr:`.IODynamicSystem.param_data` sequence.
 
 Click :download:`here <../../tutorials/linear_regression/linear_regression_solve.py>` to download the full script.
 
@@ -207,7 +207,7 @@ and store the new parameter table in a text file.
 .. code-block:: python
 
     resampled_param_data = calibration.resample()
-    calibration.model.write_to_table(calibration.curr_iter + 1)
+    calibration.system.write_to_table(calibration.curr_iter + 1)
 
 The parameter table below can be used to run the software model (e.g., YADE).
 

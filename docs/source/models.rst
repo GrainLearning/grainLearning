@@ -5,14 +5,14 @@ The models module
 -----------------
 
 The :mod:`.models` module is essential for GrainLearning to execute computational models
-and encapsulate simulation and observation (reference) data in a single :class:`.Model` class
+and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class
 Currently, the :mod:`.models` module contains
 
-- a :class:`.Model` class that executes simulations handles the simulation and observation data in a *Python environment*,
-- an :class:`.IOModel` class that sends instructions to *third-party software* (from the command line) and retrieves simulation data from the output files of the software.
+- a :class:`.DynamicSystem` class that executes simulations handles the simulation and observation data in a *Python environment*,
+- an :class:`.IODynamicSystem` class that sends instructions to *third-party software* (from the command line) and retrieves simulation data from the output files of the software.
 
 Note that the models defined in GrainLearning are state space models
-that consist of both numerical predictions :math:`\vec{x}_t` (:attr:`.Model.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.Model.obs_data`).
+that consist of both numerical predictions :math:`\vec{x}_t` (:attr:`.DynamicSystem.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.DynamicSystem.obs_data`).
 
 .. math::
 
@@ -38,15 +38,15 @@ whose distributions are updated by the :mod:`.inference` module.
 Interact with third-party software
 ----------------------------------
 
-Interaction with external "software" models can be done via the callback of the :class:`.Model` class.
-You can define your own :attr:`.Model.callback`
+Interaction with external "software" models can be done via the callback of the :class:`.DynamicSystem` class.
+You can define your own :attr:`.DynamicSystem.callback`
 and pass samples (combinations of parameters) to the **model implemented in Python** or to the software from the **command line**.
 The following gives an example of the callback where the "software" model :math:`\mathbb{F}` is a Python function. 
 
 .. code-block:: python
    :caption: A callback function implemented in Python
 
-   def run_sim(model: Type["Model"], **kwargs):
+   def run_sim(model: Type["DynamicSystem"], **kwargs):
        data = []
        for params in model.param_data:
            # a linear function y = a*x + b
@@ -56,12 +56,12 @@ The following gives an example of the callback where the "software" model :math:
        model.sim_data = np.array(data)
 
 
-The IOModel class
+The IODynamicSystem class
 `````````````````
 
-The :class:`.IOModel` inherits from :class:`.Model` and is intended to work with third-party software packages.
-The :attr:`.IOModel.run` function overrides the :attr:`.Model.run` function of the :class:`.Model`.
-to write samples in a text file and run the :attr:`.IOModel.callback` to execute the third-party software model at all sample points.
+The :class:`.IODynamicSystem` inherits from :class:`.DynamicSystem` and is intended to work with third-party software packages.
+The :attr:`.IODynamicSystem.run` function overrides the :attr:`.DynamicSystem.run` function of the :class:`.DynamicSystem`.
+to write samples in a text file and run the :attr:`.IODynamicSystem.callback` to execute the third-party software model at all sample points.
 Below is an example of the callback where parameter samples are passed as command-line arguments to an external executable.
 
 .. code-block:: python
@@ -86,17 +86,17 @@ Data format and directory structure
 ```````````````````````````````````
 
 GrainLearning can read .npy (for backward compatibility) and plain text formats.
-When using :class:`.IOModel`, the directory :attr:`.IOModel.sim_data_dir` must exist and contains the observation data file :attr:`.IOModel.obs_data_file`.
-Subdirectories with name `iter<curr_iter>` will be created in :attr:`.IOModel.sim_data_dir`.
+When using :class:`.IODynamicSystem`, the directory :attr:`.IODynamicSystem.sim_data_dir` must exist and contains the observation data file :attr:`.IODynamicSystem.obs_data_file`.
+Subdirectories with name `iter<curr_iter>` will be created in :attr:`.IODynamicSystem.sim_data_dir`.
 In these subdirectories, you find
 
 - simulation data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_sim.txt`
 - parameter data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_param.txt`,
 
-where <sim_name> is :attr:`.IOModel.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
-and <sample_ID> is the index of the :attr:`.IOModel.param_data` sequence.
+where <sim_name> is :attr:`.IODynamicSystem.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
+and <sample_ID> is the index of the :attr:`.IODynamicSystem.param_data` sequence.
 
-For example, the observation data stored in a text file :attr:`.IOModel.obs_data_file` should look like this.
+For example, the observation data stored in a text file :attr:`.IODynamicSystem.obs_data_file` should look like this.
 
 .. code-block:: text
 
@@ -120,9 +120,9 @@ Similarly, in a simulation data file `linear_Iter0-Sample00_sim.txt`, you find
 	1.869541667
 	2.151510417
 
-Note the simulation data doesn't contain the :attr:`Model.ctrl_data` sequence.
+Note the simulation data doesn't contain the :attr:`DynamicSystem.ctrl_data` sequence.
 
-Therefore, when using :class:`.IOModel` the user needs to provide the keys to the data sequence
+Therefore, when using :class:`.IODynamicSystem` the user needs to provide the keys to the data sequence
 of the **control** and **observation** group.
 These keys are also used to extract the corresponding data from the simulation data files.
 

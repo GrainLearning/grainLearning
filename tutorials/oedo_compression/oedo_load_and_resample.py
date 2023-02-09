@@ -1,5 +1,5 @@
 from grainlearning import BayesianCalibration
-from grainlearning.models import IOModel
+from grainlearning.dynamic_systems import IODynamicSystem
 
 curr_iter = 1
 sim_data_dir = "./tests/data/oedo_sim_data"
@@ -8,8 +8,8 @@ calibration = BayesianCalibration.from_dict(
     {
         "curr_iter": curr_iter,
         "num_iter": 0,
-        "model": {
-            "model_type": IOModel,
+        "system": {
+            "system_type": IODynamicSystem,
             "obs_data_file": 'obsdata.dat',
             "obs_names": ['p', 'q', 'n'],
             "ctrl_name": 'e_a',

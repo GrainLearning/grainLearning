@@ -14,14 +14,14 @@ def run_sim(model, **kwargs):
         y_sim = params[0] * model.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
 
-    model.sim_data = np.array(data)
+    model.set_sim_data(data)
 
 
 def test_smc_mse():
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 0,
-            "model": {
+            "system": {
                 "param_min": [0, 0],
                 "param_max": [1, 10],
                 "num_samples": 13,
@@ -38,9 +38,9 @@ def test_smc_mse():
 
     calibration.run_one_iteration()
     most_prob = np.argmax(calibration.calibration.posterior_ibf)
-    # most_prob_params = calibration.model.param_data[most_prob]
+    # most_prob_params = calibration.system.param_data[most_prob]
     least_err = np.argmin(
-        [mse(calibration.model.sim_data[sid, 0, :], y_obs) for sid in range(calibration.model.num_samples)])
+        [mse(calibration.system.sim_data[sid, 0, :], y_obs) for sid in range(calibration.system.num_samples)])
 
     assert most_prob == least_err, f"most probable does not have the least MAE {most_prob=} {least_err=}"
 

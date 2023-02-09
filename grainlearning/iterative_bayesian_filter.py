@@ -3,7 +3,7 @@
 import numpy as np
 from typing import Type, List
 
-from .models import Model
+from .dynamic_systems import DynamicSystem
 
 from .inference import SMC
 
@@ -41,7 +41,7 @@ class IterativeBayesianFilter:
     .. highlight:: python
     .. code-block:: python
 
-        model_cls = IterativeBayesianFilter(
+        system_cls = IterativeBayesianFilter(
                 inference = SMC(...),
                 sampling = GaussianMixtureModel(...)
         )
@@ -108,74 +108,74 @@ class IterativeBayesianFilter:
             proposal_data_file=obj.get("proposal_data_file", None),
         )
 
-    def run_inference(self, model: Type["Model"]):
+    def run_inference(self, system: Type["DynamicSystem"]):
         """Run inference (e.g, data assimilation loop) using the Sequential Monte Carlo
 
-        :param model: Model class
+        :param system: Dynamic system class
         """
         result = optimize.minimize_scalar(
             self.inference.data_assimilation_loop,
-            args=(model, self.proposal_ibf),
+            args=(system, self.proposal_ibf),
             method="bounded",
-            bounds=(model.sigma_min, model.sigma_max),
+            bounds=(system.sigma_min, system.sigma_max),
         )
-        model.sigma_max = result.x
+        system.sigma_max = result.x
 
         # if the name of proposal data file is given, make use of the proposal density during Bayesian updating
         if self.proposal_data_file is not None and self.proposal_ibf is None:
-            self.load_proposal_from_file(model)
+            self.load_proposal_from_file(system)
 
-        if model.sigma_max > model.sigma_tol:
-            self.inference.data_assimilation_loop(model.sigma_max, model, self.proposal_ibf)
+        if system.sigma_max > system.sigma_tol:
+            self.inference.data_assimilation_loop(system.sigma_max, system, self.proposal_ibf)
         else:
-            self.inference.data_assimilation_loop(model.sigma_tol, model, self.proposal_ibf)
+            self.inference.data_assimilation_loop(system.sigma_tol, system, self.proposal_ibf)
 
         self.posterior_ibf = self.inference.give_posterior()
 
-    def initialize(self, model: Type["Model"]):
+    def initialize(self, system: Type["DynamicSystem"]):
         """Resample the parameters using the Gaussian mixture model
 
-        :param model: Model class
+        :param system: Dynamic system class
         """
-        model.param_data = generate_params_qmc(model, model.num_samples, self.initial_sampling)
-        self.param_data_list.append(model.param_data)
+        system.param_data = generate_params_qmc(system, system.num_samples, self.initial_sampling)
+        self.param_data_list.append(system.param_data)
 
-    def run_sampling(self, model: Type["Model"]):
+    def run_sampling(self, system: Type["DynamicSystem"]):
         """Resample the parameters using the Gaussian mixture model
 
-        :param model: Model class
+        :param system: Dynamic system class
         """
-        self.param_data_list.append(self.sampling.regenerate_params(self.posterior_ibf, model))
+        self.param_data_list.append(self.sampling.regenerate_params(self.posterior_ibf, system))
         # self.param_data_list.append(self.sampling.regenerate_params_with_gmm(self.posterior_ibf, model))
 
-    def solve(self, model: Type["Model"]):
+    def solve(self, system: Type["DynamicSystem"]):
         """Run both inference and sampling on a model
 
-        :param model: Model class
+        :param system: Dynamic system class
         """
-        self.run_inference(model)
-        self.run_sampling(model)
+        self.run_inference(system)
+        self.run_sampling(system)
 
     def add_curr_param_data_to_list(self, param_data: np.ndarray):
         self.param_data_list.append(param_data)
 
-    def load_proposal_from_file(self, model: Type["Model"]):
-        if model.param_data is None:
+    def load_proposal_from_file(self, system: Type["DynamicSystem"]):
+        if system.param_data is None:
             RuntimeError("parameter samples not yet loaded...")
 
         if self.proposal_data_file is None: return
 
         from .tools import voronoi_vols
         from pickle import load
-        param_max, gmm = load(open(model.sim_data_dir + '/' + self.proposal_data_file, 'rb'), encoding='latin1')
-        samples = np.copy(model.param_data)
+        param_max, gmm = load(open(system.sim_data_dir + '/' + self.proposal_data_file, 'rb'), encoding='latin1')
+        samples = np.copy(system.param_data)
         samples /= param_max
 
         proposal = np.exp(gmm.score_samples(samples))
         proposal *= voronoi_vols(samples)
         # assign the maximum vol to open regions (use a uniform proposal distribution if Voronoi fails)
         if (proposal < 0.0).all():
-            self.proposal_ibf = np.ones(proposal.shape) / model.num_samples
+            self.proposal_ibf = np.ones(proposal.shape) / system.num_samples
         else:
             proposal[np.where(proposal < 0.0)] = min(proposal[np.where(proposal > 0.0)])
             self.proposal_ibf = proposal / sum(proposal)
