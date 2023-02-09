@@ -11,8 +11,9 @@ class DynamicSystem:
     and observation using the following equations:
 
     .. math::
-        x_t = f(x_{t−1}) + q_{t−1}
-        y_t = h(x_t) + r_t
+        x_t & = f(x_{t−1}) + q_{t−1}
+
+        y_t & = h(x_t) + r_t
 
     where
     :math:`x_t` is the hidden state,
@@ -70,6 +71,7 @@ class DynamicSystem:
 
     .. highlight:: python
     .. code-block:: python
+
         system_cls.set_sim_data(x)
 
     The simulation data is a numpy array of shape (num_samples, num_obs, num_steps).
@@ -88,6 +90,7 @@ class DynamicSystem:
     :param sim_data: Simulation data, defaults to None, optional
     :param sigma_max: Maximum uncertainty, defaults to 1.0e6, optional
     :param sigma_tol: Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional
+    :param sim_name: Name of the simulation, defaults to 'sim', optional
     """
 
     ##### Parameters #####
@@ -238,6 +241,7 @@ class DynamicSystem:
     @classmethod
     def from_dict(cls: Type["DynamicSystem"], obj: dict):
         """ Initialize the class using a dictionary style
+
         :param obj: Dictionary object
         :return: DynamicSystem: DynamicSystem object
         """
@@ -279,6 +283,7 @@ class DynamicSystem:
 
     def set_sim_data(self, data: np.ndarray):
         """Set the simulation data
+
         :param data: simulation data of shape (num_samples, num_obs, num_steps)
         """
         self.sim_data = np.array(data)
@@ -366,7 +371,7 @@ class IODynamicSystem(DynamicSystem):
     :param obs_data_file: Observation data file, defaults to None
     :param obs_names: Column names of the observation data, defaults to None
     :param ctrl_name: Column name of the control data, defaults to None
-    :param sim_name: Simulation name, defaults to None
+    :param sim_name: Name of the simulation, defaults to 'sim'
     :param sim_data_dir: Simulation data directory, defaults to './sim_data'
     :param sim_data_file_ext: Simulation data file extension, defaults to '.npy'
     :param callback: Callback function, defaults to None
@@ -473,6 +478,7 @@ class IODynamicSystem(DynamicSystem):
     @classmethod
     def from_dict(cls: Type["IODynamicSystem"], obj: dict):
         """ Initialize the class using a dictionary style
+
         :param obj: Dictionary object
         :return IODynamicSystem: IODynamicSystem object
         """
@@ -533,6 +539,7 @@ class IODynamicSystem(DynamicSystem):
 
     def get_sim_data_files(self, curr_iter: int = 0):
         """Get the simulation data files from the simulation data directory.
+
         :param curr_iter: Current iteration number, default to 0.
         """
         from math import floor, log
@@ -589,6 +596,7 @@ class IODynamicSystem(DynamicSystem):
     def load_param_data(self, curr_iter: int = 0):
         """
         Load parameter data from a table written in a text file.
+
         :param curr_iter: Current iteration number, default to 0.
         """
         import os
@@ -645,6 +653,7 @@ class IODynamicSystem(DynamicSystem):
 
     def write_params_to_txt(self, curr_iter: int):
         """Write the parameter data into a text file.
+
         :param curr_iter: Current iteration number, default to 0.
         :return param_data_file: The name of the parameter data file
         """

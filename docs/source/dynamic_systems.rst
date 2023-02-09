@@ -1,10 +1,10 @@
-Models
-======
+Dynamic systems
+===============
 
-The models module
------------------
+The dynamic system module
+-------------------------
 
-The :mod:`.models` module is essential for GrainLearning to execute computational models
+The :mod:`.dynamic_systems` module is essential for GrainLearning to execute computational models
 and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class
 Currently, the :mod:`.models` module contains
 
@@ -57,7 +57,7 @@ The following gives an example of the callback where the "software" model :math:
 
 
 The IODynamicSystem class
-`````````````````
+`````````````````````````
 
 The :class:`.IODynamicSystem` inherits from :class:`.DynamicSystem` and is intended to work with third-party software packages.
 The :attr:`.IODynamicSystem.run` function overrides the :attr:`.DynamicSystem.run` function of the :class:`.DynamicSystem`.

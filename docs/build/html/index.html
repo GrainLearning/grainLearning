@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to GrainLearning’s documentation! &mdash; GrainLearning  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -9,7 +10,7 @@
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-
+  
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
@@ -19,10 +20,10 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="introduction.html" />
+    <link rel="next" title="Introduction" href="introduction.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
@@ -41,12 +42,14 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_systems.html">Dynamic systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html#contributing-guidelines">Contributing guidelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a></li>
 </ul>
 
@@ -73,8 +76,8 @@
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-
-  <div class="section" id="welcome-to-grainlearning-s-documentation">
+             
+  <section id="welcome-to-grainlearning-s-documentation">
 <h1>Welcome to GrainLearning’s documentation!<a class="headerlink" href="#welcome-to-grainlearning-s-documentation" title="Permalink to this heading"></a></h1>
 <p>GrainLearning is a Bayesian uncertainty quantification and propagation toolbox for computer simulations
 of granular materials.
@@ -95,9 +98,9 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
 <li class="toctree-l2"><a class="reference internal" href="installation.html#documentation">Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="models.html#the-models-module">The models module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#interact-with-third-party-software">Interact with third-party software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_systems.html">Dynamic systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_systems.html#the-dynamic-system-module">The dynamic system module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_systems.html#interact-with-third-party-software">Interact with third-party software</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a><ul>
@@ -121,25 +124,32 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
 <li class="toctree-l2"><a class="reference internal" href="examples.html#bayesian-calibration-of-dem-models">Bayesian calibration of DEM models</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html#contributing-guidelines">Contributing guidelines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html#you-have-a-question">You have a question</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html#you-think-you-may-have-found-a-bug">You think you may have found a bug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html#you-want-to-make-some-kind-of-change-to-the-code-base">You want to make some kind of change to the code base</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.calibrationtoolbox"><code class="docutils literal notranslate"><span class="pre">CalibrationToolBox</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.dynamic_systems"><code class="docutils literal notranslate"><span class="pre">Models</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.iterativebayesianfilter"><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.bayesian_calibration"><code class="docutils literal notranslate"><span class="pre">Calibration</span> <span class="pre">toolbox</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.dynamic_systems"><code class="docutils literal notranslate"><span class="pre">Dynamic</span> <span class="pre">systems</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.iterative_bayesian_filter"><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.inference"><code class="docutils literal notranslate"><span class="pre">Inference</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-grainlearning.sampling"><code class="docutils literal notranslate"><span class="pre">Sampling</span></code></a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="indices-and-tables">
+</section>
+<section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
+</section>
 
 
            </div>
@@ -157,7 +167,7 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
+   
 
 </footer>
         </div>
@@ -168,7 +178,7 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
+  </script> 
 
 </body>
 </html>

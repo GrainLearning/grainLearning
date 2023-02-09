@@ -10,7 +10,7 @@ Python API
     :inherited-members:
 
 
-``Models``
+``Dynamic systems``
 *****************************
 
 .. automodule:: grainlearning.dynamic_systems

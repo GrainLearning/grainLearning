@@ -50,18 +50,18 @@ class BayesianCalibration:
 
         system_cls = BayesianCalibration(
             num_iter = 10,
-            model = DynamicSystem(...),
+            system = DynamicSystem(...),
             calibration = IterativeBayesianFilter(...)
             save_fig = -1
         )
 
-    :param system: A dynamic or `state-space system <https://en.wikipedia.org/wiki/Particle_filter#Approximate_Bayesian_computation_models>`_ (a DynamicSystem or IODynamicSystem object)
-    :param calibration: An Iterative Bayesian Filter
+    :param system: A `dynamic system <https://en.wikipedia.org/wiki/Particle_filter#Approximate_Bayesian_computation_models>`_ whose observables and hidden states evolve dynamically over "time"
+    :param calibration: An iterative Bayesian Filter that iteratively sample the parameter space
     :param num_iter: Number of iteration steps
     :param curr_iter: Current iteration step
     :param save_fig: Flag for skipping (-1), showing (0), or saving (1) the figures
     """
-    #: DynamicSystem being calibrated on
+    #: Dynamic system whose parameters or hidden states are being inferred
     system: Type["DynamicSystem"]
 
     #: Calibration method (e.g, Iterative Bayesian Filter)
@@ -241,7 +241,8 @@ class BayesianCalibration:
         cls: Type["BayesianCalibration"],
         obj: Dict
     ):
-        """An alternative constructor to allow choosing a model type (e.g., DynamicSystem or IODynamicSystem)
+        """An alternative constructor to allow choosing a system type (e.g., dynamic system or IO dynamic system)
+
         :param obj: a dictionary containing the keys and values to construct a BayesianCalibration object
         :return: A BayesianCalibration object
         """

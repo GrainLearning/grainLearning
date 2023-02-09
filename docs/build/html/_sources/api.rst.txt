@@ -1,16 +1,16 @@
 Python API
 ==================
 
-``CalibrationToolBox``
+``Calibration toolbox``
 *****************************
 
-.. automodule:: grainlearning.calibrationtoolbox
+.. automodule:: grainlearning.bayesian_calibration
     :members:
     :show-inheritance:
     :inherited-members:
 
 
-``Models``
+``Dynamic systems``
 *****************************
 
 .. automodule:: grainlearning.dynamic_systems
@@ -22,7 +22,7 @@ Python API
 ``Iterative Bayesian Filter``
 *****************************
 
-.. automodule:: grainlearning.iterativebayesianfilter
+.. automodule:: grainlearning.iterative_bayesian_filter
     :members:
     :show-inheritance:
     :inherited-members:
