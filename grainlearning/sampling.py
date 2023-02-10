@@ -146,7 +146,7 @@ class GaussianMixtureModel:
     ) -> np.ndarray:
         """Regenerate the parameters by fitting the Gaussian Mixture model
 
-        :param posterior_weight: Posterior found by the data assimulation
+        :param posterior_weight: Posterior found by the data assimilation
         :param system: Dynamic system class
         :return: Expanded parameters
         """

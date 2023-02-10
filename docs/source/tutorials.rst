@@ -22,13 +22,13 @@ First, we create a synthetic dataset from this linear equation.
     # add Gaussian noise (optional)
     y_obs += np.random.rand(100) * 2.5
 
-    def run_sim(model, **kwargs):
+    def run_sim(system, **kwargs):
         data = []
-        for params in model.param_data:
-            y_sim = params[0] * model.ctrl_data + params[1]
+        for params in system.param_data:
+            y_sim = params[0] * system.ctrl_data + params[1]
             data.append(np.array(y_sim, ndmin=2))
         
-        model.sim_data = np.array(data)
+        model.set_sim_data(data) 
 
 A calibration tool can be initialized by defining all the necessary input in a dictionary
 and passing it to the constructor of :class:`.BayesianCalibration`.
@@ -37,12 +37,12 @@ and passing it to the constructor of :class:`.BayesianCalibration`.
 
     import numpy as np
 
-    from grainlearning import CalibrationToolbox
+    from grainlearning import BayesianCalibration
 
-    calibration = CalibrationToolbox.from_dict(
+    calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
-            "model": {
+            "system": {
                 "param_min": [0.1, 0.1],
                 "param_max": [1, 10],
                 "param_names": ['a', 'b'],
@@ -120,17 +120,17 @@ This Python script is called by the callback `run_sim` from the command line.
 
     executable = 'python ./tutorials/linear_regression/LinearModel.py'
 
-    def run_sim(model, **kwargs):
+    def run_sim(system, **kwargs):
         from math import floor, log
         import os
         # keep the naming convention consistent between iterations
-        magn = floor(log(model.num_samples, 10)) + 1
+        mag = floor(log(system.num_samples, 10)) + 1
         curr_iter = kwargs['curr_iter']
         # check the software name and version
         print("*** Running external software... ***\n")
         # loop over and pass parameter samples to the executable
-        for i, params in enumerate(model.param_data):
-            description = 'Iter' + str(curr_iter) + '-Sample' + str(i).zfill(magn)
+        for i, params in enumerate(system.param_data):
+            description = 'Iter' + str(curr_iter) + '-Sample' + str(i).zfill(mag)
             print(" ".join([executable, '%.8e %.8e' % tuple(params), description]))
             os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
 
@@ -140,14 +140,14 @@ and `sim_data_file_ext` is correct such that GrainLearning can find the data in 
 
 .. code-block:: python
 
-    from grainlearning import CalibrationToolbox
+    from grainlearning import BayesianCalibration
     from grainlearning.dynamic_systems import IODynamicSystem
 
-    calibration = CalibrationToolbox.from_dict(
+    calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
-            "model": {
-                "model_type": IODynamicSystem,
+            "system": {
+                "system_type": IODynamicSystem,
                 "param_min": [0.1, 0.1],
                 "param_max": [1, 10],
                 "param_names": ['a', 'b'],

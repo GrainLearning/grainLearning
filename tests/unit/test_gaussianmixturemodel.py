@@ -4,7 +4,7 @@ from grainlearning import GaussianMixtureModel, DynamicSystem, generate_params_q
 
 
 def test_init():
-    """Test initialization of the Gausian Mixture StateSpaceModel"""
+    """Test initialization of the Gaussian Mixture Model"""
     gmm_cls = GaussianMixtureModel(max_num_components=5)
 
     assert isinstance(gmm_cls, GaussianMixtureModel)

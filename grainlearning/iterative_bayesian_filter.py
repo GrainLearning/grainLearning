@@ -1,14 +1,8 @@
-# %%
-
 import numpy as np
 from typing import Type, List
-
 from .dynamic_systems import DynamicSystem
-
 from .inference import SMC
-
 from .sampling import GaussianMixtureModel, generate_params_qmc
-
 from scipy import optimize
 
 
@@ -146,10 +140,10 @@ class IterativeBayesianFilter:
         :param system: Dynamic system class
         """
         self.param_data_list.append(self.sampling.regenerate_params(self.posterior_ibf, system))
-        # self.param_data_list.append(self.sampling.regenerate_params_with_gmm(self.posterior_ibf, model))
+        # self.param_data_list.append(self.sampling.regenerate_params_with_gmm(self.posterior_ibf, system))
 
     def solve(self, system: Type["DynamicSystem"]):
-        """Run both inference and sampling on a model
+        """Run both inference and sampling for a dynamic system
 
         :param system: Dynamic system class
         """

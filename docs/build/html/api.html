@@ -43,7 +43,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Dynamic systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_systems.html">Dynamic systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
@@ -232,7 +232,7 @@
 <dt class="sig sig-object py" id="grainlearning.bayesian_calibration.BayesianCalibration">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BayesianCalibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the Bayesian calibration class</p>
+<p>This is the Bayesian calibration class.</p>
 <p>A Bayesian calibration class consists of the inference class and the (re)sampling class.
 For instance, in GrainLearning, we have a calibration method called “iterative Bayesian filter”
 which consists of “sequential Monte Carlo” for model parameter estimation
@@ -330,7 +330,7 @@ unlike being assumed as an input for <cite>load_and_process(…)</cite></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.bayesian_calibration.BayesianCalibration.load_system">
 <span class="sig-name descname"><span class="pre">load_system</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration.load_system" title="Permalink to this definition"></a></dt>
-<dd><p>Load existing simulation data from disk into the state-space model</p>
+<dd><p>Load existing simulation data from disk into the dynamic system</p>
 </dd></dl>
 
 <dl class="py method">
@@ -477,7 +477,7 @@ that runs the forward predictions.</p>
 <li><p><strong>sim_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Simulation data, defaults to None, optional</p></li>
 <li><p><strong>sigma_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Maximum uncertainty, defaults to 1.0e6, optional</p></li>
 <li><p><strong>sigma_tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional</p></li>
-<li><p><strong>sim_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sim_name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Name of the simulation, defaults to ‘sim’, optional</p></li>
 </ul>
 </dd>
 </dl>
@@ -724,7 +724,7 @@ Extra functionalities are added to handle I/O operations.</p>
 <li><p><strong>obs_data_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Observation data file, defaults to None</p></li>
 <li><p><strong>obs_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Column names of the observation data, defaults to None</p></li>
 <li><p><strong>ctrl_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Column name of the control data, defaults to None</p></li>
-<li><p><strong>sim_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Simulation name, defaults to None</p></li>
+<li><p><strong>sim_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the simulation, defaults to ‘sim’</p></li>
 <li><p><strong>sim_data_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Simulation data directory, defaults to ‘./sim_data’</p></li>
 <li><p><strong>sim_data_file_ext</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Simulation data file extension, defaults to ‘.npy’</p></li>
 <li><p><strong>callback</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – Callback function, defaults to None</p></li>
@@ -1084,7 +1084,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve" title="Permalink to this definition"></a></dt>
-<dd><p>Run both inference and sampling on a model</p>
+<dd><p>Run both inference and sampling for a dynamic system</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
@@ -1429,7 +1429,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
+<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
