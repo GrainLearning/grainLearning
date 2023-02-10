@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 
-from .dynamic_systems import DynamicSystem
+from .models import Model
 from .tools import regenerate_params_with_gmm, unweighted_resample
 
 
@@ -22,7 +22,7 @@ class GaussianMixtureModel:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = GaussianMixtureModel.from_dict(
+        model_cls = GaussianMixtureModel.from_dict(
             {
                 "max_num_components": 2
             }
@@ -35,7 +35,7 @@ class GaussianMixtureModel:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = GaussianMixtureModel(
+        model_cls = GaussianMixtureModel(
             max_num_components = 2
         )
 
@@ -114,23 +114,23 @@ class GaussianMixtureModel:
         )
 
     def expand_weighted_parameters(
-        self, posterior_weight: np.ndarray, system: Type["DynamicSystem"]
+        self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value
 
-        :param posterior_weight: Posterior found by the data assimilation
-        :param system: Dynamic system class
+        :param posterior_weight: Posterior found by the data assimulation
+        :param model: Model class
         :return: Expanded parameters
         """
         num_copies = (
             np.floor(
-                self.expand_weight * system.num_samples * np.asarray(posterior_weight)
+                self.expand_weight * model.num_samples * np.asarray(posterior_weight)
             )
         ).astype(int)
 
-        indices = np.repeat(np.arange(system.num_samples), num_copies).astype(int)
+        indices = np.repeat(np.arange(model.num_samples), num_copies).astype(int)
 
-        expanded_parameters = system.param_data[indices]
+        expanded_parameters = model.param_data[indices]
 
         max_params = np.amax(expanded_parameters, axis=0)  # find max along axis
 
@@ -142,15 +142,15 @@ class GaussianMixtureModel:
         self.max_params = max_params
 
     def regenerate_params(
-        self, posterior_weight: np.ndarray, system: Type["DynamicSystem"],
+        self, posterior_weight: np.ndarray, model: Type["Model"],
     ) -> np.ndarray:
         """Regenerate the parameters by fitting the Gaussian Mixture model
 
         :param posterior_weight: Posterior found by the data assimulation
-        :param system: Dynamic system class
+        :param model: Model class
         :return: Expanded parameters
         """
-        self.expand_weighted_parameters(posterior_weight, system)
+        self.expand_weighted_parameters(posterior_weight, model)
 
         self.gmm = BayesianGaussianMixture(
             n_components=self.max_num_components,
@@ -163,20 +163,20 @@ class GaussianMixtureModel:
         )
 
         self.gmm.fit(self.expanded_normalized_params)
-        minimum_num_samples = system.num_samples
+        minimum_num_samples = model.num_samples
 
-        new_params = self.get_samples_within_bounds(system, system.num_samples)
+        new_params = self.get_samples_within_bounds(model, model.num_samples)
 
         # resample until all parameters are within the upper and lower bounds
-        test_num = system.num_samples
-        while system.param_min and system.param_max and len(new_params) < minimum_num_samples:
+        test_num = model.num_samples
+        while model.param_mins and model.param_maxs and len(new_params) < minimum_num_samples:
             test_num = int(np.ceil(1.1 * test_num))
-            new_params = self.get_samples_within_bounds(system, test_num)
+            new_params = self.get_samples_within_bounds(model, test_num)
 
         return new_params
 
     def get_samples_within_bounds(
-        self, system: Type["DynamicSystem"], num: int) -> np.ndarray:
+        self, model: Type["Model"], num: int) -> np.ndarray:
 
         if not self.slice_sampling:
             new_params, _ = self.gmm.sample(num)
@@ -184,7 +184,7 @@ class GaussianMixtureModel:
         # use slice sampling scheme for resampling
         else:
             # define the mininum of score_samples as the threshold for slice sampling
-            new_params = generate_params_qmc(system, num)
+            new_params = generate_params_qmc(model, num)
             new_params /= self.max_params
 
             scores = self.gmm.score_samples(self.expanded_normalized_params)
@@ -193,37 +193,37 @@ class GaussianMixtureModel:
 
         new_params *= self.max_params
 
-        if system.param_min and system.param_max:
-            params_above_min = new_params > np.array(system.param_min)
-            params_below_max = new_params < np.array(system.param_max)
+        if model.param_mins and model.param_maxs:
+            params_above_min = new_params > np.array(model.param_mins)
+            params_below_max = new_params < np.array(model.param_maxs)
             bool_array = params_above_min & params_below_max
             indices = bool_array[:, 0]
-            for i in range(system.num_params - 1):
+            for i in range(model.num_params - 1):
                 indices = np.logical_and(indices, bool_array[:, i + 1])
             return new_params[indices]
         else:
             return new_params
 
     def regenerate_params_with_gmm(
-        self, posterior_weight: np.ndarray, system: Type["DynamicSystem"]
+        self, posterior_weight: np.ndarray, model: Type["Model"]
     ) -> np.ndarray:
         """Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)
 
-        :param posterior_weight: Posterior found by the data assimilation
-        :param system: Dynamic system class
+        :param posterior_weight: Posterior found by the data assimulation
+        :param model: Model class
         :return: Expanded parameters
         """
 
         new_params, self.gmm = regenerate_params_with_gmm(
             posterior_weight,
-            system.param_data,
-            system.num_samples,
+            model.param_data,
+            model.num_samples,
             self.max_num_components,
             self.prior_weight,
             self.cov_type,
             unweighted_resample,
-            system.param_min,
-            system.param_max,
+            model.param_mins,
+            model.param_maxs,
             self.n_init,
             self.tol,
             self.max_iter,
@@ -233,7 +233,7 @@ class GaussianMixtureModel:
         return new_params
 
 
-def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method: str = "halton") -> np.ndarray:
+def generate_params_qmc(model: Type["Model"], num_samples: int, method: str = "halton") -> np.ndarray:
     """This is the class to uniformly draw samples in n-dimensional space from
     a low-discrepancy sequence or a Latin hypercube.
 
@@ -245,22 +245,22 @@ def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method:
     """
 
     if method == "halton":
-        sampler = Halton(system.num_params, scramble=False)
+        sampler = Halton(model.num_params, scramble=False)
 
     elif method == "sobol":
-        sampler = Sobol(system.num_params)
+        sampler = Sobol(model.num_params)
         random_base = round(np.log2(num_samples))
         num_samples = 2 ** random_base
 
     elif method == "LH":
-        sampler = LatinHypercube(system.num_params)
+        sampler = LatinHypercube(model.num_params)
 
     param_table = sampler.random(n=num_samples)
 
-    for param_i in range(system.num_params):
+    for param_i in range(model.num_params):
         for sim_i in range(num_samples):
-            mean = 0.5 * (system.param_max[param_i] + system.param_min[param_i])
-            std = 0.5 * (system.param_max[param_i] - system.param_min[param_i])
+            mean = 0.5 * (model.param_maxs[param_i] + model.param_mins[param_i])
+            std = 0.5 * (model.param_maxs[param_i] - model.param_mins[param_i])
             param_table[sim_i][param_i] = (
                 mean + (param_table[sim_i][param_i] - 0.5) * 2 * std
             )

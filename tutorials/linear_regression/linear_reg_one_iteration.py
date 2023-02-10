@@ -1,5 +1,5 @@
-from grainlearning import BayesianCalibration
-from grainlearning.dynamic_systems import IODynamicSystem
+from grainlearning import CalibrationToolbox
+from grainlearning.models import IOModel
 import os, sys
 
 sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
@@ -7,14 +7,13 @@ sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
 sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
-calibration = BayesianCalibration.from_dict(
+calibration = CalibrationToolbox.from_dict(
     {
         "curr_iter": curr_iter,
         "num_iter": 0,
-        "system": {
-            "system_type": IODynamicSystem,
-            "param_min": [0.001, 0.001],
-            "param_max": [1, 10],
+        "model": {
+            "param_mins": [0.001, 0.001],
+            "param_maxs": [1, 10],
             "obs_data_file": 'linearObs.dat',
             "obs_names": ['f'],
             "ctrl_name": 'u',
@@ -31,6 +30,7 @@ calibration = BayesianCalibration.from_dict(
             },
         },
         "save_fig": 0,
+        "model_type": IOModel,
     }
 )
 
@@ -41,4 +41,4 @@ resampled_param_data = calibration.resample()
 
 # %%
 # write new parameter table to the simulation directory
-calibration.system.write_params_to_txt(calibration.curr_iter + 1)
+calibration.model.write_to_table(calibration.curr_iter + 1)

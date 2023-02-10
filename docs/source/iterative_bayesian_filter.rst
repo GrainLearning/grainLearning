@@ -16,7 +16,7 @@ The essential steps include
 2. Currently, :attr:`.IterativeBayesianFilter.inference` uses :class:`.SMC` to quantify the evolution of the posterior distribution of model parameters over time.
 3. When running :class:`.SMC` filtering via :attr:`.IterativeBayesianFilter.run_inference`, it is crucial to ensure that the effective sample size is large enough, so that the ensemble does not degenerate into a few samples with very large weights and :class:`.GaussianMixtureModel` are trained with sufficient data.
 4. :attr:`.IterativeBayesianFilter.run_sampling` generates new samples from :class:`.GaussianMixtureModel` as the proposal density, trained with the previous ensemble (i.e., samples and associated weights).
-5. :attr:`.IterativeBayesianFilter.solve` combines the steps above and is used by :mod:`BayesianCalibration` for high-level operations, such as :attr:`.BayesianCalibration.run_one_iteration`, :attr:`.BayesianCalibration.load_and_run_one_iteration`, etc.
+5. :attr:`.IterativeBayesianFilter.solve` combines the steps above and is used by :mod:`CalibrationToolbox` for high-level operations, such as :attr:`.CalibrationTool.run_one_iteration`, :attr:`.CalibrationTool.load_and_run_one_iteration`, etc.
 
 .. figure:: ./figs/IBF.png
   :width: 600

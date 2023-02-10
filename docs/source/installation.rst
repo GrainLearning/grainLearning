@@ -1,7 +1,7 @@
 Installation
 ============
 
-GrainLearning can be installed with poetry and pip, on Windows, Mac, and Linux OS, with a Python version higher than 3.8.
+GrainLearning is can be installed with poetry and pip, on Windows, Mac, and Linux OS, with a Python version higher than 3.8.
 We have tested GrainLearning with Python versions 3.8, 3.9, and 3.10.
 
 Package management and dependencies
@@ -17,11 +17,11 @@ First, install poetry following `these instructions <https://python-poetry.org/d
    # Clone the repository
    git clone https://github.com/GrainLearning/grainLearning.git 
 
-   # Activate the virtual environment
+   # Activate a poetry environment
    cd grainLearning
    poetry shell
 
-   # Install GrainLearning and its dependencies
+   # Install the dependencies of GrainLearning 
    poetry install
 
    # Run the self-tests
@@ -39,12 +39,12 @@ Install using pip
    git clone https://github.com/GrainLearning/grainLearning.git 
    cd grainLearning
 
-   # We recommend working in a virtual environment using conda or any other python environment manager.
+   # We recommend working on an environment conda or any other python environment manager,
    # for example, with anaconda
    conda create --name grainlearning python=3.8
    conda activate grainlearning
 
-   # Install GrainLearning and its dependencies 
+   # Install GrainLearning 
    pip install .
 
    # You may need to install matplotlib and pytest
@@ -63,19 +63,19 @@ For Windows users
 
 - Installation using Windows Subsystem for Linx (WSL)
 
-  - Enable WSL1 or WSL2 according to `these instructions <https://learn.microsoft.com/en-us/windows/wsl/install-manual>`_ 
+  - Enable WSL1 or WSL2 according to the instructions `here <https://learn.microsoft.com/en-us/windows/wsl/install-manual>`_ 
   - Install GrainLearning using :ref:`poetry<installation:Install using poetry>` or :ref:`pip<installation:Install using pip>`
 
 - Installation using anaconda (if no WSLs are available on your Windows system)
 
-  - Open Anaconda Prompt and :ref:`install GrainLearning using pip<installation:Install using pip>`. This should create a virtual environment, named GrainLearning.
+  - Open Anaconda Prompt and install GrainLearning using :ref:`pip<installation:Install using pip>`. This should create a virtual environment, named GrainLearning.
   - Choose that environment from your anaconda navigator: click `Environments` and select `grainlearning` from the drop-down menu
   - Open any editor, for example, spider, and run the examples in grainLearning/tutorials.
 
 Packaging/One command install
 `````````````````````````````
 
-Stable versions of GrainLearning can be installed via `pip install grainlearning`.
+Stable versions of GrainLearning can be installed via pip.
 However, you would still need to clone the GrainLearning repository to run the tutorials. 
 
 .. code-block:: bash

@@ -1,5 +1,5 @@
-from grainlearning import BayesianCalibration
-from grainlearning.dynamic_systems import IODynamicSystem
+from grainlearning import CalibrationToolbox
+from grainlearning.models import IOModel
 
 executable = 'python ./tutorials/linear_regression/LinearModel.py'
 
@@ -19,13 +19,12 @@ def run_sim(model, **kwargs):
         os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
 
 
-calibration = BayesianCalibration.from_dict(
+calibration = CalibrationToolbox.from_dict(
     {
         "num_iter": 10,
-        "system": {
-            "system_type": IODynamicSystem,
-            "param_min": [0.001, 0.001],
-            "param_max": [1, 10],
+        "model": {
+            "param_mins": [0.001, 0.001],
+            "param_maxs": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
             "obs_data_file": 'linearObs.dat',
@@ -47,6 +46,7 @@ calibration = BayesianCalibration.from_dict(
             }
         },
         "save_fig": 0,
+        "model_type": IOModel
     }
 )
 

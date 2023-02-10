@@ -26,13 +26,13 @@ author = 'Hongyang Cheng, Retief Lubbe, Luisa Orozco, Aron Jansen'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage", "sphinx_autodoc_typehints", "sphinx.ext.autosectionlabel",
-              'sphinx_mdinclude']
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage","sphinx_autodoc_typehints", "sphinx.ext.autosectionlabel"]
 
 autosectionlabel_prefix_document = True
 
 templates_path = ['_templates']
 exclude_patterns = []
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -42,9 +42,9 @@ html_static_path = ['_static']
 
 pygments_style = 'sphinx'
 highlight_language = 'python3'
-autodoc_member_order = 'groupwise'
+autodoc_member_order= 'groupwise'
 
 add_module_names = False
-autodoc_typehints = "description"
+autodoc_typehints="description"
 
 html_static_path = []
