@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Python API &mdash; GrainLearning  documentation</title>
@@ -29,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> GrainLearning
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GrainLearning
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -43,7 +47,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Dynamic systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_systems.html">Dynamic systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
@@ -213,7 +217,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Python API</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
@@ -273,7 +277,7 @@ and “variational Gaussian mixture” for resampling.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – A <a class="reference external" href="https://en.wikipedia.org/wiki/Particle_filter#Approximate_Bayesian_computation_models">dynamic system</a> whose observables and hidden states evolve dynamically over “time”</p></li>
 <li><p><strong>calibration</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter" title="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterativeBayesianFilter</span></code></a>]) – An iterative Bayesian Filter that iteratively sample the parameter space</p></li>
@@ -288,10 +292,10 @@ and “variational Gaussian mixture” for resampling.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>An alternative constructor to allow choosing a system type (e.g., dynamic system or IO dynamic system)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – a dictionary containing the keys and values to construct a BayesianCalibration object</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A BayesianCalibration object</p>
 </dd>
 </dl>
@@ -302,7 +306,7 @@ and “variational Gaussian mixture” for resampling.</p>
 <span class="sig-name descname"><span class="pre">get_most_prob_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration.get_most_prob_params" title="Permalink to this definition"></a></dt>
 <dd><p>Return the most probable set of parameters</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Estimated parameter values</p>
 </dd>
 </dl>
@@ -313,7 +317,7 @@ and “variational Gaussian mixture” for resampling.</p>
 <span class="sig-name descname"><span class="pre">load_and_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration.load_and_process" title="Permalink to this definition"></a></dt>
 <dd><p>Load existing simulation data and compute the posterior distribution using an assumed sigma</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sigma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – assumed uncertainty coefficient, defaults to 0.1</p>
 </dd>
 </dl>
@@ -345,7 +349,7 @@ unlike being assumed as an input for <cite>load_and_process(…)</cite></p>
 <dd><p>Learn and resample from a proposal distribution
 todo this should be refactored</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Combinations of resampled parameter values</p>
 </dd>
 </dl>
@@ -364,7 +368,7 @@ todo this should be refactored</p>
 <span class="sig-name descname"><span class="pre">run_one_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration.run_one_iteration" title="Permalink to this definition"></a></dt>
 <dd><p>Run Bayesian calibration for one iteration.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – iteration step, defaults to -1</p>
 </dd>
 </dl>
@@ -461,7 +465,7 @@ that runs the forward predictions.</p>
 </div>
 <p>The simulation data is a numpy array of shape (num_samples, num_obs, num_steps).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – observation or reference data</p></li>
 <li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
@@ -477,7 +481,7 @@ that runs the forward predictions.</p>
 <li><p><strong>sim_data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Simulation data, defaults to None, optional</p></li>
 <li><p><strong>sigma_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Maximum uncertainty, defaults to 1.0e6, optional</p></li>
 <li><p><strong>sigma_tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional</p></li>
-<li><p><strong>sim_name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sim_name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Name of the simulation, defaults to ‘sim’, optional</p></li>
 </ul>
 </dd>
 </dl>
@@ -492,10 +496,10 @@ that runs the forward predictions.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Dictionary object</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>DynamicSystem: DynamicSystem object</p>
 </dd>
 </dl>
@@ -533,7 +537,7 @@ that runs the forward predictions.</p>
 <span class="sig-name descname"><span class="pre">set_sim_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.set_sim_data" title="Permalink to this definition"></a></dt>
 <dd><p>Set the simulation data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – simulation data of shape (num_samples, num_obs, num_steps)</p>
 </dd>
 </dl>
@@ -715,7 +719,7 @@ Extra functionalities are added to handle I/O operations.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param_min</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter lower bounds</p></li>
 <li><p><strong>param_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter Upper bounds</p></li>
@@ -724,7 +728,7 @@ Extra functionalities are added to handle I/O operations.</p>
 <li><p><strong>obs_data_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Observation data file, defaults to None</p></li>
 <li><p><strong>obs_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Column names of the observation data, defaults to None</p></li>
 <li><p><strong>ctrl_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Column name of the control data, defaults to None</p></li>
-<li><p><strong>sim_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Simulation name, defaults to None</p></li>
+<li><p><strong>sim_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the simulation, defaults to ‘sim’</p></li>
 <li><p><strong>sim_data_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Simulation data directory, defaults to ‘./sim_data’</p></li>
 <li><p><strong>sim_data_file_ext</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Simulation data file extension, defaults to ‘.npy’</p></li>
 <li><p><strong>callback</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – Callback function, defaults to None</p></li>
@@ -748,10 +752,10 @@ Extra functionalities are added to handle I/O operations.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Dictionary object</p>
 </dd>
-<dt class="field-even">Return IODynamicSystem</dt>
+<dt class="field-even">Return IODynamicSystem<span class="colon">:</span></dt>
 <dd class="field-even"><p>IODynamicSystem object</p>
 </dd>
 </dl>
@@ -770,7 +774,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">get_sim_data_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.get_sim_data_files" title="Permalink to this definition"></a></dt>
 <dd><p>Get the simulation data files from the simulation data directory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>curr_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Current iteration number, default to 0.</p>
 </dd>
 </dl>
@@ -781,7 +785,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">load_param_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.load_param_data" title="Permalink to this definition"></a></dt>
 <dd><p>Load parameter data from a table written in a text file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>curr_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Current iteration number, default to 0.</p>
 </dd>
 </dl>
@@ -810,7 +814,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">set_sim_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.set_sim_data" title="Permalink to this definition"></a></dt>
 <dd><p>Set the simulation data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – simulation data of shape (num_samples, num_obs, num_steps)</p>
 </dd>
 </dl>
@@ -821,10 +825,10 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">write_params_to_txt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.write_params_to_txt" title="Permalink to this definition"></a></dt>
 <dd><p>Write the parameter data into a text file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>curr_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Current iteration number, default to 0.</p>
 </dd>
-<dt class="field-even">Return param_data_file</dt>
+<dt class="field-even">Return param_data_file<span class="colon">:</span></dt>
 <dd class="field-even"><p>The name of the parameter data file</p>
 </dd>
 </dl>
@@ -1026,7 +1030,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>inference</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.inference.SMC" title="grainlearning.inference.SMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SMC</span></code></a>]) – Sequential Monte Carlo class (SMC)</p></li>
 <li><p><strong>sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel" title="grainlearning.sampling.GaussianMixtureModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a>]) – Gaussian Mixture Model class (GMM)</p></li>
@@ -1042,7 +1046,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -1053,7 +1057,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize" title="Permalink to this definition"></a></dt>
 <dd><p>Resample the parameters using the Gaussian mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
 </dd>
 </dl>
@@ -1064,7 +1068,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">run_inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_inference" title="Permalink to this definition"></a></dt>
 <dd><p>Run inference (e.g, data assimilation loop) using the Sequential Monte Carlo</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
 </dd>
 </dl>
@@ -1075,7 +1079,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">run_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_sampling" title="Permalink to this definition"></a></dt>
 <dd><p>Resample the parameters using the Gaussian mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
 </dd>
 </dl>
@@ -1086,7 +1090,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve" title="Permalink to this definition"></a></dt>
 <dd><p>Run both inference and sampling on a model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
 </dd>
 </dl>
@@ -1166,7 +1170,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ess_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Target effective sample size (what we want)</p></li>
 <li><p><strong>scale_cov_with_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Flag if the covariance matrix should scale with the maximum accross the loading steps, defaults to True</p></li>
@@ -1178,14 +1182,14 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">data_assimilation_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.data_assimilation_loop" title="Permalink to this definition"></a></dt>
 <dd><p>Perform data assimilation loop</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Guess of sigma</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Input distribution</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Result of the objective function which converges to a user defined effective sample size</p>
 </dd>
 </dl>
@@ -1196,7 +1200,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -1208,16 +1212,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the diagonal covariance matrices from a given input sigma.</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – input sigma</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Covariance matrices for all loading steps</p>
 </dd>
 </dl>
@@ -1229,16 +1233,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the ensemble averages for parameters. (Used for post-processing)</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 <li><p><strong>posteriors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Posterior distributions</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Ensemble averages</p>
 </dd>
 </dl>
@@ -1250,16 +1254,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the likelihoods as a multivariate normal of the simulation data centered around the observations.</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 <li><p><strong>cov_matrices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – covariance matricies</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Likelihood matrices for all loading steps</p>
 </dd>
 </dl>
@@ -1271,17 +1275,17 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Compute the posteriors for all the loading steps</p>
 <p>This function is vectorized for all loading steps</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 <li><p><strong>likelihoods</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Likelihood matrices</p></li>
 <li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – Optional input proposal</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Posterior distributions for all loading steps</p>
 </dd>
 </dl>
@@ -1292,10 +1296,10 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">give_posterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loading_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.give_posterior" title="Permalink to this definition"></a></dt>
 <dd><p>Give posterior distribution of a loading step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>loading_step</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Optional input loading step, defaults to -1 (last value)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Posterior distribution for a single step</p>
 </dd>
 </dl>
@@ -1377,7 +1381,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_num_components</strong> – Maximum number of components</p></li>
 <li><p><strong>prior_weight</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Prior weight, defaults to None</p></li>
@@ -1396,16 +1400,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">expand_weighted_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters" title="Permalink to this definition"></a></dt>
 <dd><p>Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -1416,7 +1420,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
 </dd>
 </dl>
@@ -1427,16 +1431,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">regenerate_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params" title="Permalink to this definition"></a></dt>
 <dd><p>Regenerate the parameters by fitting the Gaussian Mixture model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -1447,16 +1451,16 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <span class="sig-name descname"><span class="pre">regenerate_params_with_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm" title="Permalink to this definition"></a></dt>
 <dd><p>Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Expanded parameters</p>
 </dd>
 </dl>
@@ -1471,7 +1475,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 a low-discrepancy sequence or a Latin hypercube.</p>
 <p>See <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">Quasi-Monte Carlo</a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_iter</strong> – maximum number of iterations, defaults to 100000</p></li>
 <li><p><strong>expand_weight</strong> – weighted expansions, defaults to 10</p></li>
@@ -1481,7 +1485,7 @@ a low-discrepancy sequence or a Latin hypercube.</p>
 <li><p><strong>method</strong> (<em>str</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
 </dl>

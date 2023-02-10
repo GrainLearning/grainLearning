@@ -67,7 +67,7 @@ However, you still need to clone the GrainLearning repository to run the tutoria
 
 1. Linear regression with
    the [`run_sim`](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/linear_regression/python_linear_regression_solve.py#L14)
-   callback function of the [`DynamicSystem`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/models.py)
+   callback function of the [`DynamicSystem`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/dynamic_systems.py)
    class,
    in [python_linear_regression_solve.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/linear_regression/python_linear_regression_solve.py)
 

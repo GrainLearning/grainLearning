@@ -5,7 +5,7 @@ from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_a
 
 
 class BayesianCalibration:
-    """This is the Bayesian calibration class
+    """This is the Bayesian calibration class.
 
     A Bayesian calibration class consists of the inference class and the (re)sampling class.
     For instance, in GrainLearning, we have a calibration method called "iterative Bayesian filter"
@@ -125,7 +125,7 @@ class BayesianCalibration:
         self.system.param_data = self.calibration.param_data_list[index]
         self.system.num_samples = self.system.param_data.shape[0]
 
-        # Run the model instances
+        # Run the model realizations
         self.system.run(curr_iter=self.curr_iter)
 
         # Load model data from disk
@@ -140,7 +140,7 @@ class BayesianCalibration:
         self.plot_uq_in_time()
 
     def load_system(self):
-        """Load existing simulation data from disk into the state-space model
+        """Load existing simulation data from disk into the dynamic system
         """
         self.system.load_param_data(self.curr_iter)
         self.system.get_sim_data_files(self.curr_iter)
@@ -247,13 +247,13 @@ class BayesianCalibration:
         :return: A BayesianCalibration object
         """
 
-        # Get the model class, defaults to `DynamicSystem`
+        # Get the system class, defaults to `DynamicSystem`
         system_obj = obj["system"]
         system_type = system_obj.get("system_type", DynamicSystem)
         # if the dictionary has the key "system_type", then delete it to avoid passing it to the constructor
         system_obj.pop("system_type", None)
 
-        # Create a model object
+        # Create a system object
         system = system_type.from_dict(obj["system"])
 
         # Create a calibration object
