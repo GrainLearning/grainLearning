@@ -87,7 +87,7 @@ def get_keys_and_data(fileName, delimiters=['\t', ' ', ',']):
         keys = list(filter(None, keys))
         if len(keys) == ncols: break
 
-    # store data in a dictory
+    # store data in a dictionary
     keys_and_data = {}
     for key in keys:
         if '#' in key:
@@ -107,8 +107,8 @@ def regenerate_params_with_gmm(
     prior_weight: float,
     cov_type: str = "full",
     resample_to_unweighted: Callable = None,
-    param_mins: List[float] = None,
-    param_maxs: List[float] = None,
+    param_min: List[float] = None,
+    param_max: List[float] = None,
     n_init=1,
     tol=0.001,
     max_iter=100,
@@ -148,10 +148,10 @@ def regenerate_params_with_gmm(
     :param resample_to_unweighted: Callable
         Function to expand samples from weighted to unweighted
 
-    :param param_mins: list
+    :param param_min: list
         lower bound of the parameter values
 
-    :param param_maxs: list
+    :param param_max: list
         uper bound of the parameter values
 
     :param seed: int
@@ -351,14 +351,14 @@ def voronoi_vols(samples: np.ndarray):
     return vol
 
 
-def plot_param_stats(fig_name, param_names, means, covs, savefig=0):
+def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
     """
     Plot the posterior means and coefficients of variation of the model parameters over time.
     :param fig_name: string
     :param param_names: parameter names
     :param means: ndarray
     :param covs: ndarray
-    :param savefig: bool defaults to False
+    :param save_fig: bool defaults to False
     """
     num = len(param_names)
     ncols = int(np.ceil(num / 2))
@@ -370,8 +370,8 @@ def plot_param_stats(fig_name, param_names, means, covs, savefig=0):
         plt.ylabel(r'$|' + param_names[i] + r'|$')
         plt.grid(True)
     plt.tight_layout()
-    if savefig:
-        plt.savefig(f'{fig_name}_param_means.png')
+    if save_fig:
+        plt.save_fig(f'{fig_name}_param_means.png')
     else:
         plt.show()
     plt.close()
@@ -384,21 +384,21 @@ def plot_param_stats(fig_name, param_names, means, covs, savefig=0):
         plt.ylabel(r'$COV(' + param_names[i] + ')$')
         plt.grid(True)
     plt.tight_layout()
-    if savefig:
-        plt.savefig(f'{fig_name}_param_covs.png')
+    if save_fig:
+        plt.save_fig(f'{fig_name}_param_covs.png')
     else:
         plt.show()
     plt.close()
 
 
-def plot_posterior(fig_name, param_names, param_data, posterior, savefig=0):
+def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
     """
     Plot the evolution of discrete posterior distribution over the parameters in time.
     :param fig_name: string
     :param param_names: parameter names
     :param param_data: ndarray
     :param posterior: ndarray
-    :param savefig: bool defaults to False
+    :param save_fig: bool defaults to False
     """
     num_steps = posterior.shape[0]
     for i, name in enumerate(param_names):
@@ -411,14 +411,14 @@ def plot_posterior(fig_name, param_names, param_data, posterior, savefig=0):
             plt.ylabel('Posterior distribution')
             plt.grid(True)
         plt.tight_layout()
-        if savefig:
-            plt.savefig(f'{fig_name}_posterior_{name}.png')
+        if save_fig:
+            plt.save_fig(f'{fig_name}_posterior_{name}.png')
         else:
             plt.show()
         plt.close()
 
 
-def plot_param_data(fig_name, param_names, param_data_list, savefig=0):
+def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     num = len(param_names)
     ncols = int(np.ceil(num / 2))
     num = num - 1
@@ -433,13 +433,13 @@ def plot_param_data(fig_name, param_names, param_data_list, savefig=0):
             plt.legend()
         plt.legend()
         plt.tight_layout()
-    if savefig:
-        plt.savefig(f'{fig_name}_param_space.png')
+    if save_fig:
+        plt.save_fig(f'{fig_name}_param_space.png')
     else:
         plt.show()
 
 
-def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, savefig=0):
+def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, save_fig=0):
     """
     Plot the ensemble prediction, observation data, and top three best-fits
     :param fig_name: string
@@ -449,7 +449,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     :param obs_data: ndarray
     :param sim_data: ndarray
     :param posterior: ndarray
-    :param savefig: bool defaults to False
+    :param save_fig: bool defaults to False
     """
     ensemble_mean = np.einsum('ijk, ki->jk', sim_data, posteriors)
     ensemble_std = np.einsum('ijk, ki->jk', (sim_data - ensemble_mean) ** 2, posteriors)
@@ -483,8 +483,8 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
         plt.grid(True)
 
     plt.tight_layout()
-    if savefig:
-        plt.savefig(f'{fig_name}_obs_and_sim.png')
+    if save_fig:
+        plt.save_fig(f'{fig_name}_obs_and_sim.png')
     else:
         plt.show()
     plt.close()

@@ -2,8 +2,11 @@
 name = "GrainLearning"
 version = "2.0.1"
 description = "A Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials"
-authors = ["Hongyang Cheng <chyalexcheng@gmail.nl>",
-"Luisa Orozco <l.orozco@esciencecenter.nl>","Retief Lubbe <r.lubbe@utwente.nl>"]
+authors = [
+    "Hongyang Cheng <h.cheng@utwente.nl>",
+    "Luisa Orozco <l.orozco@esciencecenter.nl>",
+    "Retief Lubbe <r.lubbe@utwente.nl>",
+    "Aron Jansen <a.p.jansen@esciencecenter.nl>"]
 readme = "README.md"
 license = "GPLv2"
 homepage = "https://grainlearning.readthedocs.io/"

@@ -1,14 +1,15 @@
-from grainlearning import CalibrationToolbox
-from grainlearning.models import IOModel
+from grainlearning import BayesianCalibration
+from grainlearning.dynamic_systems import IODynamicSystem
 
 curr_iter = 1
 sim_data_dir = "./tests/data/oedo_sim_data"
 
-calibration = CalibrationToolbox.from_dict(
+calibration = BayesianCalibration.from_dict(
     {
         "curr_iter": curr_iter,
         "num_iter": 0,
-        "model": {
+        "system": {
+            "system_type": IODynamicSystem,
             "obs_data_file": 'obsdata.dat',
             "obs_names": ['p', 'q', 'n'],
             "ctrl_name": 'e_a',
@@ -16,8 +17,8 @@ calibration = CalibrationToolbox.from_dict(
             "sim_data_dir": sim_data_dir,
             "param_data_file": f'{sim_data_dir}/iter{curr_iter}/smcTable{curr_iter}.txt',
             "param_names": ['E', 'mu', 'k_r', 'mu_r'],
-            "param_mins": [100e9, 0.3, 0, 0.1],
-            "param_maxs": [200e9, 0.5, 1e4, 0.5],
+            "param_min": [100e9, 0.3, 0, 0.1],
+            "param_max": [200e9, 0.5, 1e4, 0.5],
             "inv_obs_weight": [1, 1, 0.01],
         },
         "calibration": {
@@ -29,7 +30,6 @@ calibration = CalibrationToolbox.from_dict(
             "proposal_data_file": f"iter{curr_iter - 1}/gmm_iter{curr_iter - 1}.pkl",
         },
         "save_fig": 0,
-        "model_type": IOModel
     }
 )
 
@@ -41,4 +41,4 @@ _ = calibration.resample()
 
 # %%
 # plot the uncertainty evolution
-calibration.plot_UQ_in_time()
+calibration.plot_uq_in_time()

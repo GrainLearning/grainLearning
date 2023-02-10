@@ -25,13 +25,14 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
 
    introduction
    installation
-   models
+   dynamic_systems
    inference
    sampling
    iterative_bayesian_filter
    rnn
    tutorials
    examples
+   how_to_contribute
    api
 
 Indices and tables
