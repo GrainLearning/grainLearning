@@ -4,7 +4,7 @@ from grainlearning import (
     SMC,
     IterativeBayesianFilter,
     GaussianMixtureModel,
-    Model,
+    DynamicSystem,
 )
 
 
@@ -38,27 +38,27 @@ def test_init():
 
 def test_run_inference():
     """Test if the inference runs"""
-    model_cls = Model.from_dict({
-        "param_mins": [0, 10],
-        "param_maxs": [10, 100],
+    system_cls = DynamicSystem.from_dict({
+        "param_min": [0, 10],
+        "param_max": [10, 100],
         "obs_data": np.random.uniform(0, 100, (3, 4)),
         "num_samples": 3,
-
+        "callback": None,
     })
 
-    model_cls.sim_data = np.random.uniform(0, 100, (3, 3, 4))
+    system_cls.sim_data = np.random.uniform(0, 100, (3, 3, 4))
 
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
             "inference": {"ess_target": 0.1},
             "sampling": {"max_num_components": 5},
-            "num_samples": model_cls.num_samples,
+            "num_samples": system_cls.num_samples,
         }
     )
-    print(model_cls.sigma_max)
+    print(system_cls.sigma_max)
 
-    ibf_cls.initialize(model=model_cls)
+    ibf_cls.initialize(system=system_cls)
 
-    ibf_cls.run_inference(model=model_cls)
+    ibf_cls.run_inference(system=system_cls)
 
     assert True

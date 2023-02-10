@@ -1,5 +1,5 @@
 import numpy as np
-from grainlearning import SMC, Model, GaussianMixtureModel, generate_params_qmc
+from grainlearning import SMC, DynamicSystem, GaussianMixtureModel, generate_params_qmc
 
 def test_smc_init():
     """Test initialization of Sequential Monte Carlo class."""
@@ -16,9 +16,9 @@ def test_smc_init():
 def test_get_covariance_matrix():
     """Test to see if covariance matrix is generated as expected"""
 
-    model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+    system_cls = DynamicSystem(
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[12, 3, 4], [12, 4, 5]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=3,
@@ -26,7 +26,7 @@ def test_get_covariance_matrix():
 
     smc_cls = SMC(ess_target=0.1, scale_cov_with_max=True)
 
-    cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
+    cov_matrices = smc_cls.get_covariance_matrices(100, system_cls)
 
     #: assert shape is (num_steps,num_obs,num_obs)
     assert cov_matrices.shape == (3, 2, 2)
@@ -41,7 +41,7 @@ def test_get_covariance_matrix():
     )
 
     smc_cls = SMC(ess_target=0.1, scale_cov_with_max=False)
-    cov_matrices = smc_cls.get_covariance_matrices(100, model_cls)
+    cov_matrices = smc_cls.get_covariance_matrices(100, system_cls)
     np.testing.assert_array_almost_equal(
         cov_matrices,
         [
@@ -58,21 +58,21 @@ def test_get_likelihood():
         ess_target=0.1, scale_cov_with_max=True
     )
 
-    model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+    system_cls = DynamicSystem(
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=5,
     )
 
     sim_data = []
-    for _ in range(model_cls.num_samples):
+    for _ in range(system_cls.num_samples):
         sim_data.append(np.random.rand(2, 3))
 
-    model_cls.sim_data = np.array(sim_data)
+    system_cls.sim_data = np.array(sim_data)
     cov_matrices = np.repeat([np.identity(2)], 3, axis=0) * 100
-    likelihoods = smc_cls.get_likelihoods(model_cls, cov_matrices)
+    likelihoods = smc_cls.get_likelihoods(system_cls, cov_matrices)
 
     assert likelihoods.shape == (3, 5)
 
@@ -85,9 +85,9 @@ def test_get_posterior():
         ess_target=0.1, scale_cov_with_max=True
     )
 
-    model_cls = Model(
-        param_mins=[1, 2],
-        param_maxs=[3, 4],
+    system_cls = DynamicSystem(
+        param_min=[1, 2],
+        param_max=[3, 4],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         ctrl_data=[1, 2, 3, 4],
         num_samples=5,
@@ -97,7 +97,7 @@ def test_get_posterior():
     likelihoods = np.ones((3, 5)) * 0.5
 
     posteriors = smc_cls.get_posterors(
-        model=model_cls, likelihoods=likelihoods, proposal_ibf=None
+        system=system_cls, likelihoods=likelihoods, proposal_ibf=None
     )
 
     np.testing.assert_array_almost_equal(
@@ -117,15 +117,15 @@ def test_ips_covs():
         ess_target=0.1, scale_cov_with_max=True
     )
 
-    model_cls = Model(
-        param_mins=[2, 2],
-        param_maxs=[10, 10],
+    system_cls = DynamicSystem(
+        param_min=[2, 2],
+        param_max=[10, 10],
         obs_data=[[100, 200, 300], [30, 10, 5]],
         num_samples=5,
     )
 
     gmm_cls = GaussianMixtureModel(max_num_components=1)
-    model_cls.param_data = generate_params_qmc(model_cls, model_cls.num_samples)
+    system_cls.param_data = generate_params_qmc(system_cls, system_cls.num_samples)
     posteriors = np.array(
         [
             [0.1, 0.2, 0.3, 0.2, 0.2],
@@ -133,7 +133,7 @@ def test_ips_covs():
             [0.3, 0.2, 0.2, 0.1, 0.2],
         ]
     )
-    ips, covs = smc_cls.get_ensemble_ips_covs(model=model_cls, posteriors=posteriors)
+    ips, covs = smc_cls.get_ensemble_ips_covs(system=system_cls, posteriors=posteriors)
 
     np.testing.assert_array_almost_equal(
         ips,

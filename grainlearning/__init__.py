@@ -1,6 +1,6 @@
-from .models import Model, IOModel
-from .calibrationtoolbox import CalibrationToolbox
-from .iterativebayesianfilter import IterativeBayesianFilter
+from .dynamic_systems import DynamicSystem, IODynamicSystem
+from .bayesian_calibration import BayesianCalibration
+from .iterative_bayesian_filter import IterativeBayesianFilter
 from .sampling import GaussianMixtureModel, generate_params_qmc
 from .inference import SMC
 from .tools import (
