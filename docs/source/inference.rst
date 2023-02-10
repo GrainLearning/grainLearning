@@ -49,8 +49,8 @@ The measure of this importance is the so-called **importance weight**.
 
   Illustration of importance sampling.
 
-Therefore, we draw samples :attr:`.DynamicSystem.param_data`, :math:`\vec{\Theta}^{(i)} \ (i=1,...,N_p)`,
-from a proposal density, leading to an ensemble of model states :attr:`.DynamicSystem.sim_data` :math:`\vec{x}_t^{(i)}`,
+Therefore, we draw samples :attr:`.Model.param_data`, :math:`\vec{\Theta}^{(i)} \ (i=1,...,N_p)`,
+from a proposal density, leading to an ensemble of model states :attr:`.Model.sim_data` :math:`\vec{x}_t^{(i)}`,
 and recursively update the importance weights :attr:`.SMC.posteriors` :math:`w_t^{(i)}`, via
 
 .. math::
@@ -66,7 +66,7 @@ can be simply a multivariate Gaussian, which is used by the function :attr:`.SMC
 
 where :math:`\mathbf{H}` is the observation model that reduces to a diagonal matrix for uncorrelated observables,
 and :math:`\mathbf{\Sigma}_t^D` is the covariance matrix :attr:`.SMC.cov_matrices`
-calculated from :math:`\hat{\vec{y}}_t` and the user-defined normalized variance :attr:`.DynamicSystem.sigma_max`, in :attr:`.SMC.get_covariance_matrices`.
+calculated from :math:`\hat{\vec{y}}_t` and the user-defined normalized variance :attr:`.Model.sigma_max`, in :attr:`.SMC.get_covariance_matrices`.
 
 By making use of importance sampling, the posterior distribution
 :math:`p(\hat{\vec{y}}_t|\hat{\vec{x}}_t^{(i)})` gets updated over time in :attr:`.SMC.data_assimilation_loop`

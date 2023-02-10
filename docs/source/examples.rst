@@ -13,7 +13,7 @@ ranging from trials and errors to sophisticated statistical inference.
 Solving an inverse problem that involves nonlinearity and/or discontinuity
 in the `forward` model (DEM or constitutive) is very challenging.
 Furthermore, because of the potentially large computational cost
-for running the simulations, the "trials" have to be selected with an optimized strategy to boost efficiency.
+for running the simulations, the "trials" have to be selected with an optimized strategy to boost the efficiency.
 
 Bayesian calibration of DEM models
 ----------------------------------
@@ -25,8 +25,8 @@ Below is a piece of code that performs Bayesian calibration of four DEM paramete
 
 .. code-block:: python
 
-    from grainlearning import BayesianCalibration
-    from grainlearning.dynamic_systems import IODynamicSystem
+    from grainlearning import CalibrationToolbox
+    from grainlearning.models import IOModel
 
     curr_iter = 1
     sim_data_dir = './tests/data/oedo_sim_data'
@@ -36,7 +36,6 @@ Below is a piece of code that performs Bayesian calibration of four DEM paramete
             "curr_iter": curr_iter,
             "num_iter": 0,
             "model": {
-                "model_type": IODynamicSystem,
                 "obs_data_file": 'obsdata.dat',
                 "obs_names": ['p','q','n'],
                 "ctrl_name": 'e_a',
@@ -44,8 +43,8 @@ Below is a piece of code that performs Bayesian calibration of four DEM paramete
                 "sim_data_dir": sim_data_dir,
                 "param_data_file": f'{sim_data_dir}/iter{curr_iter}/smcTable{curr_iter}.txt',
                 "param_names": ['E', 'mu', 'k_r', 'mu_r'],
-                "param_min": [100e9, 0.3, 0, 0.1],
-                "param_max": [200e9, 0.5, 1e4, 0.5], 
+                "param_mins": [100e9, 0.3, 0, 0.1],
+                "param_maxs": [200e9, 0.5, 1e4, 0.5], 
                 "inv_obs_weight": [1, 1, 0.01],
             },
             "calibration": {
@@ -56,6 +55,7 @@ Below is a piece of code that performs Bayesian calibration of four DEM paramete
                 },
             },
             "save_fig": 0,
+            "model_type": IOModel
         }
     )
 
@@ -75,9 +75,9 @@ that are progressively localized near the posterior modes over the iterations.
 
   Localization of resampled parameter values over a few iterations.
 
-Because the closer to a posterior distribution mode the higher the sample density, resampling from the repeatedly updated proposal density allows zooming into highly probable parameter subspace in very few iterations.
+Because the closer to a posterior distribution mode the higher the sample density, resampling from the repeatedly updated proposal density allows to zoom into highly probable parameter subspace in very few iterations.
 The iterative (re)sampling scheme brings three major advantages to Bayesian filtering:
 
-1. The posterior distribution is iteratively estimated with an increased resolution on the posterior landscape.
+1. The posterior distribution is iteratively estimated with an increasing resolution on the posterior landscape.
 2. The multi-level sampling algorithm keeps allocating model evaluations in parameter subspace where the posterior probabilities are expected to be high, thus significantly improving computational efficiency.
-3. Resampling that takes place between two consecutive iterations can effectively overcome the weight degeneracy problem while keeping sample trajectories intact within the time/load history.
+3. Resampling that takes place between two consecutive iterations can effectively overcome weight degeneracy problem while keeping sample trajectories intact within the time/load history.

@@ -60,14 +60,14 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 
 ### One command installation
 
-Stable versions of GrainLearning can be installed via `pip install grainlearning`
+Stable versions of GrainLearning can be installed via pip `pip install grainlearning`
 However, you still need to clone the GrainLearning repository to run the tutorials.
 
 ## Tutorials
 
 1. Linear regression with
    the [`run_sim`](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/linear_regression/python_linear_regression_solve.py#L14)
-   callback function of the [`DynamicSystem`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/models.py)
+   callback function of the [`Model`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/models.py)
    class,
    in [python_linear_regression_solve.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/linear_regression/python_linear_regression_solve.py)
 

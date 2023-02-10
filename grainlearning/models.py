@@ -4,32 +4,11 @@ import os
 from .tools import get_keys_and_data, write_to_table
 
 
-class DynamicSystem:
-    """This is the dynamical system class.
-
-    A dynamical system (also known as a state-space system) describes the time evolution of the system's (hidden) state
-    and observation using the following equations:
-
-    .. math::
-        x_t & = f(x_{t−1}) + q_{t−1}
-
-        y_t & = h(x_t) + r_t
-
-    where
-    :math:`x_t` is the hidden state,
-    :math:`y_t` is the observation, both represented as random processes,
-    :math:`f` is the state transition function,
-    :math:`h` is the observation function,
-    :math:`q_{t−1}` is the process noise, and :math:`r_t` is the observation noise.
-
-    In the context of Bayesian parameter estimation, :math:`f` is the model that describe the physical process
-    and :math:`h` is the model that describe the relationship between the hidden state and observation.
-    In the simplest case, :math:`h` is an identity matrix which indicate the one-to-one relationship
-    between :math:`x_t` and :math:`y_t`.
-
-    Therefore, the :class:`.DynamicSystem` class is used to encapsulate the observation data and the simulation data,
-    which require specifying the number of samples, the lower and upper bound of the parameters, and the callback function
-    that runs the forward predictions.
+class Model:
+    """
+    This is the probabalistic model class.
+    It contains information on the observation (or reference) data, simulation data, parameters and reference.
+    It is also used to run a callback for the simulations.
 
     There are two ways of initializing the class.
 
@@ -38,14 +17,14 @@ class DynamicSystem:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = DynamicSystem.from_dict(
+        model_cls = Model.from_dict(
             {
-                "param_names": ["a", "b"],
-                "param_min": [0, 0],
-                "param_max": [1, 10],
+
+                "param_mins": [0, 0],
+                "param_maxs": [1, 10],
                 "num_samples": 14,
                 "obs_data": y_obs,
-                "ctrl_data": y_ctrl,
+                "ctrl_data": x_ctrl,
                 "callback": run_sim
             }
         )
@@ -57,40 +36,30 @@ class DynamicSystem:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = DynamicSystem(
-            param_names = ["a", "b"],
-            param_min = [0, 0],
-            param_max = [1, 10],
-            num_samples = 14,
-            obs_data = y_obs,
-            ctrl_data = y_ctrl,
-            callback = run_sim
+        model_cls = Model(
+                param_mins = [0, 0],
+                param_maxs = [1, 10],
+                num_samples = 14,
+                obs_data = y_obs,
+                ctrl_data = x_ctrl,
+                callback = run_sim
         )
 
-    You can pass the simulation data to the class using the :meth:`.DynamicSystem.set_sim_data` method.
+    y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.
 
-    .. highlight:: python
-    .. code-block:: python
-
-        system_cls.set_sim_data(x)
-
-    The simulation data is a numpy array of shape (num_samples, num_obs, num_steps).
-
-    :param obs_data: observation or reference data
+    :param obs_data: Observation or reference data
     :param num_samples: Sample size
-    :param param_min: List of parameter lower bounds
-    :param param_max: List of parameter Upper bounds
+    :param param_mins: List of parameter lower bounds
+    :param param_maxs: List of parameter Upper bounds
+    :param ctrl_data: Optional control data (e.g, time), defaults to None
+    :param obs_names: Column names of the observation data, defaults to None
+    :param ctrl_name: Coloumn name of the control data, defaults to None
+    :param inv_obs_weight: Inverse of the observation weight, defaults to None
+    :param param_data: Parameter data, defaults to None
+    :param param_names: Parameter names, defaults to None
+    :param sim_data: Simulation data, defaults to None
     :param callback: Callback function, defaults to None
-    :param ctrl_data: control data (e.g, time), defaults to None, optional
-    :param obs_names: Column names of the observation data, defaults to None, optional
-    :param ctrl_name: Column name of the control data, defaults to None, optional
-    :param inv_obs_weight: Inverse of the observation weight, defaults to None, optional
-    :param param_data: Parameter data, defaults to None, optional
-    :param param_names: Parameter names, defaults to None, optional
-    :param sim_data: Simulation data, defaults to None, optional
-    :param sigma_max: Maximum uncertainty, defaults to 1.0e6, optional
-    :param sigma_tol: Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional
-    :param sim_name: Name of the simulation, defaults to 'sim', optional
+    :param sigma_max: Uncertainty, defaults to 1.0e6
     """
 
     ##### Parameters #####
@@ -101,27 +70,27 @@ class DynamicSystem:
     #: Parameter data of previous iteration
     param_data_prev: np.ndarray
 
-    #: Number of unknown parameters
+    #: Number of parameters
     num_params: int
 
-    #: Lower bound of the parameters
-    param_min: List
+    #: Minimum values of the parameters
+    param_mins: List
 
-    #: Upper bound of the parameters
-    param_max: List
+    #: Maximum number of parameters
+    param_maxs: List
 
-    #: Names of the parameters
+    #: Names of the parameters.
     param_names: List[str]
 
     ##### Observations #####
 
-    #: Observation (or reference) data of shape (num_obs, num_steps)
+    #: Observation (or reference) data of shape (num_obs,num_steps)
     obs_data: np.ndarray
 
     #: Observation keys
     obs_names: List[str]
 
-    #: Inverse of the observation weight
+    #: Inverse observation weight
     inv_obs_weight: List[float]
 
     #: Number of steps or sequence size in the dataset
@@ -130,13 +99,13 @@ class DynamicSystem:
     #: Number of observations in the dataset
     num_obs: int
 
-    #: Control dataset (num_ctrl, num_steps)
-    ctrl_data: np.ndarray
+    #: Control data (num_control,num_steps)
+    ctrl_data = np.ndarray
 
     #: Observation control (e.g., time)
     ctrl_name: str
 
-    #: Number of control data (identical between simulation and observation)
+    #: Number of control data
     num_ctrl: int
 
     ##### Simulations #####
@@ -144,13 +113,13 @@ class DynamicSystem:
     #: Name of the simulation (e.g., sim)
     sim_name: str = 'sim'
 
-    #: Simulation data of shape (num_samples, num_obs, num_steps)
+    #: Simulation data of shape (num_samples,num_obs,num_steps)
     sim_data: np.ndarray
 
     #: Number of samples (usually specified by user)
     num_samples: int
 
-    #: Callback function to run the forward predictions
+    #: Callback function. The input arugment is the model where model.sim_data is modified
     callback: Callable
 
     ##### Uncertainty #####
@@ -171,8 +140,8 @@ class DynamicSystem:
         self,
         obs_data: np.ndarray,
         num_samples: int,
-        param_min: List[float],
-        param_max: List[float],
+        param_mins: List[float],
+        param_maxs: List[float],
         ctrl_data: np.ndarray = None,
         obs_names: List[str] = None,
         ctrl_name: str = None,
@@ -185,7 +154,7 @@ class DynamicSystem:
         sigma_max: float = 1.0e6,
         sigma_tol: float = 1.0e-3
     ):
-        """Initialize the dynamic system class"""
+        """Initialize the Model class"""
         #### Observations ####
         self.obs_data = np.array(
             obs_data, ndmin=2
@@ -217,14 +186,13 @@ class DynamicSystem:
 
         self.callback = callback
 
-        self.param_min = param_min
+        self.param_mins = param_mins
 
-        self.param_max = param_max
+        self.param_maxs = param_maxs
 
         #### Parameters ####
 
-        if param_min:
-            self.num_params = len(param_min)
+        if param_mins: self.num_params = len(param_mins)
 
         self.param_data = param_data
 
@@ -236,27 +204,23 @@ class DynamicSystem:
 
         self.sigma_tol = sigma_tol
 
-        self.compute_inv_normalized_sigma()
+        self.get_inv_normalized_sigma()
 
     @classmethod
-    def from_dict(cls: Type["DynamicSystem"], obj: dict):
-        """ Initialize the class using a dictionary style
+    def from_dict(cls: Type["Model"], obj: dict) -> Type["Model"]:
+        """ Initialize the class using a dictionary style"""
 
-        :param obj: Dictionary object
-        :return: DynamicSystem: DynamicSystem object
-        """
-
+        # TODO do proper error checking on the input
         assert "obs_data" in obj.keys(), "Error no obs_data key found in input"
         assert "num_samples" in obj.keys(), "Error no num_samples key found in input"
-        assert "param_min" in obj.keys(), "Error no param_min key found in input"
-        assert "param_max" in obj.keys(), "Error no param_max key found in input"
-        assert "callback" in obj.keys(), "Error no callback key found in input"
+        assert "param_mins" in obj.keys(), "Error no param_mins key found in input"
+        assert "param_maxs" in obj.keys(), "Error no param_maxs key found in input"
 
         return cls(
             obs_data=obj["obs_data"],
             num_samples=obj["num_samples"],
-            param_min=obj["param_min"],
-            param_max=obj["param_max"],
+            param_mins=obj["param_mins"],
+            param_maxs=obj["param_maxs"],
             ctrl_data=obj.get("ctrl_data", None),
             obs_names=obj.get("obs_names", None),
             ctrl_name=obj.get("ctrl_name", None),
@@ -270,56 +234,24 @@ class DynamicSystem:
         )
 
     def run(self, **kwargs):
-        """Run the callback function
-
-        TODO design a better wrapper to avoid kwargs?
-        :param kwargs: keyword arguments to pass to the callback function
-        """
+        """This function runs the callback function"""
 
         if self.callback is None:
             raise ValueError("No callback function defined")
 
         self.callback(self, **kwargs)
 
-    def set_sim_data(self, data: np.ndarray):
-        """Set the simulation data
-
-        :param data: simulation data of shape (num_samples, num_obs, num_steps)
-        """
-        self.sim_data = np.array(data)
-
-    def compute_inv_normalized_sigma(self):
-        """Get the inverse of the matrix that apply different weights on the observables"""
-        inv_obs_weight = np.diagflat(self.inv_obs_weight)
-        self._inv_normalized_sigma = inv_obs_weight * np.linalg.det(inv_obs_weight) ** (
-            -1.0 / inv_obs_weight.shape[0]
+    def get_inv_normalized_sigma(self):
+        inv_obs_mat = np.diagflat(self.inv_obs_weight)
+        self._inv_normalized_sigma = inv_obs_mat * np.linalg.det(inv_obs_mat) ** (
+            -1.0 / inv_obs_mat.shape[0]
         )
 
-    @classmethod
-    def load_param_data(cls, curr_iter):
-        """Virtual function to load param data from disk"""
-        pass
 
-    @classmethod
-    def get_sim_data_files(cls, curr_iter):
-        """Virtual function to get simulation data files from disk"""
-        pass
-
-    @classmethod
-    def load_sim_data(cls):
-        """Virtual function to load simulation data"""
-        pass
-
-    @classmethod
-    def write_to_table(cls, param):
-        """Virtual function to write parameters into a text file"""
-        pass
-
-
-class IODynamicSystem(DynamicSystem):
+class IOModel(Model):
     """
-    This is the I/O dynamic system class derived from the dynamic system class.
-    Extra functionalities are added to handle I/O operations.
+    This is the IOModel class to compute the posterior distribution from an existing dataset,
+    and generate new parameter values for additional simulation runs.
 
     There are two ways of initializing the class.
 
@@ -328,18 +260,13 @@ class IODynamicSystem(DynamicSystem):
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = IODynamicSystem.from_dict(
+        model_cls = Model.from_dict(
             {
-                "system_type": IODynamicSystem,
-                "param_min": [0, 0],
-                "param_max": [1, 10],
-                "param_names": ['a', 'b'],
+                "param_mins": [0, 0],
+                "param_maxs": [1, 10],
                 "num_samples": 14,
-                "obs_data_file": 'obs_data.txt',
-                "obs_names": ['y_obs'],
-                "ctrl_name": 'y_ctrl
-                "sim_name": 'linear',
-                "sim_data_file_ext": '.txt',
+                "obs_data": y_obs,
+                "ctrl_data": x_ctrl,
                 "callback": run_sim
             }
         )
@@ -351,36 +278,31 @@ class IODynamicSystem(DynamicSystem):
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = IODynamicSystem(
-                param_min = [0, 0],
-                param_max = [1, 10],
-                param_names = ['a', 'b'],
+        model_cls = Model(
+                param_mins = [0, 0],
+                param_maxs = [1, 10],
                 num_samples = 14,
-                obs_data_file = 'obs_data.txt',
-                obs_names = ['y_obs'],
-                ctrl_name = 'y_ctrl',
-                sim_name = 'linear',
-                sim_data_file_ext = '.txt',
+                obs_data = y_obs,
+                ctrl_data = x_ctrl,
                 callback = run_sim
         )
 
-    :param param_min: List of parameter lower bounds
-    :param param_max: List of parameter Upper bounds
-    :param param_names: Parameter names, defaults to None
+    y_obs is the observation data, x_ctrl is the control data. The callback function inputs the model as an argument, where one can modify the model.sim_data.
+
+    :param obs_data: Observation or reference data
     :param num_samples: Sample size
-    :param obs_data_file: Observation data file, defaults to None
+    :param param_mins: List of parameter lower bounds
+    :param param_maxs: List of parameter Upper bounds
+    :param ctrl_data: Optional control data (e.g, time), defaults to None
     :param obs_names: Column names of the observation data, defaults to None
-    :param ctrl_name: Column name of the control data, defaults to None
-    :param sim_name: Name of the simulation, defaults to 'sim'
-    :param sim_data_dir: Simulation data directory, defaults to './sim_data'
-    :param sim_data_file_ext: Simulation data file extension, defaults to '.npy'
+    :param ctrl_name: Coloumn name of the control data, defaults to None
+    :param inv_obs_weight: Inverse of the observation weight, defaults to None
+    :param param_data: Parameter data, defaults to None
+    :param param_names: Parameter names, defaults to None
+    :param sim_data_files: Simulation data files, defaults to None
+    :param sim_data: Simulation data, defaults to None
     :param callback: Callback function, defaults to None
-    :param param_data_file: Parameter data file, defaults to None, optional
-    :param obs_data: observation or reference data, optional
-    :param ctrl_data: Control data (e.g, time), defaults to None, optional
-    :param inv_obs_weight: Inverse of the observation weight, defaults to None, optional
-    :param param_data: Parameter data, defaults to None, optional
-    :param sim_data: Simulation data, defaults to None, optional
+    :param sigma_max: Uncertainty, defaults to 1.0e6
     """
 
     ##### Parameters #####
@@ -415,8 +337,8 @@ class IODynamicSystem(DynamicSystem):
         param_data_file: str,
         obs_data: np.ndarray,
         num_samples: int,
-        param_min: List[float],
-        param_max: List[float],
+        param_mins: List[float],
+        param_maxs: List[float],
         ctrl_data: np.ndarray = None,
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
@@ -424,15 +346,15 @@ class IODynamicSystem(DynamicSystem):
         param_data: np.ndarray = None,
         param_names: List[str] = None,
     ):
-        """Initialize the IO dynamic system class"""
+        """Initialize the IOModel class"""
 
         #### Calling base constructor ####
 
         super().__init__(
             obs_data,
             num_samples,
-            param_min,
-            param_max,
+            param_mins,
+            param_maxs,
             ctrl_data,
             obs_names,
             ctrl_name,
@@ -473,23 +395,19 @@ class IODynamicSystem(DynamicSystem):
         else:
             self.inv_obs_weight = inv_obs_weight
 
-        self.compute_inv_normalized_sigma()
+        self.get_inv_normalized_sigma()
 
     @classmethod
-    def from_dict(cls: Type["IODynamicSystem"], obj: dict):
-        """ Initialize the class using a dictionary style
+    def from_dict(cls: Type["IOModel"], obj: dict) -> Type["IOModel"]:
+        """ Initialize the class using a dictionary style"""
 
-        :param obj: Dictionary object
-        :return IODynamicSystem: IODynamicSystem object
-        """
-        assert "param_names" in obj.keys(), "Error no param_names key found in input"
+        # TODO do proper error checking on the input
+        assert "sim_name" in obj.keys(), "Error no sim_name key found in input"
+        assert "sim_data_dir" in obj.keys(), "Error no sim_data_dir key found in input"
         assert "obs_data_file" in obj.keys(), "Error no obs_data_file key found in input"
         assert "obs_names" in obj.keys(), "Error no obs_names key found in input"
         assert "ctrl_name" in obj.keys(), "Error no ctrl_name key found in input"
-        assert "sim_name" in obj.keys(), "Error no sim_name key found in input"
-        assert "sim_data_dir" in obj.keys(), "Error no sim_data_dir key found in input"
-        if "param_data_file" not in obj.keys():
-            obj["param_data_file"] = None
+        if "param_data_file" not in obj.keys(): obj["param_data_file"] = None
 
         return cls(
             sim_name=obj["sim_name"],
@@ -501,8 +419,8 @@ class IODynamicSystem(DynamicSystem):
             param_data_file=obj["param_data_file"],
             obs_data=obj.get("obs_data", None),
             num_samples=obj.get("num_samples", None),
-            param_min=obj.get("param_min", None),
-            param_max=obj.get("param_max", None),
+            param_mins=obj.get("param_mins", None),
+            param_maxs=obj.get("param_maxs", None),
             ctrl_data=obj.get("ctrl_data", None),
             inv_obs_weight=obj.get("inv_obs_weight", None),
             sim_data=obj.get("sim_data", None),
@@ -512,18 +430,13 @@ class IODynamicSystem(DynamicSystem):
         )
 
     def get_obs_data(self):
-        """Get the observation data from the observation data file.
-
-        Separate the control data from the observation data if the name of control variable is given.
-        Otherwise, the observation data is the entire data in the observation data file.
-        """
-        # if self.ctrl_name is given, then separate the observation data into control data and observation data
+        # if self.ctrl_name specifies the control variable during the observation
         if self.ctrl_name:
             keys_and_data = get_keys_and_data(self.obs_data_file)
             # separate the control data sequence from the observation data
             self.ctrl_data = keys_and_data.pop(self.ctrl_name)
             self.num_steps = len(self.ctrl_data)
-            # remove the data not used by Bayesian filtering
+            # remove data not used by the calibration
             self.num_obs = len(self.obs_names)
             for key in keys_and_data.keys():
                 if key not in self.obs_names: keys_and_data.pop(key)
@@ -534,27 +447,23 @@ class IODynamicSystem(DynamicSystem):
         else:
             self.obs_data = np.genfromtxt(self.obs_data_file)
             # if only one observation data vector exists, reshape it with (1, num_steps)
-            if len(self.obs_data) == 1:
+            if len(data) == 1:
                 self.obs_data = self.obs_data.reshape([1, self.obs_data.shape[0]])
 
     def get_sim_data_files(self, curr_iter: int = 0):
-        """Get the simulation data files from the simulation data directory.
-
-        :param curr_iter: Current iteration number, default to 0.
-        """
         from math import floor, log
         from glob import glob
 
-        mag = floor(log(self.num_samples, 10)) + 1
+        magn = floor(log(self.num_samples, 10)) + 1
         self.sim_data_files = []
 
         for i in range(self.num_samples):
             if self.sim_data_file_ext != '.npy':
-                sim_data_file_ext = '_sim' + self.sim_data_file_ext
+                sim_data_file_ext = '_sim*' + self.sim_data_file_ext
             else:
                 sim_data_file_ext = self.sim_data_file_ext
-            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*'\
-                        + str(i).zfill(mag) + '*' + sim_data_file_ext
+            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*' \
+                        + str(i).zfill(magn) + '*' + sim_data_file_ext
             files = glob(file_name)
 
             if not files:
@@ -564,10 +473,8 @@ class IODynamicSystem(DynamicSystem):
             self.sim_data_files.append(files[0])
 
     def load_sim_data(self):
-        """Load the simulation data from the simulation data files.
-
-        The function does the following:
-        1. Load simulation data into an IO dynamic system object
+        """
+        1. Read simulation data into self.model.sim_data and remove the observation data sequence
         2. Check if parameter values read from the table matches those used to creat the simulation data
         """
         self.sim_data = np.zeros([self.num_samples, self.num_obs, self.num_steps])
@@ -583,31 +490,29 @@ class IODynamicSystem(DynamicSystem):
             for j, key in enumerate(self.obs_names):
                 self.sim_data[i, j, :] = data[key]
 
-            params = np.array([data[key] for key in self.param_names])
+            params = [data[key] for key in self.param_names]
             if not (np.abs((params - self.param_data[i, :])
                            / self.param_data[i, :] < 1e-5).all()):
                 raise RuntimeError(
                     "Parameters [" + ", ".join(
                         ["%s" % v for v in self.param_data[i, :]])
-                    + '] vs [' +
-                    ", ".join("%s" % v for v in params) +
+                    + '] vs [' + \
+                    ", ".join("%s" % v for v in params) + \
                     f"] from the simulation data file {f} and the parameter table do not match")
 
     def load_param_data(self, curr_iter: int = 0):
         """
-        Load parameter data from a table written in a text file.
-
-        :param curr_iter: Current iteration number, default to 0.
+        Load parameter data from a table written in a txt file
         """
         import os
         from glob import glob
 
         if os.path.exists(self.param_data_file):
-            # we assume parameter data are always in the last columns.
+            # we assumes parameter data in the last columns.
             self.param_data = np.genfromtxt(self.param_data_file, comments='!')[:, -self.num_params:]
             self.num_samples = self.param_data.shape[0]
         else:
-            # if param_data_file does not exit, get parameter daa from simulation data files
+            # get all simulation data files
             files = glob(self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*{self.sim_data_file_ext}')
             self.num_samples = len(files)
             self.sim_data_files = sorted(files)
@@ -618,11 +523,7 @@ class IODynamicSystem(DynamicSystem):
                 self.param_data[i, :] = params
 
     def run(self, **kwargs):
-        """Run the callback function
-
-        TODO design a better wrapper to avoid kwargs?
-        :param kwargs: keyword arguments to pass to the callback function
-        """
+        """This function runs the callback function"""
 
         if self.callback is None:
             raise ValueError("No callback function defined")
@@ -637,25 +538,18 @@ class IODynamicSystem(DynamicSystem):
         else:
             input(f'Removing existing simulation data in {sim_data_sub_dir}?\n')
             files = glob(sim_data_sub_dir + '/*')
-            for f in files:
-                os.remove(f)
+            for f in files: os.remove(f)
 
-        # write the parameter data into a text file
-        self.write_params_to_txt(curr_iter)
+        # write the parameter table to a text file
+        self.write_to_table(curr_iter)
 
         # run the callback function
         self.callback(self, **kwargs)
 
-        # move simulation data files into the directory defined per iteration
+        # move simulation data files into the directory per iteration
         files = glob(f'{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
-        for f in files:
-            os.replace(f'./{f}', f'./{sim_data_sub_dir}/{f}')
+        for f in files: os.replace(f'./{f}', f'./{sim_data_sub_dir}/{f}')
 
-    def write_params_to_txt(self, curr_iter: int):
-        """Write the parameter data into a text file.
-
-        :param curr_iter: Current iteration number, default to 0.
-        :return param_data_file: The name of the parameter data file
-        """
+    def write_to_table(self, curr_iter: int):
         self.param_data_file = write_to_table(
             f'{self.sim_data_dir}/iter{curr_iter}/{self.sim_name}', self.param_data, self.param_names, curr_iter)
