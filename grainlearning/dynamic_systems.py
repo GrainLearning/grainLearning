@@ -167,6 +167,12 @@ class DynamicSystem:
     #: Calculated normalized sigma to weigh the covariance matrix
     _inv_normalized_sigma: np.array
 
+    #: Estimated parameter as the first moment of the distribution (:math:`x_\mu = \sum_i w_i * x_i`)
+    estimated_params: np.ndarray = None
+
+    #: Parameter uncertainty as the second moment of the distribution (:math:`x_\sigma = \sum_i w_i \cdot (x_i - x_\mu)^2 / x_\mu`)
+    estimated_params_CV: np.ndarray = None
+
     def __init__(
         self,
         obs_data: np.ndarray,
@@ -289,11 +295,35 @@ class DynamicSystem:
         self.sim_data = np.array(data)
 
     def compute_inv_normalized_sigma(self):
-        """Get the inverse of the matrix that apply different weights on the observables"""
+        """Compute the inverse of the matrix that apply different weights on the observables"""
         inv_obs_weight = np.diagflat(self.inv_obs_weight)
         self._inv_normalized_sigma = inv_obs_weight * np.linalg.det(inv_obs_weight) ** (
             -1.0 / inv_obs_weight.shape[0]
         )
+
+    def get_inv_normalized_sigma(self):
+        """Get the inverse of the matrix that apply different weights on the observables"""
+        return self._inv_normalized_sigma
+
+    def compute_estimated_params(self, posteriors: np.array):
+        """Compute the estimated means and uncertainties for the parameters.
+
+        This function is vectorized for all time steps
+
+        :param posteriors: Posterior distribution of shape (num_steps, num_samples)
+        """
+        self.estimated_params = np.zeros((self.num_steps, self.num_params))
+        self.estimated_params_CV = np.zeros((self.num_steps, self.num_params))
+
+        for stp_id in range(self.num_steps):
+            self.estimated_params[stp_id, :] = posteriors[stp_id, :] @ self.param_data
+
+            self.estimated_params_CV[stp_id, :] = (
+                posteriors[stp_id, :] @ (self.estimated_params[stp_id, :] - self.param_data) ** 2
+            )
+
+            self.estimated_params_CV[stp_id, :] = np.sqrt(
+                self.estimated_params_CV[stp_id, :]) / self.estimated_params[stp_id, :]
 
     @classmethod
     def load_param_data(cls, curr_iter):

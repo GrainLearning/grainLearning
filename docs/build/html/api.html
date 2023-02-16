@@ -78,8 +78,10 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.dynamic_systems"><code class="docutils literal notranslate"><span class="pre">Dynamic</span> <span class="pre">systems</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem"><code class="docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.compute_estimated_params"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.compute_estimated_params()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.compute_inv_normalized_sigma"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.compute_inv_normalized_sigma()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.from_dict"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.get_inv_normalized_sigma"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.get_inv_normalized_sigma()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.get_sim_data_files"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.get_sim_data_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.load_param_data"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.load_param_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.load_sim_data"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.load_sim_data()</span></code></a></li>
@@ -89,6 +91,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.callback"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.callback</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.ctrl_data"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.ctrl_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.ctrl_name"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.ctrl_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.estimated_params"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.estimated_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.estimated_params_CV"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.estimated_params_CV</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.inv_obs_weight"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.inv_obs_weight</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.num_ctrl"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.num_ctrl</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.num_obs"><code class="docutils literal notranslate"><span class="pre">DynamicSystem.num_obs</span></code></a></li>
@@ -110,8 +114,10 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.compute_estimated_params"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.compute_estimated_params()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.compute_inv_normalized_sigma"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.compute_inv_normalized_sigma()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.from_dict"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.get_inv_normalized_sigma"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.get_inv_normalized_sigma()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.get_obs_data"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.get_obs_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.get_sim_data_files"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.get_sim_data_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.load_param_data"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.load_param_data()</span></code></a></li>
@@ -123,6 +129,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.callback"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.callback</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.ctrl_data"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.ctrl_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.ctrl_name"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.ctrl_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.estimated_params"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.estimated_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.estimated_params_CV"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.estimated_params_CV</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.inv_obs_weight"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.inv_obs_weight</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.num_ctrl"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.num_ctrl</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.dynamic_systems.IODynamicSystem.num_obs"><code class="docutils literal notranslate"><span class="pre">IODynamicSystem.num_obs</span></code></a></li>
@@ -170,18 +178,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.inference"><code class="docutils literal notranslate"><span class="pre">Inference</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.inference.SMC"><code class="docutils literal notranslate"><span class="pre">SMC</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.compute_effective_sample_size"><code class="docutils literal notranslate"><span class="pre">SMC.compute_effective_sample_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.data_assimilation_loop"><code class="docutils literal notranslate"><span class="pre">SMC.data_assimilation_loop()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.from_dict"><code class="docutils literal notranslate"><span class="pre">SMC.from_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_covariance_matrices"><code class="docutils literal notranslate"><span class="pre">SMC.get_covariance_matrices()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_ensemble_ips_covs"><code class="docutils literal notranslate"><span class="pre">SMC.get_ensemble_ips_covs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_likelihoods"><code class="docutils literal notranslate"><span class="pre">SMC.get_likelihoods()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_posterors"><code class="docutils literal notranslate"><span class="pre">SMC.get_posterors()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.give_posterior"><code class="docutils literal notranslate"><span class="pre">SMC.give_posterior()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_posterior_at_time"><code class="docutils literal notranslate"><span class="pre">SMC.get_posterior_at_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.get_posteriors"><code class="docutils literal notranslate"><span class="pre">SMC.get_posteriors()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.cov_matrices"><code class="docutils literal notranslate"><span class="pre">SMC.cov_matrices</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.covs"><code class="docutils literal notranslate"><span class="pre">SMC.covs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.ess"><code class="docutils literal notranslate"><span class="pre">SMC.ess</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.ess_target"><code class="docutils literal notranslate"><span class="pre">SMC.ess_target</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.ips"><code class="docutils literal notranslate"><span class="pre">SMC.ips</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.likelihoods"><code class="docutils literal notranslate"><span class="pre">SMC.likelihoods</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.posteriors"><code class="docutils literal notranslate"><span class="pre">SMC.posteriors</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.inference.SMC.scale_cov_with_max"><code class="docutils literal notranslate"><span class="pre">SMC.scale_cov_with_max</span></code></a></li>
@@ -236,7 +242,7 @@
 <dt class="sig sig-object py" id="grainlearning.bayesian_calibration.BayesianCalibration">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BayesianCalibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the Bayesian calibration class</p>
+<p>This is the Bayesian calibration class.</p>
 <p>A Bayesian calibration class consists of the inference class and the (re)sampling class.
 For instance, in GrainLearning, we have a calibration method called “iterative Bayesian filter”
 which consists of “sequential Monte Carlo” for model parameter estimation
@@ -296,7 +302,7 @@ and “variational Gaussian mixture” for resampling.</p>
 <dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – a dictionary containing the keys and values to construct a BayesianCalibration object</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A BayesianCalibration object</p>
+<dd class="field-even"><p>a BayesianCalibration object</p>
 </dd>
 </dl>
 </dd></dl>
@@ -334,7 +340,7 @@ unlike being assumed as an input for <cite>load_and_process(…)</cite></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.bayesian_calibration.BayesianCalibration.load_system">
 <span class="sig-name descname"><span class="pre">load_system</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.bayesian_calibration.BayesianCalibration.load_system" title="Permalink to this definition"></a></dt>
-<dd><p>Load existing simulation data from disk into the state-space model</p>
+<dd><p>Load existing simulation data from disk into the dynamic system</p>
 </dd></dl>
 
 <dl class="py method">
@@ -486,9 +492,21 @@ that runs the forward predictions.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.DynamicSystem.compute_estimated_params">
+<span class="sig-name descname"><span class="pre">compute_estimated_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posteriors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.compute_estimated_params" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the estimated means and uncertainties for the parameters.</p>
+<p>This function is vectorized for all time steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>posteriors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Posterior distribution of shape (num_steps, num_samples)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.dynamic_systems.DynamicSystem.compute_inv_normalized_sigma">
 <span class="sig-name descname"><span class="pre">compute_inv_normalized_sigma</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.compute_inv_normalized_sigma" title="Permalink to this definition"></a></dt>
-<dd><p>Get the inverse of the matrix that apply different weights on the observables</p>
+<dd><p>Compute the inverse of the matrix that apply different weights on the observables</p>
 </dd></dl>
 
 <dl class="py method">
@@ -503,6 +521,12 @@ that runs the forward predictions.</p>
 <dd class="field-even"><p>DynamicSystem: DynamicSystem object</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.DynamicSystem.get_inv_normalized_sigma">
+<span class="sig-name descname"><span class="pre">get_inv_normalized_sigma</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.get_inv_normalized_sigma" title="Permalink to this definition"></a></dt>
+<dd><p>Get the inverse of the matrix that apply different weights on the observables</p>
 </dd></dl>
 
 <dl class="py method">
@@ -565,6 +589,18 @@ that runs the forward predictions.</p>
 <dt class="sig sig-object py" id="grainlearning.dynamic_systems.DynamicSystem.ctrl_name">
 <span class="sig-name descname"><span class="pre">ctrl_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.ctrl_name" title="Permalink to this definition"></a></dt>
 <dd><p>Observation control (e.g., time)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.DynamicSystem.estimated_params">
+<span class="sig-name descname"><span class="pre">estimated_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.estimated_params" title="Permalink to this definition"></a></dt>
+<dd><p>Estimated parameter as the first moment of the distribution (<span class="math notranslate nohighlight">\(x_\mu = \sum_i w_i * x_i\)</span>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.DynamicSystem.estimated_params_CV">
+<span class="sig-name descname"><span class="pre">estimated_params_CV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.dynamic_systems.DynamicSystem.estimated_params_CV" title="Permalink to this definition"></a></dt>
+<dd><p>Parameter uncertainty as the second moment of the distribution (<span class="math notranslate nohighlight">\(x_\sigma = \sum_i w_i \cdot (x_i - x_\mu)^2 / x_\mu\)</span>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -742,9 +778,21 @@ Extra functionalities are added to handle I/O operations.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.IODynamicSystem.compute_estimated_params">
+<span class="sig-name descname"><span class="pre">compute_estimated_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posteriors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.compute_estimated_params" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the estimated means and uncertainties for the parameters.</p>
+<p>This function is vectorized for all time steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>posteriors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Posterior distribution of shape (num_steps, num_samples)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.dynamic_systems.IODynamicSystem.compute_inv_normalized_sigma">
 <span class="sig-name descname"><span class="pre">compute_inv_normalized_sigma</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.compute_inv_normalized_sigma" title="Permalink to this definition"></a></dt>
-<dd><p>Get the inverse of the matrix that apply different weights on the observables</p>
+<dd><p>Compute the inverse of the matrix that apply different weights on the observables</p>
 </dd></dl>
 
 <dl class="py method">
@@ -759,6 +807,12 @@ Extra functionalities are added to handle I/O operations.</p>
 <dd class="field-even"><p>IODynamicSystem object</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.IODynamicSystem.get_inv_normalized_sigma">
+<span class="sig-name descname"><span class="pre">get_inv_normalized_sigma</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.get_inv_normalized_sigma" title="Permalink to this definition"></a></dt>
+<dd><p>Get the inverse of the matrix that apply different weights on the observables</p>
 </dd></dl>
 
 <dl class="py method">
@@ -856,6 +910,18 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dt class="sig sig-object py" id="grainlearning.dynamic_systems.IODynamicSystem.ctrl_name">
 <span class="sig-name descname"><span class="pre">ctrl_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.ctrl_name" title="Permalink to this definition"></a></dt>
 <dd><p>Observation control (e.g., time)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.IODynamicSystem.estimated_params">
+<span class="sig-name descname"><span class="pre">estimated_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.estimated_params" title="Permalink to this definition"></a></dt>
+<dd><p>Estimated parameter as the first moment of the distribution (<span class="math notranslate nohighlight">\(x_\mu = \sum_i w_i * x_i\)</span>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.dynamic_systems.IODynamicSystem.estimated_params_CV">
+<span class="sig-name descname"><span class="pre">estimated_params_CV</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.dynamic_systems.IODynamicSystem.estimated_params_CV" title="Permalink to this definition"></a></dt>
+<dd><p>Parameter uncertainty as the second moment of the distribution (<span class="math notranslate nohighlight">\(x_\sigma = \sum_i w_i \cdot (x_i - x_\mu)^2 / x_\mu\)</span>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1088,7 +1154,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve" title="Permalink to this definition"></a></dt>
-<dd><p>Run both inference and sampling on a model</p>
+<dd><p>Run both inference and sampling for a dynamic system</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
@@ -1147,10 +1213,10 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span id="inference"></span><h2><code class="docutils literal notranslate"><span class="pre">Inference</span></code><a class="headerlink" href="#module-grainlearning.inference" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SMC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ess_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_cov_with_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SMC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ess_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_cov_with_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_matrices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This is the Sequential Monte Carlo class that recursively
-update the model state and model parameters based on Bayes’ theorem</p>
+update model states based on sequential observations using the Bayes’ theorem</p>
 <p>There are two ways of initializing the class.</p>
 <p>Method 1 - dictionary style</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">system_cls</span> <span class="o">=</span> <span class="n">SMC</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
@@ -1172,20 +1238,27 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ess_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Target effective sample size (what we want)</p></li>
-<li><p><strong>scale_cov_with_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Flag if the covariance matrix should scale with the maximum accross the loading steps, defaults to True</p></li>
+<li><p><strong>ess_target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Target effective sample size (w_0 / sum_i w_i^2) where w_0 = 1 / N_p, defaults to 0.3</p></li>
+<li><p><strong>scale_cov_with_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – True if the covariance matrix is scaled with the maxima of the observations, defaults to True</p></li>
+<li><p><strong>cov_matrices</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – Covariance matrices of shape (num_steps, num_obs, num_obs), defaults to None, Optional</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.compute_effective_sample_size">
+<span class="sig-name descname"><span class="pre">compute_effective_sample_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.compute_effective_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the effective sample size</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.data_assimilation_loop">
-<span class="sig-name descname"><span class="pre">data_assimilation_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.data_assimilation_loop" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">data_assimilation_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.data_assimilation_loop" title="Permalink to this definition"></a></dt>
 <dd><p>Perform data assimilation loop</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Guess of sigma</p></li>
-<li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Input distribution</p></li>
+<li><p><strong>sigma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Uncertainty</p></li>
+<li><p><strong>proposal</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Proposal distribution from which the samples are sampled from, defaults to None, optional</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
@@ -1201,106 +1274,81 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
+<dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – a dictionary containing the keys and values to construct an SMC object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an SMC object</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.get_covariance_matrices">
-<span class="sig-name descname"><span class="pre">get_covariance_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_guess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_covariance_matrices" title="Permalink to this definition"></a></dt>
-<dd><p>Compute the diagonal covariance matrices from a given input sigma.</p>
-<p>This function is vectorized for all loading steps</p>
+<span class="sig-name descname"><span class="pre">get_covariance_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_covariance_matrices" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the (diagonal) covariance matrices from an uncertainty that is either
+assumed by the user or updated by SMC to satisfy the target effective sample size.</p>
+<p>This function is vectorized for all time steps</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sigma_guess</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – input sigma</p></li>
-<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
+<li><p><strong>sigma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Uncertainty</p></li>
+<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Covariance matrices for all loading steps</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_ensemble_ips_covs">
-<span class="sig-name descname"><span class="pre">get_ensemble_ips_covs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_ensemble_ips_covs" title="Permalink to this definition"></a></dt>
-<dd><p>Compute the ensemble averages for parameters. (Used for post-processing)</p>
-<p>This function is vectorized for all loading steps</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
-<li><p><strong>posteriors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Posterior distributions</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Ensemble averages</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Covariance matrices for all time steps</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.get_likelihoods">
-<span class="sig-name descname"><span class="pre">get_likelihoods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_matrices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_likelihoods" title="Permalink to this definition"></a></dt>
-<dd><p>Compute the likelihoods as a multivariate normal of the simulation data centered around the observations.</p>
-<p>This function is vectorized for all loading steps</p>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_likelihoods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_matrices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_likelihoods" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the likelihood distributions of simulation data as a multivariate normal
+centered around the observation.</p>
+<p>This function is vectorized for all time steps</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
-<li><p><strong>cov_matrices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – covariance matricies</p></li>
+<li><p><strong>cov_matrices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Covariance matrices of shape (num_steps, num_obs, num_obs)</p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Likelihood matrices for all loading steps</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_posterors">
-<span class="sig-name descname"><span class="pre">get_posterors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihoods</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_posterors" title="Permalink to this definition"></a></dt>
-<dd><p>Compute the posteriors for all the loading steps</p>
-<p>This function is vectorized for all loading steps</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
-<li><p><strong>likelihoods</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Likelihood matrices</p></li>
-<li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – Optional input proposal</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Posterior distributions for all loading steps</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.inference.SMC.give_posterior">
-<span class="sig-name descname"><span class="pre">give_posterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loading_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.give_posterior" title="Permalink to this definition"></a></dt>
-<dd><p>Give posterior distribution of a loading step</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>loading_step</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Optional input loading step, defaults to -1 (last value)</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Posterior distribution for a single step</p>
+<dd class="field-even"><p>Likelihood matrices of shape (num_steps, num_samples) considering all time steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_posterior_at_time">
+<span class="sig-name descname"><span class="pre">get_posterior_at_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_posterior_at_time" title="Permalink to this definition"></a></dt>
+<dd><p>Get the posterior distribution at a certain time step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time_step</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – input time step, defaults to -1 (the last step in time), optional</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Posterior distribution at a certain time step</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.inference.SMC.get_posteriors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_posteriors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihoods</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.inference.SMC.get_posteriors" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the posterior distributions from the likelihood for all the time steps</p>
+<p>This function is vectorized for all time steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
+<li><p><strong>likelihoods</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Likelihood matrices of shape (num_steps, num_samples)</p></li>
+<li><p><strong>proposal</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – Proposal distribution at the initial time step, defaults to None, optional</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Posterior matrices of shape (num_steps, num_samples) considering all time steps</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1308,49 +1356,37 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.cov_matrices">
 <span class="sig-name descname"><span class="pre">cov_matrices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.cov_matrices" title="Permalink to this definition"></a></dt>
-<dd><p>Covariance matricies of shape (num_steps,num_obs,num_obs)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.inference.SMC.covs">
-<span class="sig-name descname"><span class="pre">covs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.covs" title="Permalink to this definition"></a></dt>
-<dd><p>Array containing covs of (num_steps, num_params)</p>
+<dd><p>Covariance matrices of shape (num_steps, num_obs, num_obs)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.ess">
-<span class="sig-name descname"><span class="pre">ess</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.ess" title="Permalink to this definition"></a></dt>
-<dd><p>Calculated effective sample size</p>
+<span class="sig-name descname"><span class="pre">ess</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.ess" title="Permalink to this definition"></a></dt>
+<dd><p>Time evolution of the effective sample size</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.ess_target">
 <span class="sig-name descname"><span class="pre">ess_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.ess_target" title="Permalink to this definition"></a></dt>
-<dd><p>Target effective sample size.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.inference.SMC.ips">
-<span class="sig-name descname"><span class="pre">ips</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.ips" title="Permalink to this definition"></a></dt>
-<dd><p>Array containing ips of (num_steps, num_params)</p>
+<dd><p>Target effective sample size</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.likelihoods">
 <span class="sig-name descname"><span class="pre">likelihoods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.likelihoods" title="Permalink to this definition"></a></dt>
-<dd><p>Likelihoods of shape (num_steps, num_samples)</p>
+<dd><p>Likelihood distributions of shape (num_steps, num_samples)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.posteriors">
 <span class="sig-name descname"><span class="pre">posteriors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></em><a class="headerlink" href="#grainlearning.inference.SMC.posteriors" title="Permalink to this definition"></a></dt>
-<dd><p>Posteriors of shape (num_steps, num_samples)</p>
+<dd><p>Posterior distributions of shape (num_steps, num_samples)</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.inference.SMC.scale_cov_with_max">
 <span class="sig-name descname"><span class="pre">scale_cov_with_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#grainlearning.inference.SMC.scale_cov_with_max" title="Permalink to this definition"></a></dt>
-<dd><p>Flag if the covariance matrix should be scaled with the maximum values of the observations</p>
+<dd><p>True if the covariance matrix is scaled with the maximum of the observations, defaults to True</p>
 </dd></dl>
 
 </dd></dl>
@@ -1433,7 +1469,7 @@ update the model state and model parameters based on Bayes’ theorem</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimulation</p></li>
+<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>

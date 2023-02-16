@@ -124,7 +124,8 @@ class IterativeBayesianFilter:
         else:
             self.inference.data_assimilation_loop(system.sigma_tol, system, self.proposal_ibf)
 
-        self.posterior_ibf = self.inference.give_posterior()
+        self.posterior_ibf = self.inference.get_posterior_at_time()
+        system.compute_estimated_params(self.inference.posteriors)
 
     def initialize(self, system: Type["DynamicSystem"]):
         """Resample the parameters using the Gaussian mixture model
