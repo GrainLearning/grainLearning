@@ -13,7 +13,7 @@ def test_init():
 
     np.testing.assert_equal(gmm_dct.__dict__, gmm_cls.__dict__)
 
-    assert gmm_cls.prior_weight == 1.0 / 5
+    assert gmm_cls.weight_concentration_prior == 1.0 / 5
 
 
 def test_expand_proposal_to_normalized_params():
@@ -28,12 +28,12 @@ def test_expand_proposal_to_normalized_params():
         num_samples=4,
     )
 
-    gmm_cls = GaussianMixtureModel(max_num_components=5, expand_weight=2)
+    gmm_cls = GaussianMixtureModel(max_num_components=5, expand_factor=2)
 
     system_cls.param_data = generate_params_qmc(system_cls, system_cls.num_samples)
 
-    gmm_cls.expand_weighted_parameters(proposal, system_cls)
-    # expanded_parms
+    gmm_cls.expand_and_normalize_weighted_samples(proposal, system_cls)
+
     np.testing.assert_almost_equal(np.amax(gmm_cls.expanded_normalized_params, axis=0), np.ones(2))
 
     np.testing.assert_array_almost_equal(
@@ -66,11 +66,11 @@ def test_regenerate_params():
         num_samples=4,
     )
 
-    gmm_cls = GaussianMixtureModel(max_num_components=2, expand_weight=2, seed=100, cov_type="full")
+    gmm_cls = GaussianMixtureModel(max_num_components=2, covariance_type="full", expand_factor=2, random_state=100)
 
     system_cls.param_data = generate_params_qmc(system_cls, system_cls.num_samples)
 
-    gmm_cls.expand_weighted_parameters(proposal, system_cls)
+    gmm_cls.expand_and_normalize_weighted_samples(proposal, system_cls)
 
     np.testing.assert_almost_equal(np.amax(gmm_cls.expanded_normalized_params, axis=0), np.ones(2))
 

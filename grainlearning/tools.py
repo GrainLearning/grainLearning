@@ -155,7 +155,7 @@ def regenerate_params_with_gmm(
         uper bound of the parameter values
 
     :param seed: int
-        random generation seed, defaults to None
+        random generation random_state, defaults to None
 
     :return:
         new_param_data: ndarray, parameter samples for the next iteration

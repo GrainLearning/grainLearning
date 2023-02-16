@@ -35,8 +35,8 @@ def test_lenreg():
                 "sampling": {
                     "max_num_components": 1,
                     "n_init": 1,
-                    "cov_type": "full",
-                    "seed": 0,
+                    "covariance_type": "full",
+                    "random_state": 0,
                 }
             }
         }
