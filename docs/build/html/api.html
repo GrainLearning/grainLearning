@@ -160,8 +160,10 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.iterative_bayesian_filter"><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.add_curr_param_data_to_list"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.add_curr_param_data_to_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.from_dict"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.from_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.load_proposal_from_file"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.load_proposal_from_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_inference"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.run_inference()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_sampling"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.run_sampling()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.solve()</span></code></a></li>
@@ -169,7 +171,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.inference"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.inference</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initial_sampling"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.initial_sampling</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.param_data_list"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.param_data_list</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior_ibf"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.posterior_ibf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.posterior</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.proposal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal_data_file"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.proposal_data_file</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.sampling"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.sampling</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.sigma_list"><code class="docutils literal notranslate"><span class="pre">IterativeBayesianFilter.sigma_list</span></code></a></li>
 </ul>
@@ -1069,9 +1073,24 @@ Otherwise, the observation data is the entire data in the observation data file.
 <span id="iterative-bayesian-filter"></span><h2><code class="docutils literal notranslate"><span class="pre">Iterative</span> <span class="pre">Bayesian</span> <span class="pre">Filter</span></code><a class="headerlink" href="#module-grainlearning.iterative_bayesian_filter" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IterativeBayesianFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ess_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'halton'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_ibf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_data_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IterativeBayesianFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ess_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'halton'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_data_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Iterative Bayesian Filter class.</p>
+<p>This is the Iterative Bayesian Filter class.</p>
+<p>The idea is to solve an inverse problem repeatedly by refining the previous knowledge of the dynamical system.
+An <a class="reference external" href="https://doi.org/10.1016/j.cma.2019.01.027">iterative Bayesian filter</a> is essentially
+a sequential Monte Carlo filter that iteratively samples the parameter space, using a proposal distribution
+trained with non-Gaussian mixture models.
+It consists of the inference class and the (re)sampling class.
+The inference class is a sequential Monte Carlo filter, and the resampling class is a Gaussian mixture model.
+The Gaussian mixture model is trained with the previous ensemble (i.e., samples and associated weights).</p>
+<p>The steps of the iterative Bayesian filter are as follows:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize" title="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Initialize</span></code></a> the ensemble of model (including parameter) states using a low-discrepancy sequence.</p></li>
+<li><p><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_inference" title="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_inference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Compute</span> <span class="pre">the</span> <span class="pre">posterior</span> <span class="pre">distribution</span></code></a> of model states such that the target effective sample size is reached.</p></li>
+<li><p><a class="reference internal" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_sampling" title="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_sampling"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">new</span> <span class="pre">samples</span></code></a> from a proposal density that is trained with the previous ensemble (i.e., samples and associated weights).</p></li>
+<li><p>Run the model with the new samples and update the ensemble of model states using <a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem.run" title="grainlearning.dynamic_systems.DynamicSystem.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DynamicSystem.run()</span></code></a> and <a class="reference internal" href="#grainlearning.bayesian_calibration.BayesianCalibration.load_system" title="grainlearning.bayesian_calibration.BayesianCalibration.load_system"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BayesianCalibration.load_system()</span></code></a>.</p></li>
+<li><p>Repeat steps 2-4 until convergence. The iterations are done in the Bayesian Calibration class by calling <a class="reference internal" href="#grainlearning.bayesian_calibration.BayesianCalibration.run_one_iteration" title="grainlearning.bayesian_calibration.BayesianCalibration.run_one_iteration"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BayesianCalibration.run_one_iteration()</span></code></a>.</p></li>
+</ol>
 <p>There are two ways of initializing the class.</p>
 <p>Method 1 - dictionary style</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ibf_cls</span> <span class="o">=</span> <span class="n">IterativeBayesianFilter</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
@@ -1100,20 +1119,34 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>inference</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.inference.SMC" title="grainlearning.inference.SMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SMC</span></code></a>]) – Sequential Monte Carlo class (SMC)</p></li>
 <li><p><strong>sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel" title="grainlearning.sampling.GaussianMixtureModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a>]) – Gaussian Mixture Model class (GMM)</p></li>
-<li><p><strong>initial_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the initial sampling method, defaults to Halton</p></li>
-<li><p><strong>ess_tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance for the effective sample size to converge, defaults to 1.0e-2</p></li>
-<li><p><strong>proposal_ibf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – User defined proposal distribution for the data assimilation loop, defaults to None</p></li>
-<li><p><strong>proposal_data_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Pickle that stores the previously trained posterior distribution</p></li>
+<li><p><strong>initial_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The initial sampling method, defaults to Halton</p></li>
+<li><p><strong>ess_tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance for the target effective sample size to converge, defaults to 1.0e-2</p></li>
+<li><p><strong>proposal</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – A proposal distribution to sample the state-parameter space, defaults to None</p></li>
+<li><p><strong>proposal_data_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Pickle that stores the previously trained proposal distribution, defaults to None</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.add_curr_param_data_to_list">
+<span class="sig-name descname"><span class="pre">add_curr_param_data_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.add_curr_param_data_to_list" title="Permalink to this definition"></a></dt>
+<dd><p>Add the current parameter samples to the list of parameter samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Current parameter samples of shape (num_samples, num_params)</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.from_dict">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.from_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
+<dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – a dictionary containing the keys and values to construct an iBF object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an iBF object</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1121,7 +1154,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize">
 <span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize" title="Permalink to this definition"></a></dt>
-<dd><p>Resample the parameters using the Gaussian mixture model</p>
+<dd><p>Initialize the ensemble of model (including parameter) states using a low-discrepancy sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
@@ -1130,9 +1163,21 @@ Otherwise, the observation data is the entire data in the observation data file.
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.load_proposal_from_file">
+<span class="sig-name descname"><span class="pre">load_proposal_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.load_proposal_from_file" title="Permalink to this definition"></a></dt>
+<dd><p>Load the proposal density from a file.</p>
+<p>param system: Dynamic system class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>system</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><em>DynamicSystem</em></a><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_inference">
 <span class="sig-name descname"><span class="pre">run_inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_inference" title="Permalink to this definition"></a></dt>
-<dd><p>Run inference (e.g, data assimilation loop) using the Sequential Monte Carlo</p>
+<dd><p>Compute the posterior distribution of model states such that the target effective sample size is reached.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
@@ -1143,7 +1188,8 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_sampling">
 <span class="sig-name descname"><span class="pre">run_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.run_sampling" title="Permalink to this definition"></a></dt>
-<dd><p>Resample the parameters using the Gaussian mixture model</p>
+<dd><p>Generate new samples from a proposal density.</p>
+<p>The proposal density can be trained with the previous ensemble (i.e., samples and associated weights).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
@@ -1155,6 +1201,8 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve" title="Permalink to this definition"></a></dt>
 <dd><p>Run both inference and sampling for a dynamic system</p>
+<p>The iterations are done at the level of the Bayesian Calibration class
+by calling <a class="reference internal" href="#grainlearning.bayesian_calibration.BayesianCalibration.run_one_iteration" title="grainlearning.bayesian_calibration.BayesianCalibration.run_one_iteration"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BayesianCalibration.run_one_iteration()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
@@ -1171,7 +1219,7 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.inference">
 <span class="sig-name descname"><span class="pre">inference</span></span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.inference" title="Permalink to this definition"></a></dt>
-<dd><p>The inference class is a member variable of the particle filter which is used to generate the likelihood</p>
+<dd><p>The inference class quantify the evolution of the posterior distribution of model states over time</p>
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">SMC</span></code>]</p>
 </dd></dl>
 
@@ -1184,26 +1232,38 @@ Otherwise, the observation data is the entire data in the observation data file.
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.param_data_list">
 <span class="sig-name descname"><span class="pre">param_data_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.param_data_list" title="Permalink to this definition"></a></dt>
-<dd><p>list of parameter data of shape (num_samples, num_params) from all iterations</p>
+<dd><p>List of the parameter samples of shape (num_samples, num_params) generated in all iterations</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior_ibf">
-<span class="sig-name descname"><span class="pre">posterior_ibf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior_ibf" title="Permalink to this definition"></a></dt>
-<dd><p>this is the current proposal distribution</p>
+<dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior">
+<span class="sig-name descname"><span class="pre">posterior</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior" title="Permalink to this definition"></a></dt>
+<dd><p>The next proposal distribution</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal">
+<span class="sig-name descname"><span class="pre">proposal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal" title="Permalink to this definition"></a></dt>
+<dd><p>The current proposal distribution</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal_data_file">
+<span class="sig-name descname"><span class="pre">proposal_data_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal_data_file" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the file that stores the current proposal distribution</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.sampling">
 <span class="sig-name descname"><span class="pre">sampling</span></span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.sampling" title="Permalink to this definition"></a></dt>
-<dd><p>The gaussian mixture model class is used to sample the parameters</p>
+<dd><p>The sampling class generates new samples from the proposal density</p>
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code>]</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.sigma_list">
 <span class="sig-name descname"><span class="pre">sigma_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.sigma_list" title="Permalink to this definition"></a></dt>
-<dd><p>List of sigmas</p>
+<dd><p>List of sigma values optimized to satisfy the target effective sample size in all iterations</p>
 </dd></dl>
 
 </dd></dl>

@@ -37,7 +37,7 @@ def test_smc_mse():
     )
 
     calibration.run_one_iteration()
-    most_prob = np.argmax(calibration.calibration.posterior_ibf)
+    most_prob = np.argmax(calibration.calibration.posterior)
     # most_prob_params = calibration.system.param_data[most_prob]
     least_err = np.argmin(
         [mse(calibration.system.sim_data[sid, 0, :], y_obs) for sid in range(calibration.system.num_samples)])

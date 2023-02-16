@@ -174,7 +174,7 @@ class BayesianCalibration:
 
         :return: Combinations of resampled parameter values
         """
-        self.calibration.posterior_ibf = self.calibration.inference.get_posterior_at_time()
+        self.calibration.posterior = self.calibration.inference.get_posterior_at_time()
         self.calibration.run_sampling(self.system, )
         resampled_param_data = self.calibration.param_data_list[-1]
         self.system.write_to_table(self.curr_iter + 1)
@@ -234,7 +234,7 @@ class BayesianCalibration:
         :return: Estimated parameter values
         """
         from numpy import argmax
-        most_prob = argmax(self.calibration.posterior_ibf)
+        most_prob = argmax(self.calibration.posterior)
         return self.system.param_data[most_prob]
 
     @classmethod

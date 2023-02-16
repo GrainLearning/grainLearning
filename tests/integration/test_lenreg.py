@@ -55,7 +55,7 @@ def test_lenreg():
     # print(calibration.sigma_list)
 
     # %%
-    most_prob = np.argmax(calibration.calibration.posterior_ibf)
+    most_prob = np.argmax(calibration.calibration.posterior)
 
     # %%
     most_prob_params = calibration.system.param_data[most_prob]
