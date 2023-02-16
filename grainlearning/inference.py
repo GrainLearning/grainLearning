@@ -146,8 +146,6 @@ class SMC:
 
         if proposal is None:
             proposal = np.ones([system.num_samples]) / system.num_samples
-        else:
-            proposal = proposal
 
         posteriors[0, :] = likelihoods[0, :] / proposal
         posteriors[0, :] /= posteriors[0, :].sum()
