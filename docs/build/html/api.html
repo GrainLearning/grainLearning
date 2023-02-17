@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="How to contribute" href="how_to_contribute.html" /> 
+    <link rel="prev" title="Contributing guidelines" href="how_to_contribute.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,8 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">How to contribute</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html#contributing-guidelines">Contributing guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">Contributing guidelines</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Python API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.bayesian_calibration"><code class="docutils literal notranslate"><span class="pre">Calibration</span> <span class="pre">toolbox</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.bayesian_calibration.BayesianCalibration"><code class="docutils literal notranslate"><span class="pre">BayesianCalibration</span></code></a><ul>
@@ -201,10 +200,21 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-grainlearning.sampling"><code class="docutils literal notranslate"><span class="pre">Sampling</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.expand_weighted_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.draw_samples_within_bounds"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.draw_samples_within_bounds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.expand_and_normalize_weighted_samples"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.expand_and_normalize_weighted_samples()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.from_dict"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.from_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.regenerate_params()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.regenerate_params_with_gmm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.covariance_type"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.covariance_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.expand_factor"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.expand_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.init_params"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.init_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.max_iter"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.max_iter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.max_num_components"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.max_num_components</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.n_init"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.n_init</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.random_state"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.random_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.slice_sampling"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.slice_sampling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.tol"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.warm_start"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.warm_start</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.weight_concentration_prior"><code class="docutils literal notranslate"><span class="pre">GaussianMixtureModel.weight_concentration_prior</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#grainlearning.sampling.generate_params_qmc"><code class="docutils literal notranslate"><span class="pre">generate_params_qmc()</span></code></a></li>
@@ -478,7 +488,7 @@ that runs the forward predictions.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – observation or reference data</p></li>
-<li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
+<li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size of the ensemble of model evaluations</p></li>
 <li><p><strong>param_min</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter lower bounds</p></li>
 <li><p><strong>param_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter Upper bounds</p></li>
 <li><p><strong>callback</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – Callback function, defaults to None</p></li>
@@ -764,7 +774,7 @@ Extra functionalities are added to handle I/O operations.</p>
 <li><p><strong>param_min</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter lower bounds</p></li>
 <li><p><strong>param_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – List of parameter Upper bounds</p></li>
 <li><p><strong>param_names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Parameter names, defaults to None</p></li>
-<li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size</p></li>
+<li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Sample size of the ensemble of model evaluations</p></li>
 <li><p><strong>obs_data_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Observation data file, defaults to None</p></li>
 <li><p><strong>obs_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Column names of the observation data, defaults to None</p></li>
 <li><p><strong>ctrl_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Column name of the control data, defaults to None</p></li>
@@ -1166,10 +1176,9 @@ The Gaussian mixture model is trained with the previous ensemble (i.e., samples 
 <dt class="sig sig-object py" id="grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.load_proposal_from_file">
 <span class="sig-name descname"><span class="pre">load_proposal_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.load_proposal_from_file" title="Permalink to this definition"></a></dt>
 <dd><p>Load the proposal density from a file.</p>
-<p>param system: Dynamic system class</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>system</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><em>DynamicSystem</em></a><em>]</em>) – </p>
+<dd class="field-odd"><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1456,15 +1465,24 @@ centered around the observation.</p>
 <span id="sampling"></span><h2><code class="docutils literal notranslate"><span class="pre">Sampling</span></code><a class="headerlink" href="#module-grainlearning.sampling" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GaussianMixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tied'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GaussianMixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_concentration_prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tied'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kmeans'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class is used for the inference (sampling) of parameters using a variational Gaussian mixture model.</p>
-<p>See <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html">BayesianGaussianMixture</a>.</p>
+<p>This is the wrapper class of the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html">Bayesian Gaussian Mixture</a>. from scikit-learn.</p>
+<p>The <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html">BayesianGaussianMixture</a>. class is extended to include the following functionalities:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.expand_and_normalize_weighted_samples" title="grainlearning.sampling.GaussianMixtureModel.expand_and_normalize_weighted_samples"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GaussianMixtureModel.expand_and_normalize_weighted_samples()</span></code></a>:
+Converting an ensemble of samples with importance weights into an ensemble of samples with equal weights</p></li>
+<li><p><a class="reference internal" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params" title="grainlearning.sampling.GaussianMixtureModel.regenerate_params"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GaussianMixtureModel.regenerate_params()</span></code></a>:
+Regenerating new samples by training and sampling from a Gaussian mixture model.</p></li>
+</ul>
 <p>There are two ways of initializing the class.</p>
 <p>Method 1 - dictionary style</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">system_cls</span> <span class="o">=</span> <span class="n">GaussianMixtureModel</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;max_num_components&quot;</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="s2">&quot;max_num_components&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;covariance_type&quot;</span><span class="p">:</span> <span class="s2">&quot;full&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">slice_sampling</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </pre></div>
@@ -1472,7 +1490,10 @@ centered around the observation.</p>
 <p>or</p>
 <p>Method 2 - class style</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">system_cls</span> <span class="o">=</span> <span class="n">GaussianMixtureModel</span><span class="p">(</span>
-    <span class="n">max_num_components</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">max_num_components</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">covariance_type</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span><span class="p">,</span>
+    <span class="n">random_state</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">slice_sampling</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1480,33 +1501,69 @@ centered around the observation.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_num_components</strong> – Maximum number of components</p></li>
-<li><p><strong>prior_weight</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Prior weight, defaults to None</p></li>
-<li><p><strong>cov_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Covariance type, defaults to “tied”</p></li>
-<li><p><strong>n_init</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of initial samples, defaults to 100</p></li>
-<li><p><strong>tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – tolarance, defaults to 1.0e-5</p></li>
-<li><p><strong>max_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum number of iterations, defaults to 100000</p></li>
-<li><p><strong>expand_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – weighted expansions, defaults to 10</p></li>
-<li><p><strong>seed</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – random generation seed, defaults to None</p></li>
-<li><p><strong>slice_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – flag to use slice sampling, defaults to False</p></li>
+<li><p><strong>weight_concentration_prior</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The dirichlet concentration of each component on the weight distribution     (Dirichlet), default to None, optional
+This is commonly called gamma in the literature. The higher concentration puts more mass in the center and will
+lead to more components being active, while a lower concentration parameter will lead to more mass at the edge
+of the mixture weights simplex. The value of the parameter must be greater than 0. If it is None,
+it’s set to <cite>1. / n_components</cite>.</p></li>
+<li><p><strong>covariance_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – {‘full’, ‘tied’, ‘diag’, ‘spherical’}, defaults to “full”, optional
+String describing the type of covariance parameters to use. Must be one of:
+<code class="samp docutils literal notranslate"><span class="pre">'full'</span></code>: each component has its own general covariance matrix.
+<code class="samp docutils literal notranslate"><span class="pre">'tied'</span></code>: all components share the same general covariance matrix.
+<code class="samp docutils literal notranslate"><span class="pre">'diag'</span></code>: each component has its own diagonal covariance matrix.
+<code class="samp docutils literal notranslate"><span class="pre">'spherical'</span></code>: each component has its own single variance.</p></li>
+<li><p><strong>n_init</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of initialization to perform, defaults to 1, optional
+The result with the highest lower bound value on the likelihood is kept.</p></li>
+<li><p><strong>tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – tolerance threshold, defaults to 1.0e-3, optional
+EM iterations will stop when the lower bound average gain on the likelihood (of the training data with respect
+to the model) is below this threshold.</p></li>
+<li><p><strong>max_iter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum number of EM iterations to perform, defaults to 100, optional</p></li>
+<li><p><strong>random_state</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – random seed given to the method chosen to initialize the parameters, defaults to None, optional</p></li>
+<li><p><strong>init_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – {‘kmeans’, ‘k-means++’, ‘random’, ‘random_from_data’}, default=’kmeans’, optional
+The method used to initialize the weights, the means and the covariances. String must be one of:
+<code class="samp docutils literal notranslate"><span class="pre">'kmeans'</span></code>: responsibilities are initialized using kmeans.
+<code class="samp docutils literal notranslate"><span class="pre">k-means++</span></code>: responsibilities are initialized using a k-means++ algorithm.
+<code class="samp docutils literal notranslate"><span class="pre">'random'</span></code>: responsibilities are initialized randomly.
+<code class="samp docutils literal notranslate"><span class="pre">'random_from_data'</span></code>: responsibilities are initialized randomly from the data.</p></li>
+<li><p><strong>warm_start</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – flag to use warm start, defaults to False, optional
+If ‘warm_start’ is True, the solution of the last fitting is used as initialization for the next call of fit().
+This can speed up convergence when fit is called several times on similar problems. See the Glossary.</p></li>
+<li><p><strong>expand_factor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – factor used when converting the ensemble from weighted to unweighted, defaults to 10, optional</p></li>
+<li><p><strong>slice_sampling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – flag to use slice sampling, defaults to False, optional</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters">
-<span class="sig-name descname"><span class="pre">expand_weighted_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters" title="Permalink to this definition"></a></dt>
-<dd><p>Expand or duplicate the parameters for the gaussian mixture model. If the weights are higher, more parameters are assigned to that value</p>
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.draw_samples_within_bounds">
+<span class="sig-name descname"><span class="pre">draw_samples_within_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.draw_samples_within_bounds" title="Permalink to this definition"></a></dt>
+<dd><p>Draw new parameter samples within the user-defined upper and lower bounds</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
+<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
+<li><p><strong>num</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of samples to draw</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New parameter samples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.expand_and_normalize_weighted_samples">
+<span class="sig-name descname"><span class="pre">expand_and_normalize_weighted_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.expand_and_normalize_weighted_samples" title="Permalink to this definition"></a></dt>
+<dd><p>Converting an ensemble of samples with importance weights into an ensemble of samples with equal weights.</p>
+<p>For instance, a sample is duplicated a few times depending on the importance weight associated to it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Importance weights associated with the ensemble</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Expanded parameters</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Expanded unweighted samples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1517,49 +1574,95 @@ centered around the observation.</p>
 <dd><p>Initialize the class using a dictionary style</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> (<em>dict</em>) – </p>
+<dd class="field-odd"><p><strong>obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – a dictionary containing the keys and values to construct a GMM object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a GMM object</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.regenerate_params">
-<span class="sig-name descname"><span class="pre">regenerate_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params" title="Permalink to this definition"></a></dt>
-<dd><p>Regenerate the parameters by fitting the Gaussian Mixture model</p>
+<span class="sig-name descname"><span class="pre">regenerate_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params" title="Permalink to this definition"></a></dt>
+<dd><p>Regenerating new samples by training and sampling from a Gaussian mixture model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
+<li><p><strong>weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
 <li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Expanded parameters</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Resampled parameter data</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm">
-<span class="sig-name descname"><span class="pre">regenerate_params_with_gmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">posterior_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm" title="Permalink to this definition"></a></dt>
-<dd><p>Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>posterior_weight</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Posterior found by the data assimilation</p></li>
-<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Expanded parameters</p>
-</dd>
-</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.covariance_type">
+<span class="sig-name descname"><span class="pre">covariance_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full'</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.covariance_type" title="Permalink to this definition"></a></dt>
+<dd><p>String describing the type of covariance parameters to use.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.expand_factor">
+<span class="sig-name descname"><span class="pre">expand_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.expand_factor" title="Permalink to this definition"></a></dt>
+<dd><p>the factor used when converting and populating the ensemble from weighted to unweighted, defaults to 10.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.init_params">
+<span class="sig-name descname"><span class="pre">init_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kmeans'</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.init_params" title="Permalink to this definition"></a></dt>
+<dd><p>The method used to initialize the weights, the means and the covariances.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.max_iter">
+<span class="sig-name descname"><span class="pre">max_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.max_iter" title="Permalink to this definition"></a></dt>
+<dd><p>maximum number of EM iterations to perform, defaults to 100</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.max_num_components">
+<span class="sig-name descname"><span class="pre">max_num_components</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.max_num_components" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum number of components</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.n_init">
+<span class="sig-name descname"><span class="pre">n_init</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.n_init" title="Permalink to this definition"></a></dt>
+<dd><p>number of initialization to perform, defaults to 1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.random_state">
+<span class="sig-name descname"><span class="pre">random_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.random_state" title="Permalink to this definition"></a></dt>
+<dd><p>random seed given to the method chosen to initialize the weights, the means and the covariances.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.slice_sampling">
+<span class="sig-name descname"><span class="pre">slice_sampling</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.slice_sampling" title="Permalink to this definition"></a></dt>
+<dd><p>flag to use slice sampling, defaults to False.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.tol">
+<span class="sig-name descname"><span class="pre">tol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.tol" title="Permalink to this definition"></a></dt>
+<dd><p>tolerance threshold, defaults to 1.0e-3.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.warm_start">
+<span class="sig-name descname"><span class="pre">warm_start</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.warm_start" title="Permalink to this definition"></a></dt>
+<dd><p>flag to use warm start, defaults to False.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grainlearning.sampling.GaussianMixtureModel.weight_concentration_prior">
+<span class="sig-name descname"><span class="pre">weight_concentration_prior</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#grainlearning.sampling.GaussianMixtureModel.weight_concentration_prior" title="Permalink to this definition"></a></dt>
+<dd><p>The dirichlet concentration of each component on the weight distribution (Dirichlet), default to None.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1573,16 +1676,10 @@ a low-discrepancy sequence or a Latin hypercube.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>max_iter</strong> – maximum number of iterations, defaults to 100000</p></li>
-<li><p><strong>expand_weight</strong> – weighted expansions, defaults to 10</p></li>
-<li><p><strong>seed</strong> – random generation seed, defaults to None</p></li>
-<li><p><strong>system</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><em>DynamicSystem</em></a><em>]</em>) – </p></li>
-<li><p><strong>num_samples</strong> (<em>int</em>) – </p></li>
-<li><p><strong>method</strong> (<em>str</em>) – </p></li>
+<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#grainlearning.dynamic_systems.DynamicSystem" title="grainlearning.dynamic_systems.DynamicSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicSystem</span></code></a>]) – Dynamic system class</p></li>
+<li><p><strong>num_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of samples to draw</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Method to use for Quasi-Monte Carlo sampling. Options are “halton”, “sobol”, and “LH”</p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1594,7 +1691,7 @@ a low-discrepancy sequence or a Latin hypercube.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="how_to_contribute.html" class="btn btn-neutral float-left" title="How to contribute" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="how_to_contribute.html" class="btn btn-neutral float-left" title="Contributing guidelines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

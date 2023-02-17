@@ -5,7 +5,7 @@ The dynamic system module
 -------------------------
 
 The :mod:`.dynamic_systems` module is essential for GrainLearning to execute computational models
-and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class
+and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class.
 Currently, the :mod:`.dynamic_systems` module contains
 
 - a :class:`.DynamicSystem` class that executes simulations handles the simulation and observation data in a *Python environment*,

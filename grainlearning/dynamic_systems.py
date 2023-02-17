@@ -77,7 +77,7 @@ class DynamicSystem:
     The simulation data is a numpy array of shape (num_samples, num_obs, num_steps).
 
     :param obs_data: observation or reference data
-    :param num_samples: Sample size
+    :param num_samples: Sample size of the ensemble of model evaluations
     :param param_min: List of parameter lower bounds
     :param param_max: List of parameter Upper bounds
     :param callback: Callback function, defaults to None
@@ -397,7 +397,7 @@ class IODynamicSystem(DynamicSystem):
     :param param_min: List of parameter lower bounds
     :param param_max: List of parameter Upper bounds
     :param param_names: Parameter names, defaults to None
-    :param num_samples: Sample size
+    :param num_samples: Sample size of the ensemble of model evaluations
     :param obs_data_file: Observation data file, defaults to None
     :param obs_names: Column names of the observation data, defaults to None
     :param ctrl_name: Column name of the control data, defaults to None
