@@ -19,13 +19,17 @@ CONTACT_KEYS = [
     'v',   # poisson's ratio
     'kr',  # rolling stiffness
     'eta', # rolling friction
-    'mu',  # sliding friction
+    'mu'  # sliding friction
     ]
 
-INPUT_KEYS = [
-    'e_v', # strains in 3 directions
+INPUT_KEYS_UNDRAINED = [
+    'e_x', # strains in 3 directions
     'e_y',
-    'e_z', # the axial direction
+    'e_z' # the axial direction
+]
+
+INPUT_KEYS_DRAINED = [
+    'e_z' # the axial direction
 ]
 
 OUTPUT_KEYS = [
@@ -35,7 +39,7 @@ OUTPUT_KEYS = [
     'f0',  # average contact normal force
     'a_c', # fabric anisotropy
     'a_n', # mechanical anisotropy
-    'a_t', # mechanical anisotropy due to tangential forces
+    'a_t' # mechanical anisotropy due to tangential forces
 ]
 
 UNUSED_KEYS_SEQUENCE = [
@@ -43,13 +47,13 @@ UNUSED_KEYS_SEQUENCE = [
     'numIter', # iteration number in the simulation at which equilibrium is
                # reached at the current loading
     'K',   # mysterious
-    'A',   # also mysterious
+    'A'   # also mysterious
 ]
 
 UNUSED_KEYS_CONSTANT = [
     'conf',# confining pressure (stored as group name) = log_10(confinement_pressure)
     'mode',# drained/undrained (stored as group name)
-    'num', # number of particles
+    'num' # number of particles
 ]
 
 def convert_all_to_hdf5(
@@ -79,7 +83,8 @@ def convert_all_to_hdf5(
         os.remove(target_file)
 
     with h5py.File(target_file, 'a') as f:
-        f.attrs['inputs'] = INPUT_KEYS
+        f.attrs['inputs_drained'] = INPUT_KEYS_DRAINED
+        f.attrs['inputs_undrained'] = INPUT_KEYS_UNDRAINED
         f.attrs['outputs'] = OUTPUT_KEYS
         f.attrs['contact_params'] = CONTACT_KEYS
         f.attrs['unused_keys_sequence'] = UNUSED_KEYS_SEQUENCE
@@ -150,7 +155,11 @@ def convert_to_arrays(
         if len(test_features) >= sequence_length:
             contact_params = [sim_params[key] for key in CONTACT_KEYS]
             contact_list.append(contact_params)
-            inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS])
+            if experiment_type == 'drained':
+                inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_DRAINED])
+            elif experiment_type == 'undrained':
+                inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_UNDRAINED])
+            else: raise ValueError(f"experiment type must be drained or undrained but got {experiment_type}")
             outputs_list.append([np.array(sim_features[key][:sequence_length]) / scalings[key] for key in OUTPUT_KEYS])
         else:
             other_lengths.append(len(test_features))
