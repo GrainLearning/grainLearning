@@ -18,11 +18,12 @@ and (2) statistical "particles" are used to achieve inference via `sequential Mo
 GrainLearning can be also used with other empirical, numerical, or data-driven models 
 that are strongly nonlinear in time.
 
-The most important modules of GrainLearning are :doc:`dynamic systems <dynamic_systems>`, :doc:`inference <inference>`, and :doc:`sampling <sampling>`.
-An unique feature of GrainLearning is the machine learning (ML) capabilities of the :doc:`samplers <sampling>`
+The most important modules of GrainLearning are :doc:`dynamic systems <dynamic_systems>`, :ref:`inference <bayesian_filtering:The inference module>`,
+and :ref:`sampling <bayesian_filtering:The sampling module>`.
+An unique feature of GrainLearning is the machine learning (ML) capabilities of the :ref:`samplers <bayesian_filtering:The sampling module>`
 to learn complex probability distributions and the :doc:`data-driven emulators <network_emulators>` to learn the physics.
 Users can combine different classes in these modules to create a variety of Bayesian calibration tools.
-Currently, only the :doc:`iterative Bayesian filter <iterative_bayesian_filter>` has been implemented and tested
+Currently, only the :ref:`iterative Bayesian filter <bayesian_filtering:Iterative Bayesian filter>` has been implemented and tested
 with `DEM models <https://www.sciencedirect.com/science/article/pii/S0045782519300520>`_
 and `continuum constitutive models <https://link.springer.com/chapter/10.1007/978-3-030-64514-4_90>`_.
 However, the modular design of GrainLearning allows for the implementation of other inference algorithms.
