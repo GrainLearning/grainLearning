@@ -9,7 +9,7 @@ from grainlearning.rnn.preprocessing import prepare_datasets
 
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
-EXPERIMENT_TYPES = ['drained', 'undrained']
+EXPERIMENT_TYPES = ['undrained']
 P_INDEX = -2 # Pressure and experiment were added at the end of contact_params.
 E_INDEX = -1 # These are the indexes to retrieve them
 
@@ -18,7 +18,8 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams['axes.labelsize'] = 25
 plt.rcParams['font.family'] = 'sans-serif'
 
-def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: dict, config: dict):
+
+def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: dict, config: dict, batch_size: int=256):
     """
     Take the first sample in the test set for each combination of pressure
     and experiment type, and plot for it the true and predicted macroscopic
@@ -32,11 +33,11 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     :return figure:
     """
     predictions = predict.predict_macroscopics(model, data, train_stats, config,
-                                       batch_size=256, single_batch=True)
+                                       batch_size=batch_size, single_batch=True)
     # extract tensors from dataset
-    test_inputs, labels = next(iter(data.batch(256)))
+    test_inputs, labels = next(iter(data.batch(batch_size)))
 
-    window_size = train_stats['window_size']
+    window_size = config['window_size']
     raw_sequence_length = train_stats['sequence_length']
     sequence_length = raw_sequence_length - window_size
 
@@ -90,6 +91,7 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
 
     return fig
 
+
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
             title: str='', x_label: str='', y_label: str='', color: str='blue',
             ylim=None, add_legend=False, P_label="", E_label=""):
@@ -104,8 +106,8 @@ def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
     if ylim: ax.set_ylim(ylim)
     if add_legend: ax.legend()
 
-# Auxiliary functions to create plots
 
+# Auxiliary functions to create plots
 def _extract_combination_inv(data, ids, i_s=0):
     """
     Calculate residual (should be zero) of:
@@ -138,54 +140,12 @@ def _find_representatives(input_data, add_e0):
 
     for pressure in PRESSURES:
         for experiment_type in EXPERIMENT_TYPES:
-            p = float(pressure[:3])
+            p = float(pressure[:3]) # better /1e6
             e = 1 if experiment_type == 'drained' else 0
             i = 0
             sample = contact_params[i]
-            while not (sample[P_INDEX] == p and sample[E_INDEX] == e):
-                i += 1
+            while not (sample[P_INDEX] == p and sample[E_INDEX] == e) and i < len(contact_params)-1:
                 sample = contact_params[i + 1]
+                i += 1
             representatives.append(i)
-
     return representatives
-
-
-if __name__ == '__main__':
-    """data_dir = pathlib.Path('data/sequences.hdf5')
-    plot_dir = pathlib.Path('plots/')
-
-    pressure = 'All'
-    experiment_type = 'All'
-    model_name = 'simple_rnn'
-    saved_model_name = f'{model_name}_{pressure}_{experiment_type}'
-    model_directory = pathlib.Path('trained_models/' + saved_model_name)
-
-    # Loading a complete model
-    model = tf.keras.models.load_model(model_directory)
-
-    #Alternative (model trained with wandb): load the weights of a model
-    #   TODO
-
-    train_stats = np.load(model_directory / 'train_stats.npy', allow_pickle=True).item()
-    window_size = train_stats['window_size']
-    split_data, _ = prepare_datasets(
-            raw_data=data_dir,
-            pressure=pressure,
-            experiment_type=experiment_type,
-            pad_length=window_size,
-            use_windows=False,
-            add_e0=True,  # was used in the model that is tested with
-            )
-
-    if not os.path.exists(plot_dir): os.makedirs(plot_dir)
-
-    config = {'use_windows': True, 'window_size': window_size,
-            'standardize_outputs': True}
-    """
-
-    path_to_trained_model = Path('trained_models/Luisas_non_conditional')
-    model, train_stats, config = predict.get_pretrained_model(path_to_trained_model)
-    data, _ = prepare_datasets(**config)
-
-    fig = plot_predictions(model, data['test'], train_stats, config)
-    fig.savefig('test.pdf')

@@ -92,12 +92,12 @@ def get_pretrained_model(path_to_model: str):
             model = rnn_model(train_stats, **config)
             model.load_weights(path_to_model / 'model-best.h5') # only weights were saved
 
-    elif os.path.exists(path_to_model / 'save_model.pb'): # Model has been saved directly using tf.keras
-        model = tf.keras.model.load_model(path_to_model)
+    elif os.path.exists(path_to_model / 'saved_model.pb'): # Model has been saved directly using tf.keras
+        model = tf.keras.models.load_model(path_to_model)
     elif os.path.exists(path_to_model / 'weights.h5'): # Model's weights have been saved directly using tf.keras
         model = rnn_model(train_stats, **config)
         model.load_weights(path_to_model / 'weights.h5')
-    else: raise FileNotFoundError("Couldnt find a model to load")
+    else: raise FileNotFoundError("Could not find a model to load")
 
     return model, train_stats, config
 
@@ -112,7 +112,7 @@ def predict_macroscopics(
         ):
     """
     Use the given model to predict the features of the given data.
-    If standardized, rescale the predictions to their original units.
+    If 'standardize_outputs' in config, rescale the predictions to their original units.
 
     :param model: Keras RNN model
     :param data: Tensorflow dataset containing 'load_sequence' and 'contact_parameters' inputs.
@@ -137,6 +137,11 @@ def predict_macroscopics(
         raise ValueError(f"Number of elements in contact_parameters of data does not match the model \
             contact_parameters shape. \
             Got {inputs['contact_parameters'].shape[2]}, expected {train_stats['num_contact_params']}.")
+
+    if not inputs['load_sequence'].shape[1] == train_stats['sequence_length']:
+        raise ValueError(f"Sequence length of the train_stats {train_stats['sequence_length']} does not match \
+            that of the data {inputs['load_sequence'].shape[1]}. If the train_stats are does of the model, \
+            check pad_length. Can be that the trained model is not compatible.")
 
     predictions = predict_over_windows(data, model, config['window_size'], train_stats['sequence_length'])
 
