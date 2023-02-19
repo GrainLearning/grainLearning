@@ -77,6 +77,52 @@ def prepare_datasets(
     return split_data, train_stats
 
 
+def prepare_single_dataset(
+        raw_data: str,
+        pressure: str = 'All',
+        experiment_type: str = 'All',
+        pad_length: int = 0,
+        standardize_outputs: bool = True,
+        add_e0: bool = False,
+        add_pressure: bool = True,
+        add_experiment_type: bool = True,
+        seed: int = 42,
+        **kwargs,):
+
+    """
+    Convert raw data into a tensorflow dataset with compatible format to predict and evaluate a rnn model.
+
+    :param raw_data: Path to hdf5 file containing the data.
+    :param pressure: Experiment confining Pressure as a string or `'All'`.
+    :param experiment_type: Either `'drained'`, `'undrained'` or `'All'`.
+    :param pad_length: Amount by which to pad the sequences from the start.
+    :param add_e0: Whether to add the initial void ratio as a contact parameter.
+    :param add_pressure: Wheter to add the pressure to contact parameters.
+      If True, the pressure is normalized by 10**6.
+    :param add_experiment_type: Wheter to add the experiment type to contact parameters. 1: drained, 0: undrained.
+    :param seed: Random seed used to split the datasets.
+
+    :return: Tuple (inputs, outputs)
+
+            * ``inputs``: Dictionary with keys `'load_sequence'`, `'contact_parameters'`, that are the
+              corresponding tensorflow Datasets to input to an rnn model.
+
+            * ``outputs``: tensorflow Dataset containing the outputs or labels.
+    """
+    with h5py.File(raw_data, 'r') as datafile: # Will raise an exception in File doesn't exists
+        inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type,
+                                                    add_pressure, add_experiment_type)
+    if add_e0:
+        contacts = _add_e0_to_contacts(contacts, inputs)
+
+    if pad_length > 0:
+        inputs = _pad_initial(inputs, pad_length)
+        outputs = _pad_initial(outputs, pad_length)
+
+    dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
+    return tf.data.Dataset.from_tensor_slices(dataset)
+
+
 def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_type: str,
                     add_pressure: bool = True , add_experiment_type: bool = True):
     """
@@ -227,7 +273,7 @@ def _standardize_outputs(split_data):
 
 def _pad_initial(array: np.array, pad_length: int, axis=1):
     """
-    Add ``pad_length`` copies of the initial state in the sequence to the start.
+    Add `'pad_length'` copies of the initial state in the sequence to the start.
     This is used to be able to predict also the first timestep from a window
     of the same size.
 
