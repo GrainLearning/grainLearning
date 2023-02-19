@@ -10,6 +10,7 @@ import wandb
 
 from grainlearning.rnn.models import rnn_model
 from grainlearning.rnn.preprocessing import prepare_datasets
+from grainlearning.rnn.windows import windowize_single_dataset
 
 
 def train(config=None):
@@ -66,13 +67,20 @@ def train(config=None):
         callbacks = [wandb_callback, early_stopping]
 
         # train
-        return model.fit(
+        history = model.fit(
                 split_data['train'],
                 epochs=config.epochs,
                 validation_data=split_data['val'],
                 callbacks=callbacks,
             )
 
+        # Evaluate in test dataset and log to wandb the metrics
+        test_data = windowize_single_dataset(split_data['test'], **config)
+        test_loss, test_mae = model.evaluate(test_data.batch(config.batch_size))
+        print(f"test loss = {test_loss}, test mae = {test_mae}")
+        wandb.log({'test_loss': test_loss, 'test_mae': test_mae})
+
+        return history
 
 def train_without_wandb(config=None):
     """
@@ -115,30 +123,37 @@ def train_without_wandb(config=None):
 
     # create batches
     for split in ['train', 'val']:  # do not batch test set
-        split_data[split] = split_data[split].batch(config["batch_size"])
+        split_data[split] = split_data[split].batch(config['batch_size'])
 
     # set up training
-    if config["save_weights_only"] : path_save_data = path_save_data/"weights.h5"
+    if config['save_weights_only'] : path_save_data = path_save_data/"weights.h5"
     early_stopping = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=config["patience"],
+            patience=config['patience'],
             restore_best_weights=True,
         )
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
                 path_save_data,
-                monitor="val_loss",
+                monitor='val_loss',
                 save_best_only=True,
-                save_weights_only=config["save_weights_only"]
+                save_weights_only=config['save_weights_only']
             )
     callbacks = [early_stopping, checkpoint]
 
     # train
-    return model.fit(
+    history = model.fit(
             split_data['train'],
-            epochs=config["epochs"],
+            epochs=config['epochs'],
             validation_data=split_data['val'],
             callbacks=callbacks,
         )
+
+    # Evaluate in test dataset and print the metrics
+    test_data = windowize_single_dataset(split_data['test'], **config)
+    test_loss, test_mae = model.evaluate(test_data.batch(config['batch_size']))
+    print(f"test loss = {test_loss}, test mae = {test_mae}")
+
+    return history
 
 
 def get_default_dict():

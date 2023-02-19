@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 
-def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, window_step: int, **kwargs):
+def windowize_train_val_test(split_data: dict, train_stats: dict, window_size: int, window_step: int, **kwargs):
     """
     Convert sequences into windows of given length. Leave test set untouched.
     Adds window_size and window_step to train_stats.
@@ -13,20 +13,21 @@ def windowize_train_val(split_data: dict, train_stats: dict, window_size: int, w
     :param window_size: Number of timesteps to include in a window.
     :param window_step: Offset between subsequent windows.
 
-    :return: windows: Dictionary of dataset splits, where the training split has been
-            modified into windows
+    :return: windows: Dictionary of dataset splits, where the training and validation splits have been
+            modified into windows.
     """
     windows = split_data
-    windows['train'] = _windowize_single_dataset(split_data['train'], window_size, window_step)
-    windows['val'] = _windowize_single_dataset(split_data['val'], window_size, window_step)
+    windows['train'] = windowize_single_dataset(split_data['train'], window_size, window_step)
+    windows['val'] = windowize_single_dataset(split_data['val'], window_size, window_step)
     return windows
 
 
-def _windowize_single_dataset(
+def windowize_single_dataset(
         data: tf.data.Dataset,
-        window_size: int,
+        window_size: int = 1,
         window_step: int = 1,
-        seed: int = 42):
+        seed: int = 42,
+        **kwargs):
     """
     Take a dataset ((inputs, contact_params),outputs) of sequences of shape N, S, L and output
     another dataset of shorter sequences of size ``window_size``, taken at intervals ``window_step``.

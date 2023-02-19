@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import tensorflow as tf
 
-from grainlearning.rnn.windows import windowize_train_val
+from grainlearning.rnn.windows import windowize_train_val_test
 
 
 def prepare_datasets(
@@ -39,7 +39,8 @@ def prepare_datasets(
                                 to have zero mean and unit variance.
     :param add_e0: Whether to add the initial void ratio as a contact parameter.
     :param add_pressure: Wheter to add the pressure to contact parameters.
-    :param add_experiment_type: Wheter to add the experiment type to contact parameters.
+      If True, the pressure is normalized by 10**6.
+    :param add_experiment_type: Wheter to add the experiment type to contact parameters. 1: drained, 0: undrained.
     :param seed: Random seed used to split the datasets.
 
     :return: Tuple (split_data, train_stats)
@@ -71,7 +72,7 @@ def prepare_datasets(
 
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
     train_stats.update(get_dimensions(split_data['train']))
-    split_data = windowize_train_val(split_data, train_stats, window_size, window_step)
+    split_data = windowize_train_val_test(split_data, train_stats, window_size, window_step)
 
     return split_data, train_stats
 
@@ -87,7 +88,7 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     :param pressure: Experiment confining pressure, `'All'` will take all pressures available.
     :param experiment_type: `'drained'`, `'undrained'` or `'All'`.
     :param add_pressure: Wheter to add the pressure to contact parameters.
-    :param add_experiment_type: Wheter to add the experiment type to contact parameters.
+    :param add_experiment_type: Wheter to add the experiment type to contact parameters. 1: drained, 0: undrained.
 
     :return: input, output and contact_params arrays merged for the given pressures and expriment_types.
     """
@@ -146,7 +147,7 @@ def _augment_contact_params(
     :param pressure: The corresponding pressure.
     :param experiment_type: The corresponding experiment type, `'drained'` or `'undrained'`.
     :param add_pressure: Whether to add pressure to contact parameters.
-    :param add_type: Whether to add experiment type to contact parameters.
+    :param add_type: Whether to add experiment type to contact parameters. 1: drained, 0: undrained.
 
     :return: Numpy array containing augmented contact parameters.
     """
