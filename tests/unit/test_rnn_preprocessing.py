@@ -164,7 +164,7 @@ def test_windowize_single_dataset(dummy_dataset):
     window_step_list = [2, 2, 1]
 
     for window_size, window_step in zip(window_size_list, window_step_list):
-        dataset = windows._windowize_single_dataset(split_data['train'], window_size=window_size, window_step=window_step)
+        dataset = windows.windowize_single_dataset(split_data['train'], window_size=window_size, window_step=window_step)
         inputs, outputs = next(iter(dataset.batch(1000))) # batch bigger than num independent samples (windows)
         expected_num_indep_samples = 70 * int(((sequence_length - window_size)/window_step) + 1)
 
@@ -175,4 +175,4 @@ def test_windowize_single_dataset(dummy_dataset):
         assert outputs.shape == (expected_num_indep_samples, num_labels) # num_samples, num_labels
 
     with pytest.raises(ValueError): # expect "window_size bigger than sequence_length."
-        _ = windows._windowize_single_dataset(split_data['train'], window_size=sequence_length + 1)
+        _ = windows.windowize_single_dataset(split_data['train'], window_size=sequence_length + 1)
