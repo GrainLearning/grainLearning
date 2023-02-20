@@ -26,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> GrainLearning
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GrainLearning
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -41,13 +45,10 @@
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_systems.html">Dynamic systems</a></li>
-<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayesian_filtering.html">Bayesian filtering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">How to contribute</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html#contributing-guidelines">Contributing guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">Contributing guidelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a></li>
 </ul>
 
@@ -64,7 +65,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -78,7 +79,8 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#B"><strong>B</strong></a>
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
@@ -92,9 +94,18 @@
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.add_curr_param_data_to_list">add_curr_param_data_to_list() (IterativeBayesianFilter method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -114,17 +125,25 @@
         <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.callback">(IODynamicSystem attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#grainlearning.inference.SMC.compute_effective_sample_size">compute_effective_sample_size() (SMC method)</a>
+</li>
+      <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.compute_estimated_params">compute_estimated_params() (DynamicSystem method)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.compute_estimated_params">(IODynamicSystem method)</a>
+</li>
+      </ul></li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.compute_inv_normalized_sigma">compute_inv_normalized_sigma() (DynamicSystem method)</a>
 
       <ul>
         <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.compute_inv_normalized_sigma">(IODynamicSystem method)</a>
 </li>
       </ul></li>
-      <li><a href="api.html#grainlearning.inference.SMC.cov_matrices">cov_matrices (SMC attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.inference.SMC.covs">covs (SMC attribute)</a>
+      <li><a href="api.html#grainlearning.inference.SMC.cov_matrices">cov_matrices (SMC attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.covariance_type">covariance_type (GaussianMixtureModel attribute)</a>
 </li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.ctrl_data">ctrl_data (DynamicSystem attribute)</a>
 
@@ -150,6 +169,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.draw_samples_within_bounds">draw_samples_within_bounds() (GaussianMixtureModel method)</a>
+</li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem">DynamicSystem (class in grainlearning.dynamic_systems)</a>
 </li>
   </ul></td>
@@ -162,11 +183,25 @@
 </li>
       <li><a href="api.html#grainlearning.inference.SMC.ess_target">ess_target (SMC attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.ess_tol">ess_tol (IterativeBayesianFilter attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.expand_weighted_parameters">expand_weighted_parameters() (GaussianMixtureModel method)</a>
+      <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.estimated_params">estimated_params (DynamicSystem attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.estimated_params">(IODynamicSystem attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.estimated_params_CV">estimated_params_CV (DynamicSystem attribute)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.estimated_params_CV">(IODynamicSystem attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.expand_and_normalize_weighted_samples">expand_and_normalize_weighted_samples() (GaussianMixtureModel method)</a>
+</li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.expand_factor">expand_factor (GaussianMixtureModel attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -200,15 +235,21 @@
 </li>
       <li><a href="api.html#grainlearning.inference.SMC.get_covariance_matrices">get_covariance_matrices() (SMC method)</a>
 </li>
-      <li><a href="api.html#grainlearning.inference.SMC.get_ensemble_ips_covs">get_ensemble_ips_covs() (SMC method)</a>
+      <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.get_inv_normalized_sigma">get_inv_normalized_sigma() (DynamicSystem method)</a>
+
+      <ul>
+        <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.get_inv_normalized_sigma">(IODynamicSystem method)</a>
 </li>
-      <li><a href="api.html#grainlearning.inference.SMC.get_likelihoods">get_likelihoods() (SMC method)</a>
+      </ul></li>
+      <li><a href="api.html#grainlearning.inference.SMC.get_likelihoods">get_likelihoods() (SMC static method)</a>
 </li>
       <li><a href="api.html#grainlearning.bayesian_calibration.BayesianCalibration.get_most_prob_params">get_most_prob_params() (BayesianCalibration method)</a>
 </li>
       <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.get_obs_data">get_obs_data() (IODynamicSystem method)</a>
 </li>
-      <li><a href="api.html#grainlearning.inference.SMC.get_posterors">get_posterors() (SMC method)</a>
+      <li><a href="api.html#grainlearning.inference.SMC.get_posterior_at_time">get_posterior_at_time() (SMC method)</a>
+</li>
+      <li><a href="api.html#grainlearning.inference.SMC.get_posteriors">get_posteriors() (SMC static method)</a>
 </li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.get_sim_data_files">get_sim_data_files() (DynamicSystem class method)</a>
 
@@ -218,8 +259,6 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.inference.SMC.give_posterior">give_posterior() (SMC method)</a>
-</li>
       <li>
     grainlearning.bayesian_calibration
 
@@ -263,21 +302,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.inference">inference (IterativeBayesianFilter attribute)</a>
 </li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.init_params">init_params (GaussianMixtureModel attribute)</a>
+</li>
       <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initial_sampling">initial_sampling (IterativeBayesianFilter attribute)</a>
 </li>
       <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.initialize">initialize() (IterativeBayesianFilter method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.inv_obs_weight">inv_obs_weight (DynamicSystem attribute)</a>
 
       <ul>
         <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.inv_obs_weight">(IODynamicSystem attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem">IODynamicSystem (class in grainlearning.dynamic_systems)</a>
-</li>
-      <li><a href="api.html#grainlearning.inference.SMC.ips">ips (SMC attribute)</a>
 </li>
       <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter">IterativeBayesianFilter (class in grainlearning.iterative_bayesian_filter)</a>
 </li>
@@ -301,6 +340,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.load_proposal_from_file">load_proposal_from_file() (IterativeBayesianFilter method)</a>
+</li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.load_sim_data">load_sim_data() (DynamicSystem class method)</a>
 
       <ul>
@@ -315,6 +356,10 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.max_iter">max_iter (GaussianMixtureModel attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.max_num_components">max_num_components (GaussianMixtureModel attribute)</a>
+</li>
       <li>
     module
 
@@ -336,6 +381,8 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.n_init">n_init (GaussianMixtureModel attribute)</a>
+</li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.num_ctrl">num_ctrl (DynamicSystem attribute)</a>
 
       <ul>
@@ -436,9 +483,13 @@
       </ul></li>
       <li><a href="api.html#grainlearning.bayesian_calibration.BayesianCalibration.plot_uq_in_time">plot_uq_in_time() (BayesianCalibration method)</a>
 </li>
-      <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior_ibf">posterior_ibf (IterativeBayesianFilter attribute)</a>
+      <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.posterior">posterior (IterativeBayesianFilter attribute)</a>
 </li>
       <li><a href="api.html#grainlearning.inference.SMC.posteriors">posteriors (SMC attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal">proposal (IterativeBayesianFilter attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.proposal_data_file">proposal_data_file (IterativeBayesianFilter attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -446,9 +497,9 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.regenerate_params">regenerate_params() (GaussianMixtureModel method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.random_state">random_state (GaussianMixtureModel attribute)</a>
 </li>
-      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.regenerate_params_with_gmm">regenerate_params_with_gmm() (GaussianMixtureModel method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.regenerate_params">regenerate_params() (GaussianMixtureModel method)</a>
 </li>
       <li><a href="api.html#grainlearning.bayesian_calibration.BayesianCalibration.resample">resample() (BayesianCalibration method)</a>
 </li>
@@ -526,6 +577,8 @@
         <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.sim_name">(IODynamicSystem attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.slice_sampling">slice_sampling (GaussianMixtureModel attribute)</a>
+</li>
       <li><a href="api.html#grainlearning.inference.SMC">SMC (class in grainlearning.inference)</a>
 </li>
       <li><a href="api.html#grainlearning.iterative_bayesian_filter.IterativeBayesianFilter.solve">solve() (IterativeBayesianFilter method)</a>
@@ -535,13 +588,25 @@
   </ul></td>
 </tr></table>
 
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.tol">tol (GaussianMixtureModel attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.write_params_to_txt">write_params_to_txt() (IODynamicSystem method)</a>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.warm_start">warm_start (GaussianMixtureModel attribute)</a>
+</li>
+      <li><a href="api.html#grainlearning.sampling.GaussianMixtureModel.weight_concentration_prior">weight_concentration_prior (GaussianMixtureModel attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#grainlearning.dynamic_systems.IODynamicSystem.write_params_to_txt">write_params_to_txt() (IODynamicSystem method)</a>
+</li>
       <li><a href="api.html#grainlearning.dynamic_systems.DynamicSystem.write_to_table">write_to_table() (DynamicSystem class method)</a>
 
       <ul>

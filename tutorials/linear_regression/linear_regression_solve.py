@@ -42,8 +42,8 @@ calibration = BayesianCalibration.from_dict(
             "sampling": {
                 "max_num_components": 2,
                 "n_init": 1,
-                "seed": 0,
-                "cov_type": "full",
+                "random_state": 0,
+                "covariance_type": "full",
             }
         },
         "save_fig": 0,

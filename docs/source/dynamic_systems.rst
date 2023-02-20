@@ -5,14 +5,14 @@ The dynamic system module
 -------------------------
 
 The :mod:`.dynamic_systems` module is essential for GrainLearning to execute computational models
-and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class
-Currently, the :mod:`.models` module contains
+and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class.
+Currently, the :mod:`.dynamic_systems` module contains
 
 - a :class:`.DynamicSystem` class that executes simulations handles the simulation and observation data in a *Python environment*,
 - an :class:`.IODynamicSystem` class that sends instructions to *third-party software* (from the command line) and retrieves simulation data from the output files of the software.
 
-Note that the models defined in GrainLearning are state space models
-that consist of both numerical predictions :math:`\vec{x}_t` (:attr:`.DynamicSystem.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.DynamicSystem.obs_data`).
+Note that the dynamic system classes defined in GrainLearning are also known as state-space models
+that consist of the predicted states :math:`\vec{x}_t` (:attr:`.DynamicSystem.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.DynamicSystem.obs_data`).
 
 .. math::
 
@@ -46,14 +46,14 @@ The following gives an example of the callback where the "software" model :math:
 .. code-block:: python
    :caption: A callback function implemented in Python
 
-   def run_sim(model: Type["DynamicSystem"], **kwargs):
+   def run_sim(system: Type["DynamicSystem"], **kwargs):
        data = []
-       for params in model.param_data:
+       for params in system.param_data:
            # a linear function y = a*x + b
-           y_sim = params[0] * model.ctrl_data + params[1]
+           y_sim = params[0] * system.ctrl_data + params[1]
            data.append(np.array(y_sim, ndmin=2))
-       # assign model output to the model class
-       model.sim_data = np.array(data)
+       # assign model output to the dynamic system class
+       model.set_sim_data(data) 
 
 
 The IODynamicSystem class
@@ -69,15 +69,15 @@ Below is an example of the callback where parameter samples are passed as comman
 
    executable = './software'
 
-   def run_sim(model, **kwargs):
+   def run_sim(system, **kwargs):
        from math import floor, log
        import os
        # keep the naming convention consistent between iterations
-       magn = floor(log(model.num_samples, 10)) + 1
+       mag = floor(log(system.num_samples, 10)) + 1
        curr_iter = kwargs['curr_iter']
        # loop over and pass parameter samples to the executable
-       for i, params in enumerate(model.param_data):
-           description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(magn)
+       for i, params in enumerate(system.param_data):
+           description = 'Iter'+str(curr_iter)+'-Sample'+str(i).zfill(mag)
            print(" ".join([executable, '%.8e %.8e'%tuple(params), description]))
            os.system(' '.join([executable, '%.8e %.8e'%tuple(params), description]))
 

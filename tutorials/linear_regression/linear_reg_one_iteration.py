@@ -27,7 +27,7 @@ calibration = BayesianCalibration.from_dict(
             "inference": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
-                "cov_type": "full",
+                "covariance_type": "full",
             },
         },
         "save_fig": 0,

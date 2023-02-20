@@ -54,9 +54,7 @@ def test_get_covariance_matrix():
 
 def test_get_likelihood():
     """Test to see if likelihood is generated as expected"""
-    smc_cls = SMC(
-        ess_target=0.1, scale_cov_with_max=True
-    )
+    smc_cls = SMC(ess_target=0.1, scale_cov_with_max=True)
 
     system_cls = DynamicSystem(
         param_min=[1, 2],
@@ -81,9 +79,7 @@ def test_get_likelihood():
 
 def test_get_posterior():
     """Test to see if posterior is generated as expected"""
-    smc_cls = SMC(
-        ess_target=0.1, scale_cov_with_max=True
-    )
+    smc_cls = SMC(ess_target=0.1, scale_cov_with_max=True)
 
     system_cls = DynamicSystem(
         param_min=[1, 2],
@@ -96,9 +92,7 @@ def test_get_posterior():
 
     likelihoods = np.ones((3, 5)) * 0.5
 
-    posteriors = smc_cls.get_posterors(
-        system=system_cls, likelihoods=likelihoods, proposal_ibf=None
-    )
+    posteriors = smc_cls.get_posteriors(system=system_cls, likelihoods=likelihoods, proposal=None)
 
     np.testing.assert_array_almost_equal(
         posteriors,
@@ -110,12 +104,10 @@ def test_get_posterior():
     )
 
 
-def test_ips_covs():
-    """Test to see if ips is generated as expected."""
+def test_estimated_params():
+    """Test to see if estimated_params is generated as expected."""
 
-    smc_cls = SMC(
-        ess_target=0.1, scale_cov_with_max=True
-    )
+    smc_cls = SMC(ess_target=0.1, scale_cov_with_max=True)
 
     system_cls = DynamicSystem(
         param_min=[2, 2],
@@ -133,10 +125,10 @@ def test_ips_covs():
             [0.3, 0.2, 0.2, 0.1, 0.2],
         ]
     )
-    ips, covs = smc_cls.get_ensemble_ips_covs(system=system_cls, posteriors=posteriors)
+    system_cls.compute_estimated_params(posteriors)
 
     np.testing.assert_array_almost_equal(
-        ips,
+        system_cls.estimated_params,
         [
             [4.8, 5.02222222],
             [4.5, 3.75555556],
@@ -145,7 +137,7 @@ def test_ips_covs():
     )
 
     np.testing.assert_array_almost_equal(
-        covs,
+        system_cls.estimated_params_CV,
         [
             [0.4145781, 0.3729435],
             [0.51759176, 0.51966342],

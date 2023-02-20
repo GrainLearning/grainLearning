@@ -36,6 +36,7 @@ tensorflow = {version ="^2.10.0", optional = true}
 docs = ["Sphinx", "sphinx-autodoc-typehints", "sphinx-mdinclude", "sphinx-rtd-theme"]
 dev = ["pytest", "pytest-cov", "prospector", "pyroma", "h5py"]
 rnn = ["wandb", "tensorflow"]
+dev = ["pytest", "pytest-cov", "prospector", "pyroma"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to GrainLearning’s documentation! &mdash; GrainLearning  documentation</title>
@@ -28,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> GrainLearning
+
+          
+          
+          <a href="#" class="icon icon-home">
+            GrainLearning
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -43,13 +47,10 @@
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_systems.html">Dynamic systems</a></li>
-<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayesian_filtering.html">Bayesian filtering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">How to contribute</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html#contributing-guidelines">Contributing guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">Contributing guidelines</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a></li>
 </ul>
 
@@ -66,7 +67,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a></li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Welcome to GrainLearning’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
@@ -103,17 +104,13 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
 <li class="toctree-l2"><a class="reference internal" href="dynamic_systems.html#interact-with-third-party-software">Interact with third-party software</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="inference.html">Inference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="inference.html#the-inference-module">The inference module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inference.html#sequential-monte-carlo">Sequential Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayesian_filtering.html">Bayesian filtering</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bayesian_filtering.html#bayes-theorem">Bayes’ theorem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bayesian_filtering.html#the-inference-module">The inference module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bayesian_filtering.html#the-sampling-module">The sampling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bayesian_filtering.html#iterative-bayesian-filter">Iterative Bayesian filter</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sampling.html#sampling-from-low-discrepancy-sequences">Sampling from low-discrepancy sequences</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sampling.html#sampling-from-a-proposal-density-function">Sampling from a proposal density function</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="iterative_bayesian_filter.html">Iterative Bayesian Filter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials.html#linear-regression-with-a-python-model">Linear regression with a Python model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials.html#linear-regression-with-a-software-model">Linear regression with a “software” model</a></li>
@@ -124,8 +121,7 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
 <li class="toctree-l2"><a class="reference internal" href="examples.html#bayesian-calibration-of-dem-models">Bayesian calibration of DEM models</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">How to contribute</a></li>
-<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html#contributing-guidelines">Contributing guidelines</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="how_to_contribute.html">Contributing guidelines</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html#you-have-a-question">You have a question</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html#you-think-you-may-have-found-a-bug">You think you may have found a bug</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html#you-want-to-make-some-kind-of-change-to-the-code-base">You want to make some kind of change to the code base</a></li>

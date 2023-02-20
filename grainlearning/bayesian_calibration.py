@@ -5,7 +5,7 @@ from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_a
 
 
 class BayesianCalibration:
-    """This is the Bayesian calibration class
+    """This is the Bayesian calibration class.
 
     A Bayesian calibration class consists of the inference class and the (re)sampling class.
     For instance, in GrainLearning, we have a calibration method called "iterative Bayesian filter"
@@ -125,7 +125,7 @@ class BayesianCalibration:
         self.system.param_data = self.calibration.param_data_list[index]
         self.system.num_samples = self.system.param_data.shape[0]
 
-        # Run the model instances
+        # Run the model realizations
         self.system.run(curr_iter=self.curr_iter)
 
         # Load model data from disk
@@ -140,7 +140,7 @@ class BayesianCalibration:
         self.plot_uq_in_time()
 
     def load_system(self):
-        """Load existing simulation data from disk into the state-space model
+        """Load existing simulation data from disk into the dynamic system
         """
         self.system.load_param_data(self.curr_iter)
         self.system.get_sim_data_files(self.curr_iter)
@@ -166,6 +166,7 @@ class BayesianCalibration:
         self.calibration.add_curr_param_data_to_list(self.system.param_data)
         self.calibration.load_proposal_from_file(self.system)
         self.calibration.inference.data_assimilation_loop(sigma, self.system)
+        self.system.compute_estimated_params(self.calibration.inference.posteriors)
 
     def resample(self):
         """Learn and resample from a proposal distribution
@@ -173,7 +174,7 @@ class BayesianCalibration:
 
         :return: Combinations of resampled parameter values
         """
-        self.calibration.posterior_ibf = self.calibration.inference.give_posterior()
+        self.calibration.posterior = self.calibration.inference.get_posterior_at_time()
         self.calibration.run_sampling(self.system, )
         resampled_param_data = self.calibration.param_data_list[-1]
         self.system.write_to_table(self.curr_iter + 1)
@@ -196,8 +197,8 @@ class BayesianCalibration:
         fig_name = f'{path}/{self.system.sim_name}'
         plot_param_stats(
             fig_name, self.system.param_names,
-            self.calibration.inference.ips,
-            self.calibration.inference.covs,
+            self.system.estimated_params,
+            self.system.estimated_params_CV,
             self.save_fig
         )
 
@@ -233,7 +234,7 @@ class BayesianCalibration:
         :return: Estimated parameter values
         """
         from numpy import argmax
-        most_prob = argmax(self.calibration.posterior_ibf)
+        most_prob = argmax(self.calibration.posterior)
         return self.system.param_data[most_prob]
 
     @classmethod
@@ -244,16 +245,16 @@ class BayesianCalibration:
         """An alternative constructor to allow choosing a system type (e.g., dynamic system or IO dynamic system)
 
         :param obj: a dictionary containing the keys and values to construct a BayesianCalibration object
-        :return: A BayesianCalibration object
+        :return: a BayesianCalibration object
         """
 
-        # Get the model class, defaults to `DynamicSystem`
+        # Get the system class, defaults to `DynamicSystem`
         system_obj = obj["system"]
         system_type = system_obj.get("system_type", DynamicSystem)
         # if the dictionary has the key "system_type", then delete it to avoid passing it to the constructor
         system_obj.pop("system_type", None)
 
-        # Create a model object
+        # Create a system object
         system = system_type.from_dict(obj["system"])
 
         # Create a calibration object

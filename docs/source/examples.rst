@@ -31,12 +31,12 @@ Below is a piece of code that performs Bayesian calibration of four DEM paramete
     curr_iter = 1
     sim_data_dir = './tests/data/oedo_sim_data'
 
-    calibration = CalibrationToolbox.from_dict(
+    calibration = BayesianCalibration.from_dict(
         {
             "curr_iter": curr_iter,
             "num_iter": 0,
-            "model": {
-                "model_type": IODynamicSystem,
+            "system": {
+                "system_type": IODynamicSystem,
                 "obs_data_file": 'obsdata.dat',
                 "obs_names": ['p','q','n'],
                 "ctrl_name": 'e_a',

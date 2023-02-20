@@ -25,7 +25,7 @@ calibration = BayesianCalibration.from_dict(
             "inference": {"ess_target": 0.2},
             "sampling": {
                 "max_num_components": 10,
-                "prior_weight": 0.01,
+                "weight_concentration_prior": 0.01,
             },
             "proposal_data_file": f"iter{curr_iter - 1}/gmm_iter{curr_iter - 1}.pkl",
         },

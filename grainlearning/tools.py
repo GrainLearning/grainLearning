@@ -117,10 +117,10 @@ def regenerate_params_with_gmm(
     """
     Resample parameters using a variational Gaussian mixture model
 
-    :param proposal: ndarray of shape model.num_samples
+    :param proposal: ndarray of shape system.num_samples
         proposal probability distribution associated to the current parameter data
 
-    :param param_data: ndarray of shape (model.num_samples, model.num_params)
+    :param param_data: ndarray of shape (system.num_samples, system.num_params)
         current parameter data
 
     :param num: int
@@ -155,7 +155,7 @@ def regenerate_params_with_gmm(
         uper bound of the parameter values
 
     :param seed: int
-        random generation seed, defaults to None
+        random generation random_state, defaults to None
 
     :return:
         new_param_data: ndarray, parameter samples for the next iteration
