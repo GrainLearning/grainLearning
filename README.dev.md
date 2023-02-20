@@ -174,3 +174,5 @@ Run several Python analysis tools to ensure that your contributions are followin
 a). `poetry install -E dev` or b). `pip install .[dev]`.
 1. While being in the main directory grainlearning, at the same level as .prospector.yaml, run prospector. Depending on how you have installed grainlearning you can either run
 a). `poetry run prospector` or b). `prospector`
+1. Also check the imports:
+`isort --check-only grainlearning --diff`
