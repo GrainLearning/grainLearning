@@ -1,8 +1,9 @@
 """
 Fixtures defined here can be used in tests located at different files.
 """
-import h5py, pytest
+import h5py
 import numpy as np
+import pytest
 
 
 @pytest.fixture(scope="session")

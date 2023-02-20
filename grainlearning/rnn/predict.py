@@ -1,16 +1,19 @@
 """
 Module containing functions to load a trained RNN model and make a prediction.
 """
-import yaml, os
-
-import numpy as np
+import os
 from pathlib import Path
+
+import h5py
+import numpy as np
 import tensorflow as tf
 import wandb
+import yaml
 
 from grainlearning.rnn.models import rnn_model
 from grainlearning.rnn.preprocessing import prepare_datasets
 from grainlearning.rnn.windows import predict_over_windows
+
 
 def get_best_run_from_sweep(entity_project_sweep_id: str):
     """
@@ -34,12 +37,12 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
         )
     config = best_run.config
     if os.path.exists(Path(best_model.dir)/'train_stats.npy'):
-        train_stats = np.load(Path(path_to_model)/'train_stats.npy', allow_pickle=True).item()
+        train_stats = np.load(Path(best_model.dir)/'train_stats.npy', allow_pickle=True).item()
         data, _ = prepare_datasets(**config)
     else:
         data, train_stats = prepare_datasets(**config)
 
-    model = rnn_model(stats, **config)
+    model = rnn_model(train_stats, **config)
     model.load_weights(best_model.name)
     return model, data, train_stats, config
 
@@ -128,7 +131,7 @@ def predict_macroscopics(
         data = tf.data.Dataset.from_tensor_slices(next(iter(data))).batch(batch_size)
 
     # Check that input sizes of data correspond to those of the pre-trained model
-    inputs, labels = next(iter(data))
+    inputs, _ = next(iter(data))
     if not inputs['load_sequence'].shape[2] == train_stats['num_load_features']:
         raise ValueError(f"Number of elements in load_sequence of data does not match the model load_sequence shape. \
             Got {inputs['load_sequence'].shape[2]}, expected {train_stats['num_load_features']}.")

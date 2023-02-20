@@ -1,10 +1,12 @@
 """
-Script to train a model to predict macroscopic features of a DEM simulation.
+Train a model to predict macroscopic features of a DEM simulation.
 """
-import os, shutil, warnings
+import os
+import shutil
+import warnings
+from pathlib import Path
 
 import numpy as np
-from pathlib import Path
 import tensorflow as tf
 import wandb
 
@@ -102,8 +104,7 @@ def train_without_wandb(config=None):
                                  do you want to proceed? [y/n]: ")
         if delete_outputs == "y": shutil.rmtree(path_save_data)
         else:
-            print("Cancelling training")
-            return
+            raise SystemExit("Cancelling training")
 
     os.mkdir(path_save_data)
 
@@ -230,7 +231,7 @@ def _check_config(config):
     :return: Updated config dictionary.
     """
     # Necessary keys
-    if not 'raw_data' in config.keys(): raise ValueError("raw_data has not been defined in config")
+    if 'raw_data' not in config.keys(): raise ValueError("raw_data has not been defined in config")
     # Note: I systematically use config.keys() instead of in config, because config can be a dict from wandb
     # This object behaves differently than python dict (might be jsut the version), but this solves it.
 
@@ -268,7 +269,7 @@ def _warning_config_field(key, config, default, add_default_to_config=False):
 
     warnings.formatwarning = _custom_format_warning
 
-    if not key in config:
+    if key not in config:
         if add_default_to_config: config[key] = default
         warnings.warn(f"No {key} specified in config, using default {default}.")
 
@@ -281,11 +282,10 @@ def _get_optimizer_config(config):
     between config and possible parameters of the optimizer.
     :param config: Dictionary containing the values of different arguments.
     """
-    config_optimizer = dict()
+    config_optimizer = {}
     keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
     for key in config.keys():
         if key in keys_optimizer and not (key == 'self' or key == 'kwargs' or key == 'name'):
             config_optimizer[key] = config[key]
 
     return config_optimizer
-

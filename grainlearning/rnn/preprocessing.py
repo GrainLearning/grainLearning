@@ -72,7 +72,7 @@ def prepare_datasets(
 
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
     train_stats.update(get_dimensions(split_data['train']))
-    split_data = windowize_train_val_test(split_data, train_stats, window_size, window_step)
+    split_data = windowize_train_val_test(split_data, window_size, window_step)
 
     return split_data, train_stats
 
@@ -82,12 +82,10 @@ def prepare_single_dataset(
         pressure: str = 'All',
         experiment_type: str = 'All',
         pad_length: int = 0,
-        standardize_outputs: bool = True,
         add_e0: bool = False,
         add_pressure: bool = True,
         add_experiment_type: bool = True,
-        seed: int = 42,
-        **kwargs,):
+        **kwargs):
 
     """
     Convert raw data into a tensorflow dataset with compatible format to predict and evaluate a rnn model.

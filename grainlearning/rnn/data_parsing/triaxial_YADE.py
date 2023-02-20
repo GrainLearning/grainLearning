@@ -11,7 +11,9 @@ Data consists of:
 This example considers DEM simulations of Triaxial compressions
 at different confinments (pressures), in drain and undrained conditions.
 """
-import os, h5py
+import os
+
+import h5py
 import numpy as np
 
 CONTACT_KEYS = [
@@ -129,8 +131,7 @@ def convert_to_arrays(
     """
     if stored_in_subfolders: data_dir = data_dir + f'{pressure}/{experiment_type}/'
     if not os.listdir(data_dir):
-        print(f"Directory {data_dir} is empty.")
-        return
+        raise FileNotFoundError(f"Directory {data_dir} is empty.")
 
     file_names = [fn for fn in os.listdir(data_dir) if fn.endswith('.npy')]
 
@@ -157,6 +158,10 @@ def convert_to_arrays(
             contact_list.append(contact_params)
             if experiment_type == 'drained':
                 inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_DRAINED])
+                # Add sigma 2 and sigma 3 to inputs.
+                sigma_2 = (np.array(sim_features['p']) - (np.array(sim_features['q'])/3.0)) / scalings['p']
+                inputs_list[-1].append(list(sigma_2[:sequence_length])) # sigma 2
+                inputs_list[-1].append(list(sigma_2[:sequence_length])) # sigma 3
             elif experiment_type == 'undrained':
                 inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_UNDRAINED])
             else: raise ValueError(f"experiment type must be drained or undrained but got {experiment_type}")
@@ -164,10 +169,8 @@ def convert_to_arrays(
         else:
             other_lengths.append(len(test_features))
 
-    print(f'At confining pressure {pressure}, for the {experiment_type} case, '
-          f'there are {len(other_lengths)} samples with a different sequence length.')
-    print(f'lengths: ')
-    print(other_lengths)
+    print(f"At confining pressure {pressure}, for the {experiment_type} case, "
+          f"there are {len(other_lengths)} samples with a different sequence lengths: {other_lengths}.")
 
     inputs_array = np.array(inputs_list)
     contact_array = np.array(contact_list)
@@ -178,7 +181,6 @@ def convert_to_arrays(
     outputs_array = np.transpose(outputs_array, (0, 2, 1))
 
     print(f'Created array of {outputs_array.shape[0]} samples,')
-
     return inputs_array, contact_array, outputs_array
 
 
@@ -191,19 +193,18 @@ def get_pressures(data_dir: str):
     :return: List of confinement pressures present in the dataset.
     """
     if not os.listdir(data_dir):
-        print(f"Directory {data_dir} is empty.")
-        return
+        raise FileNotFoundError(f"Directory {data_dir} is empty.")
 
     pressures = []
     file_names = [fn for fn in os.listdir(data_dir) if fn.endswith('.npy')]
     for f in file_names:
         try:
-            sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
+            sim_params, _ = np.load(data_dir + f, allow_pickle=True)
         except:
             print('IOError', f, pressure)
             continue
         pressure = str(10**sim_params['conf'])
-        if not (pressure in pressures): pressures.append(pressure)
+        if pressure not in pressures: pressures.append(pressure)
 
     return pressures
 

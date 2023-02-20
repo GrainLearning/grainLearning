@@ -1,10 +1,10 @@
-import pytest, h5py
-import numpy as np
+import h5py
+import pytest
 import tensorflow as tf
 
-import grainlearning.rnn.preprocessing as preprocessing
-import grainlearning.rnn.windows as windows
-from .conftest import create_dataset
+from grainlearning.rnn import preprocessing
+from grainlearning.rnn import windows
+from tests.unit.conftest import create_dataset
 
 @pytest.fixture(scope="session")
 def dummy_dataset():
@@ -68,8 +68,8 @@ def test_merge_datasets(hdf5_test_file):
         # Case all pressures, all experiments
         inputs, outputs, contact_parameters = preprocessing._merge_datasets(datafile,
                                               pressure='All', experiment_type='All')
-            # check total (sum) num of samples, and that pressure and experiment type have been added to contact_params
-            # Values to be modified if hdf5_test_file changes
+        # check total (sum) num of samples, and that pressure and experiment type have been added to contact_params
+        # Values to be modified if hdf5_test_file changes
         assert inputs.shape == (2 + 10 + 4, 3, 2) # num_samples, sequence_length, load_features
         assert outputs.shape == (2 + 10 + 4, 3, 4) # num_samples, sequence_length, num_labels
         assert contact_parameters.shape == (2 + 10 + 4, 5 + 2) # num_samples, num_contact_params + 2 (pressure, experiment_type)
@@ -106,22 +106,22 @@ def test_prepare_datasets(hdf5_test_file):
     assert train_stats['num_labels'] > 0
 
     # Test length of contact parameters when adding e0, pressure, experiment type
-        # 1. Only add e_0
+    # 1. Only add e_0
     split_data_1, train_stats_1 = preprocessing.prepare_datasets(hdf5_test_file,
          pressure='1000000', experiment_type='undrained',
          add_e0=True, add_pressure=False, add_experiment_type=False, standardize_outputs=False)
 
-        # 2. Only add pressure
+    # 2. Only add pressure
     split_data_2, train_stats_2 = preprocessing.prepare_datasets(hdf5_test_file,
          pressure='1000000', experiment_type='undrained',
          add_e0=False, add_pressure=True, add_experiment_type=False, standardize_outputs=False, pad_length=1)
 
-        # 3. Only add experiment_type
+    # 3. Only add experiment_type
     split_data_3, train_stats_3 = preprocessing.prepare_datasets(hdf5_test_file,
          pressure='1000000', experiment_type='undrained',
          add_e0=False, add_pressure=False, add_experiment_type=True, standardize_outputs=False, pad_length=3)
 
-        # Comparison against train_stats: No additional contact parameters.
+    # Comparison against train_stats: No additional contact parameters.
     assert train_stats_1['num_contact_params'] == train_stats['num_contact_params'] + 1
     assert train_stats_2['num_contact_params'] == train_stats['num_contact_params'] + 1
     assert train_stats_3['num_contact_params'] == train_stats['num_contact_params'] + 1
@@ -146,7 +146,6 @@ def test_prepare_datasets(hdf5_test_file):
 # windows
 def test_windowize_single_dataset(dummy_dataset):
     # dimensions with which dummy_dataset was generated.
-    num_samples = 100
     sequence_length = 10
     num_load_features = 4
     num_labels = 3

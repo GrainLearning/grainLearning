@@ -1,11 +1,8 @@
-import os, pathlib
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 from matplotlib import pyplot as plt
-from pathlib import Path
 
-import grainlearning.rnn.predict as predict
-from grainlearning.rnn.preprocessing import prepare_datasets
+from grainlearning.rnn import predict
 
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
@@ -19,7 +16,7 @@ plt.rcParams['axes.labelsize'] = 25
 plt.rcParams['font.family'] = 'sans-serif'
 
 
-def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: dict, config: dict, batch_size: int=256):
+def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: dict, config: dict, batch_size: int = 256):
     """
     Take the first sample in the test set for each combination of pressure
     and experiment type, and plot for it the true and predicted macroscopic
@@ -93,13 +90,13 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
 
 
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
-            title: str='', x_label: str='', y_label: str='', color: str='blue',
-            ylim=None, add_legend=False, P_label="", E_label=""):
+            title: str = '', x_label: str = '', y_label: str = '', color: str = 'blue',
+            ylim = None, add_legend = False, P_label = "", E_label = ""):
     """
     Configures the plot: data, title and axis label
     """
-    ax.plot(x_labels, y_labels, label=f'truth P={P_label}MPa {E_label}', color=color)
-    ax.plot(x_preds, y_preds, label='prediction', linestyle='dashed', color=color)
+    ax.plot(x_labels, y_labels, label=f"truth P={P_label}MPa {E_label}", color=color)
+    ax.plot(x_preds, y_preds, label="prediction", linestyle='dashed', color=color)
     if title: ax.set_title(title)
     if x_label: ax.set_xlabel(x_label)
     if y_label: ax.set_ylabel(rf'${y_label}$')

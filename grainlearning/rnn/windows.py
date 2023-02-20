@@ -2,14 +2,12 @@ import numpy as np
 import tensorflow as tf
 
 
-def windowize_train_val_test(split_data: dict, train_stats: dict, window_size: int, window_step: int, **kwargs):
+def windowize_train_val_test(split_data: dict, window_size: int, window_step: int, **kwargs):
     """
     Convert sequences into windows of given length. Leave test set untouched.
-    Adds window_size and window_step to train_stats.
 
     :param split_data: Dictionary with keys `'train'`, `'val'`, `'test'` pointing to
             tensorflow datasets.
-    :param train_stats: Dictionary storing statistics of the training data.
     :param window_size: Number of timesteps to include in a window.
     :param window_step: Offset between subsequent windows.
 
@@ -51,7 +49,7 @@ def windowize_single_dataset(
       * ``outputs`` of shape: (M, L_outputs)
     """
     load_sequences, contact_parameters, outputs = extract_tensors(data)
-    num_samples, sequence_length, num_labels = outputs.shape
+    _, sequence_length, _ = outputs.shape
 
     if window_size >= sequence_length:
         raise ValueError(f"window_size {window_size} >= sequence_length {sequence_length}.")
@@ -114,7 +112,7 @@ def predict_over_windows(
         predictions = [
             model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
             for end in range(window_size, sequence_length)
-            ]
+        ]
         predictions = tf.stack(predictions, axis=1)
         return predictions
 
@@ -136,4 +134,3 @@ def extract_tensors(data: tf.data.Dataset):
         outputs.append(_outputs)
 
     return np.array(inputs), np.array(contacts), np.array(outputs)
-

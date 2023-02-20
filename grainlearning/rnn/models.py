@@ -2,8 +2,9 @@
 Module containing a function that creates a RNN model.
 """
 import tensorflow as tf
-from tensorflow.keras import layers, Model
+from tensorflow.keras import Model
 from tensorflow.keras import backend as K
+from tensorflow.keras import layers
 
 
 def rnn_model(
@@ -65,4 +66,3 @@ def _DynamicRepeatVector(contact_params, num_repeats: int):
     def repeat_vector(contact_params):
         return layers.RepeatVector(num_repeats)(contact_params)
     return layers.Lambda(repeat_vector, output_shape=(None, num_repeats, num_features))
-

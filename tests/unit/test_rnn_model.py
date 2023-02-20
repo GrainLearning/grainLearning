@@ -1,12 +1,17 @@
-import pytest, h5py, wandb, sys, os, io, shutil
-import numpy as np
-import tensorflow as tf
+import io
+import os
+import shutil
 from pathlib import Path
 
+import numpy as np
+import pytest
+import tensorflow as tf
+
+from grainlearning.rnn import predict
+from grainlearning.rnn import preprocessing
+from grainlearning.rnn import train
 from grainlearning.rnn.models import rnn_model
-import grainlearning.rnn.preprocessing as preprocessing
-import grainlearning.rnn.train as train
-import grainlearning.rnn.predict as predict
+
 
 @pytest.fixture(scope="function") # will tear down the fixture after being used in a test_function
 def config_test(hdf5_test_file):
@@ -56,9 +61,9 @@ def test_model_output_shape():
 
     assert output.shape == (batch_size, input_shapes['num_labels'])
 
+
 # Tests train
-@pytest.mark.skip(reason="Developing the tests this one takes long.")
-def test_train(hdf5_test_file, config_test, monkeypatch):
+def test_train(config_test, monkeypatch):
     """
     Check that training goes well, no errors should be thrown.
     """
@@ -66,23 +71,23 @@ def test_train(hdf5_test_file, config_test, monkeypatch):
     # Option 1: train using wandb
     os.system("wandb offline") # so that when you run these test the info will not be synced
     history_wandb = train.train(config=config_test)
-        # check that files have been generated
+    # check that files have been generated
     assert os.path.exists(Path("wandb/latest-run/files/model-best.h5"))
     assert os.path.exists(Path("wandb/latest-run/files/train_stats.npy"))
     # if running offline this will not be generated
     #assert os.path.exists(Path("wandb/latest-run/files/config.yaml"))
-        # check metrics
+    # check metrics
     assert history_wandb.history.keys() == {'loss', 'mae', 'val_loss', 'val_mae'}
 
     # Option 2: train using plain tensorflow
-        # monkeypatch for input when asking: do you want to proceed? [y/n]:
+    # monkeypatch for input when asking: do you want to proceed? [y/n]:
     monkeypatch.setattr('sys.stdin', io.StringIO('y'))
     history_simple = train.train_without_wandb(config=config_test)
-        # check that files have been generated
+    # check that files have been generated
     assert os.path.exists(Path("outputs/saved_model.pb")) # because 'save_weights_only': False
     assert os.path.exists(Path("outputs/train_stats.npy"))
     assert os.path.exists(Path("outputs/config.npy"))
-        # check metrics
+    # check metrics
     assert history_simple.history.keys() == {'loss', 'mae', 'val_loss', 'val_mae'}
 
     # removing generated folders
@@ -92,12 +97,12 @@ def test_train(hdf5_test_file, config_test, monkeypatch):
     # Check that if 'save_weights_only' other sort of files would be saved
     config_test['save_weights_only'] = True # can safely do this because the scope of fixture is function
 
-        # Option 1: train using wandb
+    # Option 1: train using wandb
     train.train(config=config_test)
     assert os.path.exists(Path("wandb/latest-run/files/model-best.h5"))
     assert os.path.exists(Path("wandb/latest-run/files/train_stats.npy"))
 
-        # Option 2: train using plain tensorflow
+    # Option 2: train using plain tensorflow
     train.train_without_wandb(config=config_test)
     assert os.path.exists(Path("outputs/weights.h5")) # because 'save_weights_only': True
     assert os.path.exists(Path("outputs/train_stats.npy"))
@@ -109,8 +114,7 @@ def test_train(hdf5_test_file, config_test, monkeypatch):
 
 
 # Tests predict
-#@pytest.mark.skip(reason="Under construction.")
-def test_get_pretrained_model(hdf5_test_file, config_test):
+def test_get_pretrained_model(config_test):
     """ Try to load some models pretrained on synthetic data.
         Such syntetic data was generated using test_train, thus hdf5_test_file with config_test (2000000.6, undrained).
     """
@@ -142,7 +146,8 @@ def test_get_pretrained_model(hdf5_test_file, config_test):
 
     # test that error is trigger if unexistent file is passed
 
-def test_predict_macroscopics(hdf5_test_file):
+
+def test_predict_macroscopics():
     model, train_stats, config = predict.get_pretrained_model("./tests/data/rnn/wandb_only_weights/")
     data, _ = preprocessing.prepare_datasets(**config)
     predictions_1 = predict.predict_macroscopics(model, data['test'], train_stats, config, batch_size=1)
@@ -165,31 +170,26 @@ def test_predict_macroscopics(hdf5_test_file):
     # model loaded: pad_length=0, config, pad_length=1. If using train_stats of the model -> incompatible.
     data_padded = preprocessing.prepare_single_dataset(**config)
     with pytest.raises(ValueError):
-        predictions_3 = predict.predict_macroscopics(model, data_padded, train_stats, config, batch_size=2)
+        predict.predict_macroscopics(model, data_padded, train_stats, config, batch_size=2)
 
     # check that standardize outputs has been correctly applied: cannot comprare.
 
-#@pytest.mark.skip(reason="Under construction.")
-def test_predict_over_windows(hdf5_test_file, config_test):
-    window_size = 1
+
+def test_predict_over_windows(hdf5_test_file):
+    window_sizes = [1, 2]
     batch_size = 1
-    split_data, train_stats = preprocessing.prepare_datasets(raw_data=hdf5_test_file,
-                                pressure='1000000', experiment_type='undrained', window_size=window_size)
-    model = rnn_model(input_shapes=train_stats, window_size=window_size)
-    data = split_data['train'].batch(batch_size)
-    predictions = predict.predict_over_windows(data, model, window_size, train_stats['sequence_length'])
+    for window_size in window_sizes:
+        split_data, train_stats = preprocessing.prepare_datasets(raw_data=hdf5_test_file,
+                                    pressure='1000000', experiment_type='undrained',
+                                    window_size=window_size)
+        model = rnn_model(input_shapes=train_stats, window_size=window_size)
+        data = split_data['test'].batch(batch_size) # has to be test dataset that is not windowized
+        predictions = predict.predict_over_windows(data, model, window_size, train_stats['sequence_length'])
 
-    # Test that the output is a tensorflow dataset
-    assert isinstance(predictions, tf.data.Dataset)
+        # Test that the output is a tensorflow dataset
+        assert isinstance(predictions, tf.data.Dataset)
 
-    # Test that the output predictions have the correct shape
-    for pred in predictions.batch(1).map(lambda x, y: x):
-        assert pred.shape == (1, sequence_length - window_size, train_stats['num_labels'])
-
-    # Test that the function can handle different batch sizes
-    data = data.batch(5)
-    predictions = predict.predict_over_windows(data, model, window_size, sequence_length)
-    for pred in predictions.batch(1).map(lambda x, y: x):
-        assert pred.shape == (5, sequence_length - window_size, train_stats['num_labels'])
-
-
+        # dimensions
+        predictions = next(iter(predictions)) # takes only first batch
+        assert predictions.shape == (1, train_stats['sequence_length'] - window_size,  train_stats['num_labels'])
+        assert predictions.shape == (1, 3 - window_size, 4)
