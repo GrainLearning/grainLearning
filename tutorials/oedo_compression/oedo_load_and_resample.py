@@ -1,3 +1,7 @@
+"""
+This tutorial shows how to use GrainLearning to load existing simulation data,
+ estimate parameter distribution, and perform resampling to generate new parameter samples.
+"""
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
 

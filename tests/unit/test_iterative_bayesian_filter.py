@@ -1,3 +1,4 @@
+"""Test the iterative bayesian filter class."""
 import numpy as np
 
 from grainlearning import (

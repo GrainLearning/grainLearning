@@ -1,6 +1,7 @@
+"""Test the SMC class and compare the least error"""
 import numpy as np
-from grainlearning import BayesianCalibration
 from sklearn.metrics import mean_squared_error as mse
+from grainlearning import BayesianCalibration
 
 p1 = 0.2
 p2 = 5.0
@@ -8,7 +9,9 @@ x_obs = np.arange(100)
 y_obs = p1 * x_obs + p2
 y_obs_w_noise = y_obs + np.random.rand(100) * 2.5
 
+
 def run_sim(model, **kwargs):
+    """Run the linear model"""
     data = []
     for params in model.param_data:
         y_sim = params[0] * model.ctrl_data + params[1]

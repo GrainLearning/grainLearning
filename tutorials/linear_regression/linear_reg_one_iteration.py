@@ -1,6 +1,10 @@
+"""
+This tutorial shows how to run one iteration of Bayesian calibration for a linear regression model.
+"""
+import os
+import sys
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
-import os, sys
 
 sys.path.append(os.path.join(os.getcwd(), "grainlearning"))
 
@@ -41,4 +45,4 @@ resampled_param_data = calibration.resample()
 
 # %%
 # write new parameter table to the simulation directory
-calibration.system.write_params_to_txt(calibration.curr_iter + 1)
+calibration.system.write_to_table(calibration.curr_iter + 1, )

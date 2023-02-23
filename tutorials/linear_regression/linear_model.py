@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+This module is used to generate simulated data for linear regression
+"""
 import sys
 import numpy as np
 

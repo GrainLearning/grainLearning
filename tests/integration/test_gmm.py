@@ -1,5 +1,7 @@
+"""Test the Gaussian Mixture Model class."""
+import os
+import sys
 import numpy as np
-import os, sys
 
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
@@ -55,13 +57,14 @@ def test_gmm():
 
     # %%
     # write new parameter table to the simulation directory
-    calibration.system.write_params_to_txt(calibration.curr_iter + 1)
+    calibration.system.write_to_table(calibration.curr_iter + 1)
 
     # %%
     check_list = np.isclose(resampled_param_data_ref, resampled_param_data)
     check_list = check_list[:, 0] & check_list[:, 1]
     percentage = len(check_list[check_list == True]) / calibration.system.num_samples
-    assert percentage > 0.8, f"Parameter data resampled from the proposal distribution do not match. Mismatch is {100 * (1 - percentage)}%"
+    assert percentage > 0.8, f"Parameter data resampled from the proposal distribution do not match." \
+                             f"Mismatch is {100 * (1 - percentage)}%"
 
 
 test_gmm()

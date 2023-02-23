@@ -122,7 +122,7 @@ Ensemble predictions
 
 Since the importance weight on each sample :math:`\vec{\Theta}^{(i)}` is discrete
 and the sample :math:`\vec{\Theta}^{(i)}` and model state :math:`\vec{x}_t^{(i)}` are in a one-to-one relationship,
-the ensemble mean :attr:`.DynamicSystem.estimated_params` and variance :attr:`.DynamicSystem.estimated_params_CV` can be computed as 
+the ensemble mean :attr:`.DynamicSystem.estimated_params` and variance :attr:`.DynamicSystem.estimated_params_cv` can be computed as 
 
 .. math::
 

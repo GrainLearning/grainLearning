@@ -1,8 +1,12 @@
+"""
+This tutorial shows how to link a linear regression model implemented in Python to GrainLearning.
+"""
 import numpy as np
 from grainlearning import BayesianCalibration
 
 x_obs = np.arange(100)
 y_obs = 0.2 * x_obs + 5.0
+
 
 def run_sim(model, **kwargs):
     data = []

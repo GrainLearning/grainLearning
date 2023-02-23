@@ -1,91 +1,109 @@
-import sys, os, math, subprocess
+"""
+This module contains tools for the GrainLearning project.
+"""
+import sys
+import os
+import math
+import subprocess
+from typing import List, Callable
 import numpy as np
 import matplotlib.pylab as plt
-from typing import List, Callable
 from sklearn.mixture import BayesianGaussianMixture
+from scipy.spatial import Voronoi, ConvexHull
 
 
-def startSimulations(platform, software, tableName, fileName):
-    # platform desktop, aws or rcg    # software so far only yade
-    argument = tableName + " " + fileName
-    if platform == 'desktop':
-        # Definition where shell script can be found
-        path_to_shell = os.getcwd() + '/platform_shells/desktop'
-        if software == 'yade':
-            command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
-            subprocess.call(command, shell=True)
-        else:
-            print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-            sys.exit
-
-    elif platform == 'aws':
-        path_to_shell = os.getcwd() + '/platform_shells/aws'
-        if software == 'yade':
-            command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
-            subprocess.call(command, shell=True)
-        else:
-            print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-            sys.exit
-
-    elif platform == 'rcg':
-        path_to_shell = os.getcwd() + '/platform_shells/rcg'
-        if software == 'yade':
-            command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
-            subprocess.call(command, shell=True)
-        else:
-            print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-            sys.exit
-    else:
-        print('Exit code. Hardware for yade simulations not properly defined')
-        quit()
+# def startSimulations(platform, software, tableName, fileName):
+#     # platform desktop, aws or rcg    # software so far only yade
+#     argument = tableName + " " + fileName
+#     if platform == 'desktop':
+#         # Definition where shell script can be found
+#         path_to_shell = os.getcwd() + '/platform_shells/desktop'
+#         if software == 'yade':
+#             command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
+#             subprocess.call(command, shell=True)
+#         else:
+#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
+#             sys.exit
+#
+#     elif platform == 'aws':
+#         path_to_shell = os.getcwd() + '/platform_shells/aws'
+#         if software == 'yade':
+#             command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
+#             subprocess.call(command, shell=True)
+#         else:
+#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
+#             sys.exit
+#
+#     elif platform == 'rcg':
+#         path_to_shell = os.getcwd() + '/platform_shells/rcg'
+#         if software == 'yade':
+#             command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
+#             subprocess.call(command, shell=True)
+#         else:
+#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
+#             sys.exit
+#     else:
+#         print('Exit code. Hardware for yade simulations not properly defined')
+#         quit()
 
 
 def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
     """
     write parameter samples into a text file
+
+    :param sim_name: string
+    :param table: numpy array
+    :param names: list of strings
+    :param curr_iter: int
+    :param threads: int
+    :return: string
     """
 
     # Computation of decimal number for unique key
     table_file_name = f'{sim_name}_Iter{curr_iter}_samples.txt'
 
-    fout = open(table_file_name, 'w')
-    num, dim = table.shape
-    magn = math.floor(math.log(num, 10)) + 1
-    fout.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
-    for j in range(num):
-        description = 'Iter' + str(curr_iter) + '-Sample' + str(j).zfill(magn)
-        fout.write(' '.join(
-            ['%2i' % threads] + [description] + ['%9i' % j] + ['%20.10e' % table[j][i] for i in range(dim)] + ['\n']))
-    fout.close()
+    with open(table_file_name, 'w') as f_out:
+        num, dim = table.shape
+        mag = math.floor(math.log(num, 10)) + 1
+        f_out.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
+        for j in range(num):
+            description = 'Iter' + str(curr_iter) + '-Sample' + str(j).zfill(mag)
+            f_out.write(' '.join(
+                [f'{threads:2d}'] + [description] +
+                [f'{j:9d}'] + [f'{table[j][i]:20.10e}' for i in range(dim)] + ['\n']))
     return table_file_name
 
 
-def get_keys_and_data(fileName, delimiters=['\t', ' ', ',']):
+def get_keys_and_data(file_name: str, delimiters=None):
     """
     Get keys and corresponding data sequence from a text file
 
-    :param fileName: string
-
+    :param file_name: string
+    :param delimiters: list of strings, default = ['\t', ' ', ',']
     :return: keys_and_data: dictionary
     """
-    data = np.genfromtxt(fileName)
+    if delimiters is None:
+        delimiters = ['\t', ' ', ',']
+    data = np.genfromtxt(file_name)
 
     try:
-        ncols = data.shape[1]
+        nc_ols = data.shape[1]
     except IndexError:
-        nrows = data.shape[0]
-        ncols = 1
-        data = data.reshape([nrows, 1])
+        n_rows = data.shape[0]
+        nc_ols = 1
+        data = data.reshape([n_rows, 1])
 
-    fopen = open(fileName, 'r')
-    first_line = fopen.read().splitlines()[0]
-    for d in delimiters:
-        keys = first_line.split(d)
-        # remove # in the header line
-        if '#' in keys: keys.remove('#')
-        # remove empty strings from the list
-        keys = list(filter(None, keys))
-        if len(keys) == ncols: break
+    with open(file_name, 'r') as f_open:
+        first_line = f_open.read().splitlines()[0]
+        for d in delimiters:
+            keys = first_line.split(d)
+            # remove # in the header line
+            if '#' in keys:
+                keys.remove('#')
+            # remove empty strings from the list
+            keys = list(filter(None, keys))
+            if len(keys) == nc_ols:
+                break
 
     # store data in a dictionary
     keys_and_data = {}
@@ -152,10 +170,19 @@ def regenerate_params_with_gmm(
         lower bound of the parameter values
 
     :param param_max: list
-        uper bound of the parameter values
+        upper bound of the parameter values
 
     :param seed: int
         random generation random_state, defaults to None
+
+    :param n_init: int, default = 1
+        Number of initializations to perform. The best results are kept.
+
+    :param tol: float, default = 0.001
+        Convergence threshold. EM iterations will stop when the lower bound average gain is below this threshold.
+
+    :param max_iter: int, default = 100
+        Number of EM iterations to perform.
 
     :return:
         new_param_data: ndarray, parameter samples for the next iteration
@@ -194,30 +221,41 @@ def regenerate_params_with_gmm(
 
 def get_pool(mpi=False, threads=1):
     """
-    Create a thread pool for paralleling DEM simulations within GrainLearning
+    Create a thread pool for paralleling model evaluations within GrainLearning
+
+    TODO improve the scheduler for running simulation instances in parallel
+    1. On Desktop: use multiprocessing
+    2. On HPC: use MPI or multiprocessing
+    3. On Cloud (e.g. AWS)
 
     :param mpi: bool, default=False
-
     :param threads: int, default=1
     """
-    if mpi:  # using MPI
-        from mpipool import MPIPool
-        pool = MPIPool()
-        pool.start()
-        if not pool.is_master():
-            sys.exit(0)
-    elif threads > 1:  # using multiprocessing
+    # if mpi:  # using MPI
+    #     from mpipool import MPIPool
+    #     pool = MPIPool()
+    #     pool.start()
+    #     if not pool.is_master():
+    #         sys.exit(0)
+    if threads > 1:  # using multiprocessing
         from multiprocessing import Pool
         pool = Pool(processes=threads, maxtasksperchild=10)
-    else:
+    if not mpi and threads == 1:
         raise RuntimeError("Wrong arguments: either mpi=True or threads>1.")
     return pool
 
 
 def unweighted_resample(weights, expand_num=10):
-    # take int(N*w) copies of each weight, which ensures particles with the same weight are drawn uniformly
-    N = len(weights) * expand_num
-    num_copies = (np.floor(N * np.asarray(weights))).astype(int)
+    """
+    Resample from the weighted samples to unweighted samples
+
+    Take int(N*w) copies of each weight, which ensures particles with the same weight are drawn uniformly
+    :param weights: ndarray of shape (N,)
+    :param expand_num: int, default=10
+    :return: ndarray of shape (N*expand_num,)
+    """
+    n = len(weights) * expand_num
+    num_copies = (np.floor(n * np.asarray(weights))).astype(int)
     indexes = np.zeros(sum(num_copies), 'i')
     k = 0
     for i in range(len(weights)):
@@ -228,12 +266,19 @@ def unweighted_resample(weights, expand_num=10):
 
 
 def residual_resample(weights, expand_num=10):
-    N = len(weights) * expand_num
-    indexes = np.zeros(N, 'i')
+    """
+    Resample from the weighted samples to unweighted samples using the residual resampling algorithm
+
+    :param weights: ndarray of shape (N,)
+    :param expand_num: int, default=10
+    :return: ndarray of shape (N*expand_num,)
+    """
+    n = len(weights) * expand_num
+    indexes = np.zeros(n, 'i')
 
     # take int(N*w) copies of each weight, which ensures particles with the
     # same weight are drawn uniformly
-    num_copies = (np.floor(N * np.asarray(weights))).astype(int)
+    num_copies = (np.floor(n * np.asarray(weights))).astype(int)
     k = 0
     for i in range(len(weights)):
         for _ in range(num_copies[i]):  # make n copies
@@ -246,7 +291,7 @@ def residual_resample(weights, expand_num=10):
     residual /= sum(residual)  # normalize
     cumulative_sum = np.cumsum(residual)
     cumulative_sum[-1] = 1.  # avoid round-off errors: ensures sum is exactly one
-    indexes[k:N] = np.searchsorted(cumulative_sum, np.random.random(N - k))
+    indexes[k:n] = np.searchsorted(cumulative_sum, np.random.random(n - k))
 
     return indexes
 
@@ -268,14 +313,14 @@ def stratified_resample(weights, expand_num=10):
         index of the zeroth resample is indexes[0], etc.
     """
 
-    N = len(weights)
+    n = len(weights)
     # make N subdivisions, and chose a random position within each one
-    positions = (np.random.random(N) + range(N)) / N
+    positions = (np.random.random(n) + range(n)) / n
 
-    indexes = np.zeros(N, 'i')
+    indexes = np.zeros(n, 'i')
     cumulative_sum = np.cumsum(weights)
     i, j = 0, 0
-    while i < N:
+    while i < n:
         if positions[i] < cumulative_sum[j]:
             indexes[i] = j
             i += 1
@@ -299,15 +344,15 @@ def systematic_resample(weights, expand_num=10):
         array of indexes into the weights defining the resample. i.e. the
         index of the zeroth resample is indexes[0], etc.
     """
-    N = len(weights)
+    n = len(weights)
 
     # make N subdivisions, and choose positions with a consistent random offset
-    positions = (np.random.random() + np.arange(N)) / N
+    positions = (np.random.random() + np.arange(n)) / n
 
-    indexes = np.zeros(N, 'i')
+    indexes = np.zeros(n, 'i')
     cumulative_sum = np.cumsum(weights)
     i, j = 0, 0
-    while i < N:
+    while i < n:
         if positions[i] < cumulative_sum[j]:
             indexes[i] = j
             i += 1
@@ -339,7 +384,11 @@ def multinomial_resample(weights, expand_num=10):
 
 
 def voronoi_vols(samples: np.ndarray):
-    from scipy.spatial import Voronoi, ConvexHull
+    """Compute the volumes of the Voronoi cells associated with a set of points.
+
+    :param samples: ndarray of shape (N, D)
+    :return: ndarray of shape (N,)
+    """
     v = Voronoi(samples)
     vol = np.zeros(v.npoints)
     for i, reg_num in enumerate(v.point_region):
@@ -361,31 +410,31 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
     :param save_fig: bool defaults to False
     """
     num = len(param_names)
-    ncols = int(np.ceil(num / 2))
+    n_cols = int(np.ceil(num / 2))
     plt.figure('Posterior means of the parameters')
     for i in range(num):
-        plt.subplot(2, ncols, i + 1)
+        plt.subplot(2, n_cols, i + 1)
         plt.plot(means[:, i])
         plt.xlabel("'Time' step")
         plt.ylabel(r'$|' + param_names[i] + r'|$')
         plt.grid(True)
     plt.tight_layout()
     if save_fig:
-        plt.save_fig(f'{fig_name}_param_means.png')
+        plt.savefig(f'{fig_name}_param_means.png')
     else:
         plt.show()
     plt.close()
 
     plt.figure('Posterior coefficients of variance of the parameters')
     for i in range(num):
-        plt.subplot(2, ncols, i + 1)
+        plt.subplot(2, n_cols, i + 1)
         plt.plot(covs[:, i])
         plt.xlabel("'Time' step")
         plt.ylabel(r'$COV(' + param_names[i] + ')$')
         plt.grid(True)
     plt.tight_layout()
     if save_fig:
-        plt.save_fig(f'{fig_name}_param_covs.png')
+        plt.savefig(f'{fig_name}_param_covs.png')
     else:
         plt.show()
     plt.close()
@@ -406,13 +455,13 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
         for j in range(6):
             plt.subplot(2, 3, j + 1)
             plt.plot(param_data[:, i], posterior[int(num_steps * (j + 1) / 6 - 1), :], 'o')
-            plt.title("'Time' step No.%3i " % (int(num_steps * (j + 1) / 6 - 1)))
+            plt.title(f"'Time' step No.{int(num_steps * (j + 1) / 6 - 1):3d} ")
             plt.xlabel(r'$' + name + '$')
             plt.ylabel('Posterior distribution')
             plt.grid(True)
         plt.tight_layout()
         if save_fig:
-            plt.save_fig(f'{fig_name}_posterior_{name}.png')
+            plt.savefig(f'{fig_name}_posterior_{name}.png')
         else:
             plt.show()
         plt.close()
@@ -420,21 +469,21 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
 
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     num = len(param_names)
-    ncols = int(np.ceil(num / 2))
+    n_cols = int(np.ceil(num / 2))
     num = num - 1
     num_iter = len(param_data_list)
     plt.figure('Resampling the parameter space')
     for j in range(num):
-        plt.subplot(2, ncols, j + 1)
+        plt.subplot(2, n_cols, j + 1)
         for i in range(num_iter):
-            plt.plot(param_data_list[i][:, j], param_data_list[i][:, j + 1], 'o', label='iterNo. %.2i' % i)
+            plt.plot(param_data_list[i][:, j], param_data_list[i][:, j + 1], 'o', label=f'iterNo. {i:d}')
             plt.xlabel(r'$' + param_names[j] + '$')
             plt.ylabel(r'$' + param_names[j + 1] + '$')
             plt.legend()
         plt.legend()
         plt.tight_layout()
     if save_fig:
-        plt.save_fig(f'{fig_name}_param_space.png')
+        plt.savefig(f'{fig_name}_param_space.png')
     else:
         plt.show()
 
@@ -469,7 +518,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
         )
 
         for j in (-posteriors[-1, :]).argsort()[:3]:
-            plt.plot(ctrl_data, sim_data[j, i, :], label='sim No. %i' % j)
+            plt.plot(ctrl_data, sim_data[j, i, :], label=f'sim No. {j:d}')
 
         plt.plot(ctrl_data,
                  obs_data[i, :], 'ok',
@@ -484,7 +533,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
 
     plt.tight_layout()
     if save_fig:
-        plt.save_fig(f'{fig_name}_obs_and_sim.png')
+        plt.savefig(f'{fig_name}_obs_and_sim.png')
     else:
         plt.show()
     plt.close()

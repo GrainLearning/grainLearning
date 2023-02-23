@@ -1,3 +1,4 @@
+"""Test the dynamic systems module."""
 import numpy as np
 from grainlearning import DynamicSystem
 
@@ -26,7 +27,7 @@ def test_init():
 
     np.testing.assert_equal(system_cls.__dict__, model_dct.__dict__)
     np.testing.assert_array_almost_equal(
-        system_cls._inv_normalized_sigma,
+        system_cls.get_inv_normalized_sigma(),
         [
             [
                 1.41421356,

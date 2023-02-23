@@ -1,12 +1,19 @@
+"""
+This tutorial shows how to perform iterative Bayesian calibration for a linear regression model
+ using GrainLearning.
+"""
+import os
+from math import floor, log
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
 
-executable = 'python ./tutorials/linear_regression/LinearModel.py'
+executable = 'python ./tutorials/linear_regression/linear_model.py'
 
 
 def run_sim(model, **kwargs):
-    from math import floor, log
-    import os
+    """
+    Runs the external executable and passes the parameter samples to it.
+    """
     # keep the naming convention consistent between iterations
     magn = floor(log(model.num_samples, 10)) + 1
     curr_iter = kwargs['curr_iter']
@@ -15,8 +22,8 @@ def run_sim(model, **kwargs):
     # loop over and pass parameter samples to the executable
     for i, params in enumerate(model.param_data):
         description = 'Iter' + str(curr_iter) + '-Sample' + str(i).zfill(magn)
-        print(" ".join([executable, '%.8e %.8e' % tuple(params), description]))
-        os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
+        print(" ".join([executable, "%.8e %.8e" % tuple(params), description]))
+        os.system(' '.join([executable, "%.8e %.8e" % tuple(params), description]))
 
 
 calibration = BayesianCalibration.from_dict(
