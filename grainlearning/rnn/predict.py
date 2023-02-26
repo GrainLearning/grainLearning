@@ -118,7 +118,7 @@ def predict_macroscopics(
     If 'standardize_outputs' in config, rescale the predictions to their original units.
 
     :param model: Keras RNN model
-    :param data: Tensorflow dataset containing 'load_sequence' and 'contact_parameters' inputs.
+    :param data: Tensorflow dataset containing inputs: 'load_sequence' and 'contact_parameters', and outputs.
     :param train_stats: Dictionary containing statistics of the training set.
     :param config: Dictionary containing the configuration with which the model was trained.
     :param batch_size: Size of batches to use.

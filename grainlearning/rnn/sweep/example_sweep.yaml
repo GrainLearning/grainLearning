@@ -22,8 +22,6 @@ parameters:
     value: 0.7
   val_frac:
     value: 0.15
-  use_windows:
-    value: True
   window_size:
     values: [5, 10, 20, 30]
   window_step:
@@ -44,4 +42,3 @@ parameters:
     value: True
   save_weights_only:
     value: False
-

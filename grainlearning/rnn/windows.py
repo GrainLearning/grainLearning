@@ -88,7 +88,7 @@ def _shuffle(Xs, cs, ys, seed):
 
 
 def predict_over_windows(
-        data: dict,
+        data: tf.data.Dataset,
         model: tf.keras.Model,
         window_size: int,
         sequence_length: int,
@@ -101,7 +101,7 @@ def predict_over_windows(
     Note the length of the output sequence will be shorter by the window_size than
     the input sequence.
 
-    :param data: Dictionary of data containing `'load_sequence'` and `'contact_parameters'`.
+    :param data: Tensorflow Dataset containing inputs: `'load_sequence'` and `'contact_parameters'`, and outputs.
     :param model: The model to predict with.
     :param window_size: Number of timesteps in a single window.
     :param sequence_length: Number of timesteps in a full sequence.
