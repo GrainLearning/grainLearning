@@ -309,6 +309,10 @@ class DynamicSystem:
             -1.0 / inv_obs_weight.shape[0]
         )
 
+    def reset_inv_normalized_sigma(self):
+        """Reset the inverse of the weighting matrix to None"""
+        self._inv_normalized_sigma = None
+
     def get_inv_normalized_sigma(self):
         """Get the inverse of the matrix that apply different weights on the observables"""
         return self._inv_normalized_sigma
