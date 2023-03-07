@@ -274,15 +274,16 @@ class TestIODynamicSystem:
         system_cls.run(curr_iter=0)
 
         # check if the file that contains the parameter data has the right name
-        assert system_cls.param_data_file == path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0',
-                                                       'test_Iter0_Samples.txt')
+        assert path.normpath(system_cls.param_data_file) == path.normpath(
+            path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0', 'test_Iter0_Samples.txt'))
 
         # check if the simulations data are stored with the right name
         system_cls.get_sim_data_files(curr_iter=0)
         mag = floor(log(system_cls.num_samples, 10)) + 1
         for i, f in enumerate(system_cls.sim_data_files):
             description = 'Iter' + str(0) + '_Sample' + str(i).zfill(mag)
-            assert f == path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0', f'test_{description}_sim.txt')
+            assert path.normpath(f) == path.normpath(
+                path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0', f'test_{description}_sim.txt'))
 
         # check if the parameter data are correctly stored
         param_data_backup = np.copy(system_cls.param_data)
