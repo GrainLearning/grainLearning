@@ -4,6 +4,7 @@ the time evolution of the system's hidden state based on partial observations fr
 """
 from typing import Type, List, Callable
 import os
+from datetime import datetime
 from math import floor, log
 from glob import glob
 import numpy as np
@@ -295,7 +296,7 @@ class DynamicSystem:
 
         self.callback(self, **kwargs)
 
-    def set_sim_data(self, data: np.ndarray):
+    def set_sim_data(self, data: list):
         """Set the simulation data
 
         :param data: simulation data of shape (num_samples, num_obs, num_steps)
@@ -350,8 +351,12 @@ class DynamicSystem:
         """Virtual function to load simulation data"""
 
     @classmethod
-    def write_to_table(cls: Type["DynamicSystem"], curr_iter: int):
-        """Virtual function to write parameters into a text file"""
+    def write_params_to_table(cls, curr_iter):
+        """Write the parameter data into a text file"""
+
+    @classmethod
+    def backup_sim_data(cls):
+        """Virtual function to backup simulation data"""
 
 
 class IODynamicSystem(DynamicSystem):
@@ -450,15 +455,15 @@ class IODynamicSystem(DynamicSystem):
         obs_data_file: str,
         obs_names: List[str],
         ctrl_name: str,
-        param_data_file: str,
-        obs_data: np.ndarray,
         num_samples: int,
         param_min: List[float],
         param_max: List[float],
+        obs_data: np.ndarray = None,
         ctrl_data: np.ndarray = None,
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
         callback: Callable = None,
+        param_data_file: str = None,
         param_data: np.ndarray = None,
         param_names: List[str] = None,
     ):
@@ -498,7 +503,7 @@ class IODynamicSystem(DynamicSystem):
 
         #### Observations ####
 
-        self.obs_data_file = os.path.join(sim_data_dir, obs_data_file)
+        self.obs_data_file = obs_data_file
 
         self.ctrl_name = ctrl_name
 
@@ -526,8 +531,6 @@ class IODynamicSystem(DynamicSystem):
         assert "ctrl_name" in obj.keys(), "Error no ctrl_name key found in input"
         assert "sim_name" in obj.keys(), "Error no sim_name key found in input"
         assert "sim_data_dir" in obj.keys(), "Error no sim_data_dir key found in input"
-        if "param_data_file" not in obj.keys():
-            obj["param_data_file"] = None
 
         return cls(
             sim_name=obj["sim_name"],
@@ -536,7 +539,7 @@ class IODynamicSystem(DynamicSystem):
             obs_data_file=obj["obs_data_file"],
             obs_names=obj["obs_names"],
             ctrl_name=obj["ctrl_name"],
-            param_data_file=obj["param_data_file"],
+            param_data_file=obj.get("param_data_file", None),
             obs_data=obj.get("obs_data", None),
             num_samples=obj.get("num_samples", None),
             param_min=obj.get("param_min", None),
@@ -589,7 +592,7 @@ class IODynamicSystem(DynamicSystem):
                 sim_data_file_ext = '_sim' + self.sim_data_file_ext
             else:
                 sim_data_file_ext = self.sim_data_file_ext
-            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*'\
+            file_name = self.sim_data_dir.rstrip('/') + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*' \
                         + str(i).zfill(mag) + '*' + sim_data_file_ext
             files = glob(file_name)
 
@@ -646,6 +649,7 @@ class IODynamicSystem(DynamicSystem):
             self.sim_data_files = sorted(files)
             self.param_data = np.zeros([self.num_samples, self.num_params])
             for i, sim_data_file in enumerate(self.sim_data_files):
+                # TODO: this is still for npy, support text file formats
                 data = np.load(sim_data_file, allow_pickle=True).item()
                 params = [data[key] for key in self.param_names]
                 self.param_data[i, :] = params
@@ -662,34 +666,45 @@ class IODynamicSystem(DynamicSystem):
 
         # create a directory to store simulation data
         curr_iter = kwargs['curr_iter']
-        sim_data_sub_dir = f'{self.sim_data_dir}/iter{curr_iter}'
-        if not os.path.exists(sim_data_sub_dir):
-            os.makedirs(sim_data_sub_dir)
-        else:
-            input(f'Removing existing simulation data in {sim_data_sub_dir}?\n')
-            files = glob(sim_data_sub_dir + '/*')
-            for file in files:
-                os.remove(file)
+        sim_data_dir = self.sim_data_dir.rstrip('/')
+        sim_data_sub_dir = f'{sim_data_dir}/iter{curr_iter}'
+        os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
-        self.write_to_table(curr_iter)
+        self.write_params_to_table(curr_iter)
 
         # run the callback function
         self.callback(self, **kwargs)
 
-        # move simulation data files into the directory defined per iteration
-        files = glob(f'{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
+        # move simulation data files and corresponding parameter table into the directory defined per iteration
+        files = glob(f'{os.getcwd()}/{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
         for file in files:
-            os.replace(f'./{file}', f'./{sim_data_sub_dir}/{file}')
+            f_name = os.path.relpath(file, os.getcwd())
+            os.replace(f'{file}', f'{sim_data_sub_dir}/{f_name}')
 
-    def write_to_table(self, curr_iter: int):
+        # redefine the parameter data file since its location is changed
+        self.param_data_file = f'{sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
+
+    def write_params_to_table(self, curr_iter: int):
         """Write the parameter data into a text file.
 
         :param curr_iter: Current iteration number, default to 0.
         :return param_data_file: The name of the parameter data file
         """
         self.param_data_file = write_to_table(
-            f'{self.sim_data_dir}/iter{curr_iter}/{self.sim_name}',
+            f'{os.getcwd()}/{self.sim_name}',
             self.param_data,
             self.param_names,
             curr_iter)
+
+    def backup_sim_data(self):
+        """Backup simulation data files to a backup directory."""
+        # create a directory to store simulation data
+        if os.path.exists(self.sim_data_dir):
+            print(f'Moving existing simulation data in {self.sim_data_dir} into a backup directory\n')
+            timestamp = os.path.getmtime(self.sim_data_dir)
+            formatted_time = datetime.fromtimestamp(timestamp).strftime('%Y_%m_%d_%H_%M_%S')
+            path = self.sim_data_dir.rstrip('/')
+            backup_dir = f'{path}_backup_{formatted_time}'
+            os.makedirs(backup_dir, exist_ok=True)
+            os.rename(self.sim_data_dir, backup_dir)

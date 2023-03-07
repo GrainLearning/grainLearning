@@ -105,6 +105,9 @@ class BayesianCalibration:
             1. First iteration of Bayesian calibration starts with a Halton sequence
             2. Iterations continue by resampling the parameter space until certain criteria are met.
         """
+        # Move existing simulation data to the backup folder
+        self.system.backup_sim_data()
+
         print(f"Bayesian calibration iter No. {self.curr_iter}")
         # First iteration
         self.run_one_iteration()
@@ -182,7 +185,7 @@ class BayesianCalibration:
         self.calibration.posterior = self.calibration.inference.get_posterior_at_time()
         self.calibration.run_sampling(self.system, )
         resampled_param_data = self.calibration.param_data_list[-1]
-        self.system.write_to_table(self.curr_iter + 1)
+        self.system.write_params_to_table(self.curr_iter + 1)
         return resampled_param_data
 
     def plot_uq_in_time(self):

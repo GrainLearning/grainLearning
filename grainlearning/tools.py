@@ -60,7 +60,7 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
     """
 
     # Computation of decimal number for unique key
-    table_file_name = f'{sim_name}_Iter{curr_iter}_samples.txt'
+    table_file_name = f'{sim_name}_Iter{curr_iter}_Samples.txt'
 
     with open(table_file_name, 'w') as f_out:
         num, dim = table.shape
@@ -537,3 +537,17 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     else:
         plt.show()
     plt.close()
+
+
+def write_dict_to_file(data, file_name):
+    """Write a python dictionary data into a text file
+
+    :param data: dictionary, keys are the names of the columns, values are the data
+    :param file_name: string, name of the file
+    """
+    with open(file_name, 'w') as f:
+        keys = data.keys()
+        f.write('# ' + ' '.join(keys) + '\n')
+        num = len(data[list(keys)[0]])
+        for i in range(num):
+            f.write(' '.join([str(data[key][i]) for key in keys]) + '\n')

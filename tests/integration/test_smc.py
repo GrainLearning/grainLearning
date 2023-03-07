@@ -6,6 +6,7 @@ from grainlearning.dynamic_systems import IODynamicSystem
 sim_data_dir = "./tests/data/linear_sim_data"
 curr_iter = 0
 
+
 def test_smc():
     """Test the SMC class."""
     calibration = BayesianCalibration.from_dict(
@@ -14,7 +15,7 @@ def test_smc():
             "num_iter": 0,
             "system": {
                 "system_type": IODynamicSystem,
-                "obs_data_file": 'linearObs.dat',
+                "obs_data_file": f'{sim_data_dir}/linearObs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
                 "sim_name": 'linear',

@@ -18,7 +18,7 @@ def test_gmm():
             "num_iter": 0,
             "system": {
                 "system_type": IODynamicSystem,
-                "obs_data_file": 'linearObs.dat',
+                "obs_data_file": f'{sim_data_dir}/linearObs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
                 "sim_name": 'linear',
@@ -57,7 +57,7 @@ def test_gmm():
 
     # %%
     # write new parameter table to the simulation directory
-    calibration.system.write_to_table(calibration.curr_iter + 1)
+    calibration.system.write_params_to_table(calibration.curr_iter + 1)
 
     # %%
     check_list = np.isclose(resampled_param_data_ref, resampled_param_data)
