@@ -263,7 +263,7 @@ def _standardize_outputs(split_data):
         return X, (y - mean) / std
 
     standardized_splits = split_data
-    for split in ['train', 'val']:
+    for split in ['train', 'val', 'test']:
         standardized_splits[split] = _standardize(*split_data[split])
 
     return standardized_splits, train_stats
