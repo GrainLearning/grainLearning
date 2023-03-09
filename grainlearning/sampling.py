@@ -213,12 +213,11 @@ class GaussianMixtureModel:
         self.expanded_normalized_params = normalized_parameters
         self.max_params = max_params
 
-    def regenerate_params(self, weight: np.ndarray, system: Type["DynamicSystem"]):
-        """Regenerating new samples by training and sampling from a Gaussian mixture model.
+    def train(self, weight: np.ndarray, system: Type["DynamicSystem"]):
+        """Train the Gaussian mixture model.
 
         :param weight: Posterior found by the data assimilation
         :param system: Dynamic system class
-        :return: Resampled parameter data
         """
         self.expand_and_normalize_weighted_samples(weight, system)
 
@@ -235,6 +234,16 @@ class GaussianMixtureModel:
         )
 
         self.gmm.fit(self.expanded_normalized_params)
+
+    def regenerate_params(self, weight: np.ndarray, system: Type["DynamicSystem"]):
+        """Regenerating new samples by training and sampling from a Gaussian mixture model.
+
+        :param weight: Posterior found by the data assimilation
+        :param system: Dynamic system class
+        :return: Resampled parameter data
+        """
+        self.train(weight, system)
+
         minimum_num_samples = system.num_samples
 
         new_params = self.draw_samples_within_bounds(system, system.num_samples)
