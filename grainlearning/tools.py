@@ -486,6 +486,7 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
         plt.savefig(f'{fig_name}_param_space.png')
     else:
         plt.show()
+    plt.close()
 
 
 def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, save_fig=0):

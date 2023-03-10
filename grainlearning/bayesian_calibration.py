@@ -24,7 +24,7 @@ class BayesianCalibration:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = BayesianCalibration.from_dict(
+        bayesian_calibration = BayesianCalibration.from_dict(
             {
                 "num_iter": 8,
                 "system": {
@@ -53,7 +53,7 @@ class BayesianCalibration:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = BayesianCalibration(
+        bayesian_calibration = BayesianCalibration(
             num_iter = 10,
             system = DynamicSystem(...),
             calibration = IterativeBayesianFilter(...)
