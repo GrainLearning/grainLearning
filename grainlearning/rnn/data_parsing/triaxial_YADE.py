@@ -201,7 +201,7 @@ def get_pressures(data_dir: str):
         try:
             sim_params, _ = np.load(data_dir + f, allow_pickle=True)
         except:
-            print('IOError', f, pressure)
+            print('IOError', data_dir + f)
             continue
         pressure = str(10**sim_params['conf'])
         if pressure not in pressures: pressures.append(pressure)
