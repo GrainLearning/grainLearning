@@ -202,7 +202,7 @@ Running a Sweep on HPC
 
 1. Install grainLearning and rnn dependencies.  
 2. Create the folder containing your data, `run_sweep.sh`, file :ref:`my_sweep_CL.py <my sweep CL>` and `example_sweep.yaml`, make sure to modify the last one accordingly.
-3. Check that `run_sweep.sh` load the correct modules. In this file the outputs of the job will be directed to `job_outputs`. It can be that in your HPC such folder is not automatically created and thus, you have to do it in advance.
+3. Check that `run_sweep.sh` load the correct modules. In this file the outputs of the job will be directed to `job_outputs`. It can be that in your HPC such folder is not automatically created and thus, you have to do it before running your script.
 4. Run your job: ``sbatch run_sweep.sh``
    This command will create the sweep, gather the sweep_id from the output that is printed on the terminal and then start an agent.
 
