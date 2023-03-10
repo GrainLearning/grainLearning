@@ -1,22 +1,30 @@
+"""
+This tutorial shows how to perform iterative Bayesian calibration for a linear regression model
+ using GrainLearning.
+"""
+import os
+from math import floor, log
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
 
-executable = 'python ./tutorials/linear_regression/LinearModel.py'
+PATH = os.path.abspath(os.path.dirname(__file__))
+executable = f'python {PATH}/linear_model.py'
 
 
 def run_sim(model, **kwargs):
-    from math import floor, log
-    import os
+    """
+    Runs the external executable and passes the parameter sample to generate the output file.
+    """
     # keep the naming convention consistent between iterations
-    magn = floor(log(model.num_samples, 10)) + 1
+    mag = floor(log(model.num_samples, 10)) + 1
     curr_iter = kwargs['curr_iter']
     # check the software name and version
     print("*** Running external software... ***\n")
     # loop over and pass parameter samples to the executable
     for i, params in enumerate(model.param_data):
-        description = 'Iter' + str(curr_iter) + '-Sample' + str(i).zfill(magn)
-        print(" ".join([executable, '%.8e %.8e' % tuple(params), description]))
-        os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
+        description = 'Iter' + str(curr_iter) + '_Sample' + str(i).zfill(mag)
+        print(" ".join([executable, "%.8e %.8e" % tuple(params), description]))
+        os.system(' '.join([executable, "%.8e %.8e" % tuple(params), description]))
 
 
 calibration = BayesianCalibration.from_dict(
@@ -28,11 +36,11 @@ calibration = BayesianCalibration.from_dict(
             "param_max": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
-            "obs_data_file": 'linearObs.dat',
+            "obs_data_file": PATH + '/linearObs.dat',
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'linear',
-            "sim_data_dir": './tutorials/linear_regression/',
+            "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
             "sigma_tol": 0.01,
             "callback": run_sim,

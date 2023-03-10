@@ -1,7 +1,12 @@
+"""
+This module contains the Bayesian calibration class.
+"""
 from typing import Type, Dict
-from .dynamic_systems import DynamicSystem, IODynamicSystem
-from .iterative_bayesian_filter import IterativeBayesianFilter
-from .tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
+import os
+from numpy import argmax
+from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
+from grainlearning.iterative_bayesian_filter import IterativeBayesianFilter
+from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
 
 
 class BayesianCalibration:
@@ -100,12 +105,15 @@ class BayesianCalibration:
             1. First iteration of Bayesian calibration starts with a Halton sequence
             2. Iterations continue by resampling the parameter space until certain criteria are met.
         """
+        # Move existing simulation data to the backup folder
+        self.system.backup_sim_data()
+
         print(f"Bayesian calibration iter No. {self.curr_iter}")
         # First iteration
         self.run_one_iteration()
 
-        # Bayesian calibration continue until num_iter is reached or sigma_max is smaller than the tolerance
-        for i in range(self.num_iter - 1):
+        # Bayesian calibration continue until curr_iter = num_iter or sigma_max < tolerance
+        for _ in range(self.num_iter - 1):
             self.curr_iter += 1
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
@@ -129,7 +137,7 @@ class BayesianCalibration:
         self.system.run(curr_iter=self.curr_iter)
 
         # Load model data from disk
-        if type(self.system) is IODynamicSystem:
+        if isinstance(self.system, IODynamicSystem):
             self.load_system()
 
         # Estimate model parameters as a distribution
@@ -177,7 +185,7 @@ class BayesianCalibration:
         self.calibration.posterior = self.calibration.inference.get_posterior_at_time()
         self.calibration.run_sampling(self.system, )
         resampled_param_data = self.calibration.param_data_list[-1]
-        self.system.write_to_table(self.curr_iter + 1)
+        self.system.write_params_to_table(self.curr_iter + 1)
         return resampled_param_data
 
     def plot_uq_in_time(self):
@@ -186,9 +194,8 @@ class BayesianCalibration:
         if self.save_fig < 0:
             return
 
-        import os
         path = f'{self.system.sim_data_dir}/iter{self.curr_iter}' \
-            if type(self.system) == IODynamicSystem \
+            if isinstance(self.system, IODynamicSystem) \
             else f'./{self.system.sim_name}/iter{self.curr_iter}'
 
         if not os.path.exists(path):
@@ -198,7 +205,7 @@ class BayesianCalibration:
         plot_param_stats(
             fig_name, self.system.param_names,
             self.system.estimated_params,
-            self.system.estimated_params_CV,
+            self.system.estimated_params_cv,
             self.save_fig
         )
 
@@ -233,7 +240,6 @@ class BayesianCalibration:
 
         :return: Estimated parameter values
         """
-        from numpy import argmax
         most_prob = argmax(self.calibration.posterior)
         return self.system.param_data[most_prob]
 

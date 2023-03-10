@@ -1,9 +1,15 @@
-import numpy as np
+"""
+This module contains various Bayesian filtering classes by mixing the inference and sampling methods
+from the :mod:`.inference` and :mod:`.sampling` modules.
+"""
 from typing import Type, List
-from .dynamic_systems import DynamicSystem
-from .inference import SMC
-from .sampling import GaussianMixtureModel, generate_params_qmc
+from pickle import load
+import numpy as np
 from scipy import optimize
+from grainlearning.dynamic_systems import DynamicSystem
+from grainlearning.inference import SMC
+from grainlearning.sampling import GaussianMixtureModel, generate_params_qmc
+from grainlearning.tools import voronoi_vols
 
 
 class IterativeBayesianFilter:
@@ -207,14 +213,14 @@ class IterativeBayesianFilter:
         :param system: Dynamic system class
         """
         if system.param_data is None:
-            RuntimeError("parameter samples not yet loaded...")
+            raise RuntimeError("parameter samples not yet loaded...")
 
         if self.proposal_data_file is None:
             return
 
-        from .tools import voronoi_vols
-        from pickle import load
-        param_max, gmm = load(open(system.sim_data_dir + '/' + self.proposal_data_file, 'rb'), encoding='latin1')
+        with open(system.sim_data_dir + '/' + self.proposal_data_file, 'rb') as proposal_data_file:
+            param_max, gmm = load(proposal_data_file, encoding='latin1')
+
         samples = np.copy(system.param_data)
         samples /= param_max
 

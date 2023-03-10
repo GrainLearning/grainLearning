@@ -1,5 +1,5 @@
+"""Test the sampling module."""
 import numpy as np
-
 from grainlearning import GaussianMixtureModel, DynamicSystem, generate_params_qmc
 
 

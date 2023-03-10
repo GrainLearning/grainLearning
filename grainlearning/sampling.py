@@ -1,9 +1,12 @@
-from typing import Tuple, Type
+"""
+This module contains various methods to sample the state-parameter space of a dynamic system.
+"""
+from typing import Type
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
-from .dynamic_systems import DynamicSystem
-from .tools import regenerate_params_with_gmm, unweighted_resample
+from grainlearning.dynamic_systems import DynamicSystem
+# from grainlearning.tools import regenerate_params_with_gmm, unweighted_resample#
 
 
 class GaussianMixtureModel:

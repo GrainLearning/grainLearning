@@ -1,3 +1,4 @@
+"""Test the inference module."""
 import numpy as np
 from grainlearning import SMC, DynamicSystem, GaussianMixtureModel, generate_params_qmc
 
@@ -137,7 +138,7 @@ def test_estimated_params():
     )
 
     np.testing.assert_array_almost_equal(
-        system_cls.estimated_params_CV,
+        system_cls.estimated_params_cv,
         [
             [0.4145781, 0.3729435],
             [0.51759176, 0.51966342],

@@ -1,14 +1,21 @@
+"""
+This module contains various classes of state-space systems that describe
+the time evolution of the system's hidden state based on partial observations from the real world.
+"""
 from typing import Type, List, Callable
-import numpy as np
 import os
-from .tools import get_keys_and_data, write_to_table
+from datetime import datetime
+from math import floor, log
+from glob import glob
+import numpy as np
+from grainlearning.tools import get_keys_and_data, write_to_table
 
 
 class DynamicSystem:
     """This is the dynamical system class.
 
-    A dynamical system (also known as a state-space system) describes the time evolution of the system's (hidden) state
-    and observation using the following equations:
+    A dynamical system (also known as a state-space system) describes
+    the time evolution of the system's (hidden) state and observation using the following equations:
 
     .. math::
         x_t & = f(x_{t−1}) + q_{t−1}
@@ -22,13 +29,15 @@ class DynamicSystem:
     :math:`h` is the observation function,
     :math:`q_{t−1}` is the process noise, and :math:`r_t` is the observation noise.
 
-    In the context of Bayesian parameter estimation, :math:`f` is the model that describe the physical process
-    and :math:`h` is the model that describe the relationship between the hidden state and observation.
+    In the context of Bayesian parameter estimation, :math:`f` is the model
+    that describe the physical process and :math:`h` is the model that describe
+    the relationship between the hidden state and observation.
     In the simplest case, :math:`h` is an identity matrix which indicate the one-to-one relationship
     between :math:`x_t` and :math:`y_t`.
 
-    Therefore, the :class:`.DynamicSystem` class is used to encapsulate the observation data and the simulation data,
-    which require specifying the number of samples, the lower and upper bound of the parameters, and the callback function
+    Therefore, the :class:`.DynamicSystem` class is used to encapsulate the observation data
+    and the simulation data, which require specifying the number of samples,
+    the lower and upper bound of the parameters, and the callback function
     that runs the forward predictions.
 
     There are two ways of initializing the class.
@@ -171,7 +180,7 @@ class DynamicSystem:
     estimated_params: np.ndarray = None
 
     #: Parameter uncertainty as the second moment of the distribution (:math:`x_\sigma = \sum_i w_i \cdot (x_i - x_\mu)^2 / x_\mu`)
-    estimated_params_CV: np.ndarray = None
+    estimated_params_cv: np.ndarray = None
 
     def __init__(
         self,
@@ -287,7 +296,7 @@ class DynamicSystem:
 
         self.callback(self, **kwargs)
 
-    def set_sim_data(self, data: np.ndarray):
+    def set_sim_data(self, data: list):
         """Set the simulation data
 
         :param data: simulation data of shape (num_samples, num_obs, num_steps)
@@ -301,6 +310,10 @@ class DynamicSystem:
             -1.0 / inv_obs_weight.shape[0]
         )
 
+    def reset_inv_normalized_sigma(self):
+        """Reset the inverse of the weighting matrix to None"""
+        self._inv_normalized_sigma = None
+
     def get_inv_normalized_sigma(self):
         """Get the inverse of the matrix that apply different weights on the observables"""
         return self._inv_normalized_sigma
@@ -313,37 +326,37 @@ class DynamicSystem:
         :param posteriors: Posterior distribution of shape (num_steps, num_samples)
         """
         self.estimated_params = np.zeros((self.num_steps, self.num_params))
-        self.estimated_params_CV = np.zeros((self.num_steps, self.num_params))
+        self.estimated_params_cv = np.zeros((self.num_steps, self.num_params))
 
         for stp_id in range(self.num_steps):
             self.estimated_params[stp_id, :] = posteriors[stp_id, :] @ self.param_data
 
-            self.estimated_params_CV[stp_id, :] = (
+            self.estimated_params_cv[stp_id, :] = (
                 posteriors[stp_id, :] @ (self.estimated_params[stp_id, :] - self.param_data) ** 2
             )
 
-            self.estimated_params_CV[stp_id, :] = np.sqrt(
-                self.estimated_params_CV[stp_id, :]) / self.estimated_params[stp_id, :]
+            self.estimated_params_cv[stp_id, :] = np.sqrt(
+                self.estimated_params_cv[stp_id, :]) / self.estimated_params[stp_id, :]
 
     @classmethod
-    def load_param_data(cls, curr_iter):
+    def load_param_data(cls: Type["DynamicSystem"], curr_iter: int):
         """Virtual function to load param data from disk"""
-        pass
 
     @classmethod
-    def get_sim_data_files(cls, curr_iter):
+    def get_sim_data_files(cls: Type["DynamicSystem"], curr_iter: int):
         """Virtual function to get simulation data files from disk"""
-        pass
 
     @classmethod
-    def load_sim_data(cls):
+    def load_sim_data(cls: Type["DynamicSystem"]):
         """Virtual function to load simulation data"""
-        pass
 
     @classmethod
-    def write_to_table(cls, param):
-        """Virtual function to write parameters into a text file"""
-        pass
+    def write_params_to_table(cls, curr_iter):
+        """Write the parameter data into a text file"""
+
+    @classmethod
+    def backup_sim_data(cls):
+        """Virtual function to backup simulation data"""
 
 
 class IODynamicSystem(DynamicSystem):
@@ -442,15 +455,15 @@ class IODynamicSystem(DynamicSystem):
         obs_data_file: str,
         obs_names: List[str],
         ctrl_name: str,
-        param_data_file: str,
-        obs_data: np.ndarray,
         num_samples: int,
         param_min: List[float],
         param_max: List[float],
+        obs_data: np.ndarray = None,
         ctrl_data: np.ndarray = None,
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
         callback: Callable = None,
+        param_data_file: str = None,
         param_data: np.ndarray = None,
         param_names: List[str] = None,
     ):
@@ -490,7 +503,7 @@ class IODynamicSystem(DynamicSystem):
 
         #### Observations ####
 
-        self.obs_data_file = os.path.join(sim_data_dir, obs_data_file)
+        self.obs_data_file = obs_data_file
 
         self.ctrl_name = ctrl_name
 
@@ -518,8 +531,6 @@ class IODynamicSystem(DynamicSystem):
         assert "ctrl_name" in obj.keys(), "Error no ctrl_name key found in input"
         assert "sim_name" in obj.keys(), "Error no sim_name key found in input"
         assert "sim_data_dir" in obj.keys(), "Error no sim_data_dir key found in input"
-        if "param_data_file" not in obj.keys():
-            obj["param_data_file"] = None
 
         return cls(
             sim_name=obj["sim_name"],
@@ -528,7 +539,7 @@ class IODynamicSystem(DynamicSystem):
             obs_data_file=obj["obs_data_file"],
             obs_names=obj["obs_names"],
             ctrl_name=obj["ctrl_name"],
-            param_data_file=obj["param_data_file"],
+            param_data_file=obj.get("param_data_file", None),
             obs_data=obj.get("obs_data", None),
             num_samples=obj.get("num_samples", None),
             param_min=obj.get("param_min", None),
@@ -547,7 +558,7 @@ class IODynamicSystem(DynamicSystem):
         Separate the control data from the observation data if the name of control variable is given.
         Otherwise, the observation data is the entire data in the observation data file.
         """
-        # if self.ctrl_name is given, then separate the observation data into control data and observation data
+        # if self.ctrl_name is given, separate the observation data into control and observation data
         if self.ctrl_name:
             keys_and_data = get_keys_and_data(self.obs_data_file)
             # separate the control data sequence from the observation data
@@ -555,8 +566,9 @@ class IODynamicSystem(DynamicSystem):
             self.num_steps = len(self.ctrl_data)
             # remove the data not used by Bayesian filtering
             self.num_obs = len(self.obs_names)
-            for key in keys_and_data.keys():
-                if key not in self.obs_names: keys_and_data.pop(key)
+            for key in keys_and_data:
+                if key not in self.obs_names:
+                    keys_and_data.pop(key)
             # assign the obs_data array
             self.obs_data = np.zeros([self.num_obs, self.num_steps])
             for i, key in enumerate(self.obs_names):
@@ -572,9 +584,6 @@ class IODynamicSystem(DynamicSystem):
 
         :param curr_iter: Current iteration number, default to 0.
         """
-        from math import floor, log
-        from glob import glob
-
         mag = floor(log(self.num_samples, 10)) + 1
         self.sim_data_files = []
 
@@ -583,13 +592,13 @@ class IODynamicSystem(DynamicSystem):
                 sim_data_file_ext = '_sim' + self.sim_data_file_ext
             else:
                 sim_data_file_ext = self.sim_data_file_ext
-            file_name = self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*'\
+            file_name = self.sim_data_dir.rstrip('/') + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*' \
                         + str(i).zfill(mag) + '*' + sim_data_file_ext
             files = glob(file_name)
 
             if not files:
                 raise RuntimeError("No data files with name " + file_name + ' found')
-            elif len(files) > 1:
+            if len(files) > 1:
                 raise RuntimeError("Found more than one files with the name " + file_name)
             self.sim_data_files.append(files[0])
 
@@ -601,14 +610,14 @@ class IODynamicSystem(DynamicSystem):
         2. Check if parameter values read from the table matches those used to creat the simulation data
         """
         self.sim_data = np.zeros([self.num_samples, self.num_obs, self.num_steps])
-        for i, f in enumerate(self.sim_data_files):
+        for i, sim_data_file in enumerate(self.sim_data_files):
             if self.sim_data_file_ext != '.npy':
-                data = get_keys_and_data(f)
-                param_data = np.genfromtxt(f.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
+                data = get_keys_and_data(sim_data_file)
+                param_data = np.genfromtxt(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
                 for j, key in enumerate(self.param_names):
                     data[key] = param_data[j]
             else:
-                data = np.load(f, allow_pickle=True).item()
+                data = np.load(sim_data_file, allow_pickle=True).item()
 
             for j, key in enumerate(self.obs_names):
                 self.sim_data[i, j, :] = data[key]
@@ -618,10 +627,10 @@ class IODynamicSystem(DynamicSystem):
                            / self.param_data[i, :] < 1e-5).all()):
                 raise RuntimeError(
                     "Parameters [" + ", ".join(
-                        ["%s" % v for v in self.param_data[i, :]])
+                        [f"{v}" for v in self.param_data[i, :]])
                     + '] vs [' +
-                    ", ".join("%s" % v for v in params) +
-                    f"] from the simulation data file {f} and the parameter table do not match")
+                    ", ".join(f"{v}" for v in params) +
+                    f"] from the simulation data file {sim_data_file} and the parameter table do not match")
 
     def load_param_data(self, curr_iter: int = 0):
         """
@@ -629,9 +638,6 @@ class IODynamicSystem(DynamicSystem):
 
         :param curr_iter: Current iteration number, default to 0.
         """
-        import os
-        from glob import glob
-
         if os.path.exists(self.param_data_file):
             # we assume parameter data are always in the last columns.
             self.param_data = np.genfromtxt(self.param_data_file, comments='!')[:, -self.num_params:]
@@ -642,8 +648,9 @@ class IODynamicSystem(DynamicSystem):
             self.num_samples = len(files)
             self.sim_data_files = sorted(files)
             self.param_data = np.zeros([self.num_samples, self.num_params])
-            for i, f in enumerate(self.sim_data_files):
-                data = np.load(f, allow_pickle=True).item()
+            for i, sim_data_file in enumerate(self.sim_data_files):
+                # TODO: this is still for npy, support text file formats
+                data = np.load(sim_data_file, allow_pickle=True).item()
                 params = [data[key] for key in self.param_names]
                 self.param_data[i, :] = params
 
@@ -658,34 +665,46 @@ class IODynamicSystem(DynamicSystem):
             raise ValueError("No callback function defined")
 
         # create a directory to store simulation data
-        import os
-        from glob import glob
         curr_iter = kwargs['curr_iter']
-        sim_data_sub_dir = f'{self.sim_data_dir}/iter{curr_iter}'
-        if not os.path.exists(sim_data_sub_dir):
-            os.makedirs(sim_data_sub_dir)
-        else:
-            input(f'Removing existing simulation data in {sim_data_sub_dir}?\n')
-            files = glob(sim_data_sub_dir + '/*')
-            for f in files:
-                os.remove(f)
+        sim_data_dir = self.sim_data_dir.rstrip('/')
+        sim_data_sub_dir = f'{sim_data_dir}/iter{curr_iter}'
+        os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
-        self.write_params_to_txt(curr_iter)
+        self.write_params_to_table(curr_iter)
 
         # run the callback function
         self.callback(self, **kwargs)
 
-        # move simulation data files into the directory defined per iteration
-        files = glob(f'{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
-        for f in files:
-            os.replace(f'./{f}', f'./{sim_data_sub_dir}/{f}')
+        # move simulation data files and corresponding parameter table into the directory defined per iteration
+        files = glob(f'{os.getcwd()}/{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
+        for file in files:
+            f_name = os.path.relpath(file, os.getcwd())
+            os.replace(f'{file}', f'{sim_data_sub_dir}/{f_name}')
 
-    def write_params_to_txt(self, curr_iter: int):
+        # redefine the parameter data file since its location is changed
+        self.param_data_file = f'{sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
+
+    def write_params_to_table(self, curr_iter: int):
         """Write the parameter data into a text file.
 
         :param curr_iter: Current iteration number, default to 0.
         :return param_data_file: The name of the parameter data file
         """
         self.param_data_file = write_to_table(
-            f'{self.sim_data_dir}/iter{curr_iter}/{self.sim_name}', self.param_data, self.param_names, curr_iter)
+            f'{os.getcwd()}/{self.sim_name}',
+            self.param_data,
+            self.param_names,
+            curr_iter)
+
+    def backup_sim_data(self):
+        """Backup simulation data files to a backup directory."""
+        # create a directory to store simulation data
+        if os.path.exists(self.sim_data_dir):
+            print(f'Moving existing simulation data in {self.sim_data_dir} into a backup directory\n')
+            timestamp = os.path.getmtime(self.sim_data_dir)
+            formatted_time = datetime.fromtimestamp(timestamp).strftime('%Y_%m_%d_%H_%M_%S')
+            path = self.sim_data_dir.rstrip('/')
+            backup_dir = f'{path}_backup_{formatted_time}'
+            os.makedirs(backup_dir, exist_ok=True)
+            os.rename(self.sim_data_dir, backup_dir)

@@ -1,7 +1,10 @@
+"""
+This module contains various methods for performing statistical and Bayesian inference
+"""
 from typing import Type
 import numpy as np
-from .dynamic_systems import DynamicSystem
 from scipy.stats import multivariate_normal
+from grainlearning.dynamic_systems import DynamicSystem
 
 
 class SMC:
@@ -34,9 +37,12 @@ class SMC:
                 scale_cov_with_max = True
         )
 
-    :param ess_target: Target effective sample size (w_0 / sum_i w_i^2) where w_0 = 1 / N_p, defaults to 0.3
-    :param scale_cov_with_max: True if the covariance matrix is scaled with the maxima of the observations, defaults to True
-    :param cov_matrices: Covariance matrices of shape (num_steps, num_obs, num_obs), defaults to None, Optional
+    :param ess_target: Target effective sample size (w_0 / sum_i w_i^2)
+        where w_0 = 1 / N_p, defaults to 0.3
+    :param scale_cov_with_max: True if the covariance matrix is scaled
+        with the maxima of the observations, defaults to True
+    :param cov_matrices: Covariance matrices of shape (num_steps, num_obs, num_obs),
+        defaults to None, Optional
     """
 
     #: Target effective sample size

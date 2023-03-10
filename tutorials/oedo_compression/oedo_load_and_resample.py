@@ -1,8 +1,13 @@
+"""
+This tutorial shows how to use GrainLearning to load existing simulation data,
+ estimate parameter distribution, and perform resampling to generate new parameter samples.
+"""
+import os
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
 
+sim_data_dir = os.path.abspath(os.path.join(__file__, "../../../tests/data/oedo_sim_data"))
 curr_iter = 1
-sim_data_dir = "./tests/data/oedo_sim_data"
 
 calibration = BayesianCalibration.from_dict(
     {
@@ -10,7 +15,7 @@ calibration = BayesianCalibration.from_dict(
         "num_iter": 0,
         "system": {
             "system_type": IODynamicSystem,
-            "obs_data_file": 'obsdata.dat',
+            "obs_data_file": sim_data_dir + '/obsdata.dat',
             "obs_names": ['p', 'q', 'n'],
             "ctrl_name": 'e_a',
             "sim_name": 'oedo',
