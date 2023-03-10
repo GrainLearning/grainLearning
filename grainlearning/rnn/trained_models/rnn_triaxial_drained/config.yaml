@@ -8,7 +8,7 @@ _wandb:
     is_jupyter_run: false
     is_kaggle_kernel: false
     python_version: 3.8.10
-    start_time: 1673785040.913637
+    start_time: 1676050385.936368
     t:
       1:
       - 2
@@ -43,9 +43,6 @@ add_e0:
 batch_size:
   desc: null
   value: 256
-conditional:
-  desc: null
-  value: true
 dense_units:
   desc: null
   value: 250
@@ -54,13 +51,16 @@ epochs:
   value: 300
 experiment_type:
   desc: null
-  value: All
+  value: drained
 learning_rate:
   desc: null
   value: 0.0001
 lstm_units:
   desc: null
   value: 250
+pad_length:
+  desc: null
+  value: 0
 patience:
   desc: null
   value: 25
@@ -69,14 +69,11 @@ pressure:
   value: All
 raw_data:
   desc: null
-  value: data/triaxial_compresion.hdf5
+  value: data/triaxial_compression_variable_input.hdf5
 save_weights_only:
   desc: null
   value: false
 standardize_outputs:
-  desc: null
-  value: true
-use_windows:
   desc: null
   value: true
 window_size:
