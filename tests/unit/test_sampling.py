@@ -1,4 +1,5 @@
 """Test the sampling module."""
+from os import remove
 import numpy as np
 from grainlearning import GaussianMixtureModel, DynamicSystem, generate_params_qmc
 
@@ -231,7 +232,47 @@ def test_draw_samples_within_bounds():
     )
 
 
-def test_generate_halton():
+def test_save_and_load_gmm():
+    """Test if the Gaussian Mixture Model is saved correctly to a file"""
+    #: Make a dummy proposal distribution
+    proposal = np.array([0, 0.1, 0.2, 0.3, 0.2, 0.1, 0.1])
+
+    #: Initialize a system object
+    system_cls = DynamicSystem(
+        param_min=[1e6, 0.19],
+        param_max=[1e7, 0.5],
+        obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
+        ctrl_data=[1, 2, 3, 4],
+        num_samples=proposal.shape[0],
+    )
+
+    #: Initialize a Gaussian Mixture Model object
+    gmm_cls = GaussianMixtureModel(max_num_components=2, random_state=100, expand_factor=2)
+
+    #: Generate the initial parameter samples
+    system_cls.param_data = generate_params_qmc(system_cls, system_cls.num_samples)
+
+    #: Train the Gaussian Mixture Model
+    gmm_cls.train(proposal, system_cls)
+
+    #: Save the Gaussian Mixture Model to a file
+    gmm_cls.save_gmm_to_file("test_gmm.pkl")
+
+    #: Load the Gaussian Mixture Model from a file
+    gmm_cls_new = GaussianMixtureModel(max_num_components=2, random_state=100, expand_factor=2)
+    gmm_cls_new.load_gmm_from_file("test_gmm.pkl")
+
+    #: Check if the loaded Gaussian Mixture Model is the same as the original one
+    np.testing.assert_equal(gmm_cls_new.gmm.__dict__, gmm_cls.gmm.__dict__)
+
+    #: Check if the loaded max_params is the same as the original one
+    np.testing.assert_equal(gmm_cls_new.max_params, gmm_cls_new.max_params)
+
+    #: Delete the file
+    remove("test_gmm.pkl")
+
+
+def test_generate_params_qmc():
     """Test the Parameters class if the generated halton sequence is between mins and maxs"""
     system_cls = DynamicSystem.from_dict(
         {
@@ -239,24 +280,51 @@ def test_generate_halton():
             "param_max": [3, 4],
             "obs_data": [2, 4, 6, 7],
             "ctrl_data": [1, 2, 3, 4],
-            "num_samples": 2,
+            "num_samples": 5,
             "callback": None,
         }
     )
 
-    system_cls.param_data = generate_params_qmc(system_cls, system_cls.num_samples)
+    #: Check if the halton sequence is generated correctly
+    np.testing.assert_array_almost_equal(
+        generate_params_qmc(system_cls, system_cls.num_samples),
+        np.array(
+            [
+                [1., 2.],
+                [2., 2.66666667],
+                [1.5, 3.33333333],
+                [2.5, 2.22222222],
+                [1.25, 2.88888889]
+            ]
+        ),
+        0.0001,
+    )
 
-    print(system_cls.param_data)
+    #: Check if the sobol sequence is generated correctly
+    np.testing.assert_array_almost_equal(
+        generate_params_qmc(system_cls, system_cls.num_samples, "sobol", 1),
+        np.array(
+            [
+                [1.31093064, 3.17749465],
+                [2.67676943, 2.20812031],
+                [2.22669116, 3.71838415],
+                [1.84694732, 2.68699761]
+            ]
+        ),
+        0.0001,
+    )
 
-    assert all(
-        system_cls.param_data[:, 1] >= 2 - 0.0000001
-    ), "parameter 1 min out of range"
-    assert all(
-        system_cls.param_data[:, 1] <= 4 + 0.0000001
-    ), "parameter 1 max out of range"
-    assert all(
-        system_cls.param_data[:, 0] >= 1 - 0.0000001
-    ), "parameter 2 min out of range"
-    assert all(
-        system_cls.param_data[:, 0] <= 3 + 0.0000001
-    ), "parameter 3 max out of range"
+    #: Check if the Latin Hypercube is generated correctly
+    np.testing.assert_array_almost_equal(
+        generate_params_qmc(system_cls, system_cls.num_samples, "LH", 1),
+        np.array(
+            [
+                [1.59527135, 3.61981452],
+                [2.54233615, 3.22054022],
+                [1.27526742, 2.63066942],
+                [1.86891896, 2.23632035],
+                [2.78016252, 3.18897635]
+            ]
+        ),
+        0.0001,
+    )

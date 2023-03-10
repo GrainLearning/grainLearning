@@ -32,7 +32,7 @@ calibration = BayesianCalibration.from_dict(
                 "max_num_components": 10,
                 "weight_concentration_prior": 0.01,
             },
-            "proposal_data_file": f"iter{curr_iter - 1}/gmm_iter{curr_iter - 1}.pkl",
+            "proposal_data_file": f"gmm_iter{curr_iter - 1}.pkl",
         },
         "save_fig": 0,
     }

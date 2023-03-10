@@ -172,7 +172,7 @@ class BayesianCalibration:
         """
         self.load_system()
         self.calibration.add_curr_param_data_to_list(self.system.param_data)
-        self.calibration.load_proposal_from_file(self.system)
+        self.calibration.load_proposal_from_file(self.system, self.curr_iter)
         self.calibration.inference.data_assimilation_loop(sigma, self.system)
         self.system.compute_estimated_params(self.calibration.inference.posteriors)
 

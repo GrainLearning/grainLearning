@@ -2,10 +2,13 @@
 This module contains various methods to sample the state-parameter space of a dynamic system.
 """
 from typing import Type
+from pickle import dump, load
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from grainlearning.dynamic_systems import DynamicSystem
+
+
 # from grainlearning.tools import regenerate_params_with_gmm, unweighted_resample#
 
 
@@ -116,7 +119,11 @@ class GaussianMixtureModel:
     #: flag to use slice sampling, defaults to False.
     slice_sampling: False
 
+    #: The class of the Gaussian Mixture Model
     gmm: Type["BayesianGaussianMixture"]
+
+    #: Current maximum values of the parameters
+    max_params = None
 
     def __init__(
         self,
@@ -317,8 +324,21 @@ class GaussianMixtureModel:
     #
     #     return new_params
 
+    def save_gmm_to_file(self, proposal_data_file: str = "proposal_density.pkl"):
+        """Save the Gaussian mixture model to a file."""
+        with open(proposal_data_file, "wb") as f:
+            dump((self.max_params, self.gmm), f)
 
-def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method: str = "halton"):
+    def load_gmm_from_file(self, proposal_data_file: str = "proposal_density.pkl"):
+        """Load the Gaussian mixture model from a file.
+
+        :param proposal_data_file: Name of the file that stores the trained Gaussian mixture model
+        """
+        with open(proposal_data_file, "rb") as f:
+            self.max_params, self.gmm = load(f)
+
+
+def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method: str = "halton", seed=None):
     """This is the class to uniformly draw samples in n-dimensional space from
     a low-discrepancy sequence or a Latin hypercube.
 
@@ -327,17 +347,18 @@ def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method:
     :param system: Dynamic system class
     :param num_samples: Number of samples to draw
     :param method: Method to use for Quasi-Monte Carlo sampling. Options are "halton", "sobol", and "LH"
+    :param seed: Seed for the random number generator
     """
 
     sampler = Halton(system.num_params, scramble=False)
 
     if method == "sobol":
-        sampler = Sobol(system.num_params)
+        sampler = Sobol(system.num_params,seed=seed)
         random_base = round(np.log2(num_samples))
         num_samples = 2 ** random_base
 
     elif method == "LH":
-        sampler = LatinHypercube(system.num_params)
+        sampler = LatinHypercube(system.num_params,seed=seed)
 
     param_table = sampler.random(n=num_samples)
 
