@@ -143,8 +143,8 @@ def convert_to_arrays(
     for f in file_names:
         try:
             sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
-        except:
-            print('IOError', f, pressure)
+        except FileNotFoundError:
+            print('IOError', data_dir + f)
             continue
 
         if not stored_in_subfolders:
@@ -158,7 +158,7 @@ def convert_to_arrays(
             contact_list.append(contact_params)
             if experiment_type == 'drained':
                 inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_DRAINED])
-                # Add sigma 2 and sigma 3 to inputs.
+                # Add sigma 2 and sigma 3 to inputs (optional)
                 sigma_2 = (np.array(sim_features['p']) - (np.array(sim_features['q'])/3.0)) / scalings['p']
                 inputs_list[-1].append(list(sigma_2[:sequence_length])) # sigma 2
                 inputs_list[-1].append(list(sigma_2[:sequence_length])) # sigma 3
@@ -200,7 +200,7 @@ def get_pressures(data_dir: str):
     for f in file_names:
         try:
             sim_params, _ = np.load(data_dir + f, allow_pickle=True)
-        except:
+        except FileNotFoundError:
             print('IOError', data_dir + f)
             continue
         pressure = str(10**sim_params['conf'])

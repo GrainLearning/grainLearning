@@ -53,16 +53,3 @@ def rnn_model(
     model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
 
     return model
-
-
-def _DynamicRepeatVector(contact_params, num_repeats: int):
-    """
-    To deal with repetitions of variable sequence lenghts.
-    Adapted from https://github.com/keras-team/keras/issues/7949#issuecomment-383550274
-    NOTE: Can't get this to work when not using windows ...
-    """
-    num_features = K.shape(contact_params)[1]  # contact_params.shape[1]
-
-    def repeat_vector(contact_params):
-        return layers.RepeatVector(num_repeats)(contact_params)
-    return layers.Lambda(repeat_vector, output_shape=(None, num_repeats, num_features))

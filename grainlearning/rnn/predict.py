@@ -64,10 +64,10 @@ def get_pretrained_model(path_to_model: str):
     # Read config.yaml into a python dictionary equivalent to config.
     # config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
     path_to_model = Path(path_to_model)
-    if os.path.exists(path_to_model / 'config.yaml') or os.path.exists(path_to_model / 'config.yml'): # Model has been trained using wandb
+    if os.path.exists(path_to_model / 'config.yaml') or os.path.exists(path_to_model / 'config.yml', encoding="utf-8"): # Model has been trained using wandb
 
-        if os.path.exists(path_to_model / 'config.yaml'): file = open(path_to_model / 'config.yaml', 'r')
-        else: file = open(path_to_model / 'config.yml', 'r')
+        if os.path.exists(path_to_model / 'config.yaml'): file = open(path_to_model / 'config.yaml', 'r', encoding="utf-8")
+        else: file = open(path_to_model / 'config.yml', 'r', encoding="utf-8")
 
         config = yaml.load(file, Loader=yaml.FullLoader)
         del config['wandb_version']; del config['_wandb']
