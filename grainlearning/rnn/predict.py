@@ -15,6 +15,10 @@ from grainlearning.rnn.preprocessing import prepare_datasets
 from grainlearning.rnn.windows import predict_over_windows
 
 
+NAME_MODEL_H5 = 'model-best.h5'
+NAME_TRAIN_STATS = 'train_stats.npy'
+
+
 def get_best_run_from_sweep(entity_project_sweep_id: str):
     """
     Load the best performing model found with a weights and biases sweep.
@@ -31,13 +35,13 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
     sweep = wandb.Api().sweep(entity_project_sweep_id)
     best_run = sweep.best_run()
     best_model = wandb.restore(
-            'model-best.h5',  # this saves the model locally under this name
+            NAME_MODEL_H5,  # this saves the model locally under this name
             run_path=entity_project_sweep_id + best_run.id,
             replace=True,
         )
     config = best_run.config
-    if os.path.exists(Path(best_model.dir)/'train_stats.npy'):
-        train_stats = np.load(Path(best_model.dir)/'train_stats.npy', allow_pickle=True).item()
+    if os.path.exists(Path(best_model.dir)/NAME_TRAIN_STATS):
+        train_stats = np.load(Path(best_model.dir)/NAME_TRAIN_STATS, allow_pickle=True).item()
         data, _ = prepare_datasets(**config)
     else:
         data, train_stats = prepare_datasets(**config)
@@ -55,19 +59,45 @@ def get_pretrained_model(path_to_model: str):
 
     :param path_to_model: str or pathlib.Path to the folder where is stored.
 
-    :returns:
+    :return:
         - model: keras model ready to use.
         - train_stats: Array containing the values used to standardize the data (if config.standardize_outputs = True),
           and lenghts of sequences, load_features, contact_params, labels, window_size and window_step.
         - config: dictionary with the model configuration
     """
-    # Read config.yaml into a python dictionary equivalent to config.
-    # config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
     path_to_model = Path(path_to_model)
-    if os.path.exists(path_to_model / 'config.yaml') or os.path.exists(path_to_model / 'config.yml'): # Model has been trained using wandb
+    config = load_config(path_to_model)
 
-        if os.path.exists(path_to_model / 'config.yaml'): file = open(path_to_model / 'config.yaml', 'r', encoding="utf-8")
-        else: file = open(path_to_model / 'config.yml', 'r', encoding="utf-8")
+    # Load train_stats
+    if os.path.exists(path_to_model / NAME_TRAIN_STATS):
+        train_stats = np.load(path_to_model / NAME_TRAIN_STATS, allow_pickle=True).item()
+    else: raise FileNotFoundError('train_stats.npy was not found')
+
+    # Load model
+    model = load_model(path_to_model, train_stats, config)
+
+    return model, train_stats, config
+
+
+def load_config(path_to_model: str):
+    """
+    Searches for the configuration (of the model training) file in 'path_to_model'.
+    Read config.yaml into a python dictionary equivalent to config.
+    config.yaml contains information about hyperparameters and model parameters, is generated in every run of wandb.
+    Raises FileNotFoundError if there are not files matching possible formats.
+
+    :param path_to_model: str or pathlib.Path to the folder where is stored.
+
+    :return: Dictionary config.
+    """
+    path_to_model = Path(path_to_model)
+
+    # Possible yaml names
+    config_yaml = ['config.yaml', 'config.yml']
+    if os.path.exists(path_to_model / config_yaml[0]) or os.path.exists(path_to_model / config_yaml[1]): # Model has been trained using wandb
+
+        if os.path.exists(path_to_model / config_yaml[0]): file = open(path_to_model / config_yaml[0], 'r', encoding="utf-8")
+        else: file = open(path_to_model / config_yaml[1], 'r', encoding="utf-8")
 
         config = yaml.load(file, Loader=yaml.FullLoader)
         del config['wandb_version']; del config['_wandb']
@@ -82,18 +112,28 @@ def get_pretrained_model(path_to_model: str):
         config = h5py.File(path_to_model / 'config.h5', 'r')
     else: raise FileNotFoundError('config was not found we tried formats (.yaml, .yml, .npy, .h5)')
 
-    # Load train_stats
-    if os.path.exists(path_to_model / 'train_stats.npy'):
-        train_stats = np.load(path_to_model / 'train_stats.npy', allow_pickle=True).item()
-    else: raise FileNotFoundError('train_stats.npy was not found')
+    return config
 
-    # Load model
-    if os.path.exists(path_to_model / 'model-best.h5'): # Model has been trained using wandb
+
+def load_model(path_to_model: str, train_stats: dict, config: dict):
+    """
+    Searches for the file containing the saved model in 'path_to_model'.
+    Raises FileNotFoundError if there are not files matching possible formats.
+
+    :param path_to_model: str or pathlib.Path to the folder where is stored.
+    :param train_stats: Dictionary containing different dimensions of the data used to trained and standardization values.
+      Its contents are saved in 'path_to_model/train_stats.npy'.
+    :param config: Dictionary containing the configuration of the training for such model.
+
+    :return: Keras model.
+    """
+    path_to_model = Path(path_to_model)
+    if os.path.exists(path_to_model / NAME_MODEL_H5): # Model has been trained using wandb
         try:
-            model = tf.keras.models.load_model(path_to_model / 'model-best.h5') # whole model was saved
+            model = tf.keras.models.load_model(path_to_model / NAME_MODEL_H5) # whole model was saved
         except ValueError:
             model = rnn_model(train_stats, **config)
-            model.load_weights(path_to_model / 'model-best.h5') # only weights were saved
+            model.load_weights(path_to_model / NAME_MODEL_H5) # only weights were saved
 
     elif os.path.exists(path_to_model / 'saved_model.pb'): # Model has been saved directly using tf.keras
         model = tf.keras.models.load_model(path_to_model)
@@ -102,7 +142,7 @@ def get_pretrained_model(path_to_model: str):
         model.load_weights(path_to_model / 'weights.h5')
     else: raise FileNotFoundError("Could not find a model to load")
 
-    return model, train_stats, config
+    return model
 
 
 def predict_macroscopics(
