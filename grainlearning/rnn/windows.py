@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 
-def windowize_train_val_test(split_data: dict, window_size: int, window_step: int, **kwargs):
+def windowize_train_val_test(split_data: dict, window_size: int, window_step: int, **_):
     """
     Convert sequences into windows of given length. Leave test set untouched.
 
@@ -25,7 +25,7 @@ def windowize_single_dataset(
         window_size: int = 1,
         window_step: int = 1,
         seed: int = 42,
-        **kwargs):
+        **_):
     """
     Take a dataset ((inputs, contact_params),outputs) of sequences of shape N, S, L and output
     another dataset of shorter sequences of size ``window_size``, taken at intervals ``window_step``.
@@ -54,37 +54,34 @@ def windowize_single_dataset(
     if window_size >= sequence_length:
         raise ValueError(f"window_size {window_size} >= sequence_length {sequence_length}.")
 
-    # For brevity denote load_sequence, contacts, outputs as X, c, y
-    Xs, cs, ys = [], [], []
+    # For brevity denote load_sequence, contacts, outputs as x, c, y
+    xs, cs, ys = [], [], []
     for end in range(window_size, sequence_length + 1, window_step):
-        input_window = load_sequences[:, end - window_size:end]
-        final_output = outputs[:, end - 1]
-        Xs.append(input_window)
-        ys.append(final_output)
+        xs.append(load_sequences[:, end - window_size:end]) # input window
+        ys.append(outputs[:, end - 1]) # final output
         cs.append(contact_parameters)
 
-    Xs = np.array(Xs)
+    xs = np.array(xs)
     cs = np.array(cs)
     ys = np.array(ys)
 
     # now we have the first dimension for samples and the second for windows,
     # we want to merge those to treat each window as an independent sample
-    num_indep_samples = Xs.shape[0] * Xs.shape[1]
-    Xs = np.reshape(Xs, (num_indep_samples,) + Xs.shape[2:])
+    num_indep_samples = xs.shape[0] * xs.shape[1]
+    xs = np.reshape(xs, (num_indep_samples,) + xs.shape[2:])
     cs = np.reshape(cs, (num_indep_samples,) + cs.shape[2:])
     ys = np.reshape(ys, (num_indep_samples,) + ys.shape[2:])
 
     # finally shuffle the windows
-    Xs, cs, ys =  _shuffle(Xs, cs, ys, seed)
+    xs, cs, ys =  _shuffle(xs, cs, ys, seed)
     # and convert back into a tensorflow dataset
-    dataset = tf.data.Dataset.from_tensor_slices(({'load_sequence': Xs, 'contact_parameters': cs}, ys))
-    return dataset
+    return tf.data.Dataset.from_tensor_slices(({'load_sequence': xs, 'contact_parameters': cs}, ys))
 
 
-def _shuffle(Xs, cs, ys, seed):
+def _shuffle(xs, cs, ys, seed):
     np.random.seed(seed)
-    inds = np.random.permutation(len(Xs))
-    return Xs[inds], cs[inds], ys[inds]
+    inds = np.random.permutation(len(xs))
+    return xs[inds], cs[inds], ys[inds]
 
 
 def predict_over_windows(
@@ -108,7 +105,7 @@ def predict_over_windows(
 
     :return: Tensor of predicted sequences.
     """
-    def _predict_windows(inputs, outputs):
+    def _predict_windows(inputs, *_):
         predictions = [
             model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
             for end in range(window_size, sequence_length)

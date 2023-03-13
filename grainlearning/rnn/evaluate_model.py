@@ -66,8 +66,8 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     for i_s, color in zip(representative_idxs,
             ['blue', 'green', 'purple', 'darkgreen', 'navy', 'yellowgreen']):
 
-        P_label = str(float(test_inputs['contact_parameters'][i_s][P_INDEX]))
-        E_label = 'drained' if test_inputs['contact_parameters'][i_s][E_INDEX]==1 else 'undrained'
+        p_label = str(float(test_inputs['contact_parameters'][i_s][P_INDEX]))
+        e_label = 'drained' if test_inputs['contact_parameters'][i_s][E_INDEX]==1 else 'undrained'
 
         _plot_sequence(0, 0, 'e', i_s=i_s, color=color)
         _plot_sequence(0, 1, 'f_0', i_s=i_s, color=color)
@@ -84,18 +84,18 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
                 steps, _extract_combination_inv(labels, ids, i_s=i_s),
                 steps_predicted, _extract_combination_inv(predictions, ids, i_s=i_s),
                 y_label=label_combination_inv, x_label='steps', color=color,
-                add_legend=True, P_label=P_label, E_label=E_label)
+                add_legend=True, p_label=p_label, e_label=e_label)
 
     return fig
 
 
 def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
             title: str = '', x_label: str = '', y_label: str = '', color: str = 'blue',
-            ylim = None, add_legend = False, P_label = "", E_label = ""):
+            ylim = None, add_legend = False, p_label = "", e_label = ""):
     """
     Configures the plot: data, title and axis label
     """
-    ax.plot(x_labels, y_labels, label=f"truth P={P_label}MPa {E_label}", color=color)
+    ax.plot(x_labels, y_labels, label=f"truth P={p_label}MPa {e_label}", color=color)
     ax.plot(x_preds, y_preds, label="prediction", linestyle='dashed', color=color)
     if title: ax.set_title(title)
     if x_label: ax.set_xlabel(x_label)

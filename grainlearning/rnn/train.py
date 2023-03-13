@@ -139,14 +139,13 @@ def train_without_wandb(config=None):
                 save_best_only=True,
                 save_weights_only=config['save_weights_only']
             )
-    callbacks = [early_stopping, checkpoint]
 
     # train
     history = model.fit(
             split_data['train'],
             epochs=config['epochs'],
             validation_data=split_data['val'],
-            callbacks=callbacks,
+            callbacks=[early_stopping, checkpoint],
         )
 
     # Evaluate in test dataset and print the metrics
@@ -251,7 +250,7 @@ def _check_config(config):
     # Warning for an unexpected key value
     config_optimizer = _get_optimizer_config(config)
     for key in config.keys():
-        if key not in defaults and key not in config_optimizer.keys():
+        if key not in defaults and key not in config_optimizer:
             warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
 
     return config
@@ -264,7 +263,7 @@ def _warning_config_field(key, config, default, add_default_to_config=False):
     If add_default_to_config=True, then it adds the key and its default value to config.
     """
     # customized warning to print -only- the warning message
-    def _custom_format_warning(msg, *args, **kwargs):
+    def _custom_format_warning(msg, *_, **_):
         return str(msg) + '\n' # ignore everything except the message
 
     warnings.formatwarning = _custom_format_warning
@@ -285,7 +284,7 @@ def _get_optimizer_config(config):
     config_optimizer = {}
     keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
     for key in config.keys():
-        if key in keys_optimizer and not (key == 'self' or key == 'kwargs' or key == 'name'):
+        if key in keys_optimizer and not key in ('self', 'kwargs', 'name'):
             config_optimizer[key] = config[key]
 
     return config_optimizer

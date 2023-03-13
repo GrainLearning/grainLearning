@@ -19,7 +19,7 @@ def prepare_datasets(
         add_pressure: bool = True,
         add_experiment_type: bool = True,
         seed: int = 42,
-        **kwargs,
+        **_,
         ):
     """
     Convert raw data into preprocessed split datasets.
@@ -85,7 +85,7 @@ def prepare_single_dataset(
         add_e0: bool = False,
         add_pressure: bool = True,
         add_experiment_type: bool = True,
-        **kwargs):
+        **_):
     """
     Convert raw data into a tensorflow dataset with compatible format to predict and evaluate a rnn model.
 
@@ -258,8 +258,8 @@ def _standardize_outputs(split_data):
     std = np.std(train_outputs, axis=(0, 1))
     train_stats = {'mean': mean, 'std': std}
 
-    def _standardize(X, y):
-        return X, (y - mean) / std
+    def _standardize(x, y):
+        return x, (y - mean) / std
 
     standardized_splits = split_data
     for split in ['train', 'val', 'test']:
@@ -281,7 +281,7 @@ def _pad_initial(array: np.array, pad_length: int, axis=1):
     """
     starts = array[:, :1, :]
     padding = tf.repeat(starts, pad_length, axis=axis)
-    padded_array = tf.concat([padding, array], axis=axis)
+    padded_array = tf.concat([padding, array], axis)
     return padded_array
 
 

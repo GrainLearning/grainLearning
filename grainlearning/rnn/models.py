@@ -13,7 +13,7 @@ def rnn_model(
         lstm_units: int = 50,
         dense_units: int = 20,
         seed: int = 42,
-        **kwargs,
+        **_,
         ):
     """
     Neural network with an LSTM layer.

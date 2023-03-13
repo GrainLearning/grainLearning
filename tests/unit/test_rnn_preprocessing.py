@@ -127,8 +127,8 @@ def test_prepare_datasets(hdf5_test_file):
     assert train_stats_3['num_contact_params'] == train_stats['num_contact_params'] + 1
 
     # Test that standardize_outputs is applied correctly when standardize_outputs=False
-    assert 'mean' not in train_stats_1.keys()
-    assert 'std' not in train_stats_1.keys()
+    assert 'mean' not in train_stats_1
+    assert 'std' not in train_stats_1
 
     # Test that pad_length was applied correctly
     # expected_num_indep_samples = train_frac * num_samples * int(((sequence_length - window_size)/window_step) + 1 + pad_lenght)
