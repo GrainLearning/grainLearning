@@ -6,7 +6,7 @@ from typing import Type, List
 from pickle import load
 import numpy as np
 from scipy import optimize
-from grainlearning.dynamic_systems import DynamicSystem
+from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
 from grainlearning.inference import SMC
 from grainlearning.sampling import GaussianMixtureModel, generate_params_qmc
 from grainlearning.tools import voronoi_vols
@@ -149,14 +149,15 @@ class IterativeBayesianFilter:
         system.param_data = generate_params_qmc(system, system.num_samples, self.initial_sampling)
         self.param_data_list.append(system.param_data)
 
-    def run_inference(self, system: Type["DynamicSystem"]):
+    def run_inference(self, system: Type["DynamicSystem"], curr_iter: int = 0):
         """Compute the posterior distribution of model states such that the target effective sample size is reached.
 
         :param system: Dynamic system class
+        :param curr_iter: Current iteration number
         """
         # if the name of proposal data file is given, make use of the proposal density during Bayesian updating
         if self.proposal_data_file is not None and self.proposal is None:
-            self.load_proposal_from_file(system)
+            self.load_proposal_from_file(system, curr_iter=curr_iter)
 
         result = optimize.minimize_scalar(
             self.inference.data_assimilation_loop,
@@ -207,10 +208,11 @@ class IterativeBayesianFilter:
         """
         self.param_data_list.append(param_data)
 
-    def load_proposal_from_file(self, system: Type["DynamicSystem"]):
+    def load_proposal_from_file(self, system: Type["IODynamicSystem"], curr_iter: int):
         """Load the proposal density from a file.
 
         :param system: Dynamic system class
+        :param curr_iter: Current iteration number
         """
         if system.param_data is None:
             raise RuntimeError("parameter samples not yet loaded...")
@@ -218,13 +220,13 @@ class IterativeBayesianFilter:
         if self.proposal_data_file is None:
             return
 
-        with open(system.sim_data_dir + '/' + self.proposal_data_file, 'rb') as proposal_data_file:
-            param_max, gmm = load(proposal_data_file, encoding='latin1')
+        # load the proposal density from a file
+        self.sampling.load_gmm_from_file(f'{system.sim_data_dir}/iter{curr_iter-1}/{self.proposal_data_file}')
 
         samples = np.copy(system.param_data)
-        samples /= param_max
+        samples /= self.sampling.max_params
 
-        proposal = np.exp(gmm.score_samples(samples))
+        proposal = np.exp(self.sampling.gmm.score_samples(samples))
         proposal *= voronoi_vols(samples)
         # assign the maximum vol to open regions (use a uniform proposal distribution if Voronoi fails)
         if (proposal < 0.0).all():
@@ -232,3 +234,11 @@ class IterativeBayesianFilter:
         else:
             proposal[np.where(proposal < 0.0)] = min(proposal[np.where(proposal > 0.0)])
             self.proposal = proposal / sum(proposal)
+
+    def save_proposal_to_file(self, system: Type["IODynamicSystem"], curr_iter: int):
+        """Save the proposal density to a file.
+
+        :param system: Dynamic system class
+        :param curr_iter: Current iteration number
+        """
+        self.sampling.save_gmm_to_file(f'{system.sim_data_dir}/iter{curr_iter-1}/{self.proposal_data_file}')
