@@ -263,7 +263,7 @@ def _warning_config_field(key, config, default, add_default_to_config=False):
     If add_default_to_config=True, then it adds the key and its default value to config.
     """
     # customized warning to print -only- the warning message
-    def _custom_format_warning(msg, *_, **_):
+    def _custom_format_warning(msg, *_):
         return str(msg) + '\n' # ignore everything except the message
 
     warnings.formatwarning = _custom_format_warning

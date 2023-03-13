@@ -72,8 +72,8 @@ def test_train(config_test, monkeypatch):
     os.system("wandb offline") # so that when you run these test the info will not be synced
     history_wandb = train.train(config=config_test)
     # check that files have been generated
-    assert os.path.exists(Path("wandb/latest-run/files/model-best.h5"))
-    assert os.path.exists(Path("wandb/latest-run/files/train_stats.npy"))
+    assert Path("wandb/latest-run/files/model-best.h5").exists()
+    assert Path("wandb/latest-run/files/train_stats.npy").exists()
     # if running offline this will not be generated
     #assert os.path.exists(Path("wandb/latest-run/files/config.yaml"))
     # check metrics
@@ -84,9 +84,9 @@ def test_train(config_test, monkeypatch):
     monkeypatch.setattr('sys.stdin', io.StringIO('y'))
     history_simple = train.train_without_wandb(config=config_test)
     # check that files have been generated
-    assert os.path.exists(Path("outputs/saved_model.pb")) # because 'save_weights_only': False
-    assert os.path.exists(Path("outputs/train_stats.npy"))
-    assert os.path.exists(Path("outputs/config.npy"))
+    assert Path("outputs/saved_model.pb").exists() # because 'save_weights_only': False
+    assert Path("outputs/train_stats.npy").exists()
+    assert Path("outputs/config.npy").exists()
     # check metrics
     assert history_simple.history.keys() == {'loss', 'mae', 'val_loss', 'val_mae'}
 
@@ -99,14 +99,14 @@ def test_train(config_test, monkeypatch):
 
     # Option 1: train using wandb
     train.train(config=config_test)
-    assert os.path.exists(Path("wandb/latest-run/files/model-best.h5"))
-    assert os.path.exists(Path("wandb/latest-run/files/train_stats.npy"))
+    assert Path("wandb/latest-run/files/model-best.h5").exists()
+    assert Path("wandb/latest-run/files/train_stats.npy").exists()
 
     # Option 2: train using plain tensorflow
     train.train_without_wandb(config=config_test)
-    assert os.path.exists(Path("outputs/weights.h5")) # because 'save_weights_only': True
-    assert os.path.exists(Path("outputs/train_stats.npy"))
-    assert os.path.exists(Path("outputs/config.npy"))
+    assert Path("outputs/weights.h5").exists() # because 'save_weights_only': True
+    assert Path("outputs/train_stats.npy").exists()
+    assert Path("outputs/config.npy").exists()
 
     # removing generated folders
     shutil.rmtree("wandb")
