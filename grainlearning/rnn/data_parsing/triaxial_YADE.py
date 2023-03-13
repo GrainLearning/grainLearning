@@ -61,8 +61,7 @@ UNUSED_KEYS_CONSTANT = [
 def convert_all_to_hdf5(
         pressures: list,
         experiment_types: list,
-        data_dir: str,
-        target_file: str,
+        paths: tuple,
         sequence_length: int,
         stored_in_subfolders: bool
         ):
@@ -72,8 +71,9 @@ def convert_all_to_hdf5(
 
     :param pressures: List of strings of pressures available.
     :param experiment_types: List of strings of experiment types available.
-    :param data_dir: Root directory containing all the data.
-    :param target_file: Path to hdf5 file to be created.
+    :param paths: tuple containing two strings:
+      - data_dir: Root directory containing all the data.
+      - target_file: Path to hdf5 file to be created (should also have the name and the extension).
     :param sequence_length: Expected number of time steps in sequences. If the sequence is
       longer, only the first ``sequence_length`` element will be considered.
     :param stored_in_subfolders: True if yade .npy files are stored in pressure/experiment_type
@@ -139,7 +139,7 @@ def convert_to_arrays(
     scalings = {key: 1. for key in OUTPUT_KEYS}
     scalings['p'] = scalings['q'] = 1.e6
 
-    contact_list, inputs_list, outputs_list, other_lengths = ([] for i in range(4))
+    contact_list, inputs_list, outputs_list, other_lengths = ([] for _ in range(4))
     for f in file_names:
         try:
             sim_params, sim_features = np.load(data_dir + f, allow_pickle=True)
@@ -154,18 +154,10 @@ def convert_to_arrays(
         # test if sequence is of full length
         test_features = sim_features[OUTPUT_KEYS[0]]
         if len(test_features) >= sequence_length:
-            contact_params = [sim_params[key] for key in CONTACT_KEYS]
+            inputs, outputs, contact_params = get_members(sim_params, scalings, experiment_type, sequence_length)
             contact_list.append(contact_params)
-            if experiment_type == 'drained':
-                inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_DRAINED])
-                # Add sigma 2 and sigma 3 to inputs (optional)
-                sigma_2 = (np.array(sim_features['p']) - (np.array(sim_features['q'])/3.0)) / scalings['p']
-                inputs_list[-1].append(list(sigma_2[:sequence_length])) # sigma 2
-                inputs_list[-1].append(list(sigma_2[:sequence_length])) # sigma 3
-            elif experiment_type == 'undrained':
-                inputs_list.append([sim_features[key][:sequence_length] for key in INPUT_KEYS_UNDRAINED])
-            else: raise ValueError(f"experiment type must be drained or undrained but got {experiment_type}")
-            outputs_list.append([np.array(sim_features[key][:sequence_length]) / scalings[key] for key in OUTPUT_KEYS])
+            inputs_list.append(inputs)
+            outputs_list.append(outputs)
         else:
             other_lengths.append(len(test_features))
 
@@ -182,6 +174,40 @@ def convert_to_arrays(
 
     print(f'Created array of {outputs_array.shape[0]} samples,')
     return inputs_array, contact_array, outputs_array
+
+
+def get_members(
+        sim_params: dict,
+        sim_features: dict,
+        scalings: list,
+        experiment_type: str,
+        sequence_length: int):
+    """
+    Get inputs, outputs and contact_params lists from sim_params (unpickled from simulation output files), given the constants declared.
+
+    :param sim_params: dictionary loaded from simulation output file. Contains the fixed parameters of the simulation (i.e. contact params).
+    :param sim_features: dictionary loaded from simulation output file. Contains the variable parameters during the simualtions (i.e inputs and outputs).
+    :param scalings: floats to normalize some of the parameters.
+    :param experiment_type: String indicating the experiment type ('drained', 'undrained')
+    :param sequence_length: length of time series, if the simulations has longer time series than this parameter,
+      the sequence will be cut and only the first sequence_lenght values will be taken into account.
+
+    :return: 3 lists containing, inputs, outputs and contact_params.
+    """
+    contact_params = [sim_params[key] for key in CONTACT_KEYS]
+    #contact_list.append(contact_params)
+    if experiment_type == 'drained':
+        inputs = [sim_features[key][:sequence_length] for key in INPUT_KEYS_DRAINED]
+        # Add sigma 2 and sigma 3 to inputs (optional) Not necessary since this info is in pressure or conf.
+        #sigma_2 = (np.array(sim_features['p']) - (np.array(sim_features['q'])/3.0)) / scalings['p']
+        #inputs.append(list(sigma_2[:sequence_length])) # sigma 2
+        #inputs.append(list(sigma_2[:sequence_length])) # sigma 3
+    elif experiment_type == 'undrained':
+        inputs = [sim_features[key][:sequence_length] for key in INPUT_KEYS_UNDRAINED]
+    else: raise ValueError(f"experiment type must be drained or undrained but got {experiment_type}")
+    outputs = [np.array(sim_features[key][:sequence_length]) / scalings[key] for key in OUTPUT_KEYS]
+
+    return inputs, outputs, contact_params
 
 
 def get_pressures(data_dir: str):
@@ -210,23 +236,27 @@ def get_pressures(data_dir: str):
 
 
 def main():
+    # path to directory containing the data
+    data_dir='/Users/luisaorozco/Documents/Projects/GrainLearning/data/TriaxialCompression/'
+    # path where the resultant hdf5 file will be created (including name of the file and extension)
+    target_file='sequences.hdf5'
+
     # Option 1: YADE .npy files stored in subfolders pressure/experiment_type
     pressures = ['0.2e6', '0.5e6', '1.0e6']
     experiment_types = ['undrained','drained']
     stored_in_subfolders = True
 
     # Option 2: YADE .npy files are stored in a single folder.
-    pressures = get_pressures('./')
-    experiment_types = ['drained']
-    stored_in_subfolders = False
+    pressures_2 = get_pressures('./')
+    experiment_types_2 = ['drained']
+    stored_in_subfolders_2 = False
 
     # Call main function
     convert_all_to_hdf5(
             pressures=pressures,
             experiment_types=experiment_types,
-            data_dir='/Users/aronjansen/Documents/grainsData/TriaxialCompression/',
+            paths=(data_dir, target_file),
             sequence_length=200,
-            target_file='data/sequences.hdf5',
             stored_in_subfolders=stored_in_subfolders
         )
 
