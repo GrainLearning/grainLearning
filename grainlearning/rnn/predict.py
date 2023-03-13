@@ -66,6 +66,8 @@ def get_pretrained_model(path_to_model: str):
         - config: dictionary with the model configuration
     """
     path_to_model = Path(path_to_model)
+
+    # Load config
     config = load_config(path_to_model)
 
     # Load train_stats
@@ -96,12 +98,13 @@ def load_config(path_to_model: str):
     config_yaml = ['config.yaml', 'config.yml']
     if os.path.exists(path_to_model / config_yaml[0]) or os.path.exists(path_to_model / config_yaml[1]): # Model has been trained using wandb
 
-        if os.path.exists(path_to_model / config_yaml[0]): file = open(path_to_model / config_yaml[0], 'r', encoding="utf-8")
-        else: file = open(path_to_model / config_yaml[1], 'r', encoding="utf-8")
+        if os.path.exists(path_to_model / config_yaml[0]): yaml_file = open(path_to_model / config_yaml[0], 'r', encoding="utf-8")
+        else: yaml_file = open(path_to_model / config_yaml[1], 'r', encoding="utf-8")
 
-        config = yaml.load(file, Loader=yaml.FullLoader)
+        config = yaml.load(yaml_file, Loader=yaml.FullLoader)
+        yaml_file.close()
+
         del config['wandb_version']; del config['_wandb']
-
         for key in config.keys():
             del config[key]['desc']
             config[key] = config[key]['value']
@@ -172,16 +175,16 @@ def predict_macroscopics(
 
     # Check that input sizes of data correspond to those of the pre-trained model
     inputs, _ = next(iter(data))
-    if not inputs['load_sequence'].shape[2] == train_stats['num_load_features']:
+    if inputs['load_sequence'].shape[2] != train_stats['num_load_features']:
         raise ValueError(f"Number of elements in load_sequence of data does not match the model load_sequence shape. \
             Got {inputs['load_sequence'].shape[2]}, expected {train_stats['num_load_features']}.")
 
-    if not inputs['contact_parameters'].shape[1] == train_stats['num_contact_params']:
+    if inputs['contact_parameters'].shape[1] != train_stats['num_contact_params']:
         raise ValueError(f"Number of elements in contact_parameters of data does not match the model \
             contact_parameters shape. \
             Got {inputs['contact_parameters'].shape[2]}, expected {train_stats['num_contact_params']}.")
 
-    if not inputs['load_sequence'].shape[1] == train_stats['sequence_length']:
+    if inputs['load_sequence'].shape[1] != train_stats['sequence_length']:
         raise ValueError(f"Sequence length of the train_stats {train_stats['sequence_length']} does not match \
             that of the data {inputs['load_sequence'].shape[1]}. If the train_stats are does of the model, \
             check pad_length. Can be that the trained model is not compatible.")
