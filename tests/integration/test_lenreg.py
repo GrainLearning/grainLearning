@@ -18,6 +18,7 @@ def run_sim(model, **kwargs):
 
 
 def test_lenreg():
+    """Test the linear regression example"""
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,

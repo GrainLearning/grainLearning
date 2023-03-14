@@ -1,8 +1,8 @@
 """Test the dynamic system module."""
 from os import path
 from shutil import rmtree
-import numpy as np
 from math import floor, log
+import numpy as np
 from grainlearning import DynamicSystem, IODynamicSystem
 from grainlearning.tools import write_dict_to_file
 
