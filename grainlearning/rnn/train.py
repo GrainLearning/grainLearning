@@ -284,7 +284,7 @@ def _get_optimizer_config(config):
     config_optimizer = {}
     keys_optimizer = tf.keras.optimizers.Adam.__init__.__code__.co_varnames
     for key in config.keys():
-        if key in keys_optimizer and not key in ('self', 'kwargs', 'name'):
+        if key in keys_optimizer and key not in ('self', 'kwargs', 'name'):
             config_optimizer[key] = config[key]
 
     return config_optimizer

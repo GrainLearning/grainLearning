@@ -81,7 +81,7 @@ def get_pretrained_model(path_to_model: str):
     return model, train_stats, config
 
 
-def load_config(path_to_model: str):
+def load_config(path_to_model: Path):
     """
     Searches for the configuration (of the model training) file in 'path_to_model'.
     Read config.yaml into a python dictionary equivalent to config.
@@ -118,7 +118,7 @@ def load_config(path_to_model: str):
     return config
 
 
-def load_model(path_to_model: str, train_stats: dict, config: dict):
+def load_model(path_to_model: Path, train_stats: dict, config: dict):
     """
     Searches for the file containing the saved model in 'path_to_model'.
     Raises FileNotFoundError if there are not files matching possible formats.

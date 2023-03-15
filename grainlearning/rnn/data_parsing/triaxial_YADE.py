@@ -177,7 +177,7 @@ def convert_to_arrays(
 def get_members(
         sim_params: dict,
         sim_features: dict,
-        scalings: list,
+        scalings: dict,
         experiment_type: str,
         sequence_length: int):
     """
