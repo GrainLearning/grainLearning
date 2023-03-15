@@ -157,5 +157,3 @@ def _find_representatives(input_data, add_e0):
 
 def _find_random_samples(input_data, num_samples):
     return random.sample(range(0, len(input_data['contact_parameters'])), num_samples)
-
-
