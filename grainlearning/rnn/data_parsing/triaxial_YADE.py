@@ -81,6 +81,7 @@ def convert_all_to_hdf5(
 
     .. warning:: Will remove `target_file` if already exists.
     """
+    data_dir, target_file = paths
     if os.path.exists(target_file):
         os.remove(target_file)
 
@@ -154,7 +155,7 @@ def convert_to_arrays(
         # test if sequence is of full length
         test_features = sim_features[OUTPUT_KEYS[0]]
         if len(test_features) >= sequence_length:
-            inputs, outputs, contact_params = get_members(sim_params, scalings, experiment_type, sequence_length)
+            inputs, outputs, contact_params = get_members(sim_params, sim_features, scalings, experiment_type, sequence_length)
             contact_list.append(contact_params)
             inputs_list.append(inputs)
             outputs_list.append(outputs)
@@ -164,16 +165,13 @@ def convert_to_arrays(
     print(f"At confining pressure {pressure}, for the {experiment_type} case, "
           f"there are {len(other_lengths)} samples with a different sequence lengths: {other_lengths}.")
 
-    inputs_array = np.array(inputs_list)
-    contact_array = np.array(contact_list)
-    outputs_array = np.array(outputs_list)
-
     # keras requires (batch, sequence_length, features) shape, so transpose axes
-    inputs_array = np.transpose(inputs_array, (0, 2, 1))
-    outputs_array = np.transpose(outputs_array, (0, 2, 1))
+    inputs_list = np.transpose(np.array(inputs_list), (0, 2, 1))
+    outputs_list = np.transpose(np.array(outputs_list), (0, 2, 1))
+    contact_list = np.array(contact_list)
 
-    print(f'Created array of {outputs_array.shape[0]} samples,')
-    return inputs_array, contact_array, outputs_array
+    print(f'Created array of {outputs_list.shape[0]} samples,')
+    return inputs_list, contact_list, outputs_list
 
 
 def get_members(
@@ -238,6 +236,7 @@ def get_pressures(data_dir: str):
 def main():
     # path to directory containing the data
     data_dir='/Users/luisaorozco/Documents/Projects/GrainLearning/data/TriaxialCompression/'
+
     # path where the resultant hdf5 file will be created (including name of the file and extension)
     target_file='sequences.hdf5'
 
@@ -247,9 +246,9 @@ def main():
     stored_in_subfolders = True
 
     # Option 2: YADE .npy files are stored in a single folder.
-    pressures_2 = get_pressures('./')
-    experiment_types_2 = ['drained']
-    stored_in_subfolders_2 = False
+    #pressures_2 = get_pressures('./')
+    #experiment_types_2 = ['drained']
+    #stored_in_subfolders_2 = False
 
     # Call main function
     convert_all_to_hdf5(
