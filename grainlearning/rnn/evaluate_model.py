@@ -3,7 +3,6 @@ import random
 import tensorflow as tf
 from matplotlib import pyplot as plt
 
-
 from grainlearning.rnn import predict
 
 
@@ -11,11 +10,6 @@ PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
 EXPERIMENT_TYPES = ['undrained']
 P_INDEX = -2 # Pressure and experiment were added at the end of contact_params.
 E_INDEX = -1 # These are the indexes to retrieve them
-
-# configuration of matplotlib
-plt.rcParams['text.usetex'] = True
-plt.rcParams['axes.labelsize'] = 25
-plt.rcParams['font.family'] = 'sans-serif'
 
 
 def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: dict, config: dict, batch_size: int = 256):
@@ -31,6 +25,10 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
 
     :return figure:
     """
+    # configuration of matplotlib
+    plt.rcParams['axes.labelsize'] = 25
+    plt.rcParams['font.family'] = 'sans-serif'
+
     predictions = predict.predict_macroscopics(model, data, train_stats, config,
                                        batch_size=batch_size, single_batch=True)
     # extract tensors from dataset
@@ -49,7 +47,7 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
 
     fig, ax = plt.subplots(3, 3, figsize=(20, 20))
     ids = {'e': 0, 'f_0': 3, 'a_c': 4, 'a_n': 5, 'a_t': 6, 'p': 1, 'q': 2}
-    label_combination_inv = "$\\frac{q}{p} - \\frac{2}{5} (a_c + a_n + \\frac{3}{2} a_t)$"
+    label_combination_inv = "\\frac{q}{p} - \\frac{2}{5} (a_c + a_n + \\frac{3}{2} a_t)"
 
     add_e0 = config['add_e0'] if 'add_e0' in config else False
     add_pressure = config['add_pressure'] if 'add_pressure' in config else True
@@ -60,8 +58,8 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     else:
         representative_idxs = _find_random_samples(test_inputs, 5)
 
-    def _plot_sequence(i, j, y_key, i_s=0, x_key='$steps$', color='blue'):
-        if x_key == '$steps$':
+    def _plot_sequence(i, j, y_key, i_s=0, x_key='steps', color='blue'):
+        if x_key == 'steps':
             x = steps
             x_p = steps_predicted
         else:
@@ -84,7 +82,7 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
         fill_ax(ax[0, 2],
                 steps, _extract_q_over_p(labels, ids, i_s=i_s),
                 steps_predicted, _extract_q_over_p(predictions, ids, i_s=i_s),
-                y_label='$q/p$', x_label='$steps$', color=color)
+                y_label='q/p', x_label='steps', color=color)
         _plot_sequence(1, 0, 'a_c', i_s=i_s, color=color)
         _plot_sequence(1, 1, 'a_n', i_s=i_s, color=color)
         _plot_sequence(1, 2, 'a_t', i_s=i_s, color=color)
@@ -93,7 +91,7 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
         fill_ax(ax[2, 0],
                 steps, _extract_combination_inv(labels, ids, i_s=i_s),
                 steps_predicted, _extract_combination_inv(predictions, ids, i_s=i_s),
-                y_label=label_combination_inv, x_label='$steps$', color=color,
+                y_label=label_combination_inv, x_label='steps', color=color,
                 add_legend=True, p_label=p_label, e_label=e_label)
 
     return fig
@@ -108,7 +106,7 @@ def fill_ax(ax, x_labels, y_labels, x_preds, y_preds,
     ax.plot(x_labels, y_labels, label=f"truth P={p_label}MPa {e_label}", color=color)
     ax.plot(x_preds, y_preds, label="prediction", linestyle='dashed', color=color)
     if title: ax.set_title(title)
-    if x_label: ax.set_xlabel(x_label)
+    if x_label: ax.set_xlabel(rf'${x_label}$')
     if y_label: ax.set_ylabel(rf'${y_label}$')
     if ylim: ax.set_ylim(ylim)
     if add_legend: ax.legend()
