@@ -7,7 +7,7 @@ from grainlearning.rnn import predict
 
 
 PRESSURES = ['0.2e6', '0.5e6', '1.0e6']
-EXPERIMENT_TYPES = ['undrained']
+EXPERIMENT_TYPES = ['drained', 'undrained']
 P_INDEX = -2 # Pressure and experiment were added at the end of contact_params.
 E_INDEX = -1 # These are the indexes to retrieve them
 
