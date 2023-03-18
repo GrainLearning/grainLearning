@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 **/__pycache__/
 *.py[cod]
-docs/build/*
+docs/build/
 poetry.lock
 
 htmlcov
@@ -9,6 +9,12 @@ htmlcov
 coverage.xml
 cov.xml
 .pytest_cache
+
+./grainLearning/rnn/data/
+./grainLearning/rnn/outputs/
+./grainLearning/rnn/wandb/
+
+tutorials/rnn/.ipynb_checkpoints/
 
 # Mac
 .DS_Store

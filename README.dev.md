@@ -140,8 +140,14 @@ You can check the documentation [here](https://grainlearning.readthedocs.io/en/l
 
 ### Create the documentation locally using poetry
 1. You need to be in the same `poetry shell` used to install grainlearning, or repeat the process to install using poetry and doc extras: `poetry install -E docs` or `poetry install --extras "docs"`. Alternatively you can install via pip: `pip install .[docs]`
+
+In Ubuntu and MacOS:
+
 1. `cd docs`
 1. `poetry run make html`
+
+In windows:
+1. Double click `make.bat`
 
 ## Testing and code coverage
 You must have had installed grainlearning development dependencies: `poetry install -E dev` or `poetry install --extras "dev"` or `pip install .[dev]`
@@ -168,3 +174,5 @@ Run several Python analysis tools to ensure that your contributions are followin
 a). `poetry install -E dev` or b). `pip install .[dev]`.
 1. While being in the main directory grainlearning, at the same level as .prospector.yaml, run prospector. Depending on how you have installed grainlearning you can either run
 a). `poetry run prospector` or b). `prospector`
+1. Also check the imports:
+`isort --check-only grainlearning --diff`

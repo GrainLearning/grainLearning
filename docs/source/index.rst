@@ -27,6 +27,7 @@ An iterative Bayesian filtering framework for fast and automated calibration of 
    installation
    dynamic_systems
    bayesian_filtering
+   rnn
    tutorials
    examples
    how_to_contribute

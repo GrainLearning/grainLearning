@@ -1,0 +1,44 @@
+program: my_sweep_CL.py
+project: grain_sequence
+entity: apjansen
+method: bayes
+metric:
+  goal: minimize
+  name: val_loss
+parameters:
+  raw_data:
+    value: 'path_to_data_hdf5_file'
+  pressure:
+    value: 'All'
+  experiment_type:
+    value: 'All'
+  add_e0:
+    value: False
+  add_pressure:
+    value: False
+  add_experiment_type:
+    value: False
+  train_frac:
+    value: 0.7
+  val_frac:
+    value: 0.15
+  window_size:
+    values: [5, 10, 20, 30]
+  window_step:
+    value: 1
+  lstm_units:
+    value: 50
+  dense_units:
+    value: 20
+  patience:
+    value: 5
+  epochs:
+    value: 2
+  learning_rate:
+    values: [1e-4, 1e-3]
+  batch_size:
+    values: [128, 256, 512]
+  standardize_outputs:
+    value: True
+  save_weights_only:
+    value: False
