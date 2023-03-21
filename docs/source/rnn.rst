@@ -97,7 +97,7 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
    import grainlearning.rnn.train as train_rnn
 
    # 1. Create my dictionary of configuration
-   my_config = train_rnn.get_default_dict()
+   my_config = train_rnn.get_default_config()
    
    # 2. Run the training using bare tensorflow
    train_rnn.train(config=my_config)
@@ -105,6 +105,8 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_train.py``
 
 If is the first time running wandb it will ask you to login (copy paste your API key that you'll find in your wandb profile).
+
+In this example we used a default configuration, but you can define your own config dictionary. For more info go to our Python API-RNN-train.
 
 Hyperparameter optimization: Sweep
 :::::::::::::::::::::::::::::::::::
@@ -216,7 +218,7 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
    import grainlearning.rnn.train as train_rnn
 
    # 1. Create my dictionary of configuration
-   my_config = train_rnn.get_default_dict()
+   my_config = train_rnn.get_default_config()
    
    # 2. Run the training using bare tensorflow
    train_rnn.train_without_wandb(config=my_config)

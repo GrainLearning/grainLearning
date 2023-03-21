@@ -156,7 +156,7 @@ def train_without_wandb(config=None):
     return history
 
 
-def get_default_dict():
+def get_default_config():
     """
     Returns a dictionary with default values for the configuration of data preparation,
     RNN model and training procedure. Possible fields are:
@@ -237,7 +237,7 @@ def _check_config(config):
     # Warning that defaults would be used if not defined.
     # Adding the default to config because is required in other functions.
     keys_to_check = ['window_size', 'save_weights_only', 'batch_size', 'epochs', 'learning_rate', 'patience']
-    defaults = get_default_dict()
+    defaults = get_default_config()
     for key in keys_to_check:
         config = _warning_config_field(key, config, defaults[key], add_default_to_config=True)
 
