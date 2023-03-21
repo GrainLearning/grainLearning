@@ -6,14 +6,14 @@ Install grainlearning with the posibility to build documentation and check tests
 1. Clone the repository: `git clone git@github.com:GrainLearning/grainLearning.git`
 1. Go to the source code directory: `cd grainLearning`
 1. Activate the virtual environment: `poetry shell`
-1. Install GrainLearning and its dependencies: `poetry install -E docs -E dev` or `poetry install --extras "docs dev"`
+1. Install GrainLearning and its dependencies: `poetry install --all-extras`
 1. Run all self-tests of GrainLearning with pytest: `poetry run pytest -v`
 
 ### Using pip
 1. Clone the repository: `git clone git@github.com:GrainLearning/grainLearning.git`
 1. Go to the source code directory: `cd grainLearning`
 1. We advise to use a python environment using pyenv or conda.
-1. Install GrainLearning and its dependencies: `pip install .[docs,dev]`, if you are using an zsh shell you should run `pip install .'[docs,dev]'` instead, this is because zsh uses square brackets for globbing / pattern matching.
+1. Install GrainLearning and its dependencies: `pip install .[docs,rnn,dev,tutorials]`, if you are using an zsh shell you should run `pip install .'[docs,rnn,dev,tutorials]'` instead, this is because zsh uses square brackets for globbing / pattern matching.
 
 ## Making a release
 This section describes how to make a release in 3 parts:
