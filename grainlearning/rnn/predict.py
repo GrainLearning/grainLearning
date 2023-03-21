@@ -193,4 +193,3 @@ def predict_macroscopics(
         predictions = predictions.map(lambda y: std * y + mean)
 
     return next(iter(predictions))
-
