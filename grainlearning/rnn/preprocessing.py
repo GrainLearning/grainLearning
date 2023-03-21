@@ -56,7 +56,7 @@ def prepare_datasets(
         inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type,
                                                     add_pressure, add_experiment_type)
     if add_e0:
-        contacts = _add_e0_to_contacts(contacts, inputs)
+        contacts = _add_e0_to_contacts(contacts, outputs)
 
     if pad_length > 0:
         inputs = _pad_initial(inputs, pad_length)
@@ -110,7 +110,7 @@ def prepare_single_dataset(
         inputs, outputs, contacts = _merge_datasets(datafile, pressure, experiment_type,
                                                     add_pressure, add_experiment_type)
     if add_e0:
-        contacts = _add_e0_to_contacts(contacts, inputs)
+        contacts = _add_e0_to_contacts(contacts, outputs)
 
     if pad_length > 0:
         inputs = _pad_initial(inputs, pad_length)
@@ -162,7 +162,7 @@ def _merge_datasets(datafile: h5py._hl.files.File, pressure: str, experiment_typ
     return input_sequences, output_sequences, contact_params
 
 
-def _add_e0_to_contacts(contacts: np.array, inputs: np.array):
+def _add_e0_to_contacts(contacts: np.array, outputs: np.array):
     """
     Add the initial void ratio e_0 as an extra contact parameter at the end.
 
@@ -171,7 +171,7 @@ def _add_e0_to_contacts(contacts: np.array, inputs: np.array):
 
     :return: Modified contacts list with e_0 added at the end.
     """
-    e0s = inputs[:, 0, 0]  # first element in series, 0th feature == e_0
+    e0s = outputs[:, 0, 0]  # first element in series, 0th feature == e_0
     e0s = np.expand_dims(e0s, axis=1)
     contacts = np.concatenate([contacts, e0s], axis=1)
     return contacts
