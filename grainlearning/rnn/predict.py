@@ -153,8 +153,7 @@ def predict_macroscopics(
         data: tf.data.Dataset,
         train_stats: dict,
         config: dict,
-        batch_size: int = 256,
-        single_batch: bool = False,
+        batch_size: int = 256
         ):
     """
     Use the given model to predict the features of the given data.
@@ -165,13 +164,10 @@ def predict_macroscopics(
     :param train_stats: Dictionary containing statistics of the training set.
     :param config: Dictionary containing the configuration with which the model was trained.
     :param batch_size: Size of batches to use.
-    :param single_batch: Whether to predict only a single batch (defaults to False).
 
     :return: predictions: tf.Tensor containing the predictions in original units.
     """
     data = data.batch(batch_size)
-    if single_batch:
-        data = tf.data.Dataset.from_tensor_slices(next(iter(data))).batch(batch_size)
 
     # Check that input sizes of data correspond to those of the pre-trained model
     inputs, _ = next(iter(data))
@@ -197,3 +193,4 @@ def predict_macroscopics(
         predictions = predictions.map(lambda y: std * y + mean)
 
     return next(iter(predictions))
+
