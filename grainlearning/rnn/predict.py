@@ -168,9 +168,9 @@ def predict_macroscopics(
     :return: predictions: tf.Tensor containing the predictions in original units.
     """
     data = data.batch(batch_size)
+    inputs = list(data)[0][0]
 
     # Check that input sizes of data correspond to those of the pre-trained model
-    inputs, _ = next(iter(data))
     if inputs['load_sequence'].shape[2] != train_stats['num_load_features']:
         raise ValueError(f"Number of elements in load_sequence of data does not match the model load_sequence shape. \
             Got {inputs['load_sequence'].shape[2]}, expected {train_stats['num_load_features']}.")
@@ -185,11 +185,11 @@ def predict_macroscopics(
             that of the data {inputs['load_sequence'].shape[1]}. If the train_stats are does of the model, \
             check pad_length. Can be that the trained model is not compatible.")
 
-    predictions = predict_over_windows(data, model, config['window_size'], train_stats['sequence_length'])
+    predictions = predict_over_windows(inputs, model, config['window_size'], train_stats['sequence_length'])
 
     if config['standardize_outputs']:
         mean = tf.cast(train_stats['mean'], tf.float32)
         std = tf.cast(train_stats['std'], tf.float32)
-        predictions = predictions.map(lambda y: std * y + mean)
+        predictions = tf.map_fn(lambda y: std * y + mean, predictions)
 
-    return next(iter(predictions))
+    return predictions
