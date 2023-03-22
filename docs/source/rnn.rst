@@ -299,6 +299,43 @@ This can fail if you have deleted some runs or if your wandb folder is not prese
 Use a trained RNN in grainLearning calibration process
 ------------------------------------------------------
 
+A trained RNN can be used as a surrogate model and play the role of a ``DynamicSystem`` in the calibration workflow. In such case, instead of having to generate your data in advance or performing a complete DEM simulation per iteration and group of parameters, the simulation data is provided by the RNN.
+
+In which cases can we use RNN for the calibration process?
+``````````````````````````````````````````````````````````
+
+.. warning:: We recommend you to be careful when using Neural Networks as surrogate models, always check and test your workflows, be mindful of the I) parameters that you pass to your Neural Network, and II) model capabilities.
+
+- You have **several** simulation and/or experimental data in which you clearly identify:
+  -  `Control parameters` that may vary during the experiment (i.e. ``system.ctrl_data``).
+  -  `Tunable parameters` that remain constant during the experiment and can be inferred through the calibration process (i.e. ``system.param_data``).
+  - `Observation parameters` that evolve during the experiment and are not controlled (i.e. ``system.sim_data``), for example the material response. 
+- You need **several** data because the performance (both accuracy and generalization) of the RNN depends on how much data was it trained on. No-one would like to rely their calibration process on an RNN that performs well only for a very-specific set of parameters.
+- Your time sequences have always the same length. Both for GrainLearning and RNN models this dimension of the data must be fixed. Considering handling your data such that you trim the vectors to the same length.
+- **Consistency is key:** understand the dimensions of your data, if it need to be normalized, and if it is consistent with what the pre-trained model is expecting.
+
+How does it work?
+`````````````````
+A simple example can be found in `tutorials <https://github.com/GrainLearning/grainLearning/tree/main/tutorials/rnn>`_. Such tutorial has three main parts:
+
+1. **Prepare the pre-trained model:** Load a model using ``grainlearning.rnn.predict.get_pretrained_model()``.
+2. **Create a callback function to link to `DynamicSystem`:** Function in which the predictions are going to be drawn.
+3. **GrainLearning calibration loop.**
+
+In this case, `synthetic data` was considered: we took one example from our triaxial compression DEM simulations. 
+This is useful to show the functionality since we know in advance the desired output. However, in a real-world case, one may have an RNN trained on DEM simulations and the observation is an experiment of an equivalent system. In that case, ``most_prob_params`` inferred by grainlearning correspond to the ``contact_params`` of the DEM simulation being equivalent to your real-world material.
+
+Tips 
+````
+
+- The `inputs` to the RNN are:
+  
+  - ``load_sequence``: ``system.ctrl_data`` and 
+  - ``contact_params``: ``system.param_data``.
+  
+  And ``system.set_sim_data()`` should be called with the `outputs` (i.e prediction) of the RNN.
+- Set the ranges defined by ``param_min`` and ``param_max`` of the  as the ``system`` to the ranges in which you understand how your trained model performs.
+
 The RNN model
 -------------
 
