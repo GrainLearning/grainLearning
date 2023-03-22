@@ -107,7 +107,7 @@ def predict_over_windows(
     """
     predictions = [
         model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
-                    for end in range(window_size, sequence_length)
+        for end in range(window_size, sequence_length)
         ]
     predictions = tf.stack(predictions, axis=1)
     return predictions
