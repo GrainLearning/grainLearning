@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import tensorflow as tf
+import wandb
 
 from grainlearning.rnn import predict
 from grainlearning.rnn import preprocessing
