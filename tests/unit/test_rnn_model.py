@@ -94,6 +94,7 @@ def test_train(config_test, monkeypatch):
     assert history_simple.history.keys() == {'loss', 'mae', 'val_loss', 'val_mae'}
 
     # removing generated folders
+    if sys.platform=='win32': wandb.finish()
     shutil.rmtree("wandb")
     shutil.rmtree("outputs")
 
