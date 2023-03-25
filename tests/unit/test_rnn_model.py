@@ -64,7 +64,6 @@ def test_model_output_shape():
 
 
 # Tests train
-@pytest.mark.skipif(sys.platform=='win32', reason='wandb does not generate latest-run simlink in windows')
 def test_train(config_test, monkeypatch):
     """
     Check that training goes well, no errors should be thrown.
@@ -72,6 +71,7 @@ def test_train(config_test, monkeypatch):
 
     # Option 1: train using wandb
     os.system("wandb offline") # so that when you run these test the info will not be synced
+    if sys.platform=='win32': wandb.init(settings={"symlink": True}, config=config_test)
     history_wandb = train.train(config=config_test)
     # check that files have been generated
     assert Path("wandb/latest-run/files/model-best.h5").exists()
