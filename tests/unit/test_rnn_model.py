@@ -81,6 +81,7 @@ def test_train(config_test, monkeypatch):
     #assert os.path.exists(Path("wandb/latest-run/files/config.yaml"))
     # check metrics
     assert history_wandb.history.keys() == {'loss', 'mae', 'val_loss', 'val_mae'}
+    if sys.platform=='win32': wandb.finish()
 
     # Option 2: train using plain tensorflow
     # monkeypatch for input when asking: do you want to proceed? [y/n]:
@@ -94,9 +95,8 @@ def test_train(config_test, monkeypatch):
     assert history_simple.history.keys() == {'loss', 'mae', 'val_loss', 'val_mae'}
 
     # removing generated folders
-    if sys.platform=='win32': wandb.finish()
-    shutil.rmtree("wandb")
     shutil.rmtree("outputs")
+    shutil.rmtree("wandb")
 
     # Check that if 'save_weights_only' other sort of files would be saved
     config_test['save_weights_only'] = True # can safely do this because the scope of fixture is function
