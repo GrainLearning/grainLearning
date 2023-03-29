@@ -80,6 +80,10 @@ However, you still need to clone the GrainLearning repository to run the tutoria
 
 4. Load existing simulation data and run GrainLearning for one iteration,
    in [oedo_load_and_resample.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/oedo_compression/oedo_load_and_resample.py)
+5. RNN module tutorials:
+  - [Train your RNN](tutorials/rnn/train_rnn.ipynb)
+  - [Predict using an RNN](tutorials/rnn/predict.ipynb)
+  - [Use an RNN in the calibration workflow](tutorials/rnn/rnn_calibration_GL.ipynb)
 
 ## Citing GrainLearning
 

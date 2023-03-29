@@ -85,7 +85,7 @@ def _shuffle(xs, cs, ys, seed):
 
 
 def predict_over_windows(
-        data: tf.data.Dataset,
+        inputs: dict,
         model: tf.keras.Model,
         window_size: int,
         sequence_length: int,
@@ -98,22 +98,19 @@ def predict_over_windows(
     Note the length of the output sequence will be shorter by the window_size than
     the input sequence.
 
-    :param data: Tensorflow Dataset containing inputs: `'load_sequence'` and `'contact_parameters'`, and outputs.
+    :param inputs: dict containing inputs: `'load_sequence'` and `'contact_parameters'`, both being tensorflow.Tensor.
     :param model: The model to predict with.
     :param window_size: Number of timesteps in a single window.
     :param sequence_length: Number of timesteps in a full sequence.
 
-    :return: Tensor of predicted sequences.
+    :return: tensorflow.Tensor of predicted sequences.
     """
-    def _predict_windows(inputs, *_):
-        predictions = [
-            model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
-            for end in range(window_size, sequence_length)
+    predictions = [
+        model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
+        for end in range(window_size, sequence_length)
         ]
-        predictions = tf.stack(predictions, axis=1)
-        return predictions
-
-    return data.map(_predict_windows)
+    predictions = tf.stack(predictions, axis=1)
+    return predictions
 
 
 def extract_tensors(data: tf.data.Dataset):

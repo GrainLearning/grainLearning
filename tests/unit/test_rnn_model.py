@@ -186,12 +186,12 @@ def test_predict_over_windows(hdf5_test_file):
                                     window_size=window_size)
         model = rnn_model(input_shapes=train_stats, window_size=window_size)
         data = split_data['test'].batch(batch_size) # has to be test dataset that is not windowized
-        predictions = predict.predict_over_windows(data, model, window_size, train_stats['sequence_length'])
+        inputs = list(data)[0][0]
+        predictions = predict.predict_over_windows(inputs, model, window_size, train_stats['sequence_length'])
 
-        # Test that the output is a tensorflow dataset
-        assert isinstance(predictions, tf.data.Dataset)
+        # Test that the output is a tensorflow Tensor
+        assert isinstance(predictions, tf.Tensor)
 
-        # dimensions
-        predictions = next(iter(predictions)) # takes only first batch
+        # Check the dimensions
         assert predictions.shape == (1, train_stats['sequence_length'] - window_size,  train_stats['num_labels'])
         assert predictions.shape == (1, 3 - window_size, 4)

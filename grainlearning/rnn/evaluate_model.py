@@ -30,7 +30,7 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     plt.rcParams['font.family'] = 'sans-serif'
 
     predictions = predict.predict_macroscopics(model, data, train_stats, config,
-                                       batch_size=batch_size, single_batch=True)
+                                       batch_size=batch_size)
     # extract tensors from dataset
     test_inputs, labels = next(iter(data.batch(batch_size)))
 
