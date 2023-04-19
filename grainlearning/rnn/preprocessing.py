@@ -217,6 +217,7 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     :param train_frac: Fraction of data used for training set.
     :param val_frac: Fraction of data used for validation set. Test fraction is the remaining.
     :param seed: Random seed used to make the split.
+
     :return: Dictionary containing `'train'`, `'val'`, and `'test'` datasets.
     """
     n_tot = dataset[1].shape[0]
@@ -228,8 +229,8 @@ def _make_splits(dataset: tuple, train_frac: float, val_frac: float, seed: int):
     if n_val <= 0: # error if not enough samples in validation dataset
         raise ValueError(f"Fractions of training and validation lead to have {n_val} samples in validation dataset.")
     if n_train + n_val >= n_tot:
-        raise ValueError(f"Fractions of training {train_frac} and validation {val_frac} \
-                        lead to have {n_tot - n_train - n_val} samples in test dataset.")
+        raise ValueError(f"Fractions of training {train_frac} and validation {val_frac} "
+                        f"lead to have {n_tot - n_train - n_val} samples in test dataset.")
 
     np.random.seed(seed=seed)
     inds = np.random.permutation(np.arange(n_tot))
