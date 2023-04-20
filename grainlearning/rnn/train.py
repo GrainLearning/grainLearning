@@ -166,19 +166,19 @@ def get_default_config():
 
     * RNN model
 
-      * `'window_size'`: int, number of steps composing a window.
-      * `'window_step'`: int, number of steps between consecutive windows (default = 1).
-      * `'pad_length'`: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
-      * `'lstm_units'`: int, number of neurons or units in LSTM layer.
-      * `'dense_units'`: int, number of neurons or units of dense layer.
+      * ``'window_size'``: int, number of steps composing a window.
+      * ``'window_step'``: int, number of steps between consecutive windows (default = 1).
+      * ``'pad_length'``: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
+      * ``'lstm_units'``: int, number of neurons or units in LSTM layer.
+      * ``'dense_units'``: int, number of neurons or units of dense layer.
 
     * Training procedure
 
-      * `'patience'`: patience of `tf.keras.callbacks.EarlyStopping`.
-      * `'epochs'`: Maximum number of epochs.
-      * `'learning_rate'`: double, learning_rate of `tf.keras.optimizers.Adam`.
-      * `'batch_size'`: Size of the data batches per training step.
-      * `'save_weights_only'`: Boolean
+      * ``'patience'``: patience of `tf.keras.callbacks.EarlyStopping`.
+      * ``'epochs'``: Maximum number of epochs.
+      * ``'learning_rate'``: double, learning_rate of `tf.keras.optimizers.Adam`.
+      * ``'batch_size'``: Size of the data batches per training step.
+      * ``'save_weights_only'``: Boolean
 
         * True: Only the weights will be saved (**Recommended** fro compatibility across platforms).
         * False: The whole model will be saved.

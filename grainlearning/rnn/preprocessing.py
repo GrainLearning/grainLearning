@@ -97,7 +97,6 @@ def prepare_single_dataset(
     :param add_pressure: Wheter to add the pressure to contact parameters.
       If True, the pressure is normalized by 10**6.
     :param add_experiment_type: Wheter to add the experiment type to contact parameters. 1: drained, 0: undrained.
-    :param seed: Random seed used to split the datasets.
 
     :return: Tuple (inputs, outputs)
 

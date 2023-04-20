@@ -12,20 +12,33 @@ class Preprocessor(ABC):
     def __init__(self):
         pass
 
-
     @abstractmethod
     def prepare_datasets(self, **kwargs):
         """
         Abstract class to be implemented in each of the child classes.
         Must return a tuple containing:
 
-          * ``data_split``: Dictionary with keys `'train'`, `'val'`, `'test'`, and values of the corresponding tensorflow Datasets.
+          * ``data_split``: Dictionary with keys ``'train'``, ``'val'``, ``'test'``, and values of the corresponding tensorflow Datasets.
           * ``train_stats``: Dictionary containing the shape of the data:
                   ``sequence_length``, ``num_input_features``, ``num_contact_params``, ``num_labels``,
-                  and `'mean'` and `'std'` of the training set, in case ``standardize_outputs`` is True.
+                  and ``'mean'`` and ``'std'`` of the training set, in case ``standardize_outputs`` is True.
         """
         # Throw an error because this should be always implemented in the child class (?)
-        pass
+        raise NotImplementedError("Subclasses should implement this")
+
+    @abstractmethod
+    def prepare_single_dataset(self):
+        """
+        Abstract class to be implemented in each of the child classes.
+        Must return a Tensorflow dataset containing a Tuple (inputs, outputs)
+
+          * ``inputs``: Dictionary with keys ``'load_sequence'``, ``'contact_parameters'``, that are the
+            corresponding tensorflow Datasets to input to an rnn model.
+
+          * ``outputs``: tensorflow Dataset containing the outputs or labels.
+        """
+        # Throw an error because this should be always implemented in the child class (?)
+        raise NotImplementedError("Subclasses should implement this")
 
     @classmethod
     def warning_config_field(cls, key: str, config: dict, default, add_default_to_config: bool = False):
@@ -66,7 +79,7 @@ class Preprocessor(ABC):
         :param val_frac: Fraction of data used for validation set. Test fraction is the remaining.
         :param seed: Random seed used to make the split.
 
-        :return: Dictionary containing `'train'`, `'val'`, and `'test'` datasets.
+        :return: Dictionary containing ``'train'``, ``'val'``, and ``'test'`` datasets.
         """
         n_tot = dataset[1].shape[0]
         n_train = int(train_frac * n_tot)
@@ -101,7 +114,7 @@ class Preprocessor(ABC):
         :param inds: Indexes of the elements in ``dataset`` that are going to be gathered in this specific split.
 
         :return: tuple of the split, 2 dimensions:
-          * inputs: dictionary containing `'load_sequence'` and `'contact_params'`.
+          * inputs: dictionary containing ``'load_sequence'`` and ``'contact_params'``.
           * outputs: Labels
         """
         X = {key: tf.gather(val, inds) for key, val in dataset[0].items()}
@@ -131,9 +144,9 @@ class Preprocessor(ABC):
     def standardize_outputs(cls, split_data: dict):
         """
         Standardize outputs of ``split_data`` using the mean and std of the training data
-        taken over both the samples and the timesteps. The 3 datasets `'train'`, `'val'`, `'test'` will be standardized.
+        taken over both the samples and the timesteps. The 3 datasets ``'train'``, ``'val'``, ``'test'`` will be standardized.
 
-        :param split_data: dictionary containing `'train'`, `'val'`, `'test'` keys and the respective datasets.
+        :param split_data: dictionary containing ``'train'``, ``'val'``, ``'test'`` keys and the respective datasets.
 
         :return: Tuple containing:
 
@@ -190,8 +203,8 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         Initializes the values of required attributes to preprocess the data, from kwargs:
 
         :param raw_data: Path to hdf5 file containing the data.
-        :param pressure: Experiment confining Pressure as a string or `'All'`.
-        :param experiment_type: Either `'drained'`, `'undrained'` or `'All'`.
+        :param pressure: Experiment confining Pressure as a string or ``'All'``.
+        :param experiment_type: Either `'drained'`, `'undrained'` or ``'All'``.
         :param train_frac: Fraction of data used in the training set.
         :param val_frac: Fraction of the data used in the validation set.
         :param pad_length: Amount by which to pad the sequences from the start.
@@ -218,21 +231,21 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         """
         Returns a dictionary with default values for the configuration of data preparation. Possible fields are:
 
-        * `'raw_data'`: Path to hdf5 file generated using parse_data_YADE.py
-        * `'pressure'` and `'experiment_type'`: Name of the subfield of dataset to consider. It can also be 'All'.
-        * `'standardize_outputs'`: If True transform the data labels to have zero mean and unit variance.
+        * ``'raw_data'``: Path to hdf5 file generated using parse_data_YADE.py
+        * ``'pressure'`` and ``'experiment_type'``: Name of the subfield of dataset to consider. It can also be 'All'.
+        * ``'standardize_outputs'``: If True transform the data labels to have zero mean and unit variance.
           Also, in train_stats the mean and variance of each label will be stored,
           so that can be used to transform predicitons.
           (This is very usful if the labels are not between [0,1])
-        * `'add_e0'`: Whether to add the initial void ratio (output) as a contact parameter.
-        * `'add_pressure'`: Wether to add the pressure to contact_parameters.
-        * `'add_experiment_type'`: Wether to add the experiment type to contact_parameters.
-        * `'train_frac'`: Fraction of the data used for training, between [0,1].
-        * `'val_frac'`: Fraction of the data used for validation, between [0,1].
+        * ``'add_e0'``: Whether to add the initial void ratio (output) as a contact parameter.
+        * ``'add_pressure'``: Wether to add the pressure to contact_parameters.
+        * ``'add_experiment_type'``: Wether to add the experiment type to contact_parameters.
+        * ``'train_frac'``: Fraction of the data used for training, between [0,1].
+        * ``'val_frac'``: Fraction of the data used for validation, between [0,1].
           The fraction of the data used for test is then ``1 - train_frac - val_frac``.
-        * `'window_size'`: int, number of steps composing a window.
-        * `'window_step'`: int, number of steps between consecutive windows (default = 1).
-        * `'pad_length'`: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
+        * ``'window_size'``: int, number of steps composing a window.
+        * ``'window_step'``: int, number of steps between consecutive windows (default = 1).
+        * ``'pad_length'``: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
 
         :return: Dictionary containing default values of the arguments that the user can set.
         """
@@ -278,7 +291,6 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
 
         return config
 
-
     def prepare_datasets(self, seed: int = 42):
         """
         Convert raw data into preprocessed split datasets.
@@ -290,12 +302,12 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
 
         :return: Tuple (split_data, train_stats)
 
-          * ``split_data``: Dictionary with keys `'train'`, `'val'`, `'test'`, and values the
+          * ``split_data``: Dictionary with keys ``'train'``, ``'val'``, ``'test'``, and values the
             corresponding tensorflow Datasets.
 
           * ``train_stats``: Dictionary containing the shape of the data:
             ``sequence_length``, ``num_load_features``, ``num_contact_params``, ``num_labels``,
-            and `'mean'` and `'std'` of the training set, in case ``standardize_outputs`` is True.
+            and ``'mean'`` and ``'std'`` of the training set, in case ``standardize_outputs`` is True.
         """
         with h5py.File(self.raw_data, 'r') as datafile: # Will raise an exception in File doesn't exists
             inputs, outputs, contacts = self._merge_datasets(datafile)
@@ -321,11 +333,33 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
 
         return split_data, train_stats
 
+    def prepare_single_dataset(self):
+        """
+        Convert raw data into a tensorflow dataset with compatible format to predict and evaluate a rnn model.
+
+        :return: Tensorflow dataset containing a Tuple (inputs, outputs)
+
+          * ``inputs``: Dictionary with keys ``'load_sequence'``, ``'contact_parameters'``, that are the
+            corresponding tensorflow Datasets to input to an rnn model.
+
+          * ``outputs``: tensorflow Dataset containing the outputs or labels.
+        """
+        with h5py.File(self.raw_data, 'r') as datafile: # Will raise an exception in File doesn't exists
+            inputs, outputs, contacts = self._merge_datasets(datafile)
+        if self.add_e0:
+            contacts = self._add_e0_to_contacts(contacts, outputs)
+
+        if self.pad_length > 0:
+            inputs = super().pad_initial(inputs, self.pad_length)
+            outputs = super().pad_initial(outputs, self.pad_length)
+
+        dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
+        return tf.data.Dataset.from_tensor_slices(dataset)
 
     def _merge_datasets(self, datafile: h5py._hl.files.File):
         """
         Merge the datasets with different pressures and experiment types.
-        If ``pressure`` or ``experiment_type`` is `'All'`.
+        If ``pressure`` or ``experiment_type`` is ``'All'``.
         Otherwise just return the inputs, outputs and contact_params for the given pressure and experimen_type.
 
         :param datafile: h5py file containing the dataset.
@@ -355,7 +389,6 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
 
         return input_sequences, output_sequences, contact_params
 
-
     def _add_e0_to_contacts(self, contacts: np.array, outputs: np.array):
         """
         Add the initial void ratio e_0 as an extra contact parameter at the end.
@@ -371,7 +404,6 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
 
         return contacts
 
-
     def _augment_contact_params(self, contact_params: np.array, pressure: str, experiment_type: str):
         """
         Add the pressure and the experiment type as contact parameters.
@@ -381,7 +413,7 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         :param contact_params: Array containing contact parameters for all the
                 samples with the given pressure and experiment type.
         :param pressure: The corresponding pressure.
-        :param experiment_type: The corresponding experiment type: `'drained'` or `'undrained'`.
+        :param experiment_type: The corresponding experiment type: ``'drained'`` or ``'undrained'``.
 
         :return: Numpy array containing augmented contact parameters.
         """
