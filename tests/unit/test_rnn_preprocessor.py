@@ -4,7 +4,7 @@ import tensorflow as tf
 
 from grainlearning.rnn import windows
 from tests.unit.conftest import create_dataset
-import grainlearning.rnn.preprocessor as preprocessor
+from grainlearning.rnn import preprocessor
 
 @pytest.fixture(scope="session")
 def dummy_dataset():
@@ -31,7 +31,7 @@ def default_config(hdf5_test_file):
 
 @pytest.fixture(scope="function")
 def dummy_preprocessor(default_config):
-    preprocessor_TC = preprocessor.Preprocessor_Triaxial_Compression(**default_config)
+    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**default_config)
     return preprocessor_TC
 
 def test_make_splits(dummy_dataset, dummy_preprocessor):
@@ -87,7 +87,7 @@ def test_merge_datasets(hdf5_test_file, default_config):
     with h5py.File(hdf5_test_file, 'r') as datafile:
         # Case all pressures, all experiments
         config_TC = default_config.copy()
-        preprocessor_TC_1 = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+        preprocessor_TC_1 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
 
         inputs, outputs, contact_parameters = preprocessor_TC_1._merge_datasets(datafile)
         # check total (sum) num of samples, and that pressure and experiment type have been added to contact_params
@@ -99,7 +99,7 @@ def test_merge_datasets(hdf5_test_file, default_config):
         # Case specific pressure and experiment
         config_TC["pressure"] = '0.2e5'
         config_TC["experiment_type"] = 'drained'
-        preprocessor_TC_2 = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+        preprocessor_TC_2 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
 
         inputs, outputs, contact_parameters = preprocessor_TC_2._merge_datasets(datafile)
         assert inputs.shape == (2, 3, 2) # num_samples, sequence_length, load_features
@@ -113,7 +113,7 @@ def test_prepare_datasets(default_config):
     config_TC["standardize_outputs"] = True
     config_TC["add_pressure"] = False
     config_TC["add_experiment_type"] = False
-    preprocessor_TC_0 = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+    preprocessor_TC_0 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
     split_data, train_stats = preprocessor_TC_0.prepare_datasets()
 
     # Test split_data
@@ -137,7 +137,7 @@ def test_prepare_datasets(default_config):
     config_TC["add_pressure"] = False
     config_TC["add_experiment_type"] = False
     config_TC["standardize_outputs"] = False
-    preprocessor_TC_1 = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+    preprocessor_TC_1 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
     split_data_1, train_stats_1 = preprocessor_TC_1.prepare_datasets()
 
     # 2. Only add pressure
@@ -145,7 +145,7 @@ def test_prepare_datasets(default_config):
     config_TC["add_pressure"] = True
     config_TC["add_experiment_type"] = False
     config_TC["pad_length"] = 1
-    preprocessor_TC_2 = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+    preprocessor_TC_2 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
     split_data_2, train_stats_2 = preprocessor_TC_2.prepare_datasets()
 
     # 3. Only add experiment_type
@@ -153,7 +153,7 @@ def test_prepare_datasets(default_config):
     config_TC["add_pressure"] = False
     config_TC["add_experiment_type"] = True
     config_TC["pad_length"] = 3
-    preprocessor_TC_3 = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+    preprocessor_TC_3 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
     split_data_3, train_stats_3 = preprocessor_TC_3.prepare_datasets()
 
     # Comparison against train_stats: No additional contact parameters.
@@ -174,7 +174,7 @@ def test_prepare_datasets(default_config):
     # Test that error is raised when unexistent hdf5 file is passed
     with pytest.raises(FileNotFoundError):
         config_TC["raw_data"] = 'unexistent_file.hdf5'
-        preprocessor_TC_U = preprocessor.Preprocessor_Triaxial_Compression(**config_TC)
+        preprocessor_TC_U = preprocessor.PreprocessorTriaxialCompression(**config_TC)
         _ = preprocessor_TC_U.prepare_datasets('unexistent_file.hdf5')
 
 # windows

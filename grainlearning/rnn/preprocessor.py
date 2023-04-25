@@ -5,7 +5,7 @@ import warnings
 
 from abc import ABC, abstractmethod
 
-import grainlearning.rnn.windows as windows
+from grainlearning.rnn import windows
 
 class Preprocessor(ABC):
 
@@ -142,7 +142,8 @@ class Preprocessor(ABC):
     def standardize_outputs(cls, split_data: dict):
         """
         Standardize outputs of ``split_data`` using the mean and std of the training data
-        taken over both the samples and the timesteps. The 3 datasets ``'train'``, ``'val'``, ``'test'`` will be standardized.
+        taken over both the samples and the timesteps.
+        The 3 datasets ``'train'``, ``'val'``, ``'test'`` will be standardized.
 
         :param split_data: dictionary containing ``'train'``, ``'val'``, ``'test'`` keys and the respective datasets.
 
@@ -188,7 +189,7 @@ class Preprocessor(ABC):
                 }
 
 
-class Preprocessor_Triaxial_Compression(Preprocessor):
+class PreprocessorTriaxialCompression(Preprocessor):
     """
     Class to Preprocess data of triaxial compression experiments, inheriting from abstract class :class:`Preprocessor`
 
@@ -214,7 +215,8 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         :param add_pressure: Wether to add the pressure to contact parameters.
           If True, the pressure is normalized by 10**6.
 
-        .. note:: Teh parameters that will not be explicitly specified with its value in ``kwargs`` will take the defaults from :meth:`Preprocessor_Triaxial_Compression.get_default_config`.
+        .. note:: The parameters that will not be explicitly specified with its value
+          in ``kwargs`` will take the defaults from :meth:`Preprocessor_Triaxial_Compression.get_default_config`.
 
         :param add_experiment_type: Wether to add the experiment type to contact parameters.
         """
@@ -418,7 +420,7 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         new_info = []
         pres_num = float(pressure) / 10**6
         if self.add_pressure: new_info.append(pres_num)
-        if self.add_experiment_type: new_info.append(self.experiment_type == 'drained')
+        if self.add_experiment_type: new_info.append(experiment_type == 'drained')
 
         num_samples = contact_params.shape[0]
         new_info = np.expand_dims(new_info, 0)

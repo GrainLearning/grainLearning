@@ -16,7 +16,7 @@ from grainlearning.rnn.preprocessor import Preprocessor
 from grainlearning.rnn.windows import windowize_single_dataset
 
 
-def train(preprocessor: Preprocessor, config=None):
+def train(preprocessor: Preprocessor, config=None, model: tf.keras.Model=None):
     """
     Train a model and report to weights and biases.
 
@@ -28,6 +28,7 @@ def train(preprocessor: Preprocessor, config=None):
 
     :param preprocessor: Preprocessor object to load and prepare the data.
     :param config: dictionary containing model and training configurations.
+    :param model: Keras model if ``None`` is passed then an ``rnn_model`` will be created (default).
 
     :return: Same as ``tf.keras.Model.fit()``: A History object.
       Its History.history attribute is a record of training loss values and
@@ -44,7 +45,9 @@ def train(preprocessor: Preprocessor, config=None):
         np.save(os.path.join(wandb.run.dir, 'train_stats.npy'), train_stats)
 
         # set up the model
-        model = rnn_model(train_stats, **config)
+        if model == None:
+            model = rnn_model(train_stats, **config)
+
         optimizer = tf.keras.optimizers.Adam(**config_optimizer)
         model.compile(
                 optimizer=optimizer,
@@ -86,13 +89,14 @@ def train(preprocessor: Preprocessor, config=None):
 
         return history
 
-def train_without_wandb(preprocessor: Preprocessor, config=None):
+def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras.Model=None):
     """
     Train a model locally: no report to wandb.
     Saves either the model or its weight to folder outputs.
 
     :param preprocessor: Preprocessor object to load and prepare the data.
-    :param config: dictionary containing taining hyperparameters and some model parameters
+    :param config: dictionary containing taining hyperparameters and some model parameters.
+    :param model: Keras model if ``None`` is passed then an ``rnn_model`` will be created (default).
 
     :return: Same as ``tf.keras.Model.fit()``: A History object.
       Its History.history attribute is a record of training loss values and

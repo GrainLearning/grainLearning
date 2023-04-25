@@ -12,7 +12,7 @@ from grainlearning.rnn import predict
 from grainlearning.rnn import preprocessing
 from grainlearning.rnn import train
 from grainlearning.rnn.models import rnn_model
-import grainlearning.rnn.preprocessor as preprocessor
+from grainlearning.rnn.import preprocessor
 
 @pytest.fixture(scope="function") # will tear down the fixture after being used in a test_function
 def config_test(hdf5_test_file):
@@ -69,7 +69,7 @@ def test_train(config_test, monkeypatch):
     """
     Check that training goes well, no errors should be thrown.
     """
-    preprocessor_TC = preprocessor.Preprocessor_Triaxial_Compression(**config_test)
+    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config_test)
     # Option 1: train using wandb
     os.system("wandb offline") # so that when you run these test the info will not be synced
     history_wandb = train.train(preprocessor_TC, config=config_test)
@@ -151,13 +151,13 @@ def test_get_pretrained_model(config_test):
 
 def test_predict_macroscopics():
     model, train_stats, config = predict.get_pretrained_model("./tests/data/rnn/wandb_only_weights/")
-    preprocessor_TC = preprocessor.Preprocessor_Triaxial_Compression(**config)
+    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
     data, _ = preprocessor_TC.prepare_datasets()
     predictions_1 = predict.predict_macroscopics(model, data['test'], train_stats, config, batch_size=1)
     config['pad_length'] = config['window_size']
     config['train_frac'] = 0.25
     config['val_frac'] = 0.25
-    preprocessor_TC_2 = preprocessor.Preprocessor_Triaxial_Compression(**config)
+    preprocessor_TC_2 = preprocessor.PreprocessorTriaxialCompression(**config)
     data_padded, train_stats_2 = preprocessor_TC_2.prepare_datasets()
     predictions_2 = predict.predict_macroscopics(model, data_padded['test'], train_stats_2, config, batch_size=2)
 
