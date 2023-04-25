@@ -12,7 +12,7 @@ from grainlearning.rnn import predict
 from grainlearning.rnn import preprocessing
 from grainlearning.rnn import train
 from grainlearning.rnn.models import rnn_model
-from grainlearning.rnn.import preprocessor
+from grainlearning.rnn import preprocessor
 
 @pytest.fixture(scope="function") # will tear down the fixture after being used in a test_function
 def config_test(hdf5_test_file):
