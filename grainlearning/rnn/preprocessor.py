@@ -224,71 +224,6 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         for key, value in config.items():
             setattr(self, key, value)
 
-    @classmethod
-    def get_default_config(cls):
-        """
-        Returns a dictionary with default values for the configuration of data preparation. Possible fields are:
-
-        * ``'raw_data'``: Path to hdf5 file generated using parse_data_YADE.py
-        * ``'pressure'`` and ``'experiment_type'``: Name of the subfield of dataset to consider. It can also be 'All'.
-        * ``'standardize_outputs'``: If True transform the data labels to have zero mean and unit variance.
-          Also, in train_stats the mean and variance of each label will be stored,
-          so that can be used to transform predicitons.
-          (This is very usful if the labels are not between [0,1])
-        * ``'add_e0'``: Whether to add the initial void ratio (output) as a contact parameter.
-        * ``'add_pressure'``: Wether to add the pressure to contact_parameters.
-        * ``'add_experiment_type'``: Wether to add the experiment type to contact_parameters.
-        * ``'train_frac'``: Fraction of the data used for training, between [0,1].
-        * ``'val_frac'``: Fraction of the data used for validation, between [0,1].
-          The fraction of the data used for test is then ``1 - train_frac - val_frac``.
-        * ``'window_size'``: int, number of steps composing a window.
-        * ``'window_step'``: int, number of steps between consecutive windows (default = 1).
-        * ``'pad_length'``: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
-
-        :return: Dictionary containing default values of the arguments that the user can set.
-        """
-        return {
-            'raw_data': 'data/sequences.hdf5',
-            'pressure': 'All',
-            'experiment_type': 'All',
-            'add_e0': False,
-            'add_pressure': True,
-            'add_experiment_type': True,
-            'train_frac': 0.7,
-            'val_frac': 0.15,
-            'window_size': 10,
-            'window_step': 1,
-            'pad_length': 0,
-            'standardize_outputs': True
-        }
-
-    @classmethod
-    def check_config(cls, config:dict):
-        """
-        Checks that values requiring an input from the user would be specified in config.
-
-        :param config: Dictionary containing the values of different arguments.
-
-        :return: Updated config dictionary.
-        """
-        # Note: I systematically use config.keys() instead of in config, because config can be a dict from wandb.
-        # This object behaves differently than python dict (might be just the version), but this solves it.
-        if 'raw_data' not in config.keys(): raise ValueError("raw_data has not been defined in config")
-
-        # Warning that defaults would be used if not defined and adding them to config because is required in other functions.
-        keys_to_check = ['pressure', 'experiment_type', 'standardize_outputs',
-                         'add_e0', 'add_pressure', 'add_experiment_type',
-                         'window_size', 'pad_length', 'train_frac', 'val_frac']
-        defaults = cls.get_default_config()
-        for key in keys_to_check:
-            config = super().warning_config_field(key, config, defaults[key], add_default_to_config=True)
-
-        # Deleting elements that are not in default
-        keys_to_delete = set(config) - set(defaults)
-        for key in keys_to_delete: del config[key]
-
-        return config
-
     def prepare_datasets(self, seed: int = 42):
         """
         Convert raw data into preprocessed split datasets.
@@ -353,6 +288,71 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
 
         dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
         return tf.data.Dataset.from_tensor_slices(dataset)
+
+    @classmethod
+    def get_default_config(cls):
+        """
+        Returns a dictionary with default values for the configuration of data preparation. Possible fields are:
+
+        * ``'raw_data'``: Path to hdf5 file generated using parse_data_YADE.py
+        * ``'pressure'`` and ``'experiment_type'``: Name of the subfield of dataset to consider. It can also be 'All'.
+        * ``'standardize_outputs'``: If True transform the data labels to have zero mean and unit variance.
+          Also, in train_stats the mean and variance of each label will be stored,
+          so that can be used to transform predicitons.
+          (This is very usful if the labels are not between [0,1])
+        * ``'add_e0'``: Whether to add the initial void ratio (output) as a contact parameter.
+        * ``'add_pressure'``: Wether to add the pressure to contact_parameters.
+        * ``'add_experiment_type'``: Wether to add the experiment type to contact_parameters.
+        * ``'train_frac'``: Fraction of the data used for training, between [0,1].
+        * ``'val_frac'``: Fraction of the data used for validation, between [0,1].
+          The fraction of the data used for test is then ``1 - train_frac - val_frac``.
+        * ``'window_size'``: int, number of steps composing a window.
+        * ``'window_step'``: int, number of steps between consecutive windows (default = 1).
+        * ``'pad_length'``: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
+
+        :return: Dictionary containing default values of the arguments that the user can set.
+        """
+        return {
+            'raw_data': 'data/sequences.hdf5',
+            'pressure': 'All',
+            'experiment_type': 'All',
+            'add_e0': False,
+            'add_pressure': True,
+            'add_experiment_type': True,
+            'train_frac': 0.7,
+            'val_frac': 0.15,
+            'window_size': 10,
+            'window_step': 1,
+            'pad_length': 0,
+            'standardize_outputs': True
+        }
+
+    @classmethod
+    def check_config(cls, config:dict):
+        """
+        Checks that values requiring an input from the user would be specified in config.
+
+        :param config: Dictionary containing the values of different arguments.
+
+        :return: Updated config dictionary.
+        """
+        # Note: I systematically use config.keys() instead of in config, because config can be a dict from wandb.
+        # This object behaves differently than python dict (might be just the version), but this solves it.
+        if 'raw_data' not in config.keys(): raise ValueError("raw_data has not been defined in config")
+
+        # Warning that defaults would be used if not defined and adding them to config because is required in other functions.
+        keys_to_check = ['pressure', 'experiment_type', 'standardize_outputs',
+                         'add_e0', 'add_pressure', 'add_experiment_type',
+                         'window_size', 'pad_length', 'train_frac', 'val_frac']
+        defaults = cls.get_default_config()
+        for key in keys_to_check:
+            config = super().warning_config_field(key, config, defaults[key], add_default_to_config=True)
+
+        # Deleting elements that are not in default
+        keys_to_delete = set(config) - set(defaults)
+        for key in keys_to_delete: del config[key]
+
+        return config
 
     def _merge_datasets(self, datafile: h5py._hl.files.File):
         """
