@@ -36,7 +36,7 @@ def train(preprocessor: Preprocessor, config=None):
     """
     with wandb.init(config=config):
         config = wandb.config
-        config = _check_config(config)
+        config = _check_config(config, preprocessor)
         config_optimizer = _get_optimizer_config(config)
 
         # preprocess data
@@ -99,7 +99,7 @@ def train_without_wandb(preprocessor: Preprocessor, config=None):
       metrics values at successive epochs, as well as
       validation loss values and validation metrics values.
     """
-    config = _check_config(config)
+    config = _check_config(config, preprocessor)
     config_optimizer = _get_optimizer_config(config)
     path_save_data = Path('outputs')
     if os.path.exists(path_save_data):
@@ -201,7 +201,7 @@ def get_default_config():
     }
 
 
-def _check_config(config:dict):
+def _check_config(config: dict, preprocessor: Preprocessor):
     """
     Checks that values requiring an input from the user would be specified in config.
 
@@ -227,7 +227,7 @@ def _check_config(config:dict):
     # Warning for an unexpected key value
     config_optimizer = _get_optimizer_config(config)
     for key in config.keys():
-        if key not in defaults and key not in config_optimizer:
+        if key not in defaults and key not in config_optimizer and key not in preprocessor.get_default_config():
             warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
 
     return config

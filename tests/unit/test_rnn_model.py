@@ -12,7 +12,7 @@ from grainlearning.rnn import predict
 from grainlearning.rnn import preprocessing
 from grainlearning.rnn import train
 from grainlearning.rnn.models import rnn_model
-
+import grainlearning.rnn.preprocessor as preprocessor
 
 @pytest.fixture(scope="function") # will tear down the fixture after being used in a test_function
 def config_test(hdf5_test_file):
@@ -69,10 +69,10 @@ def test_train(config_test, monkeypatch):
     """
     Check that training goes well, no errors should be thrown.
     """
-
+    preprocessor_TC = preprocessor.Preprocessor_Triaxial_Compression(**config_test)
     # Option 1: train using wandb
     os.system("wandb offline") # so that when you run these test the info will not be synced
-    history_wandb = train.train(config=config_test)
+    history_wandb = train.train(preprocessor_TC, config=config_test)
     # check that files have been generated
     assert Path("wandb/latest-run/files/model-best.h5").exists()
     assert Path("wandb/latest-run/files/train_stats.npy").exists()
@@ -84,7 +84,7 @@ def test_train(config_test, monkeypatch):
     # Option 2: train using plain tensorflow
     # monkeypatch for input when asking: do you want to proceed? [y/n]:
     monkeypatch.setattr('sys.stdin', io.StringIO('y'))
-    history_simple = train.train_without_wandb(config=config_test)
+    history_simple = train.train_without_wandb(preprocessor_TC, config=config_test)
     # check that files have been generated
     assert Path("outputs/saved_model.pb").exists() # because 'save_weights_only': False
     assert Path("outputs/train_stats.npy").exists()
@@ -100,12 +100,12 @@ def test_train(config_test, monkeypatch):
     config_test['save_weights_only'] = True # can safely do this because the scope of fixture is function
 
     # Option 1: train using wandb
-    train.train(config=config_test)
+    train.train(preprocessor_TC, config=config_test)
     assert Path("wandb/latest-run/files/model-best.h5").exists()
     assert Path("wandb/latest-run/files/train_stats.npy").exists()
 
     # Option 2: train using plain tensorflow
-    train.train_without_wandb(config=config_test)
+    train.train_without_wandb(preprocessor_TC, config=config_test)
     assert Path("outputs/weights.h5").exists() # because 'save_weights_only': True
     assert Path("outputs/train_stats.npy").exists()
     assert Path("outputs/config.npy").exists()
@@ -151,12 +151,14 @@ def test_get_pretrained_model(config_test):
 
 def test_predict_macroscopics():
     model, train_stats, config = predict.get_pretrained_model("./tests/data/rnn/wandb_only_weights/")
-    data, _ = preprocessing.prepare_datasets(**config)
+    preprocessor_TC = preprocessor.Preprocessor_Triaxial_Compression(**config)
+    data, _ = preprocessor_TC.prepare_datasets()
     predictions_1 = predict.predict_macroscopics(model, data['test'], train_stats, config, batch_size=1)
     config['pad_length'] = config['window_size']
     config['train_frac'] = 0.25
     config['val_frac'] = 0.25
-    data_padded, train_stats_2 = preprocessing.prepare_datasets(**config)
+    preprocessor_TC_2 = preprocessor.Preprocessor_Triaxial_Compression(**config)
+    data_padded, train_stats_2 = preprocessor_TC_2.prepare_datasets()
     predictions_2 = predict.predict_macroscopics(model, data_padded['test'], train_stats_2, config, batch_size=2)
 
     assert isinstance(predictions_1, tf.Tensor)
