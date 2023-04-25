@@ -23,8 +23,7 @@ class Preprocessor(ABC):
                   ``sequence_length``, ``num_input_features``, ``num_contact_params``, ``num_labels``,
                   and ``'mean'`` and ``'std'`` of the training set, in case ``standardize_outputs`` is True.
         """
-        # Throw an error because this should be always implemented in the child class (?)
-        raise NotImplementedError("Subclasses should implement this")
+        pass
 
     @abstractmethod
     def prepare_single_dataset(self):
@@ -37,8 +36,7 @@ class Preprocessor(ABC):
 
           * ``outputs``: tensorflow Dataset containing the outputs or labels.
         """
-        # Throw an error because this should be always implemented in the child class (?)
-        raise NotImplementedError("Subclasses should implement this")
+        pass
 
     @classmethod
     def warning_config_field(cls, key: str, config: dict, default, add_default_to_config: bool = False):
@@ -192,7 +190,7 @@ class Preprocessor(ABC):
 
 class Preprocessor_Triaxial_Compression(Preprocessor):
     """
-    Class to Preprocess data of triaxial compresion experiments, inheriting from abstract class :class:`Preprocessor`
+    Class to Preprocess data of triaxial compression experiments, inheriting from abstract class :class:`Preprocessor`
 
     Attributes: see :meth:`Preprocessor_Triaxial_Compression.get_default_config`
 
@@ -213,12 +211,12 @@ class Preprocessor_Triaxial_Compression(Preprocessor):
         :param standardize_outputs: Whether to transform the training set labels
                                     to have zero mean and unit variance.
         :param add_e0: Whether to add the initial void ratio as a contact parameter.
-        :param add_pressure: Wheter to add the pressure to contact parameters.
+        :param add_pressure: Wether to add the pressure to contact parameters.
           If True, the pressure is normalized by 10**6.
 
         .. note:: Teh parameters that will not be explicitly specified with its value in ``kwargs`` will take the defaults from :meth:`Preprocessor_Triaxial_Compression.get_default_config`.
 
-        :param add_experiment_type: Wheter to add the experiment type to contact parameters.
+        :param add_experiment_type: Wether to add the experiment type to contact parameters.
         """
         config = self.check_config(kwargs)
 
