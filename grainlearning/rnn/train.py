@@ -121,7 +121,9 @@ def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras
     np.save(path_save_data/'config.npy', config)
 
     # set up the model
-    model = rnn_model(train_stats, **config)
+    if model == None:
+        model = rnn_model(train_stats, **config)
+
     optimizer = tf.keras.optimizers.Adam(**config_optimizer)
     model.compile(
             optimizer=optimizer,
