@@ -74,7 +74,7 @@ jobs:
             uses: zenodraft/action@0.10.0
             with:
               compression: zip
-              collection: 7118564
+              collection: 7123966
               metadata: .zenodo.json
               publish: false
               sandbox: true
