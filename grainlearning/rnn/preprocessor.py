@@ -193,7 +193,7 @@ class PreprocessorTriaxialCompression(Preprocessor):
     """
     Class to Preprocess data of triaxial compression experiments, inheriting from abstract class :class:`Preprocessor`
 
-    Attributes: see :meth:`Preprocessor_Triaxial_Compression.get_default_config`
+    Attributes: see :meth:`PreprocessorTriaxialCompression.get_default_config`
 
     """
     def __init__(self, **kwargs):
@@ -216,7 +216,7 @@ class PreprocessorTriaxialCompression(Preprocessor):
           If True, the pressure is normalized by 10**6.
 
         .. note:: The parameters that will not be explicitly specified with its value
-          in ``kwargs`` will take the defaults from :meth:`Preprocessor_Triaxial_Compression.get_default_config`.
+          in ``kwargs`` will take the defaults from :meth:`PreprocessorTriaxialCompression.get_default_config`.
 
         :param add_experiment_type: Wether to add the experiment type to contact parameters.
         """
