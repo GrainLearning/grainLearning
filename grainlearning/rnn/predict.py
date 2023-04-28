@@ -11,20 +11,23 @@ import wandb
 import yaml
 
 from grainlearning.rnn.models import rnn_model
-from grainlearning.rnn.preprocessing import prepare_datasets
+#from grainlearning.rnn.preprocessing import prepare_datasets
 from grainlearning.rnn.windows import predict_over_windows
+from grainlearning.rnn.preprocessor import Preprocessor, PreprocessorTriaxialCompression
 
-
+# Constants
 NAME_MODEL_H5 = 'model-best.h5'
 NAME_TRAIN_STATS = 'train_stats.npy'
 
 
-def get_best_run_from_sweep(entity_project_sweep_id: str):
+def get_best_run_from_sweep(entity_project_sweep_id: str, preprocessor: Preprocessor = None):
     """
     Load the best performing model found with a weights and biases sweep.
     Also load the data splits it was trained on.
 
     :param entity_project_sweep_id: string of form <user>/<project>/<sweep_id>
+    :param preprocessor: Preprocessor object to load and prepare the data.
+      If None is given, then a PreprocessorTriaxialCompression will be considered
 
     :return:
         - model: The trained model with the lowest validation loss.
@@ -40,11 +43,14 @@ def get_best_run_from_sweep(entity_project_sweep_id: str):
             replace=True,
         )
     config = best_run.config
+    if preprocessor is None:
+        preprocessor = PreprocessorTriaxialCompression(**config)
+
     if os.path.exists(Path(best_model.dir)/NAME_TRAIN_STATS):
         train_stats = np.load(Path(best_model.dir)/NAME_TRAIN_STATS, allow_pickle=True).item()
-        data, _ = prepare_datasets(**config)
+        data, _ = preprocessor.prepare_datasets()
     else:
-        data, train_stats = prepare_datasets(**config)
+        data, train_stats = preprocessor.prepare_datasets()
 
     model = rnn_model(train_stats, **config)
     model.load_weights(best_model.name)

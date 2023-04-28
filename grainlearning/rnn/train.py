@@ -11,12 +11,11 @@ import tensorflow as tf
 import wandb
 
 from grainlearning.rnn.models import rnn_model
-from grainlearning.rnn.preprocessing import prepare_datasets
 from grainlearning.rnn.preprocessor import Preprocessor
 from grainlearning.rnn.windows import windowize_single_dataset
 
 
-def train(preprocessor: Preprocessor, config=None, model: tf.keras.Model=None):
+def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = None):
     """
     Train a model and report to weights and biases.
 
@@ -45,7 +44,7 @@ def train(preprocessor: Preprocessor, config=None, model: tf.keras.Model=None):
         np.save(os.path.join(wandb.run.dir, 'train_stats.npy'), train_stats)
 
         # set up the model
-        if model == None:
+        if model is None:
             model = rnn_model(train_stats, **config)
 
         optimizer = tf.keras.optimizers.Adam(**config_optimizer)
@@ -89,7 +88,7 @@ def train(preprocessor: Preprocessor, config=None, model: tf.keras.Model=None):
 
         return history
 
-def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras.Model=None):
+def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.keras.Model = None):
     """
     Train a model locally: no report to wandb.
     Saves either the model or its weight to folder outputs.
@@ -116,12 +115,12 @@ def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras
     os.mkdir(path_save_data)
 
     # preprocess data
-    split_data, train_stats = prepare_datasets(**config)
+    split_data, train_stats = preprocessor.prepare_datasets()
     np.save(path_save_data/'train_stats.npy', train_stats)
     np.save(path_save_data/'config.npy', config)
 
     # set up the model
-    if model == None:
+    if model is None:
         model = rnn_model(train_stats, **config)
 
     optimizer = tf.keras.optimizers.Adam(**config_optimizer)
@@ -239,7 +238,7 @@ def _check_config(config: dict, preprocessor: Preprocessor):
     return config
 
 
-def _warning_config_field(key, config, default, add_default_to_config=False):
+def _warning_config_field(key, config, default, add_default_to_config = False):
     """
     Raises a warning if key is not included in config dictionary.
     Also informs the default value that will be used.
