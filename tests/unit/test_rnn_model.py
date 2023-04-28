@@ -9,7 +9,6 @@ import pytest
 import tensorflow as tf
 
 from grainlearning.rnn import predict
-#from grainlearning.rnn import preprocessing
 from grainlearning.rnn import train
 from grainlearning.rnn.models import rnn_model
 from grainlearning.rnn import preprocessor
@@ -172,7 +171,6 @@ def test_predict_macroscopics():
     assert predictions_2.shape == (2, 3, 4) # always good in case train_stats or config are broken.
 
     # model loaded: pad_length=0, config, pad_length=1. If using train_stats of the model -> incompatible.
-    #data_padded = preprocessing.prepare_single_dataset(**config)
     data_padded = preprocessor_TC_2.prepare_single_dataset()
     with pytest.raises(ValueError):
         predict.predict_macroscopics(model, data_padded, train_stats, config, batch_size=2)
@@ -190,9 +188,6 @@ def test_predict_over_windows(config_test):
         config['window_size'] = window_size
         preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
         split_data, train_stats = preprocessor_TC.prepare_datasets()
-        #split_data, train_stats = preprocessing.prepare_datasets(raw_data=hdf5_test_file,
-        #                            pressure='1000000', experiment_type='undrained',
-        #                            window_size=window_size)
         model = rnn_model(input_shapes=train_stats, window_size=window_size)
         data = split_data['test'].batch(batch_size) # has to be test dataset that is not windowized
         inputs = list(data)[0][0]
