@@ -1,0 +1,98 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.3
+    framework: keras
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.8.10
+    start_time: 1680086416.211426
+    t:
+      1:
+      - 2
+      - 3
+      - 5
+      - 12
+      - 53
+      - 55
+      2:
+      - 2
+      - 3
+      - 5
+      - 12
+      - 53
+      - 55
+      3:
+      - 2
+      - 3
+      - 8
+      - 23
+      - 37
+      4: 3.8.10
+      5: 0.13.3
+      8:
+      - 5
+      10:
+      - 9
+add_e0:
+  desc: null
+  value: true
+add_experiment_type:
+  desc: null
+  value: false
+add_pressure:
+  desc: null
+  value: true
+batch_size:
+  desc: null
+  value: 256
+beta_1:
+  desc: null
+  value: 0.891077093784729
+beta_2:
+  desc: null
+  value: 0.7583919415780221
+dense_units:
+  desc: null
+  value: 200
+epochs:
+  desc: null
+  value: 200
+epsilon:
+  desc: null
+  value: 4.0448727348806445e-06
+experiment_type:
+  desc: null
+  value: undrained
+learning_rate:
+  desc: null
+  value: 0.0002849001482511476
+lstm_units:
+  desc: null
+  value: 204
+patience:
+  desc: null
+  value: 25
+pressure:
+  desc: null
+  value: All
+raw_data:
+  desc: null
+  value: data/triaxial_compression_variable_input.hdf5
+save_weights_only:
+  desc: null
+  value: false
+standardize_outputs:
+  desc: null
+  value: true
+train_frac:
+  desc: null
+  value: 0.7
+window_size:
+  desc: null
+  value: 7
+window_step:
+  desc: null
+  value: 1

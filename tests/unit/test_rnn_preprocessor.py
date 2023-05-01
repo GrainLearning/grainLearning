@@ -2,9 +2,9 @@ import h5py
 import pytest
 import tensorflow as tf
 
-from grainlearning.rnn import preprocessing
 from grainlearning.rnn import windows
 from tests.unit.conftest import create_dataset
+from grainlearning.rnn import preprocessor
 
 @pytest.fixture(scope="session")
 def dummy_dataset():
@@ -12,8 +12,29 @@ def dummy_dataset():
                               num_load_features = 4, num_labels = 3, num_contact_params = 5)
     return ({'load_sequence': inputs, 'contact_parameters': contact_params}, outputs)
 
+@pytest.fixture(scope="function")
+def default_config(hdf5_test_file):
+    return {
+        'raw_data': hdf5_test_file,
+        'pressure': 'All',
+        'experiment_type': 'All',
+        'add_e0': False,
+        'add_pressure': True,
+        'add_experiment_type': True,
+        'train_frac': 0.7,
+        'val_frac': 0.15,
+        'window_size': 1,
+        'window_step': 1,
+        'pad_length': 0,
+        'standardize_outputs': False
+    }
 
-def test_make_splits(dummy_dataset):
+@pytest.fixture(scope="function")
+def dummy_preprocessor(default_config):
+    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**default_config)
+    return preprocessor_TC
+
+def test_make_splits(dummy_dataset, dummy_preprocessor):
     num_samples = 100
     sequence_length = 10
     num_load_features = 4
@@ -24,7 +45,7 @@ def test_make_splits(dummy_dataset):
     val_frac_list = [0.25, 0.15, 0.5]
 
     for train_frac, val_frac in zip(train_frac_list, val_frac_list):
-        split_data = preprocessing._make_splits(dummy_dataset, train_frac, val_frac, seed=42)
+        split_data = dummy_preprocessor.make_splits(dummy_dataset, train_frac, val_frac, seed=42)
         assert split_data.keys() == {'train', 'val', 'test'}
 
         # Check that each split contains the expected number of samples
@@ -45,15 +66,14 @@ def test_make_splits(dummy_dataset):
             assert split_data[key][1].shape == (n_samples, sequence_length, num_labels)
 
     with pytest.raises(ValueError): # check that it is not possible to have a 0 length validation dataset
-        _ = preprocessing._make_splits(dummy_dataset, 1.0, 0.0, seed=42)
+        _ = dummy_preprocessor.make_splits(dummy_dataset, 1.0, 0.0, seed=18)
 
-
-def test_get_dimensions(dummy_dataset):
-    split_data = preprocessing._make_splits(dummy_dataset, train_frac=0.7, val_frac=0.15, seed=42)
+def test_get_dimensions(dummy_dataset, dummy_preprocessor):
+    split_data = dummy_preprocessor.make_splits(dummy_dataset, train_frac=0.7, val_frac=0.15, seed=42)
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
     for data_i in split_data.values():
-        dimensions = preprocessing.get_dimensions(data_i)
+        dimensions = dummy_preprocessor.get_dimensions(data_i)
 
         assert dimensions.keys() == {'sequence_length', 'num_load_features', 'num_contact_params', 'num_labels'}
 
@@ -63,11 +83,13 @@ def test_get_dimensions(dummy_dataset):
         assert dimensions['num_contact_params'] == 5
         assert dimensions['num_labels'] == 3
 
-def test_merge_datasets(hdf5_test_file):
+def test_merge_datasets(hdf5_test_file, default_config):
     with h5py.File(hdf5_test_file, 'r') as datafile:
         # Case all pressures, all experiments
-        inputs, outputs, contact_parameters = preprocessing._merge_datasets(datafile,
-                                              pressure='All', experiment_type='All')
+        config_TC = default_config.copy()
+        preprocessor_TC_1 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+
+        inputs, outputs, contact_parameters = preprocessor_TC_1._merge_datasets(datafile)
         # check total (sum) num of samples, and that pressure and experiment type have been added to contact_params
         # Values to be modified if hdf5_test_file changes
         assert inputs.shape == (2 + 10 + 4, 3, 2) # num_samples, sequence_length, load_features
@@ -75,20 +97,24 @@ def test_merge_datasets(hdf5_test_file):
         assert contact_parameters.shape == (2 + 10 + 4, 5 + 2) # num_samples, num_contact_params + 2 (pressure, experiment_type)
 
         # Case specific pressure and experiment
-        inputs, outputs, contact_parameters = preprocessing._merge_datasets(datafile,
-                                              pressure='0.2e5', experiment_type='drained')
+        config_TC["pressure"] = '0.2e5'
+        config_TC["experiment_type"] = 'drained'
+        preprocessor_TC_2 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+
+        inputs, outputs, contact_parameters = preprocessor_TC_2._merge_datasets(datafile)
         assert inputs.shape == (2, 3, 2) # num_samples, sequence_length, load_features
         assert outputs.shape == (2, 3, 4) # num_samples, sequence_length, num_labels
         assert contact_parameters.shape == (2, 5 + 2) # num_samples, num_contact_params + 2 (pressure, experiment_type)
 
-
-def test_prepare_datasets(hdf5_test_file):
-    split_data, train_stats = preprocessing.prepare_datasets(hdf5_test_file,
-            pressure='1000000', experiment_type='undrained',
-            train_frac=0.5, val_frac=0.2,
-            pad_length=0, window_size=1, window_step=1,
-            standardize_outputs=True,
-            add_e0=False, add_pressure=False, add_experiment_type=False)
+def test_prepare_datasets(default_config):
+    config_TC = default_config.copy()
+    config_TC["pressure"] = '1000000'
+    config_TC["experiment_type"] = 'undrained'
+    config_TC["standardize_outputs"] = True
+    config_TC["add_pressure"] = False
+    config_TC["add_experiment_type"] = False
+    preprocessor_TC_0 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+    split_data, train_stats = preprocessor_TC_0.prepare_datasets()
 
     # Test split_data
     assert isinstance(split_data, dict)
@@ -107,19 +133,28 @@ def test_prepare_datasets(hdf5_test_file):
 
     # Test length of contact parameters when adding e0, pressure, experiment type
     # 1. Only add e_0
-    split_data_1, train_stats_1 = preprocessing.prepare_datasets(hdf5_test_file,
-         pressure='1000000', experiment_type='undrained',
-         add_e0=True, add_pressure=False, add_experiment_type=False, standardize_outputs=False)
+    config_TC["add_e0"] = True
+    config_TC["add_pressure"] = False
+    config_TC["add_experiment_type"] = False
+    config_TC["standardize_outputs"] = False
+    preprocessor_TC_1 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+    split_data_1, train_stats_1 = preprocessor_TC_1.prepare_datasets()
 
     # 2. Only add pressure
-    split_data_2, train_stats_2 = preprocessing.prepare_datasets(hdf5_test_file,
-         pressure='1000000', experiment_type='undrained',
-         add_e0=False, add_pressure=True, add_experiment_type=False, standardize_outputs=False, pad_length=1)
+    config_TC["add_e0"] = False
+    config_TC["add_pressure"] = True
+    config_TC["add_experiment_type"] = False
+    config_TC["pad_length"] = 1
+    preprocessor_TC_2 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+    split_data_2, train_stats_2 = preprocessor_TC_2.prepare_datasets()
 
     # 3. Only add experiment_type
-    split_data_3, train_stats_3 = preprocessing.prepare_datasets(hdf5_test_file,
-         pressure='1000000', experiment_type='undrained',
-         add_e0=False, add_pressure=False, add_experiment_type=True, standardize_outputs=False, pad_length=3)
+    config_TC["add_e0"] = False
+    config_TC["add_pressure"] = False
+    config_TC["add_experiment_type"] = True
+    config_TC["pad_length"] = 3
+    preprocessor_TC_3 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+    split_data_3, train_stats_3 = preprocessor_TC_3.prepare_datasets()
 
     # Comparison against train_stats: No additional contact parameters.
     assert train_stats_1['num_contact_params'] == train_stats['num_contact_params'] + 1
@@ -138,20 +173,19 @@ def test_prepare_datasets(hdf5_test_file):
 
     # Test that error is raised when unexistent hdf5 file is passed
     with pytest.raises(FileNotFoundError):
-        _ = preprocessing.prepare_datasets('unexistent_file.hdf5')
-
-    # We could test here if an error is raised if a group doesn't have the right format: inputs, outpus, contact_params
-    # but I'm supposing that people use a file from data_parsing to create their dataset, and thus this is not necessary.
+        config_TC["raw_data"] = 'unexistent_file.hdf5'
+        preprocessor_TC_U = preprocessor.PreprocessorTriaxialCompression(**config_TC)
+        _ = preprocessor_TC_U.prepare_datasets('unexistent_file.hdf5')
 
 # windows
-def test_windowize_single_dataset(dummy_dataset):
+def test_windowize_single_dataset(dummy_dataset, dummy_preprocessor):
     # dimensions with which dummy_dataset was generated.
     sequence_length = 10
     num_load_features = 4
     num_labels = 3
     num_contact_params = 5
 
-    split_data = preprocessing._make_splits(dummy_dataset, train_frac=0.7, val_frac=0.15, seed=42)
+    split_data = dummy_preprocessor.make_splits(dummy_dataset, train_frac=0.7, val_frac=0.15, seed=42)
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
 
     # sanity checks of the splits dimensions

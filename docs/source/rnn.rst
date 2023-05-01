@@ -7,8 +7,7 @@ There are four main usages of RNN module:
 
 1. `Train a RNN with your own data`_.
 2. `Make a prediction with a pre-trained model`_.
-3. `Use a trained RNN in grainLearning calibration process`_.
-4. Train a RNN model during the grainLearning calibration process.
+3. `Use a trained RNN model in grainLearning calibration process`_.
    
 Train a RNN with your own data
 ------------------------------
@@ -76,6 +75,13 @@ You can access groups and datasets:
    >>> attributes['contact_params']
    >>> array(['E', 'v', 'kr', 'eta', 'mu'], dtype=object)
 
+Understand how data is prepared
+```````````````````````````````
+
+Prior to training we do some manipulation of the numpy arrays stored in the hdf5 database to get them to tensorflow datasets. The main transformations involve: merging arrays from different hdf5 groups, standardizing the data, splitting de dataset in `train`, `validation` and `test` datasets, including or excluding information from the hdf5 group name to the parameters passed to the neural network.
+
+We have an abstract class :class:`.Preprocessor` and a child class :class:`.PreprocessorTriaxialCompression` with the implementation of the abstract methods tailored to the case of Triaxial Compression DEM simulations. At the moment, this one considers the `Sliding windows`_ technique for handling the data during training and prediction.
+
 **Option 1:** Train using wandb
 ```````````````````````````````
 `Weights a Biases <https://wandb.ai/site>`_ is an external platform that can be used for tracking experiments and hyperparameter tuning. It allows the user to gather training metrics, model configuration and system performance for different runs (i.e. training of your RNN).
@@ -95,12 +101,34 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
    :caption: my_train.py
 
    import grainlearning.rnn.train as train_rnn
+   from grainlearning.rnn import preprocessor
 
    # 1. Create my dictionary of configuration
-   my_config = train_rnn.get_default_config()
+   my_config = {
+        'raw_data': 'path_to_dataset.hdf5',
+        'pressure': 'All',
+        'experiment_type': 'drained',
+        'add_pressure': True,
+        'add_e0': True,
+        'train_frac': 0.7,
+        'val_frac': 0.15,
+        'window_size': 20,
+        'window_step': 1,
+        'patience': 25,
+        'epochs': 10,
+        'learning_rate': 1e-4,
+        'lstm_units': 250,
+        'dense_units': 250,
+        'batch_size': 256,
+        'standardize_outputs': True,
+        'save_weights_only': True
+    }
    
-   # 2. Run the training using bare tensorflow
-   train_rnn.train(config=my_config)
+   # 2. Create an object Preprocessor to pre-process my data
+   preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**my_config)
+   
+   # 3. Run the training Tensorflow and reporting to wandb
+   train_rnn.train(preprocessor_TC, config=my_config)
 
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_train.py``
 
@@ -128,41 +156,48 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
 
    import wandb
    import grainlearning.rnn.train as train_rnn
+   from grainlearning.rnn import preprocessor
 
-   wandb.login()
-   sweep_configuration = {
-    'method': 'bayes',
-    'name': 'sweep',
-    'metric': {'goal': 'maximize', 'name': 'val_acc'},
-    'parameters':
-      {
-        'raw_data': 'data/sequences.hdf5',
-        'pressure': 'All',
-        'experiment_type': 'All',
-        'add_e0': False,
-        'add_pressure': True,
-        'add_experiment_type': True,
-        'train_frac': 0.7,
-        'val_frac': 0.15,
-        'window_size': 10,
-        'window_step': 1,
-        'pad_length': 0,
-        'lstm_units': 200,
-        'dense_units': 200,
-        'patience': 5,
-        'epochs': 100,
-        'learning_rate': 1e-3,
-        'batch_size': 256,
-        'standardize_outputs': True,
-        'save_weights_only': False
+   def my_training_function():
+     """ A function that wraps the training process"""
+     preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**wandb.config)
+     train_rnn.train(preprocessor_TC)
+
+   if __name__ == '__main__':
+      wandb.login()
+      sweep_configuration = {
+      'method': 'bayes',
+      'name': 'sweep',
+      'metric': {'goal': 'maximize', 'name': 'val_acc'},
+      'parameters':
+         {
+         'raw_data': 'my_path_to_dataset.hdf5',
+         'pressure': 'All',
+         'experiment_type': 'All',
+         'add_e0': False,
+         'add_pressure': True,
+         'add_experiment_type': True,
+         'train_frac': 0.7,
+         'val_frac': 0.15,
+         'window_size': 10,
+         'window_step': 1,
+         'pad_length': 0,
+         'lstm_units': 200,
+         'dense_units': 200,
+         'patience': 5,
+         'epochs': 100,
+         'learning_rate': 1e-3,
+         'batch_size': 256,
+         'standardize_outputs': True,
+         'save_weights_only': False
+         }
       }
-   }
-   
-   # create a new sweep, here you can also configure your project and entity.
-   sweep_id = wandb.sweep(sweep=sweep_configuration)
+      
+      # create a new sweep, here you can also configure your project and entity.
+      sweep_id = wandb.sweep(sweep=sweep_configuration)
 
-   # run an agent
-   wandb.agent(sweep_id, function=train_rnn.train, count=4)
+      # run an agent
+      wandb.agent(sweep_id, function=my_training_function, count=4)
 
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_sweep.py``.
 
@@ -187,7 +222,11 @@ From the command line
    :caption: my_sweep_CL.py
 
    import grainlearning.rnn.train as train_rnn
-   train_rnn.train()
+   from grainlearning.rnn import preprocessor
+
+   wandb.init()
+   preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**wandb.config)
+   train_rnn.train(preprocessor_TC)
 
 4. Open a terminal and activate the environment where grainLearning and rnn dependencies are installed.
 5. If you are running the training in a supercomputer continue with the instructions in `Running a Sweep on HPC`_.
@@ -216,12 +255,34 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
    :caption: my_train.py
 
    import grainlearning.rnn.train as train_rnn
+   from grainlearning.rnn import preprocessor
 
    # 1. Create my dictionary of configuration
-   my_config = train_rnn.get_default_config()
+   my_config = {
+        'raw_data': 'path_to_dataset.hdf5',
+        'pressure': 'All',
+        'experiment_type': 'drained',
+        'add_pressure': True,
+        'add_e0': True,
+        'train_frac': 0.7,
+        'val_frac': 0.15,
+        'window_size': 20,
+        'window_step': 1,
+        'patience': 25,
+        'epochs': 10,
+        'learning_rate': 1e-4,
+        'lstm_units': 250,
+        'dense_units': 250,
+        'batch_size': 256,
+        'standardize_outputs': True,
+        'save_weights_only': True
+    }
    
-   # 2. Run the training using bare tensorflow
-   train_rnn.train_without_wandb(config=my_config)
+   # 2. Create an object Preprocessor to pre-process my data
+   preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**my_config)
+
+   # 3. Run the training using bare tensorflow
+   train_rnn.train_without_wandb(preprocessor_TC, config=my_config)
 
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_train.py``
 
@@ -250,22 +311,23 @@ In this example, we are going to load the same dataset that we used for training
    from pathlib import Path
 
    import grainlearning.rnn.predict as predict_rnn
-   from grainlearning.rnn.preprocessing import prepare_datasets
+   from grainlearning.rnn import preprocessor
 
    # 1. Define the location of the model to use
-   path_to_trained_model = Path('C:/GrainLearning/grainLearning/grainlearning/rnn/trained_models/My_model_1')
+   path_to_trained_model = Path('C:/trained_models/My_model_1')
 
    # 2. Get the model information
    model, train_stats, config = predict_rnn.get_pretrained_model(path_to_trained_model)
 
    # 3. Load input data to predict from
-   config['raw_data'] = '../train/data/sequences.hdf5'
-   data, _ = prepare_datasets(**config)
+   config['raw_data'] = '../train/data/my_database.hdf5'
+   preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
+   data, _ = preprocessor_TC.prepare_datasets()
 
    #4. Make a prediction
    predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
 
-If the model was trained with ``standardize_outputs = True``, ``predictions`` are going to be unstandardized (i.e. no values between [0,1] but with the original scale). 
+If the model was trained with ``standardize_outputs = True``, ``predictions`` are going to be unstandardized (i.e. no values between [0, 1] but with the original scale). 
 In our example, ``predictions`` is a tensorflow tensor of size ``(batch_size, length_sequences - window_size, num_labels)``.
 
 A wandb sweep
@@ -279,7 +341,7 @@ Often this looks like `<entity>/<project>/<sweep_id>`.
    from pathlib import Path
 
    import grainlearning.rnn.predict as predict_rnn
-   from grainlearning.rnn.preprocessing import prepare_datasets
+   from grainlearning.rnn import preprocessor
 
    # 1. Define which sweep to look into
    entity_project_sweep_id = 'grainlearning-escience/grainLearning-grainlearning_rnn/6zrc0vjb'
@@ -289,15 +351,16 @@ Often this looks like `<entity>/<project>/<sweep_id>`.
 
    # 3. Load input data to predict from
    config['raw_data'] = '../train/data/sequences.hdf5'
-   data, _ = prepare_datasets(**config)
+   preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
+   data, _ = preprocessor_TC.prepare_datasets()
 
    #4. Make a prediction
    predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
 
 This can fail if you have deleted some runs or if your wandb folder is not present in this folder. We advise to copy `config.yaml`, `train_stats.py` and `model_best.h5` from `wandb/runXXX/files` to another location and follow `Saved model`_ instructions. These files can also be downloaded from the wandb dashboard.
 
-Use a trained RNN in grainLearning calibration process
-------------------------------------------------------
+Use a trained RNN model in grainLearning calibration process
+------------------------------------------------------------
 
 A trained RNN can be used as a surrogate model and play the role of a ``DynamicSystem`` in the calibration workflow. In such case, instead of having to generate your data in advance or performing a complete DEM simulation per iteration and group of parameters, the simulation data is provided by the RNN.
 
@@ -355,7 +418,7 @@ The RNN model is a Neural Network with RNN layer implemented in Tensorflow. We c
 
 The contact parameters are first passed through 2 trainable dense layers whose outputs are ``state_h`` and ``state_c``. Such outputs are the initial state of the LSTM layer.
 
-.. note:: ``add_pressure`` and ``add_experiment_type`` (booleans in config dictionary) define wether the confinement pressure and type of experiment are added at the end of the defined contact parameters.
+.. note:: ``num_contact_params``, ``num_load_features`` and ``num_labels`` are determined during the preparation of your data and depending on the choice of Preprocessor, they may be different. CHeck the documentation of the Preprocessor that you use.
 
 Sliding windows
 ```````````````
@@ -365,7 +428,7 @@ The data is split along the temporal dimension in sliding windows of fixed lengt
 .. image:: ./figs/rnn_window.png
    :alt: Windows used for sequence splitting and model prediction
 
-The module,takes care of splitting the data into windows and stacking the predictions for each step of the sequence.
+The module takes care of splitting the data into windows and stacking the predictions for each step of the sequence.
 With this configuration, the first ``window_size`` points are not predicted by the model. To predict those too, add ``pad_length`` equals to ``window_size`` to the config dictionary. The trick here will be to add ``pad_length`` copies of the first element of `inputs` to the sequence that will be afterwards windowized.
 
 .. note:: 

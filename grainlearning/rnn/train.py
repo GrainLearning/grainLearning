@@ -11,11 +11,11 @@ import tensorflow as tf
 import wandb
 
 from grainlearning.rnn.models import rnn_model
-from grainlearning.rnn.preprocessing import prepare_datasets
+from grainlearning.rnn.preprocessor import Preprocessor
 from grainlearning.rnn.windows import windowize_single_dataset
 
 
-def train(config=None):
+def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = None):
     """
     Train a model and report to weights and biases.
 
@@ -25,7 +25,9 @@ def train(config=None):
     And run with the line shown subsequently in the terminal.
     The config is loaded from the yaml file.
 
+    :param preprocessor: Preprocessor object to load and prepare the data.
     :param config: dictionary containing model and training configurations.
+    :param model: Keras model if ``None`` is passed then an ``rnn_model`` will be created (default).
 
     :return: Same as ``tf.keras.Model.fit()``: A History object.
       Its History.history attribute is a record of training loss values and
@@ -34,15 +36,17 @@ def train(config=None):
     """
     with wandb.init(config=config):
         config = wandb.config
-        config = _check_config(config)
+        config = _check_config(config, preprocessor)
         config_optimizer = _get_optimizer_config(config)
 
         # preprocess data
-        split_data, train_stats = prepare_datasets(**config)
+        split_data, train_stats = preprocessor.prepare_datasets()
         np.save(os.path.join(wandb.run.dir, 'train_stats.npy'), train_stats)
 
         # set up the model
-        model = rnn_model(train_stats, **config)
+        if model is None:
+            model = rnn_model(train_stats, **config)
+
         optimizer = tf.keras.optimizers.Adam(**config_optimizer)
         model.compile(
                 optimizer=optimizer,
@@ -84,19 +88,21 @@ def train(config=None):
 
         return history
 
-def train_without_wandb(config=None):
+def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.keras.Model = None):
     """
     Train a model locally: no report to wandb.
     Saves either the model or its weight to folder outputs.
 
-    :param config: dictionary containing taining hyperparameters and some model parameters
+    :param preprocessor: Preprocessor object to load and prepare the data.
+    :param config: dictionary containing taining hyperparameters and some model parameters.
+    :param model: Keras model if ``None`` is passed then an ``rnn_model`` will be created (default).
 
     :return: Same as ``tf.keras.Model.fit()``: A History object.
       Its History.history attribute is a record of training loss values and
       metrics values at successive epochs, as well as
       validation loss values and validation metrics values.
     """
-    config = _check_config(config)
+    config = _check_config(config, preprocessor)
     config_optimizer = _get_optimizer_config(config)
     path_save_data = Path('outputs')
     if os.path.exists(path_save_data):
@@ -109,12 +115,14 @@ def train_without_wandb(config=None):
     os.mkdir(path_save_data)
 
     # preprocess data
-    split_data, train_stats = prepare_datasets(**config)
+    split_data, train_stats = preprocessor.prepare_datasets()
     np.save(path_save_data/'train_stats.npy', train_stats)
     np.save(path_save_data/'config.npy', config)
 
     # set up the model
-    model = rnn_model(train_stats, **config)
+    if model is None:
+        model = rnn_model(train_stats, **config)
+
     optimizer = tf.keras.optimizers.Adam(**config_optimizer)
     model.compile(
             optimizer=optimizer,
@@ -158,55 +166,32 @@ def train_without_wandb(config=None):
 
 def get_default_config():
     """
-    Returns a dictionary with default values for the configuration of data preparation,
-    RNN model and training procedure. Possible fields are:
-
-    * Data preparation
-
-      * `'raw_data'`: Path to hdf5 file generated using parse_data_YADE.py
-      * `'pressure'` and `'experiment_type'`: Name of the subfield of dataset to consider. It can also be 'All'.
-      * `'standardize_outputs'`: If True transform the data labels to have zero mean and unit variance.
-        Also, in train_stats the mean and variance of each label will be stored,
-        so that can be used to transform predicitons.
-        (This is very usful if the labels are not between [0,1])
-      * `'add_e0'`: Whether to add the initial void ratio (output) as a contact parameter.
-      * `'add_pressure'`: Wether to add the pressure to contact_parameters.
-      * `'add_experiment_type'`: Wether to add the experiment type to contact_parameters.
-      * `'train_frac'`: Fraction of the data used for training, between [0,1].
-      * `'val_frac'`: Fraction of the data used for validation, between [0,1].
-        The fraction of the data used for test is then ``1 - train_frac - val_frac``.
+    Returns a dictionary with default values for the configuration of RNN model
+    and training procedure. Possible fields are:
 
     * RNN model
 
-      * `'window_size'`: int, number of steps composing a window.
-      * `'window_step'`: int, number of steps between consecutive windows (default = 1).
-      * `'pad_length'`: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
-      * `'lstm_units'`: int, number of neurons or units in LSTM layer.
-      * `'dense_units'`: int, number of neurons or units of dense layer.
+      * ``'window_size'``: int, number of steps composing a window.
+      * ``'window_step'``: int, number of steps between consecutive windows (default = 1).
+      * ``'pad_length'``: int, equals to ``window_size``. Length of the sequence that with be pad at the start.
+      * ``'lstm_units'``: int, number of neurons or units in LSTM layer.
+      * ``'dense_units'``: int, number of neurons or units of dense layer.
 
     * Training procedure
 
-      * `'patience'`: patience of `tf.keras.callbacks.EarlyStopping`.
-      * `'epochs'`: Maximum number of epochs.
-      * `'learning_rate'`: double, learning_rate of `tf.keras.optimizers.Adam`.
-      * `'batch_size'`: Size of the data batches per training step.
-      * `'save_weights_only'`:
+      * ``'patience'``: patience of `tf.keras.callbacks.EarlyStopping`.
+      * ``'epochs'``: Maximum number of epochs.
+      * ``'learning_rate'``: double, learning_rate of `tf.keras.optimizers.Adam`.
+      * ``'batch_size'``: Size of the data batches per training step.
+      * ``'save_weights_only'``: Boolean
 
-        * True: Only the weights will be saved.
-        * False: The whole model will be saved **(Recommended)**.
+        * True: Only the weights will be saved (**Recommended** fro compatibility across platforms).
+        * False: The whole model will be saved.
 
 
     :return: Dictionary containing default values of the arguments that the user can set.
     """
     return {
-        'raw_data': 'data/sequences.hdf5',
-        'pressure': 'All',
-        'experiment_type': 'All',
-        'add_e0': False,
-        'add_pressure': True,
-        'add_experiment_type': True,
-        'train_frac': 0.7,
-        'val_frac': 0.15,
         'window_size': 10,
         'window_step': 1,
         'pad_length': 0,
@@ -221,7 +206,7 @@ def get_default_config():
     }
 
 
-def _check_config(config):
+def _check_config(config: dict, preprocessor: Preprocessor):
     """
     Checks that values requiring an input from the user would be specified in config.
 
@@ -229,8 +214,6 @@ def _check_config(config):
 
     :return: Updated config dictionary.
     """
-    # Necessary keys
-    if 'raw_data' not in config.keys(): raise ValueError("raw_data has not been defined in config")
     # Note: I systematically use config.keys() instead of in config, because config can be a dict from wandb
     # This object behaves differently than python dict (might be jsut the version), but this solves it.
 
@@ -242,21 +225,20 @@ def _check_config(config):
         config = _warning_config_field(key, config, defaults[key], add_default_to_config=True)
 
     # Warning that defaults would be used if not defined
-    keys_to_check = ['pressure', 'experiment_type', 'standardize_outputs', 'add_e0',
-                     'pad_length', 'train_frac', 'val_frac', 'add_pressure', 'add_experiment_type']
+    keys_to_check = ['pad_length']
     for key in keys_to_check:
         _warning_config_field(key, config, defaults[key])
 
     # Warning for an unexpected key value
     config_optimizer = _get_optimizer_config(config)
     for key in config.keys():
-        if key not in defaults and key not in config_optimizer:
+        if key not in defaults and key not in config_optimizer and key not in preprocessor.get_default_config():
             warnings.warn(f"Unexpected key in config: {key}. Allowed keys are {defaults.keys()}.")
 
     return config
 
 
-def _warning_config_field(key, config, default, add_default_to_config=False):
+def _warning_config_field(key, config, default, add_default_to_config = False):
     """
     Raises a warning if key is not included in config dictionary.
     Also informs the default value that will be used.

@@ -49,18 +49,10 @@ Python API
 ``RNN Module``
 **************
 
-data parsing
-++++++++++++
-
-.. automodule:: grainlearning.rnn.data_parsing.triaxial_YADE
-    :members:
-    :show-inheritance:
-    :inherited-members:
-
 data pre-processing
 +++++++++++++++++++
 
-.. automodule:: grainlearning.rnn.preprocessing
+.. automodule:: grainlearning.rnn.preprocessor
     :members:
     :show-inheritance:
     :inherited-members:
