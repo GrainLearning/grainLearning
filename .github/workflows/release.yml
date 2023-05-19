@@ -1,4 +1,4 @@
-name: Build and upload to PyPI adn zenodo
+name: Build and upload to PyPI and zenodo
 
 on:
   workflow_dispatch:
@@ -65,18 +65,17 @@ jobs:
         steps:
           - name: Checkout the contents of your repository
             uses: actions/checkout@v2
-          - name: Create a draft snapshot of your repository contents as a new
-                  version in collection 7118564 on Zenodo using metadata
+          - name: Create a draft snapshot of the repository contents as a new
+                  version in collection 7123966 on Zenodo using metadata
                   from repository file .zenodo.json
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
+              ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_TOKEN }}
             uses: zenodraft/action@0.10.0
             with:
               compression: zip
               collection: 7123966
               metadata: .zenodo.json
               publish: false
-              sandbox: true
               upsert-doi: true
               upsert-location: identifiers[1]
