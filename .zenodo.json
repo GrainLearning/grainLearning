@@ -1,0 +1,45 @@
+{
+  "creators": [
+    {
+      "affiliation": "University of Twente",
+      "name": "Cheng, Hongyang",
+      "orcid": "0000-0001-7652-8600"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": " Orozco, Luisa",
+      "orcid": "0000-0002-9153-650X"
+    },
+    {
+      "affiliation": "University of Twente",
+      "name": "Lubbe, Retief"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Jansen, Aron",
+      "orcid": "0000-0002-4764-9347"
+    },
+    {
+      "affiliation": "University of Newcastle",
+      "name": "Hartmann, Philipp",
+      "orcid": "0000-0002-2524-8024"
+    },
+    {
+      "affiliation": "University of Newcastle",
+      "name": "Thoeni, Klaus",
+      "orcid": "0000-0001-7351-7447"
+    }
+  ],
+  "description": "GrainLearning is a Bayesian uncertainty quantification and propagation toolbox for computer simulations of granular materials. The software is primarily used to infer and quantify parameter uncertainties in computational models of granular materials from observation data, also known as inverse analyses or data assimilation. Implemented in Python, GrainLearning can be loaded into a Python environment to process the simulation and observation data, or alternatively, as an independent tool where simulation runs are done separately, e.g., via a shell script.",
+  "keywords": [
+    "Uncertainty quantification",
+    "Granular materials",
+    "Machine learning",
+    "Calibration",
+    "Bayesian inference"
+  ],
+  "license": {
+    "id": "GPL-2.0"
+  },
+  "title": "GrainLearning"
+}

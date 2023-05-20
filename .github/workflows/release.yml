@@ -1,0 +1,81 @@
+name: Build and upload to PyPI and zenodo
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
+      
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10
+          
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install poetry
+          poetry lock --no-update
+          poetry install -E dev -E rnn
+      - name: Verify that we can build the package
+        run: poetry build
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*
+      
+  upload_test_pypi:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+  upload_pypi:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          
+  publish-zenodo:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout the contents of your repository
+            uses: actions/checkout@v2
+          - name: Create a draft snapshot of the repository contents as a new
+                  version in collection 7123966 on Zenodo using metadata
+                  from repository file .zenodo.json
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+            uses: zenodraft/action@0.10.0
+            with:
+              compression: zip
+              collection: 7123966
+              metadata: .zenodo.json
+              publish: false
+              upsert-doi: true
+              upsert-location: identifiers[1]
