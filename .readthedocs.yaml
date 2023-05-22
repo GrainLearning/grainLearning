@@ -5,8 +5,12 @@ build:
   tools:
     python: "3.9"
   jobs:
-    post_install:
+    post_create_environment:
+      # install poetry https://docs.readthedocs.io/en/stable/build-customization.html#id11
       - pip install poetry
+      # Tell poetry to not use a virtual environment 
+      # (We are in a virtual environement anyway)
       - poetry config virtualenvs.create false
+    post_install:
       - poetry lock --no-update
       - poetry install -E docs -E rnn
