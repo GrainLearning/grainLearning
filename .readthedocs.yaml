@@ -12,5 +12,5 @@ build:
       # (We are in a virtual environement anyway)
       - poetry config virtualenvs.create false
     post_install:
-      - poetry lock --no-update
+      # - poetry lock --no-update
       - poetry install -E docs -E rnn
