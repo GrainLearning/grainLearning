@@ -23,7 +23,7 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 - Uniform, quasi-random sampling using [low-discrepancy sequences](https://en.wikipedia.org/wiki/Halton_sequence)
 - Iterative sampling by training a
   nonparametric [Gaussian mixture model](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.BayesianGaussianMixture.html)
-- Surrogate modeling capability for "time" series data
+- [Surrogate modeling](https://grainlearning.readthedocs.io/en/latest/rnn.html) capability for "time" series data
 
 [//]: # (using [recurrent neural networks]&#40;https://en.wikipedia.org/wiki/Recurrent_neural_network&#41;)
 
@@ -81,9 +81,9 @@ However, you still need to clone the GrainLearning repository to run the tutoria
 4. Load existing simulation data and run GrainLearning for one iteration,
    in [oedo_load_and_resample.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/oedo_compression/oedo_load_and_resample.py)
 5. RNN module tutorials:
-  - [Train your RNN](tutorials/rnn/train_rnn.ipynb)
-  - [Predict using an RNN](tutorials/rnn/predict.ipynb)
-  - [Use an RNN in the calibration workflow](tutorials/rnn/rnn_calibration_GL.ipynb)
+    - [Train your RNN](tutorials/rnn/train_rnn.ipynb)
+    - [Predict using an RNN](tutorials/rnn/predict.ipynb)
+    - [Use an RNN in the calibration workflow](tutorials/rnn/rnn_calibration_GL.ipynb)
 
 ## Citing GrainLearning
 
@@ -102,14 +102,13 @@ Please choose from the following:
 
 ## Community
 
-The original development of `GrainLearning` is done by [Hongyang Cheng](hongyangcheng.weebly.com), in collaboration
+The original development of `GrainLearning` is done by [Hongyang Cheng](https://hongyangcheng.weebly.com), in collaboration
 with [Klaus Thoeni](https://www.newcastle.edu.au/profile/klaus-thoeni)
 , [Philipp Hartmann](https://www.newcastle.edu.au/profile/philipp-hartmann),
 and [Takayuki Shuku](https://sites.google.com/view/takayukishukuswebsite/home).
-The software is currently maintained with the help
+The software is currently maintained by [Hongyang Cheng](https://hongyangcheng.weebly.com) and [Stefan Luding](https://www2.msm.ctw.utwente.nl/sluding/) with the help
 of [Luisa Orozco](https://www.esciencecenter.nl/team/dr-luisa-orozco/)
-, [Retief Lubbe](https://tusail.eu/projects/esr-12.html),
-and [Aron Jansen](https://www.esciencecenter.nl/team/dr-aron-jansen/).
+and [Retief Lubbe](https://tusail.eu/projects/esr-12.html).
 The GrainLearning project receives contributions from students and collaborators. For an exhaustive list,
 see [CONTRIBUTORS.md]().
 
