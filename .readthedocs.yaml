@@ -12,5 +12,6 @@ build:
       # (We are in a virtual environement anyway)
       - poetry config virtualenvs.create false
     post_install:
+      # commented out because poetry in readthedocs environement was not able to find right packages otherwise
       # - poetry lock --no-update
       - poetry install -E docs -E rnn
