@@ -13,7 +13,7 @@ During the installation of grainLearning activate extra `rnn`:
 
 *Note:* This will install a version of tensorflow depending on your system. If gpu dependencies are not installed or activated, it will default to **CPU** version. Check the installation of tensorflow and/or re-install it following specific instructions for your hardware.
 
-For MacOS with arm64 processor, we recommend to install  tensorflow following [this](https://betterdatascience.com/install-tensorflow-2-7-on-macbook-pro-m1-pro/) and install grainLearning without `rnn` extra.
+> For MacOS with arm64 processor, we recommend to install  tensorflow following [this](https://betterdatascience.com/install-tensorflow-2-7-on-macbook-pro-m1-pro/) and install grainLearning without `rnn` extra. In this case if you want to have [weights and biases](https://wandb.ai/site) you can install it via `pip install wandb`.
 
 ## How to use
 

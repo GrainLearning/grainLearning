@@ -10,7 +10,6 @@
 | Documentation                | [![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest)|
 | Code Quality                | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=GrainLearning_grainLearning&metric=coverage)](https://sonarcloud.io/summary/new_code?id=GrainLearning_grainLearning) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GrainLearning_grainLearning&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=GrainLearning_grainLearning) |
 
-
 Bayesian uncertainty quantification for discrete and continuum numerical models of granular materials,
 developed by various projects of the University of Twente (NL), the Netherlands eScience Center (NL), University of
 Newcastle (AU), and Hiroshima University (JP).
@@ -45,6 +44,10 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 1. Go to the source code directory: `cd grainLearning`
 1. Activate the virtual environment: `conda create --name grainlearning python=3.8 && conda activate grainlearning`
 1. Install GrainLearning and its dependencies: `pip install .`
+
+__Developers__ please refer to [README.dev.md](README.dev.md).
+
+To install GrainLearning including the RNN module capabilities check [grainlearning/rnn/README.md](grainlearning/rnn/README.md).
 
 ### For Windows users
 
@@ -109,12 +112,11 @@ and [Takayuki Shuku](https://sites.google.com/view/takayukishukuswebsite/home).
 The software is currently maintained by [Hongyang Cheng](https://hongyangcheng.weebly.com) and [Stefan Luding](https://www2.msm.ctw.utwente.nl/sluding/) with the help
 of [Luisa Orozco](https://www.esciencecenter.nl/team/dr-luisa-orozco/)
 and [Retief Lubbe](https://tusail.eu/projects/esr-12.html).
-The GrainLearning project receives contributions from students and collaborators. For an exhaustive list,
-see [CONTRIBUTORS.md]().
+The GrainLearning project receives contributions from students and collaborators.
 
 ## Help and Support
 
-For assistance with the GrainLearning software, please raise an issue on the GitHub Issues page.
+For assistance with the GrainLearning software, please create an issue on the GitHub Issues page.
 
 ## Credits
 
