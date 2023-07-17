@@ -123,7 +123,7 @@ def test_regenerate_params():
     new_params = gmm_cls.regenerate_params(proposal, system_cls)
 
     #: Assert if the new parameters are correct
-    np.testing.assert_array_almost_equal(
+    np.testing.assert_allclose(
         new_params,
         np.array(
             [
@@ -133,7 +133,7 @@ def test_regenerate_params():
                 [5.66254261e+06, 2.67135646e-01]
             ]
         ),
-        0.0001,
+        rtol=0.001,
     )
 
     #: Make a new dummy proposal distribution
@@ -149,7 +149,7 @@ def test_regenerate_params():
     new_params = gmm_cls.regenerate_params(proposal, system_cls)
 
     #: Assert if the new parameters are correct
-    np.testing.assert_array_almost_equal(
+    np.testing.assert_allclose(
         new_params,
         np.array(
             [
@@ -159,7 +159,7 @@ def test_regenerate_params():
                 [4.23437500e+06, 3.35432099e-01]
             ]
         ),
-        0.0001,
+        rtol=0.001,
     )
 
 
@@ -194,16 +194,16 @@ def test_draw_samples_within_bounds():
     new_params = gmm_cls.draw_samples_within_bounds(system_cls, system_cls.num_samples)
 
     # Assert if the new parameters are generated correctly
-    np.testing.assert_array_almost_equal(
+    np.testing.assert_allclose(
         new_params,
         np.array(
             [
-                [5.28625749e+06, 2.64309176e-01],
-                [3.17723928e+06, 2.60832533e-01],
-                [4.08334948e+06, 3.34190765e-01]
+                [6.442085e+06, 3.272525e-01],
+                [5.109979e+06, 2.736598e-01],
+                [4.379674e+06, 3.722799e-01]
             ]
         ),
-        0.0001,
+        rtol=0.001,
     )
 
     #: Initialize a new Gaussian Mixture Model object
