@@ -463,7 +463,7 @@ class IODynamicSystem(DynamicSystem):
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
         callback: Callable = None,
-        param_data_file: str = None,
+        param_data_file: str = '',
         param_data: np.ndarray = None,
         param_names: List[str] = None,
     ):
@@ -539,7 +539,7 @@ class IODynamicSystem(DynamicSystem):
             obs_data_file=obj["obs_data_file"],
             obs_names=obj["obs_names"],
             ctrl_name=obj["ctrl_name"],
-            param_data_file=obj.get("param_data_file", None),
+            param_data_file=obj.get("param_data_file", ''),
             obs_data=obj.get("obs_data", None),
             num_samples=obj.get("num_samples", None),
             param_min=obj.get("param_min", None),
@@ -566,9 +566,7 @@ class IODynamicSystem(DynamicSystem):
             self.num_steps = len(self.ctrl_data)
             # remove the data not used by Bayesian filtering
             self.num_obs = len(self.obs_names)
-            for key in keys_and_data:
-                if key not in self.obs_names:
-                    keys_and_data.pop(key)
+            keys_and_data = {key: keys_and_data[key] for key in self.obs_names}
             # assign the obs_data array
             self.obs_data = np.zeros([self.num_obs, self.num_steps])
             for i, key in enumerate(self.obs_names):
@@ -636,15 +634,17 @@ class IODynamicSystem(DynamicSystem):
             self.param_data = np.genfromtxt(self.param_data_file, comments='!')[:, -self.num_params:]
             self.num_samples = self.param_data.shape[0]
         else:
-            # if param_data_file does not exit, get parameter daa from simulation data files
-            files = glob(self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*{self.sim_data_file_ext}')
+            # if param_data_file does not exit, get parameter data from text files
+            files = glob(self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*_param*{self.sim_data_file_ext}')
             self.num_samples = len(files)
             self.sim_data_files = sorted(files)
             self.param_data = np.zeros([self.num_samples, self.num_params])
             for i, sim_data_file in enumerate(self.sim_data_files):
-                # TODO: this is still for npy, support text file formats
-                data = np.load(sim_data_file, allow_pickle=True).item()
-                params = [data[key] for key in self.param_names]
+                if self.sim_data_file_ext == '.npy':
+                    data = np.load(sim_data_file, allow_pickle=True).item()
+                else:
+                    data = get_keys_and_data(sim_data_file)
+                params = [data[key][0] for key in self.param_names]
                 self.param_data[i, :] = params
 
     def run(self, **kwargs):

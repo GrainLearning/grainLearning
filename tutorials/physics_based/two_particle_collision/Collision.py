@@ -25,6 +25,8 @@ from grainlearning.tools import write_dict_to_file
 isBatch = runningInBatch()
 if isBatch:
     description = O.tags['description']
+else:
+    description = 'collision_test_run'
 
 # glass bead parameters (units: ug->1e-9kg; mm->1e-3m; ms->1e-3s)
 lenScale = 1e3  # length in mm <- 1e-3 m
