@@ -198,7 +198,7 @@ class TestIODynamicSystem:
             param_max=[1, 10],
             param_names=['a', 'b'],
             num_samples=20,
-            obs_data_file=path.abspath(path.join(__file__, "../..")) + '/data/linear_sim_data/linearObs.dat',
+            obs_data_file=path.abspath(path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
             obs_names=['f'],
             ctrl_name='u',
             sim_name='linear',
@@ -212,7 +212,7 @@ class TestIODynamicSystem:
             "param_max": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
-            "obs_data_file": path.abspath(path.join(__file__, "../..")) + '/data/linear_sim_data/linearObs.dat',
+            "obs_data_file": path.abspath(path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'linear',
@@ -246,10 +246,10 @@ class TestIODynamicSystem:
                 data.append(np.array(y, ndmin=2))
                 # Write the data to a file
                 data_file_name = f'{sim_name}_' + description + '_sim.txt'
-                write_dict_to_file({'f': y}, data_file_name)
+                write_dict_to_file({'f': list(y)}, data_file_name)
                 # Write the parameters to a file
                 data_param_name = f'{sim_name}_' + description + '_param.txt'
-                param_data = {'param0': [param[0]], 'param1': [param[1]], 'param2': [param[2]], 'param3': [param[3]]}
+                param_data = {'a': [param[0]], 'b': [param[1]], 'c': [param[2]], 'd': [param[3]]}
                 write_dict_to_file(param_data, data_param_name)
             # Set the simulation data
             system.set_sim_data(data)
@@ -259,7 +259,7 @@ class TestIODynamicSystem:
             param_max=[None, None, None, None],
             param_names=['a', 'b', 'c', 'd'],
             num_samples=10,
-            obs_data_file=path.abspath(path.join(__file__, "../..")) + '/data/linear_sim_data/linearObs.dat',
+            obs_data_file=path.abspath(path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
             obs_names=['f'],
             ctrl_name='u',
             sim_name='test',
@@ -301,7 +301,7 @@ class TestIODynamicSystem:
             "system_type": IODynamicSystem,
             "param_min": [0.001, 0.001],
             "param_max": [1, 10],
-            "obs_data_file": path.abspath(path.join(__file__, "../../data/linear_sim_data/linearObs.dat")),
+            "obs_data_file": path.abspath(path.join(__file__, "../../data/linear_sim_data/linear_obs.dat")),
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'linear',

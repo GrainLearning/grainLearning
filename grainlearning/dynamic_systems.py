@@ -613,9 +613,9 @@ class IODynamicSystem(DynamicSystem):
         for i, sim_data_file in enumerate(self.sim_data_files):
             if self.sim_data_file_ext != '.npy':
                 data = get_keys_and_data(sim_data_file)
-                param_data = np.genfromtxt(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
-                for j, key in enumerate(self.param_names):
-                    data[key] = param_data[j]
+                param_data = get_keys_and_data(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
+                for key in self.param_names:
+                    data[key] = param_data[key][0]
             else:
                 data = np.load(sim_data_file, allow_pickle=True).item()
 
@@ -623,14 +623,7 @@ class IODynamicSystem(DynamicSystem):
                 self.sim_data[i, j, :] = data[key]
 
             params = np.array([data[key] for key in self.param_names])
-            if not (np.abs((params - self.param_data[i, :])
-                           / self.param_data[i, :] < 1e-5).all()):
-                raise RuntimeError(
-                    "Parameters [" + ", ".join(
-                        [f"{v}" for v in self.param_data[i, :]])
-                    + '] vs [' +
-                    ", ".join(f"{v}" for v in params) +
-                    f"] from the simulation data file {sim_data_file} and the parameter table do not match")
+            np.testing.assert_allclose(params, self.param_data[i, :], rtol=1e-5)
 
     def load_param_data(self, curr_iter: int = 0):
         """
@@ -692,7 +685,7 @@ class IODynamicSystem(DynamicSystem):
         :return param_data_file: The name of the parameter data file
         """
         self.param_data_file = write_to_table(
-            f'{os.getcwd()}/{self.sim_name}',
+            self.sim_name,
             self.param_data,
             self.param_names,
             curr_iter)

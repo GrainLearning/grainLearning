@@ -14,7 +14,7 @@ executable = f'python {PATH}/linear_model.py'
 
 def run_sim(model, **kwargs):
     """
-    Runs the external executable and passes the parameter sample to generate the output file.
+    Run the external executable and passes the parameter sample to generate the output file.
     """
     # keep the naming convention consistent between iterations
     mag = floor(log(model.num_samples, 10)) + 1
@@ -40,7 +40,7 @@ def test_lenreg_IO():
                 "param_names": ['a', 'b'],
                 "num_samples": 20,
                 "obs_data_file": os.path.abspath(
-                    os.path.join(__file__, "../..")) + '/data/linear_sim_data/linearObs.dat',
+                    os.path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
                 "sim_name": 'linear',

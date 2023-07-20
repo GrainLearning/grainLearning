@@ -183,7 +183,7 @@ def test_save_and_load_proposal():
         obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
         ctrl_data=[1, 2, 3, 4],
         param_names=['a', 'b'],
-        obs_data_file=os.path.abspath(os.path.join(__file__, "../..")) + '/data/linear_sim_data/linearObs.dat',
+        obs_data_file=os.path.abspath(os.path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
     )
 
     #: Assert that the inference runs correctly if a proposal density is provided

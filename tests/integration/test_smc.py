@@ -15,7 +15,7 @@ def test_smc():
             "num_iter": 0,
             "system": {
                 "system_type": IODynamicSystem,
-                "obs_data_file": f'{sim_data_dir}/linearObs.dat',
+                "obs_data_file": f'{sim_data_dir}/linear_obs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
                 "sim_name": 'linear',
