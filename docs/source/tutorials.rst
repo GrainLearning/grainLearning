@@ -152,7 +152,7 @@ and `sim_data_file_ext` is correct such that GrainLearning can find the data in 
                 "param_max": [1, 10],
                 "param_names": ['a', 'b'],
                 "num_samples": 20,
-                "obs_data_file": 'linearObs.dat',
+                "obs_data_file": 'linear_obs.dat',
                 "obs_names": ['f'],
                 "ctrl_name": 'u',
                 "sim_name": 'linear',

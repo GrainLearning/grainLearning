@@ -11,20 +11,20 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 executable = f'python {PATH}/linear_model.py'
 
 
-def run_sim(model, **kwargs):
+def run_sim(system, **kwargs):
     """
-    Runs the external executable and passes the parameter sample to generate the output file.
+    Run the external executable and passes the parameter sample to generate the output file.
     """
     # keep the naming convention consistent between iterations
-    mag = floor(log(model.num_samples, 10)) + 1
+    mag = floor(log(system.num_samples, 10)) + 1
     curr_iter = kwargs['curr_iter']
     # check the software name and version
     print("*** Running external software... ***\n")
     # loop over and pass parameter samples to the executable
-    for i, params in enumerate(model.param_data):
+    for i, params in enumerate(system.param_data):
         description = 'Iter' + str(curr_iter) + '_Sample' + str(i).zfill(mag)
-        print(" ".join([executable, "%.8e %.8e" % tuple(params), description]))
-        os.system(' '.join([executable, "%.8e %.8e" % tuple(params), description]))
+        print(" ".join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
+        os.system(' '.join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
 
 
 calibration = BayesianCalibration.from_dict(
@@ -36,7 +36,7 @@ calibration = BayesianCalibration.from_dict(
             "param_max": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 20,
-            "obs_data_file": PATH + '/linearObs.dat',
+            "obs_data_file": PATH + '/linear_obs.dat',
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'linear',
