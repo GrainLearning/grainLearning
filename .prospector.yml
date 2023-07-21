@@ -11,6 +11,8 @@ member-warnings: false
 
 ignore-paths:
   - docs
+  - tests
+  - tutorials
 
 pyroma:
     run: true
