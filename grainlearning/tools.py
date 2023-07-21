@@ -7,6 +7,7 @@ import math
 import subprocess
 from typing import List, Callable
 import numpy as np
+import matplotlib.pylab as plt
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.spatial import Voronoi, ConvexHull
 
@@ -59,14 +60,14 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
     """
 
     # Computation of decimal number for unique key
-    table_file_name = f'{os.getcwd()}/{sim_name}_Iter{curr_iter}_Samples.txt'
+    table_file_name = f'{sim_name}_Iter{curr_iter}_Samples.txt'
 
     with open(table_file_name, 'w') as f_out:
         num, dim = table.shape
         mag = math.floor(math.log(num, 10)) + 1
         f_out.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
         for j in range(num):
-            description = f'{sim_name}_Iter' + str(curr_iter) + '-Sample' + str(j).zfill(mag)
+            description = 'Iter' + str(curr_iter) + '-Sample' + str(j).zfill(mag)
             f_out.write(' '.join(
                 [f'{threads:2d}'] + [description] +
                 [f'{j:9d}'] + [f'{table[j][i]:20.10e}' for i in range(dim)] + ['\n']))
@@ -83,7 +84,14 @@ def get_keys_and_data(file_name: str, delimiters=None):
     """
     if delimiters is None:
         delimiters = ['\t', ' ', ',']
-    data = np.genfromtxt(file_name, ndmin=2)
+    data = np.genfromtxt(file_name)
+
+    try:
+        nc_ols = data.shape[1]
+    except IndexError:
+        n_rows = data.shape[0]
+        nc_ols = 1
+        data = data.reshape([n_rows, 1])
 
     with open(file_name, 'r') as f_open:
         first_line = f_open.read().splitlines()[0]
@@ -94,7 +102,7 @@ def get_keys_and_data(file_name: str, delimiters=None):
                 keys.remove('#')
             # remove empty strings from the list
             keys = list(filter(None, keys))
-            if len(keys) == data.shape[1]:
+            if len(keys) == nc_ols:
                 break
 
     # store data in a dictionary
@@ -401,7 +409,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
     :param covs: ndarray
     :param save_fig: bool defaults to False
     """
-    import matplotlib.pylab as plt
     num = len(param_names)
     n_cols = int(np.ceil(num / 2))
     plt.figure('Posterior means of the parameters')
@@ -442,10 +449,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
     :param posterior: ndarray
     :param save_fig: bool defaults to False
     """
-    try:
-        import matplotlib.pylab as plt
-    except ImportError:
-        print('matplotlib is not installed, cannot plot posterior distribution. Please install with grainlearning[plot]')
     num_steps = posterior.shape[0]
     for i, name in enumerate(param_names):
         plt.figure(f'Posterior distribution of {name}')
@@ -465,7 +468,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
 
 
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
-    import matplotlib.pylab as plt
     num = len(param_names)
     n_cols = int(np.ceil(num / 2))
     num = num - 1
@@ -499,7 +501,6 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     :param posterior: ndarray
     :param save_fig: bool defaults to False
     """
-    import matplotlib.pylab as plt
     ensemble_mean = np.einsum('ijk, ki->jk', sim_data, posteriors)
     ensemble_std = np.einsum('ijk, ki->jk', (sim_data - ensemble_mean) ** 2, posteriors)
     ensemble_std = np.sqrt(ensemble_std)
@@ -548,10 +549,6 @@ def write_dict_to_file(data, file_name):
     with open(file_name, 'w') as f:
         keys = data.keys()
         f.write('# ' + ' '.join(keys) + '\n')
-        # check if data[list(keys)[0]] is a list
-        if isinstance(data[list(keys)[0]], list):
-            num = len(data[list(keys)[0]])
-            for i in range(num):
-                f.write(' '.join([str(data[key][i]) for key in keys]) + '\n')
-        else:
-            f.write(' '.join([str(data[key]) for key in keys]) + '\n')
+        num = len(data[list(keys)[0]])
+        for i in range(num):
+            f.write(' '.join([str(data[key][i]) for key in keys]) + '\n')

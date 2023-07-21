@@ -20,8 +20,7 @@ def write_dict_to_file(data, file_name):
 
 a = float(sys.argv[1])
 b = float(sys.argv[2])
-sim_name = sys.argv[3]
-description = sys.argv[4]
+description = sys.argv[3]
 
 x_obs = np.arange(100)
 y_sim = a * x_obs + b
@@ -35,10 +34,10 @@ y_sim = a * x_obs + b
 # np.save(data_file_name,data)
 
 # write sim data and parameter in text files
-data_file_name = f'{sim_name}_{description}_sim.txt'
+data_file_name = 'linear_' + description + '_sim.txt'
 sim_data = {'f': y_sim}
 write_dict_to_file(sim_data, data_file_name)
 
-data_param_name = f'{sim_name}_{description}_param.txt'
+data_param_name = 'linear_' + description + '_param.txt'
 param_data = {'a': [a], 'b': [b]}
 write_dict_to_file(param_data, data_param_name)

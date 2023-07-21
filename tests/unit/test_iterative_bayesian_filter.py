@@ -171,12 +171,20 @@ def test_run_inference():
 def test_save_and_load_proposal():
     """Test if the proposal density can be loaded from a file"""
     #: Initialize a system object (note the observed data is not used in this test)
-    system_cls = IODynamicSystem(sim_name='test_ibf', sim_data_dir=PATH + '/sim_data/', sim_data_file_ext='.txt',
-                                 obs_data_file=os.path.abspath(
-                                     os.path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
-                                 obs_names=['f'], ctrl_name='u', num_samples=10, param_min=[1e6, 0.2],
-                                 param_max=[1e7, 0.5], obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]], ctrl_data=[1, 2, 3, 4],
-                                 param_names=['a', 'b'])
+    system_cls = IODynamicSystem(
+        sim_name='test_ibf',
+        sim_data_dir=PATH + '/sim_data/',
+        sim_data_file_ext='.txt',
+        obs_names=['f'],
+        ctrl_name='u',
+        num_samples=10,
+        param_min=[1e6, 0.2],
+        param_max=[1e7, 0.5],
+        obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]],
+        ctrl_data=[1, 2, 3, 4],
+        param_names=['a', 'b'],
+        obs_data_file=os.path.abspath(os.path.join(__file__, "../..")) + '/data/linear_sim_data/linearObs.dat',
+    )
 
     #: Assert that the inference runs correctly if a proposal density is provided
     ibf_cls = IterativeBayesianFilter.from_dict(
