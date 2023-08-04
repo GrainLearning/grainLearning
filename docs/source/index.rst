@@ -6,18 +6,17 @@
 Welcome to GrainLearning's documentation!
 =========================================
 
-GrainLearning is a Bayesian uncertainty quantification and propagation toolbox for computer simulations
-of granular materials.
-The software is primarily used to infer and quantify parameter uncertainties in computational models of granular materials
-from observation data, which is also known as inverse analyses or data assimilation. 
-Implemented in Python, GrainLearning can be loaded into a Python environment to process the simulation and observation data,
-or alternatively, as an independent tool where simulation runs are done separately, e.g., via a shell script.
+GrainLearning is a Bayesian uncertainty quantification toolbox for computer simulations of granular materials.
+The software is primarily used to infer model parameter distributions from observation or reference data,
+a process also known as inverse analyses or data assimilation. 
+Implemented in Python, GrainLearning can be loaded into a Python environment to process your simulation and observation data,
+or alternatively, used as an independent tool where simulations are run separately, e.g., from the command line.
 
-If you use GrainLearning, please cite `the version of the GrainLearning software you used <https://zenodo.org/record/7123966>`_ and the following paper:
+If you use GrainLearning, please cite `the version of the GrainLearning software you used <https://zenodo.org/record/7123966>`_.
+If you want to know more about how the method works, the following papers can be interesting:
 
-H. Cheng, T. Shuku, K. Thoeni, P. Tempone, S. Luding, V. Magnanimo.
-An iterative Bayesian filtering framework for fast and automated calibration of DEM models. *Comput. Methods Appl. Mech. Eng., 350 (2019)*, pp. 268-294,
-`10.1016/j.cma.2019.01.027 <https://doi.org/10.1016/j.cma.2019.01.027>`_
+- H. Cheng, T. Shuku, K. Thoeni, P. Tempone, S. Luding, V. Magnanimo. An iterative Bayesian filtering framework for fast and automated calibration of DEM models. *Comput. Methods Appl. Mech. Eng., 350 (2019)*, pp. 268-294, `10.1016/j.cma.2019.01.027 <https://doi.org/10.1016/j.cma.2019.01.027>`_
+- P. Hartmann, H. Cheng, K. Thoeni. Performance study of iterative Bayesian filtering to develop an efficient calibration framework for DEM. *Computers and Geotechnics 141*, 104491,  `10.1016/j.compgeo.2021.104491 <https://doi.org/10.1016/j.compgeo.2021.104491>`_
 
 .. toctree::
    :maxdepth: 2

@@ -105,7 +105,7 @@ Online
 
 You can check the online documentation `here <https://grainlearning.readthedocs.io/en/latest/>`_.
 
-Build the documentation
+Build the documentation locally
 ```````````````````````
 
 .. code-block:: bash

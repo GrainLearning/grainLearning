@@ -4,15 +4,19 @@ Dynamic systems
 The dynamic system module
 -------------------------
 
-The :mod:`.dynamic_systems` module is essential for GrainLearning to execute computational models
-and encapsulate simulation and observation (reference) data in a single :class:`.DynamicSystem` class.
+The :mod:`.dynamic_systems` module is essential for GrainLearning to run the predictive model(s)
+and encapsulate simulation and observation (or reference) data in a single :class:`.DynamicSystem` class.
 Currently, the :mod:`.dynamic_systems` module contains
 
-- a :class:`.DynamicSystem` class that executes simulations handles the simulation and observation data in a *Python environment*,
-- an :class:`.IODynamicSystem` class that sends instructions to *third-party software* (from the command line) and retrieves simulation data from the output files of the software.
+- a :class:`.DynamicSystem` class that handles the simulation and observation data within a *Python environment*,
+- an :class:`.IODynamicSystem` class that sends instructions to *third-party software* (e.g., via the command line)
+and retrieves simulation data from the output files of the software.
 
-Note that the dynamic system classes defined in GrainLearning are also known as state-space models
-that consist of the predicted states :math:`\vec{x}_t` (:attr:`.DynamicSystem.sim_data`) and experimental observables :math:`\vec{y}_t` (:attr:`.DynamicSystem.obs_data`).
+Note that a dynamic system is also known as a state-space model in the literature.
+It describes the time evolution of the state of the model :math:`\vec{x}_t` (:attr:`.DynamicSystem.sim_data`)
+and the state of the observables :math:`\vec{y}_t` (:attr:`.DynamicSystem.obs_data`).
+Both :math:`\vec{x}_t` and :math:`\vec{y}_t` are random variables
+whose distributions are updated by the :mod:`.inference` module.
 
 .. math::
 
@@ -23,23 +27,22 @@ that consist of the predicted states :math:`\vec{x}_t` (:attr:`.DynamicSystem.si
 	\label{eq:obsModel}
 	\end{align}
 
-where :math:`\mathbb{F}` represents the *third-party software* model that
+where :math:`\mathbb{F}` represents the **third-party software** model that
 takes the previous model state :math:`\vec{x}_{t-1}` to make predictions for time :math:`t`. 
-If all observables :math:`\vec{y}_t` are independent and have a one-to-one relationship with :math:`\vec{y}_t`,
+If all observables :math:`\vec{y}_t` are independent and have a one-to-one correspondence with :math:`\vec{x}_t`,
+(meaning you predict what you observe),
 the observation model :math:`\mathbb{H}` reduces to the identity matrix :math:`\mathbf{I}_d`, 
 with :math:`d` being the number of independent observables.
 
 The simulation and observation errors :math:`\vec{\nu}_t` and :math:`\vec{\omega}_t`
-are random variables and assumed to be normally distributed with zero means.
+are random variables and assumed to be normally distributed around zero means.
 We consider both errors together in the covariance matrix with :attr:`.SMC.cov_matrices`.
-In fact, :math:`\vec{x}_t` and :math:`\vec{y}_t` are also random variables
-whose distributions are updated by the :mod:`.inference` module.
 
 Interact with third-party software
 ----------------------------------
 
-Interaction with external "software" models can be done via the callback of the :class:`.DynamicSystem` class.
-You can define your own :attr:`.DynamicSystem.callback`
+Interaction with external "software" models can be done via the callback function of the :class:`.DynamicSystem` class.
+You can define your own callback function
 and pass samples (combinations of parameters) to the **model implemented in Python** or to the software from the **command line**.
 The following gives an example of the callback where the "software" model :math:`\mathbb{F}` is a Python function. 
 
