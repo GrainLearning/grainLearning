@@ -66,7 +66,7 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
         mag = math.floor(math.log(num, 10)) + 1
         f_out.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
         for j in range(num):
-            description = f'{sim_name}_Iter' + str(curr_iter) + '-Sample' + str(j).zfill(mag)
+            description = f'{sim_name}_Iter' + str(curr_iter) + '_Sample' + str(j).zfill(mag)
             f_out.write(' '.join(
                 [f'{threads:2d}'] + [description] +
                 [f'{j:9d}'] + [f'{table[j][i]:20.10e}' for i in range(dim)] + ['\n']))

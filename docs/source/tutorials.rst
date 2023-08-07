@@ -130,7 +130,7 @@ This Python script is called by the callback `run_sim` from the command line.
         print("*** Running external software... ***\n")
         # loop over and pass parameter samples to the executable
         for i, params in enumerate(system.param_data):
-            description = 'Iter' + str(curr_iter) + '-Sample' + str(i).zfill(mag)
+            description = 'Iter' + str(curr_iter) + '_Sample' + str(i).zfill(mag)
             print(" ".join([executable, '%.8e %.8e' % tuple(params), description]))
             os.system(' '.join([executable, '%.8e %.8e' % tuple(params), description]))
 
@@ -176,8 +176,8 @@ and `sim_data_file_ext` is correct such that GrainLearning can find the data in 
 When running `calibration.run()`, subdirectories with the name `iter<curr_iter>` will be created in :attr:`.IODynamicSystem.sim_data_dir`.
 In these subdirectories, you find
 
-- simulation data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_sim.txt`
-- parameter data file: `<sim_name>_Iter<curr_iter>-Sample<sample_ID>_param.txt`,
+- simulation data file: `<sim_name>_Iter<curr_iter>_Sample<sample_ID>_sim.txt`
+- parameter data file: `<sim_name>_Iter<curr_iter>_Sample<sample_ID>_param.txt`,
 
 where <sim_name> is :attr:`.IODynamicSystem.sim_name`, <curr_iter> is :attr:`.BayesianCalibration.curr_iter`,
 and <sample_ID> is the index of the :attr:`.IODynamicSystem.param_data` sequence.
@@ -214,11 +214,11 @@ The parameter table below can be used to run the software model (e.g., YADE).
 .. code-block:: text
 
 	!OMP_NUM_THREADS description key a b 
-	 8 Iter1-Sample00         0     5.0000000000e-01     3.3333333333e+00 
-	 8 Iter1-Sample01         1     2.5000000000e-01     6.6666666667e+00 
-	 8 Iter1-Sample02         2     7.5000000000e-01     1.1111111111e+00 
-	 8 Iter1-Sample03         3     1.2500000000e-01     4.4444444444e+00 
-	 8 Iter1-Sample04         4     6.2500000000e-01     7.7777777778e+00 
-	 8 Iter1-Sample05         5     3.7500000000e-01     2.2222222222e+00 
+	 8 Iter1_Sample00         0     5.0000000000e-01     3.3333333333e+00 
+	 8 Iter1_Sample01         1     2.5000000000e-01     6.6666666667e+00 
+	 8 Iter1_Sample02         2     7.5000000000e-01     1.1111111111e+00 
+	 8 Iter1_Sample03         3     1.2500000000e-01     4.4444444444e+00 
+	 8 Iter1_Sample04         4     6.2500000000e-01     7.7777777778e+00 
+	 8 Iter1_Sample05         5     3.7500000000e-01     2.2222222222e+00 
 
 Click :download:`here <../../tutorials/linear_regression/linear_reg_one_iteration.py>` to download the full script.
