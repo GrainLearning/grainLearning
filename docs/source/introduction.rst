@@ -43,7 +43,9 @@ Examples of this can be found for :ref:`YADE <examples:Run DEM simulations guide
 (`Yet Another Dynamic Engine <http://yade-dem.org/>`_).
 For more information on how to integrate a predictive model into GrainLearning, see :doc:`dynamic systems <dynamic_systems>`.
 
-.. note:: While reading this documentation, keep in mind the following definitions, as they will appear frequently in various sections.
+.. note:: 
+  While reading this documentation, keep in mind the following definitions, as they will appear frequently in various sections.
+
   - **Prior**: the initial knowledge about model state and/or parameter before any data is taken into account, expressed as a probability distribution.
   - **Posterior**: the updated knowledge after the evidence is taken into account via Bayes' theorem.
   - **Proposal**: the distribution from which we draw new samples. It can be assumed or learned.
