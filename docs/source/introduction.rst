@@ -23,7 +23,7 @@ GrainLearning is non-intrusive. Computer models used by GrainLearning are blackb
 The most important modules of GrainLearning are :doc:`dynamic systems <dynamic_systems>`, :ref:`inference <bayesian_filtering:The inference module>`,
 and :ref:`sampling <bayesian_filtering:The sampling module>`.
 An unique feature of GrainLearning is the machine learning (ML) capabilities of the :ref:`samplers <bayesian_filtering:The sampling module>`
-to learn complex **probability distributions** and the :ref:`data-driven **emulators** <rnn:Train a RNN with your own data>` to learn the physics.
+to learn complex **probability distributions** and the :ref:`data-driven emulators <rnn:Train a RNN with your own data>` to learn the physics.
 Users can combine different classes in these modules to create a variety of Bayesian calibration tools.
 Currently, only the :ref:`iterative Bayesian filter <bayesian_filtering:Iterative Bayesian filter>` has been implemented, and tested
 with `DEM models <https://www.sciencedirect.com/science/article/pii/S0045782519300520>`_
