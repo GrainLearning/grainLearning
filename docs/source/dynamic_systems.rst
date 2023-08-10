@@ -60,16 +60,16 @@ The following code snippet shows how to define a callback function that runs a l
 .. code-block:: python
    :caption: A linear function implemented in Python
 
-  def run_sim(system, **kwargs):
-      data = []
-      # loop over parameter samples
-      for params in system.param_data:
-          # Run the model: y = a*x + b
-          y_sim = params[0] * system.ctrl_data + params[1]
-          # Append the simulation data to the list
-          data.append(np.array(y_sim, ndmin=2))
-     # pass the simulation data to the dynamic system
-      system.set_sim_data(data)
+   def run_sim(system, **kwargs):
+       data = []
+       # loop over parameter samples
+       for params in system.param_data:
+           # Run the model: y = a*x + b
+           y_sim = params[0] * system.ctrl_data + params[1]
+           # Append the simulation data to the list
+           data.append(np.array(y_sim, ndmin=2))
+       # pass the simulation data to the dynamic system
+       system.set_sim_data(data)
 
 
 The function `run_sim` is assigned to the :attr:`.DynamicSystem.callback` attribute of the :class:`.DynamicSystem` class
@@ -128,7 +128,7 @@ For example, the observation data stored in a text file :attr:`.IODynamicSystem.
 .. code-block:: text
 
 	# u f
-	0 5.0
+	0	5.0
 	1	5.2
 	2	5.4
 	3	5.6
