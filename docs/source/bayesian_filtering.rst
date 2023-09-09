@@ -213,7 +213,7 @@ and their importance weights estimated by the :mod:`.inference` method.
 New samples are then drawn from this mixture model that acts as a proposal density in :attr:`~.GaussianMixtureModel.regenerate_params`. 
 
 .. figure:: figs/gmm.jpg
-  :width: 400
+  :width: 500
   :alt: Resampling via a Gaussian mixture
 
   Resampling of parameter space via a Gaussian mixture model.
@@ -240,7 +240,7 @@ The essential steps include
 
 .. warning::
    When running :class:`.SMC` filtering via :attr:`.IterativeBayesianFilter.run_inference`,
-   it is crucial to ensure that the :attr:` effective sample size <.SMC.ess>` is large enough,
+   it is crucial to ensure that the :attr:`effective sample size <.SMC.ess>` is large enough,
    so that the ensemble does not degenerate into few samples with very large weights.
 
 The figure below illustrates the workflow of iterative Bayesian filtering.
