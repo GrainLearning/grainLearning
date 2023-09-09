@@ -137,8 +137,7 @@ class BayesianCalibration:
         self.system.run(curr_iter=self.curr_iter)
 
         # Load model data from disk
-        if isinstance(self.system, IODynamicSystem):
-            self.load_system()
+        self.load_system()
 
         # Estimate model parameters as a distribution
         self.calibration.solve(self.system, )
@@ -150,9 +149,13 @@ class BayesianCalibration:
     def load_system(self):
         """Load existing simulation data from disk into the dynamic system
         """
-        self.system.load_param_data(self.curr_iter)
-        self.system.get_sim_data_files(self.curr_iter)
-        self.system.load_sim_data()
+        if isinstance(self.system, IODynamicSystem):
+            self.system.load_param_data(self.curr_iter)
+            self.system.get_sim_data_files(self.curr_iter)
+            self.system.load_sim_data()
+        else:
+            if self.system.param_data is None or self.system.sim_data is None:
+                raise RuntimeError("The parameter and simulation data are not set up correctly.")
 
     def load_and_run_one_iteration(self):
         """Load existing simulation data and run Bayesian calibration for one iteration
@@ -161,7 +164,8 @@ class BayesianCalibration:
         """
         self.load_system()
         self.calibration.add_curr_param_data_to_list(self.system.param_data)
-        self.calibration.solve(self.system, )
+        self.calibration.solve(self.system)
+        self.system.write_params_to_table(self.curr_iter + 1)
         self.calibration.sigma_list.append(self.system.sigma_max)
         self.plot_uq_in_time()
 

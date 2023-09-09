@@ -303,6 +303,13 @@ class DynamicSystem:
         """
         self.sim_data = np.array(data)
 
+    def set_param_data(self, data: list):
+        """Set the simulation data
+
+        :param data: parameter data of shape (num_samples, num_params)
+        """
+        self.param_data = np.array(data)
+
     def compute_inv_normalized_sigma(self):
         """Compute the inverse of the matrix that apply different weights on the observables"""
         inv_obs_weight = np.diagflat(self.inv_obs_weight)

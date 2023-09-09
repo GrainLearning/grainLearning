@@ -9,8 +9,7 @@ and encapsulate simulation and observation (or reference) data in a single :clas
 Currently, the :mod:`.dynamic_systems` module contains
 
 - a :class:`.DynamicSystem` class that handles the simulation and observation data within a *Python environment*,
-- an :class:`.IODynamicSystem` class that sends instructions to external *third-party software* (e.g., via the command line)
-and retrieves simulation data from the output files of the software.
+- an :class:`.IODynamicSystem` class that sends instructions to external *third-party software* (e.g., via the command line) and retrieves simulation data from the output files of the software.
 
 .. note:: A dynamic system is also known as a state-space model in the literature.
   It describes the time evolution of the state of the model :math:`\vec{x}_t` (:attr:`.DynamicSystem.sim_data`)
@@ -73,7 +72,7 @@ The following code snippet shows how to define a callback function that runs a l
 
 
 The function `run_sim` is assigned to the :attr:`.DynamicSystem.callback` attribute of the :class:`.DynamicSystem` class
-and is is called every time the :attr:`.DynamicSystem.run` function is called (see :ref:`the figure <my-figure>` above).
+and is is called every time the :attr:`.DynamicSystem.run` function is called (see :ref:`the figure <execution_loop>` above).
 
 
 Interact with non-Python software
