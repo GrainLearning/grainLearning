@@ -47,7 +47,7 @@ calibration = BayesianCalibration.from_dict(
             },
             "initial_sampling": "halton",
         },
-        "save_fig": 0,
+        "save_fig": -1,
     }
 )
 

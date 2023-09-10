@@ -11,18 +11,17 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 executable = f'python {PATH}/linear_model.py'
 
 
-def run_sim(system, **kwargs):
+def run_sim(system):
     """
     Run the external executable and passes the parameter sample to generate the output file.
     """
     # keep the naming convention consistent between iterations
     mag = floor(log(system.num_samples, 10)) + 1
-    curr_iter = kwargs['curr_iter']
     # check the software name and version
     print("*** Running external software... ***\n")
     # loop over and pass parameter samples to the executable
     for i, params in enumerate(system.param_data):
-        description = 'Iter' + str(curr_iter) + '_Sample' + str(i).zfill(mag)
+        description = 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)
         print(" ".join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
         os.system(' '.join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
 

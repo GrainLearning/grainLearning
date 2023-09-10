@@ -220,7 +220,7 @@ class TestIODynamicSystem:
     def test_run(self):
         """Test if the callback function works as expected"""
 
-        def run_sim(system, **kwargs):
+        def run_sim(system):
             """Run the simulation"""
             # Initialize the data list
             data = []
@@ -232,8 +232,7 @@ class TestIODynamicSystem:
             for i, param in enumerate(system.param_data):
                 # Get the description of the current sample
                 mag = floor(log(system.num_samples, 10)) + 1
-                curr_iter = kwargs['curr_iter']
-                description = 'Iter' + str(curr_iter) + '_Sample' + str(i).zfill(mag)
+                description = 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)
                 # Run the model
                 y = param[0] + param[1] * x + param[2] * x ** 2 + param[3] * x ** 3
                 # Append the data to the list
@@ -258,14 +257,14 @@ class TestIODynamicSystem:
         system_cls.param_data = np.arange(1, system_cls.num_samples * 4 + 1, dtype=float).reshape(
             system_cls.num_samples, 4)
 
-        system_cls.run(curr_iter=0)
+        system_cls.run()
 
         # check if the file that contains the parameter data has the right name
         assert path.normpath(system_cls.param_data_file) == path.normpath(
             path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0', 'test_Iter0_Samples.txt'))
 
         # check if the simulations data are stored with the right name
-        system_cls.get_sim_data_files(curr_iter=0)
+        system_cls.get_sim_data_files()
         mag = floor(log(system_cls.num_samples, 10)) + 1
         for i, f in enumerate(system_cls.sim_data_files):
             description = 'Iter' + str(0) + '_Sample' + str(i).zfill(mag)
@@ -274,7 +273,7 @@ class TestIODynamicSystem:
 
         # check if the parameter data are correctly stored
         param_data_backup = np.copy(system_cls.param_data)
-        system_cls.load_param_data(curr_iter=0)
+        system_cls.load_param_data()
         np.testing.assert_array_equal(param_data_backup, system_cls.param_data)
 
         # check if the simulation data are correctly stored

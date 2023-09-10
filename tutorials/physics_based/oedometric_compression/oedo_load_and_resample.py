@@ -6,7 +6,7 @@ import os
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
 
-sim_data_dir = os.path.abspath(os.path.join(__file__, "../../../tests/data/oedo_sim_data"))
+sim_data_dir = os.path.abspath(os.path.join(__file__, "../../../../tests/data/oedo_sim_data"))
 curr_iter = 1
 
 calibration = BayesianCalibration.from_dict(

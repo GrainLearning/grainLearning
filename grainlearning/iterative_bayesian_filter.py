@@ -149,15 +149,14 @@ class IterativeBayesianFilter:
         system.param_data = generate_params_qmc(system, system.num_samples, self.initial_sampling)
         self.param_data_list.append(system.param_data)
 
-    def run_inference(self, system: Type["DynamicSystem"], curr_iter: int = 0):
+    def run_inference(self, system: Type["DynamicSystem"]):
         """Compute the posterior distribution of model states such that the target effective sample size is reached.
 
         :param system: Dynamic system class
-        :param curr_iter: Current iteration number
         """
         # if the name of proposal data file is given, make use of the proposal density during Bayesian updating
         if self.proposal_data_file is not None and self.proposal is None:
-            self.load_proposal_from_file(system, curr_iter=curr_iter)
+            self.load_proposal_from_file(system)
 
         result = optimize.minimize_scalar(
             self.inference.data_assimilation_loop,
@@ -208,11 +207,10 @@ class IterativeBayesianFilter:
         """
         self.param_data_list.append(param_data)
 
-    def load_proposal_from_file(self, system: Type["IODynamicSystem"], curr_iter: int):
+    def load_proposal_from_file(self, system: Type["IODynamicSystem"]):
         """Load the proposal density from a file.
 
         :param system: Dynamic system class
-        :param curr_iter: Current iteration number
         """
         if system.param_data is None:
             raise RuntimeError("parameter samples not yet loaded...")
@@ -221,7 +219,7 @@ class IterativeBayesianFilter:
             return
 
         # load the proposal density from a file
-        self.sampling.load_gmm_from_file(f'{system.sim_data_dir}/iter{curr_iter-1}/{self.proposal_data_file}')
+        self.sampling.load_gmm_from_file(f'{system.sim_data_dir}/iter{system.curr_iter-1}/{self.proposal_data_file}')
 
         samples = np.copy(system.param_data)
         samples /= self.sampling.max_params
@@ -235,10 +233,9 @@ class IterativeBayesianFilter:
             proposal[np.where(proposal < 0.0)] = min(proposal[np.where(proposal > 0.0)])
             self.proposal = proposal / sum(proposal)
 
-    def save_proposal_to_file(self, system: Type["IODynamicSystem"], curr_iter: int):
+    def save_proposal_to_file(self, system: Type["IODynamicSystem"]):
         """Save the proposal density to a file.
 
         :param system: Dynamic system class
-        :param curr_iter: Current iteration number
         """
-        self.sampling.save_gmm_to_file(f'{system.sim_data_dir}/iter{curr_iter-1}/{self.proposal_data_file}')
+        self.sampling.save_gmm_to_file(f'{system.sim_data_dir}/iter{system.curr_iter-1}/{self.proposal_data_file}')

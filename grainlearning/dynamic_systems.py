@@ -90,6 +90,7 @@ class DynamicSystem:
     :param param_min: List of parameter lower bounds
     :param param_max: List of parameter Upper bounds
     :param callback: Callback function, defaults to None
+    :param curr_iter: current iteration ID, defaults to 0
     :param ctrl_data: control data (e.g, time), defaults to None, optional
     :param obs_names: Column names of the observation data, defaults to None, optional
     :param ctrl_name: Column name of the control data, defaults to None, optional
@@ -162,6 +163,9 @@ class DynamicSystem:
     #: Callback function to run the forward predictions
     callback: Callable
 
+    #: Current iteration ID
+    curr_iter: int
+
     ##### Uncertainty #####
 
     #: Minimum value of the uncertainty
@@ -195,6 +199,7 @@ class DynamicSystem:
         sim_name: str = None,
         sim_data: np.ndarray = None,
         callback: Callable = None,
+        curr_iter: int = 0,
         param_data: np.ndarray = None,
         param_names: List[str] = None,
         sigma_max: float = 1.0e6,
@@ -231,6 +236,8 @@ class DynamicSystem:
         self.sim_data = sim_data
 
         self.callback = callback
+
+        self.curr_iter = curr_iter
 
         self.param_min = param_min
 
@@ -284,7 +291,7 @@ class DynamicSystem:
             sigma_tol=obj.get("sigma_tol", 0.001),
         )
 
-    def run(self, **kwargs):
+    def run(self):
         """Run the callback function
 
         TODO design a better wrapper to avoid kwargs?
@@ -294,7 +301,7 @@ class DynamicSystem:
         if self.callback is None:
             raise ValueError("No callback function defined")
 
-        self.callback(self, **kwargs)
+        self.callback(self)
 
     def set_sim_data(self, data: list):
         """Set the simulation data
@@ -346,11 +353,11 @@ class DynamicSystem:
                 self.estimated_params_cv[stp_id, :]) / self.estimated_params[stp_id, :]
 
     @classmethod
-    def load_param_data(cls: Type["DynamicSystem"], curr_iter: int):
+    def load_param_data(cls: Type["DynamicSystem"]):
         """Virtual function to load param data from disk"""
 
     @classmethod
-    def get_sim_data_files(cls: Type["DynamicSystem"], curr_iter: int):
+    def get_sim_data_files(cls: Type["DynamicSystem"]):
         """Virtual function to get simulation data files from disk"""
 
     @classmethod
@@ -358,7 +365,7 @@ class DynamicSystem:
         """Virtual function to load simulation data"""
 
     @classmethod
-    def write_params_to_table(cls, curr_iter):
+    def write_params_to_table(cls):
         """Write the parameter data into a text file"""
 
     @classmethod
@@ -425,6 +432,7 @@ class IODynamicSystem(DynamicSystem):
     :param sim_data_dir: Simulation data directory, defaults to './sim_data'
     :param sim_data_file_ext: Simulation data file extension, defaults to '.npy'
     :param callback: Callback function, defaults to None
+    :param curr_iter: Current iteration ID, defaults to 0
     :param param_data_file: Parameter data file, defaults to None, optional
     :param obs_data: observation or reference data, optional
     :param ctrl_data: Control data (e.g, time), defaults to None, optional
@@ -470,6 +478,7 @@ class IODynamicSystem(DynamicSystem):
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
         callback: Callable = None,
+        curr_iter: int = 0,
         param_data_file: str = '',
         param_data: np.ndarray = None,
         param_names: List[str] = None,
@@ -490,6 +499,7 @@ class IODynamicSystem(DynamicSystem):
             sim_name,
             sim_data,
             callback,
+            curr_iter,
             param_data,
             param_names
         )
@@ -584,10 +594,9 @@ class IODynamicSystem(DynamicSystem):
             if len(self.obs_data) == 1:
                 self.obs_data = self.obs_data.reshape([1, self.obs_data.shape[0]])
 
-    def get_sim_data_files(self, curr_iter: int = 0):
-        """Get the simulation data files from the simulation data directory.
-
-        :param curr_iter: Current iteration number, default to 0.
+    def get_sim_data_files(self):
+        """
+        Get the simulation data files from the simulation data directory.
         """
         mag = floor(log(self.num_samples, 10)) + 1
         self.sim_data_files = []
@@ -597,7 +606,7 @@ class IODynamicSystem(DynamicSystem):
                 sim_data_file_ext = '_sim' + self.sim_data_file_ext
             else:
                 sim_data_file_ext = self.sim_data_file_ext
-            file_name = self.sim_data_dir.rstrip('/') + f'/iter{curr_iter}/{self.sim_name}*Iter{curr_iter}*' \
+            file_name = self.sim_data_dir.rstrip('/') + f'/iter{self.curr_iter}/{self.sim_name}*Iter{self.curr_iter}*' \
                         + str(i).zfill(mag) + '*' + sim_data_file_ext
             files = glob(file_name)
 
@@ -630,11 +639,9 @@ class IODynamicSystem(DynamicSystem):
             params = np.array([data[key] for key in self.param_names])
             np.testing.assert_allclose(params, self.param_data[i, :], rtol=1e-5)
 
-    def load_param_data(self, curr_iter: int = 0):
+    def load_param_data(self):
         """
         Load parameter data from a table written in a text file.
-
-        :param curr_iter: Current iteration number, default to 0.
         """
         if os.path.exists(self.param_data_file):
             # we assume parameter data are always in the last columns.
@@ -642,7 +649,7 @@ class IODynamicSystem(DynamicSystem):
             self.num_samples = self.param_data.shape[0]
         else:
             # if param_data_file does not exit, get parameter data from text files
-            files = glob(self.sim_data_dir + f'/iter{curr_iter}/{self.sim_name}*_param*{self.sim_data_file_ext}')
+            files = glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_param*{self.sim_data_file_ext}')
             self.num_samples = len(files)
             self.sim_data_files = sorted(files)
             self.param_data = np.zeros([self.num_samples, self.num_params])
@@ -654,30 +661,27 @@ class IODynamicSystem(DynamicSystem):
                 params = [data[key][0] for key in self.param_names]
                 self.param_data[i, :] = params
 
-    def run(self, **kwargs):
-        """Run the callback function
-
-        TODO design a better wrapper to avoid kwargs?
-        :param kwargs: keyword arguments to pass to the callback function
+    def run(self):
+        """
+        Run the callback function
         """
 
         if self.callback is None:
             raise ValueError("No callback function defined")
 
         # create a directory to store simulation data
-        curr_iter = kwargs['curr_iter']
         sim_data_dir = self.sim_data_dir.rstrip('/')
-        sim_data_sub_dir = f'{sim_data_dir}/iter{curr_iter}'
+        sim_data_sub_dir = f'{sim_data_dir}/iter{self.curr_iter}'
         os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
-        self.write_params_to_table(curr_iter)
+        self.write_params_to_table()
 
         # run the callback function
-        self.callback(self, **kwargs)
+        self.callback(self)
 
         # move simulation data files and corresponding parameter table into the directory defined per iteration
-        files = glob(f'{os.getcwd()}/{self.sim_name}_Iter{curr_iter}*{self.sim_data_file_ext}')
+        files = glob(f'{os.getcwd()}/{self.sim_name}_Iter{self.curr_iter}*{self.sim_data_file_ext}')
         for file in files:
             f_name = os.path.relpath(file, os.getcwd())
             os.replace(f'{file}', f'{sim_data_sub_dir}/{f_name}')
@@ -685,17 +689,16 @@ class IODynamicSystem(DynamicSystem):
         # redefine the parameter data file since its location is changed
         self.param_data_file = f'{sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
 
-    def write_params_to_table(self, curr_iter: int):
+    def write_params_to_table(self):
         """Write the parameter data into a text file.
 
-        :param curr_iter: Current iteration number, default to 0.
         :return param_data_file: The name of the parameter data file
         """
         self.param_data_file = write_to_table(
             self.sim_name,
             self.param_data,
             self.param_names,
-            curr_iter)
+            self.curr_iter)
 
     def backup_sim_data(self):
         """Backup simulation data files to a backup directory."""

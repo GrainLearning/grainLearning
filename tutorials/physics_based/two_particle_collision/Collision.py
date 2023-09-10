@@ -98,5 +98,5 @@ O.dt = table.safe * PWaveTimeStep()
 O.bodies[1].state.vel = Vector3(0, 0, -0.01)
 
 # run DEM simulation
-O.run(int(1e10))
+O.run()
 waitIfBatch()
