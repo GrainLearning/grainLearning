@@ -96,7 +96,7 @@ class BayesianCalibration:
 
         self.num_iter = num_iter
 
-        self.curr_iter = curr_iter
+        self.set_curr_iter(curr_iter)
 
         self.save_fig = save_fig
 
@@ -114,7 +114,7 @@ class BayesianCalibration:
 
         # Bayesian calibration continue until curr_iter = num_iter or sigma_max < tolerance
         for _ in range(self.num_iter - 1):
-            self.curr_iter += 1
+            self.increase_curr_iter()
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
             if self.system.sigma_max < self.system.sigma_tol:
@@ -134,11 +134,10 @@ class BayesianCalibration:
         self.system.num_samples = self.system.param_data.shape[0]
 
         # Run the model realizations
-        self.system.run(curr_iter=self.curr_iter)
+        self.system.run()
 
         # Load model data from disk
-        if isinstance(self.system, IODynamicSystem):
-            self.load_system()
+        self.load_system()
 
         # Estimate model parameters as a distribution
         self.calibration.solve(self.system, )
@@ -150,9 +149,13 @@ class BayesianCalibration:
     def load_system(self):
         """Load existing simulation data from disk into the dynamic system
         """
-        self.system.load_param_data(self.curr_iter)
-        self.system.get_sim_data_files(self.curr_iter)
-        self.system.load_sim_data()
+        if isinstance(self.system, IODynamicSystem):
+            self.system.load_param_data()
+            self.system.get_sim_data_files()
+            self.system.load_sim_data()
+        else:
+            if self.system.param_data is None or self.system.sim_data is None:
+                raise RuntimeError("The parameter and simulation data are not set up correctly.")
 
     def load_and_run_one_iteration(self):
         """Load existing simulation data and run Bayesian calibration for one iteration
@@ -161,7 +164,8 @@ class BayesianCalibration:
         """
         self.load_system()
         self.calibration.add_curr_param_data_to_list(self.system.param_data)
-        self.calibration.solve(self.system, )
+        self.calibration.solve(self.system)
+        self.system.write_params_to_table()
         self.calibration.sigma_list.append(self.system.sigma_max)
         self.plot_uq_in_time()
 
@@ -172,7 +176,7 @@ class BayesianCalibration:
         """
         self.load_system()
         self.calibration.add_curr_param_data_to_list(self.system.param_data)
-        self.calibration.load_proposal_from_file(self.system, self.curr_iter)
+        self.calibration.load_proposal_from_file(self.system)
         self.calibration.inference.data_assimilation_loop(sigma, self.system)
         self.system.compute_estimated_params(self.calibration.inference.posteriors)
 
@@ -185,7 +189,7 @@ class BayesianCalibration:
         self.calibration.posterior = self.calibration.inference.get_posterior_at_time()
         self.calibration.run_sampling(self.system, )
         resampled_param_data = self.calibration.param_data_list[-1]
-        self.system.write_params_to_table(self.curr_iter + 1)
+        self.system.write_params_to_table()
         return resampled_param_data
 
     def plot_uq_in_time(self):
@@ -242,6 +246,20 @@ class BayesianCalibration:
         """
         most_prob = argmax(self.calibration.posterior)
         return self.system.param_data[most_prob]
+
+    def set_curr_iter(self, curr_iter: int):
+        """Set the current iteration step
+
+        param curr_iter: Current iteration step
+        """
+        self.system.curr_iter = curr_iter
+        self.curr_iter = self.system.curr_iter
+
+    def increase_curr_iter(self):
+        """Increase the current iteration step by one
+        """
+        self.system.curr_iter += 1
+        self.curr_iter += 1
 
     @classmethod
     def from_dict(

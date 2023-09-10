@@ -18,6 +18,15 @@ for running the simulations, the "trials" have to be selected with an optimized 
 Bayesian calibration of DEM models
 ----------------------------------
 
+
+
+Run DEM simulations guided by GrainLearning
+```````````````````````````````````````````
+
+
+Process simulation data with GrainLearning
+``````````````````````````````````````````
+
 In the case of DEM modeling of granular soils, relevant parameters could be
 Young's modulus, friction coefficient, Poisson's ratio, rolling stiffness, and rolling friction, etc.
 of a soil particle, as well as structural parameters like a particle size distribution parameterized by its moments.

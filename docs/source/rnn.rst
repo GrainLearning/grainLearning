@@ -1,9 +1,10 @@
 RNN Module
 ==========
 
-We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model in the tensorflow framework. For more information about the model go to section `The RNN model`_.
+We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model
+in the tensorflow framework. For more information about the model go to section `The RNN model`_.
 
-There are four main usages of RNN module:
+There are four main usages of the RNN module:
 
 1. `Train a RNN with your own data`_.
 2. `Make a prediction with a pre-trained model`_.
@@ -14,7 +15,7 @@ Train a RNN with your own data
 
 Get your data to our format
 ```````````````````````````
-The RNN model of this module considers a specific data format and organization. Our example of data consists of several DEM simulations of Triaxial Compressions of samples having different contact parameters. Such simulations were performed using `YADE <http://yade-dem.org/>`_ that outputs the simulation state to a .npy file every given amount of time steps. The files are stored under the folder structure pressure/experiment_type.
+The RNN model of this module considers a specific data format and organization. Our example of data consists of several DEM simulations of Triaxial Compressions of granular material specimens having different contact parameters. Such simulations were performed using `YADE <http://yade-dem.org/>`_ that outputs the simulation state to a .npy file every given amount of time steps. The files are stored under the folder structure pressure/experiment_type.
 
 * Prepare your parsing script. We recommend to copy this script locally. 
 * Use ``CONTACT_KEYS``, ``INPUT_KEYS`` and ``OUTPUT_KEYS`` consistent with your dataset. You can modify, add or remove elements of such dictionaries. These will also be stored as :ref:`dataset attributes <linkDatasetAttributes>`.

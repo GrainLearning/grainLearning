@@ -199,10 +199,10 @@ def test_save_and_load_proposal():
     sim_data_sub_dir = f'{system_cls.sim_data_dir}/iter{-1}'
     if not os.path.exists(sim_data_sub_dir):
         os.makedirs(sim_data_sub_dir)
-    ibf_cls.save_proposal_to_file(system_cls, curr_iter=0)
+    ibf_cls.save_proposal_to_file(system_cls)
 
     #: Load the Gaussian Mixture Model from a file
-    ibf_cls.load_proposal_from_file(system_cls, curr_iter=0)
+    ibf_cls.load_proposal_from_file(system_cls)
 
     #: Check if the loaded proposal density is the same as the original one
     np.testing.assert_allclose(ibf_cls.proposal, dummy_proposal, 0.18)
