@@ -69,24 +69,29 @@ However, you still need to clone the GrainLearning repository to run the tutoria
 ## Tutorials
 
 1. Linear regression with
-   the [`run_sim`](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/simple_regression/linear_regression/python_linear_regression_solve.py#L14)
-   callback function of the [`DynamicSystem`](https://github.com/GrainLearning/grainLearning/blob/main/grainlearning/dynamic_systems.py)
+   the [`run_sim`](tutorials/simple_regression/linear_regression/python_linear_regression_solve.py#L14)
+   callback function of the [`DynamicSystem`](grainlearning/dynamic_systems.py)
    class,
-   in [python_linear_regression_solve.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/simple_regression/linear_regression/python_linear_regression_solve.py)
+   in [python_linear_regression_solve.py](tutorials/simple_regression/linear_regression/python_linear_regression_solve.py)
 
 2. Nonlinear, multivariate regression
 
 3. Interact with the numerical model of your choice
-   via [`run_sim`](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/simple_regression/linear_regression/linear_regression_solve.py#L11)
+   via [`run_sim`](tutorials/simple_regression/linear_regression/linear_regression_solve.py#L11)
    ,
-   in [linear_regression_solve.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/simple_regression/linear_regression/linear_regression_solve.py)
+   in [linear_regression_solve.py](main/tutorials/simple_regression/linear_regression/linear_regression_solve.py)
 
-4. Load existing simulation data and run GrainLearning for one iteration,
-   in [oedo_load_and_resample.py](https://github.com/GrainLearning/grainLearning/blob/main/tutorials/oedo_compression/oedo_load_and_resample.py)
-5. RNN module tutorials:
-    - [Train your RNN](tutorials/rnn/train_rnn.ipynb)
-    - [Predict using an RNN](tutorials/rnn/predict.ipynb)
-    - [Use an RNN in the calibration workflow](tutorials/rnn/rnn_calibration_GL.ipynb)
+4. Load existing DEM simulation data and run GrainLearning for one iteration,
+   in [oedo_load_and_resample.py](tutorials/oedo_compression/oedo_load_and_resample.py)
+
+5. Example of GrainLearning integration into YADE
+    - [Two particle collision](tutorials/physics_based/two_particle_collision)
+    - [Triaxial compression](tutorials/physics_based/triaxial_compression)
+
+6. Data-driven module tutorials:
+    - [Train your LSTM model](tutorials/data_driven/LSTM/train_rnn.ipynb)
+    - [Predict using an LSTM model](tutorials/data_driven/LSTM/predict.ipynb)
+    - [Use an LSTM model in the calibration workflow](tutorials/data_driven/LSTM/rnn_calibration_GL.ipynb)
 
 ## Citing GrainLearning
 
