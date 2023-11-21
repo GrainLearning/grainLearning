@@ -651,15 +651,19 @@ class IODynamicSystem(DynamicSystem):
             # if param_data_file does not exit, get parameter data from text files
             files = glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_param*{self.sim_data_file_ext}')
             self.num_samples = len(files)
-            self.sim_data_files = sorted(files)
-            self.param_data = np.zeros([self.num_samples, self.num_params])
-            for i, sim_data_file in enumerate(self.sim_data_files):
-                if self.sim_data_file_ext == '.npy':
-                    data = np.load(sim_data_file, allow_pickle=True).item()
-                else:
-                    data = get_keys_and_data(sim_data_file)
-                params = [data[key][0] for key in self.param_names]
-                self.param_data[i, :] = params
+            # if the number of files found is non-zero
+            if self.num_samples != 0:
+                self.sim_data_files = sorted(files)
+                self.param_data = np.zeros([self.num_samples, self.num_params])
+                for i, sim_data_file in enumerate(self.sim_data_files):
+                    if self.sim_data_file_ext == '.npy':
+                        data = np.load(sim_data_file, allow_pickle=True).item()
+                    else:
+                        data = get_keys_and_data(sim_data_file)
+                    params = [data[key][0] for key in self.param_names]
+                    self.param_data[i, :] = params
+            else:
+                raise RuntimeError(f'No data found for iteration {self.curr_iter}')
 
     def run(self):
         """

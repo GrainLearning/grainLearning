@@ -414,9 +414,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
     plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_means.png')
-    else:
-        plt.show()
-    plt.close()
 
     plt.figure('Posterior coefficients of variance of the parameters')
     for i in range(num):
@@ -428,9 +425,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
     plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_covs.png')
-    else:
-        plt.show()
-    plt.close()
 
 
 def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
@@ -459,9 +453,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
         plt.tight_layout()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
-        else:
-            plt.show()
-        plt.close()
 
 
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
@@ -482,9 +473,6 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
         plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_space.png')
-    else:
-        plt.show()
-    plt.close()
 
 
 def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, save_fig=0):
@@ -534,10 +522,13 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_obs_and_sim.png')
-    else:
+
+
+def close_plots(save_fig=0):
+    import matplotlib.pylab as plt
+    if not save_fig:
         plt.show()
     plt.close()
-
 
 def write_dict_to_file(data, file_name):
     """Write a python dictionary data into a text file

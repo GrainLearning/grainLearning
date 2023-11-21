@@ -6,7 +6,7 @@ import os
 from numpy import argmax
 from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
 from grainlearning.iterative_bayesian_filter import IterativeBayesianFilter
-from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
+from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim, close_plots
 
 
 class BayesianCalibration:
@@ -180,6 +180,18 @@ class BayesianCalibration:
         self.calibration.inference.data_assimilation_loop(sigma, self.system)
         self.system.compute_estimated_params(self.calibration.inference.posteriors)
 
+    def load_all(self):
+        """Simply load all previous iterations of Bayesian calibration
+        """
+        for _ in range(self.num_iter - 1):
+            print(f"Bayesian calibration iter No. {self.curr_iter}")
+            self.load_system()
+            self.calibration.add_curr_param_data_to_list(self.system.param_data)
+            self.calibration.run_inference(self.system)
+            self.calibration.sigma_list.append(self.system.sigma_max)
+            self.plot_uq_in_time()
+            self.increase_curr_iter()
+        
     def resample(self):
         """Learn and resample from a proposal distribution
         todo this should be refactored
@@ -238,6 +250,8 @@ class BayesianCalibration:
             self.calibration.inference.posteriors,
             self.save_fig
         )
+        
+        close_plots(self.save_fig)
 
     def get_most_prob_params(self):
         """Return the most probable set of parameters
