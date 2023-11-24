@@ -2,9 +2,10 @@
 This module contains various methods for performing statistical and Bayesian inference
 """
 from typing import Type
+
 import numpy as np
-from scipy.stats import multivariate_normal
 from grainlearning.dynamic_systems import DynamicSystem
+from scipy.stats import multivariate_normal
 
 
 class SMC:
@@ -43,25 +44,10 @@ class SMC:
         with the maxima of the observations, defaults to True
     :param cov_matrices: Covariance matrices of shape (num_steps, num_obs, num_obs),
         defaults to None, Optional
+    :param likelihoods: Likelihood distributions of shape (num_steps, num_samples)
+    :param posteriors: Posterior distributions of shape (num_steps, num_samples)
+    :param ess: Time evolution of the effective sample size
     """
-
-    #: Target effective sample size
-    ess_target: float
-
-    #: True if the covariance matrix is scaled with the maximum of the observations, defaults to True
-    scale_cov_with_max: bool = True
-
-    #: Covariance matrices of shape (num_steps, num_obs, num_obs)
-    cov_matrices: np.array
-
-    #: Likelihood distributions of shape (num_steps, num_samples)
-    likelihoods: np.array
-
-    #: Posterior distributions of shape (num_steps, num_samples)
-    posteriors: np.array
-
-    #: Time evolution of the effective sample size
-    ess: np.array
 
     def __init__(
         self,
@@ -69,12 +55,28 @@ class SMC:
         scale_cov_with_max: bool = True,
         cov_matrices: np.array = None,
     ):
-        """Initialize the SMC class"""
+        """Initialize the SMC class
+
+        Parameters
+        ----------
+        ess_target : float
+            Target effective sample size
+        scale_cov_with_max : bool, optional
+            True if the covariance matrix is scaled with the maximum of the observations, by default True
+        cov_matrices : np.array, optional
+            Covariance matrices of shape (num_steps, num_obs, num_obs), by default None
+        """
         self.ess_target = ess_target
 
         self.scale_cov_with_max = scale_cov_with_max
 
         self.cov_matrices = cov_matrices
+
+        self.likelihoods = None
+
+        self.posteriors = None
+
+        self.ess = None
 
     @classmethod
     def from_dict(cls: Type["SMC"], obj: dict):

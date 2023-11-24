@@ -111,6 +111,7 @@ class DynamicSystem:
     :param estimated_params_cv: Estimated parameter coefficient of variation as the second moment of the distribution (:math:`x_\sigma = \sqrt{\sum_i w_i * (x_i - x_\mu)^2} / x_\mu`), defaults to None, optional
     """
 
+
     def __init__(
         self,
         obs_data: np.ndarray,

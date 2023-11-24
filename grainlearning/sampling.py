@@ -1,13 +1,13 @@
 """
 This module contains various methods to sample the state-parameter space of a dynamic system.
 """
-from typing import Type
 from pickle import dump, load
-import numpy as np
-from sklearn.mixture import BayesianGaussianMixture
-from scipy.stats.qmc import Sobol, Halton, LatinHypercube
-from grainlearning.dynamic_systems import DynamicSystem
+from typing import Type
 
+import numpy as np
+from grainlearning.dynamic_systems import DynamicSystem
+from scipy.stats.qmc import Halton, LatinHypercube, Sobol
+from sklearn.mixture import BayesianGaussianMixture
 
 # from grainlearning.tools import regenerate_params_with_gmm, unweighted_resample#
 
@@ -85,53 +85,18 @@ class GaussianMixtureModel:
         This can speed up convergence when fit is called several times on similar problems. See the Glossary.
     :param expand_factor: factor used when converting the ensemble from weighted to unweighted, defaults to 10, optional
     :param slice_sampling: flag to use slice sampling, defaults to False, optional
+    :param gmm: The class of the Gaussian Mixture Model
+    :param max_params: Current maximum values of the parameters
     """
-    #: Maximum number of components
-    max_num_components: int = 0
-
-    #: The dirichlet concentration of each component on the weight distribution (Dirichlet), default to None.
-    weight_concentration_prior: float = 0.0
-
-    #: String describing the type of covariance parameters to use.
-    covariance_type: str = "full"
-
-    #: number of initialization to perform, defaults to 1.
-    n_init: int = 1
-
-    #: tolerance threshold, defaults to 1.0e-3.
-    tol: float = 1.0e-3
-
-    #: maximum number of EM iterations to perform, defaults to 100
-    max_iter: int = 100
-
-    #: random seed given to the method chosen to initialize the weights, the means and the covariances.
-    random_state: int
-
-    #: The method used to initialize the weights, the means and the covariances.
-    init_params: str = "kmeans"
-
-    #: flag to use warm start, defaults to False.
-    warm_start: bool = False
-
-    #: the factor used when converting and populating the ensemble from weighted to unweighted, defaults to 10.
-    expand_factor: int = 10
-
-    #: flag to use slice sampling, defaults to False.
-    slice_sampling: False
-
-    #: The class of the Gaussian Mixture Model
-    gmm: Type["BayesianGaussianMixture"]
-
-    #: Current maximum values of the parameters
-    max_params = None
+    
 
     def __init__(
         self,
-        max_num_components,
-        weight_concentration_prior: float = None,
-        covariance_type: str = "tied",
+        max_num_components=0,
+        weight_concentration_prior: float = 0.2,
+        covariance_type: str = "full",
         n_init: int = 1,
-        tol: float = 1.0e-5,
+        tol: float = 1.0e-3,
         max_iter: int = 100,
         random_state: int = None,
         init_params: str = "kmeans",
@@ -139,7 +104,33 @@ class GaussianMixtureModel:
         expand_factor: int = 10,
         slice_sampling: bool = False,
     ):
-        """ Initialize the Gaussian Mixture Model class"""
+        """Initialize the Gaussian mixture model.
+
+        Parameters
+        ----------
+        max_num_components : _type_
+            Maximum number of components
+        weight_concentration_prior : float, optional
+            The dirichlet concentration of each component on the weight distribution (Dirichlet), by default None
+        covariance_type : str, optional
+            String describing the type of covariance parameters to use, by default "tied"
+        n_init : int, optional
+            number of initialization to perform, by default 1
+        tol : float, optional
+            Tolerance threshold, defaults to 1.0e-3, by default 1.0e-5
+        max_iter : int, optional
+            Maximum number of EM iterations to perform, by default 100
+        random_state : int, optional
+            Random seed given to the method chosen to initialize the weights, the means and the covariances, by default None
+        init_params : str, optional
+            The method used to initialize the weights, the means and the covariances, by default "kmeans"
+        warm_start : bool, optional
+            Flag to use warm start, defaults to False., by default False
+        expand_factor : int, optional
+            The factor used when converting and populating the ensemble from weighted to unweighted, by default 10
+        slice_sampling : bool, optional
+            Flag to use slice sampling, by default False
+        """
         self.max_num_components = max_num_components
 
         if weight_concentration_prior is None:
@@ -169,7 +160,7 @@ class GaussianMixtureModel:
 
         self.expanded_normalized_params = None
 
-        self.gmm = Type["BayesianGaussianMixture"]
+        self.gmm = None
 
     @classmethod
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
