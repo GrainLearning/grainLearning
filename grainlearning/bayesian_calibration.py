@@ -103,9 +103,12 @@ class BayesianCalibration:
 
         self.num_iter = num_iter
 
-        self.set_curr_iter(curr_iter)
-
         self.save_fig = save_fig
+
+        self.curr_iter = self.system.curr_iter
+
+        self.system.curr_iter = curr_iter
+
 
         
 
@@ -256,13 +259,6 @@ class BayesianCalibration:
         most_prob = argmax(self.calibration.posterior)
         return self.system.param_data[most_prob]
 
-    def set_curr_iter(self, curr_iter: int):
-        """Set the current iteration step
-
-        param curr_iter: Current iteration step
-        """
-        self.system.curr_iter = curr_iter
-        self.curr_iter = self.system.curr_iter
 
     def increase_curr_iter(self):
         """Increase the current iteration step by one
