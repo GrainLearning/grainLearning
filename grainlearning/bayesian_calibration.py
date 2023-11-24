@@ -1,12 +1,18 @@
 """
 This module contains the Bayesian calibration class.
 """
-from typing import Type, Dict
 import os
-from numpy import argmax
+from typing import Dict, Type
+
 from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
 from grainlearning.iterative_bayesian_filter import IterativeBayesianFilter
-from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
+from grainlearning.tools import (
+    plot_obs_and_sim,
+    plot_param_data,
+    plot_param_stats,
+    plot_posterior,
+)
+from numpy import argmax
 
 
 class BayesianCalibration:
@@ -66,30 +72,31 @@ class BayesianCalibration:
     :param curr_iter: Current iteration step
     :param save_fig: Flag for skipping (-1), showing (0), or saving (1) the figures
     """
-    #: Dynamic system whose parameters or hidden states are being inferred
-    system: Type["DynamicSystem"]
-
-    #: Calibration method (e.g, Iterative Bayesian Filter)
-    calibration: Type["IterativeBayesianFilter"]
-
-    #: Number of iterations
-    num_iter: int
-
-    #: Current calibration step
-    curr_iter: int = 0
-
-    #: Flag to save figures
-    save_fig: int = -1
 
     def __init__(
         self,
         system: Type["DynamicSystem"],
         calibration: Type["IterativeBayesianFilter"],
-        num_iter: int,
-        curr_iter: int,
-        save_fig: int
+        num_iter: int = 10,
+        curr_iter: int = 0,
+        save_fig: int = -1
     ):
-        """Initialize the Bayesian calibration class"""
+        """Initialize a Bayesian calibration object
+
+
+        Parameters
+        ----------
+        system : Type[&quot;DynamicSystem&quot;]
+            Dynamic system whose parameters or hidden states are being inferred
+        calibration : Type[&quot;IterativeBayesianFilter&quot;]
+            Calibration method (e.g, Iterative Bayesian Filter)
+        num_iter : int
+            Number of iterations
+        curr_iter : int
+            Current calibration step
+        save_fig : int
+            Flag to save figures
+        """
         self.system = system
 
         self.calibration = calibration
@@ -99,6 +106,8 @@ class BayesianCalibration:
         self.set_curr_iter(curr_iter)
 
         self.save_fig = save_fig
+
+        
 
     def run(self):
         """ This is the main calibration loop which does the following steps
