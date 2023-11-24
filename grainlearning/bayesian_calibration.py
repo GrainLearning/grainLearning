@@ -81,7 +81,7 @@ class BayesianCalibration:
         curr_iter: int = 0,
         save_fig: int = -1
     ):
-        """Initialize a Bayesian calibration object
+        """Initialize a Bayesian calibration object.
 
 
         Parameters
@@ -97,18 +97,18 @@ class BayesianCalibration:
         save_fig : int
             Flag to save figures
         """
-        self.system = system
 
-        self.calibration = calibration
 
         self.num_iter = num_iter
 
         self.save_fig = save_fig
 
-        self.curr_iter = self.system.curr_iter
+        self.curr_iter = curr_iter
 
+        self.system = system
         self.system.curr_iter = curr_iter
 
+        self.calibration = calibration
 
         
 
