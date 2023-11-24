@@ -1,7 +1,8 @@
 """Test the sampling module."""
 from os import remove
+
 import numpy as np
-from grainlearning import GaussianMixtureModel, DynamicSystem, generate_params_qmc
+from grainlearning import DynamicSystem, GaussianMixtureModel, generate_params_qmc
 
 
 def test_init():
@@ -125,13 +126,11 @@ def test_regenerate_params():
     #: Assert if the new parameters are correct
     np.testing.assert_allclose(
         new_params,
-        np.array(
-            [
-                [2.50061801e+06, 1.92539376e-01],
-                [5.40525882e+06, 3.10537276e-01],
-                [3.46458943e+06, 3.76945456e-01],
-                [5.66254261e+06, 2.67135646e-01]
-            ]
+        np.array([
+            [2.507042e+06, 1.927278e-01],
+            [5.405586e+06, 3.105264e-01],
+            [3.464498e+06, 3.769364e-01],
+            [5.662892e+06, 2.671123e-01]]
         ),
         rtol=0.001,
     )
