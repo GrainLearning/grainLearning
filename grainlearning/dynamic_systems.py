@@ -285,6 +285,20 @@ class DynamicSystem:
         :param data: parameter data of shape (num_samples, num_params)
         """
         self.param_data = np.array(data)
+    
+    def set_obs_data(self, data: list):
+        """Set the observation data
+
+        :param data: observation data of shape (num_obs, num_steps)
+        """
+        self.obs_data = np.array(data,ndmin=2)
+    
+    def set_ctrl_data(self, data: list):
+        """Set the control data
+
+        :param data: control data of shape (num_ctrl, num_steps)
+        """
+        self.ctrl_data = np.array(data)
 
     def compute_inv_normalized_sigma(self):
         """Compute the inverse of the matrix that apply different weights on the observables"""
