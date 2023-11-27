@@ -1,15 +1,15 @@
 """
 This module contains tools for the GrainLearning project.
 """
-import sys
-import os
 import math
+import os
 import subprocess
-from typing import List, Callable
-import numpy as np
-from sklearn.mixture import BayesianGaussianMixture
-from scipy.spatial import Voronoi, ConvexHull
+import sys
+from typing import Callable, List
 
+import numpy as np
+from scipy.spatial import ConvexHull, Voronoi
+from sklearn.mixture import BayesianGaussianMixture
 
 # def startSimulations(platform, software, tableName, fileName):
 #     # platform desktop, aws or rcg    # software so far only yade
@@ -465,7 +465,12 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
 
 
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
+    import itertools
+
     import matplotlib.pylab as plt
+    import seaborn as sns
+
+    # from scipy.interpolate import griddata
     num = len(param_names)
     n_cols = int(np.ceil(num / 2))
     num = num - 1
@@ -485,6 +490,68 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     else:
         plt.show()
     plt.close()
+
+
+    # retief countour plot
+
+    if num < 6:
+        n_rows = 2
+    else:
+        n_rows = 3
+    
+    n_cols = int(np.ceil(num / n_rows))
+
+    # num_iter, num_samples, num_params
+ 
+
+    fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(9, 6))
+    # parm_data = np.array(param_data_list)
+
+
+    
+    for pi in range(num): #loop over parameters
+        palette = itertools.cycle(sns.color_palette("YlOrBr"))
+        for ni in range(num_iter): #loop over iterations
+            p_data = np.array(param_data_list[ni])
+            x = p_data[:, pi]
+            y = p_data[:, pi + 1]
+            data = np.array([x,y])
+            sns.kdeplot(x=x,y=y,ax=axs.flatten()[pi],color=next(palette), levels=10)
+            sns.scatterplot(x=x, y=y, s=15,ax=axs.flatten()[pi],color=next(palette),label=f'iterNo. {ni:d}')
+            axs.flatten()[pi].set_xlabel(r'$' + param_names[pi] + '$')
+            axs.flatten()[pi].set_ylabel(r'$' + param_names[pi + 1] + '$')
+            axs.flatten()[pi].get_legend().remove()
+            # axs.flatten()[pi].plot(parm_data[ni, :, pi], parm_data[ni, :, pi + 1], 'o', label=f'iterNo. {ni:d}')
+            # axs.flatten()[pi].set_xlabel(r'$' + param_names[pi] + '$')
+            # axs.flatten()[pi].set_ylabel(r'$' + param_names[pi + 1] + '$')
+            # axs.flatten()[pi].legend()
+    # axs.flatten()[0].legend()
+    lgd = axs.flatten()[-1].legend(loc='center left', bbox_to_anchor=(1, 1))
+    
+    plt.tight_layout()
+    if save_fig:
+        plt.savefig(f'{fig_name}_param_space_retief.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
+    else:
+        plt.show()
+    plt.close()
+
+    # for ni in range(num_iter):
+    #     parm_data = np.array(param_data_list[ni]).T
+    #     for pi,params in  enumerate(parm_data):
+    #         x = params
+            
+
+    # Linearly interpolate the data (x, y) on a grid defined by (xi, yi).
+        # triang = tri.Triangulation(x, y)
+        # interpolator = tri.LinearTriInterpolator(triang, z)
+        # Xi, Yi = np.meshgrid(xi, yi)
+        # zi = interpolator(Xi, Yi)
+
+    # Note that scipy.interpolate provides means to interpolate data on a grid
+    # as well. The following would be an alternative to the four lines above:
+    # from scipy.interpolate import griddata
+    # zi = griddata((x, y), z, (xi[None, :], yi[:, None]), method='linear')
+
 
 
 def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, save_fig=0):
