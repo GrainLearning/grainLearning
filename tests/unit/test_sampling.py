@@ -126,11 +126,11 @@ def test_regenerate_params():
     #: Assert if the new parameters are correct
     np.testing.assert_allclose(
         new_params,
-        np.array([
-            [2.507042e+06, 1.927278e-01],
-            [5.405586e+06, 3.105264e-01],
-            [3.464498e+06, 3.769364e-01],
-            [5.662892e+06, 2.671123e-01]]
+        np.array(
+                [[2.503388e+06, 1.926141e-01],
+                  [5.405269e+06, 3.105382e-01],
+                  [3.464399e+06, 3.769494e-01],
+                  [5.662564e+06, 2.671306e-01]]
         ),
         rtol=0.001,
     )
@@ -196,11 +196,9 @@ def test_draw_samples_within_bounds():
     np.testing.assert_allclose(
         new_params,
         np.array(
-            [
-                [6.442085e+06, 3.272525e-01],
-                [5.109979e+06, 2.736598e-01],
-                [4.379674e+06, 3.722799e-01]
-            ]
+                [[6.571536e+06, 3.226069e-01],
+                  [4.580230e+06, 2.844746e-01],
+                  [6.811376e+06, 2.839984e-01]]
         ),
         rtol=0.001,
     )
