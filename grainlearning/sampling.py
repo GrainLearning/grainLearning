@@ -96,7 +96,7 @@ class GaussianMixtureModel:
         weight_concentration_prior: float = 0.2,
         covariance_type: str = "full",
         n_init: int = 1,
-        tol: float = 1.0e-3,
+        tol: float = 1.0e-5,
         max_iter: int = 100,
         random_state: int = None,
         init_params: str = "kmeans",
