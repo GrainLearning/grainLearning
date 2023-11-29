@@ -6,7 +6,7 @@ import os
 from numpy import argmax
 from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
 from grainlearning.iterative_bayesian_filter import IterativeBayesianFilter
-from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim
+from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim, plot_pdf
 
 
 class BayesianCalibration:
@@ -237,6 +237,13 @@ class BayesianCalibration:
             self.system.sim_data,
             self.calibration.inference.posteriors,
             self.save_fig
+        )
+
+        plot_pdf(
+            fig_name,
+            self.system.param_names,
+            self.calibration.param_data_list[1],
+            self.save_fig,
         )
 
     def get_most_prob_params(self):

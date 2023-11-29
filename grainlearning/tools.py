@@ -539,6 +539,32 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     plt.close()
 
 
+def plot_pdf(fig_name, param_names, samples, save_fig=0):
+    """
+    Plot the posterior density function of the parameter distribution
+    :param fig_name: string
+    :param sim_name: string
+    :param param_names: list of strings containing parameter names
+    :param samples: ndarray of shape (num_samples, self.num_params)
+    :param save_fig: bool defaults to False
+    """
+    import seaborn as sns
+    import pandas as pd
+    import matplotlib.pylab as plt
+    df = pd.DataFrame(samples, columns=param_names)
+
+    # plot the parameter distribution in a scatter plot
+    fig = sns.PairGrid(df, diag_sharey=False)
+    fig.map_upper(sns.scatterplot, s=15)
+    fig.map_lower(sns.kdeplot)
+    fig.map_diag(sns.kdeplot, lw=2)
+
+    if save_fig:
+        plt.savefig(f'{fig_name}_scatterplot.png')
+    else:
+        plt.show()
+
+
 def write_dict_to_file(data, file_name):
     """Write a python dictionary data into a text file
 
