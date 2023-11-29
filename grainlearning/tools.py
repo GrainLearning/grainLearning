@@ -409,28 +409,22 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.subplot(2, n_cols, i + 1)
         plt.plot(means[:, i])
         plt.xlabel("'Time' step")
-        plt.ylabel(r'$|' + param_names[i] + r'|$')
+        plt.ylabel(f'Mean of f{param_names[i]}')
         plt.grid(True)
     plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_means.png')
-    else:
-        plt.show()
-    plt.close()
 
     plt.figure('Posterior coefficients of variance of the parameters')
     for i in range(num):
         plt.subplot(2, n_cols, i + 1)
         plt.plot(covs[:, i])
         plt.xlabel("'Time' step")
-        plt.ylabel(r'$COV(' + param_names[i] + ')$')
+        plt.ylabel(f'Coefficient of variation of f{param_names[i]}')
         plt.grid(True)
     plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_covs.png')
-    else:
-        plt.show()
-    plt.close()
 
 
 def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
@@ -445,7 +439,8 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
     try:
         import matplotlib.pylab as plt
     except ImportError:
-        print('matplotlib is not installed, cannot plot posterior distribution. Please install with grainlearning[plot]')
+        print(
+            'matplotlib is not installed, cannot plot posterior distribution. Please install with grainlearning[plot]')
     num_steps = posterior.shape[0]
     for i, name in enumerate(param_names):
         plt.figure(f'Posterior distribution of {name}')
@@ -459,9 +454,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
         plt.tight_layout()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
-        else:
-            plt.show()
-        plt.close()
 
 
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
@@ -482,9 +474,6 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
         plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_space.png')
-    else:
-        plt.show()
-    plt.close()
 
 
 def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_data, posteriors, save_fig=0):
@@ -534,9 +523,6 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_obs_and_sim.png')
-    else:
-        plt.show()
-    plt.close()
 
 
 def plot_pdf(fig_name, param_names, samples, save_fig=0):
@@ -558,11 +544,19 @@ def plot_pdf(fig_name, param_names, samples, save_fig=0):
     fig.map_upper(sns.scatterplot, s=15)
     fig.map_lower(sns.kdeplot)
     fig.map_diag(sns.kdeplot, lw=2)
+    fig.fig.canvas.manager.set_window_title('Estimated posterior probability density function')
 
     if save_fig:
         plt.savefig(f'{fig_name}_scatterplot.png')
     else:
         plt.show()
+
+
+def close_plots(save_fig=0):
+    import matplotlib.pylab as plt
+    if not save_fig:
+        plt.show()
+    plt.close()
 
 
 def write_dict_to_file(data, file_name):
