@@ -255,7 +255,7 @@ class BayesianCalibration:
         plot_pdf(
             fig_name,
             self.system.param_names,
-            self.calibration.param_data_list[1],
+            self.calibration.param_data_list,
             self.save_fig,
         )
 

@@ -409,7 +409,7 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.subplot(2, n_cols, i + 1)
         plt.plot(means[:, i])
         plt.xlabel("'Time' step")
-        plt.ylabel(f'Mean of f{param_names[i]}')
+        plt.ylabel(f'Mean of {param_names[i]}')
         plt.grid(True)
     plt.tight_layout()
     if save_fig:
@@ -420,7 +420,7 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.subplot(2, n_cols, i + 1)
         plt.plot(covs[:, i])
         plt.xlabel("'Time' step")
-        plt.ylabel(f'Coefficient of variation of f{param_names[i]}')
+        plt.ylabel(f'Coefficient of variation of {param_names[i]}')
         plt.grid(True)
     plt.tight_layout()
     if save_fig:
@@ -447,9 +447,9 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
         for j in range(6):
             plt.subplot(2, 3, j + 1)
             plt.plot(param_data[:, i], posterior[int(num_steps * (j + 1) / 6 - 1), :], 'o')
-            plt.title(f"'Time' step No.{int(num_steps * (j + 1) / 6 - 1):3d} ")
+            plt.title(f"'Time' step {int(num_steps * (j + 1) / 6 - 1):3d} ")
             plt.xlabel(r'$' + name + '$')
-            plt.ylabel('Posterior distribution')
+            plt.ylabel('Posterior probability mass')
             plt.grid(True)
         plt.tight_layout()
         if save_fig:
@@ -458,6 +458,8 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
 
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     import matplotlib.pylab as plt
+    import seaborn as sns
+    flare_cmap = sns.color_palette("flare", as_cmap=True)
     num = len(param_names)
     n_cols = int(np.ceil(num / 2))
     num = num - 1
@@ -466,7 +468,8 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     for j in range(num):
         plt.subplot(2, n_cols, j + 1)
         for i in range(num_iter):
-            plt.plot(param_data_list[i][:, j], param_data_list[i][:, j + 1], 'o', label=f'iterNo. {i:d}')
+            plt.scatter(param_data_list[i][:, j], param_data_list[i][:, j + 1], edgecolors='white',
+                        color=flare_cmap(i / (num_iter - 1)), label=f'Iter No. {i:d}')
             plt.xlabel(r'$' + param_names[j] + '$')
             plt.ylabel(r'$' + param_names[j + 1] + '$')
             plt.legend()
@@ -531,25 +534,40 @@ def plot_pdf(fig_name, param_names, samples, save_fig=0):
     :param fig_name: string
     :param sim_name: string
     :param param_names: list of strings containing parameter names
-    :param samples: ndarray of shape (num_samples, self.num_params)
+    :param samples: list of ndarray of shape (num_samples, self.num_params)
     :param save_fig: bool defaults to False
     """
     import seaborn as sns
     import pandas as pd
     import matplotlib.pylab as plt
-    df = pd.DataFrame(samples, columns=param_names)
+
+    # create a deep copy of the samples (FIXME: this is a workaround for a bug in iBF constructor)
+    new_samples = [np.copy(sample) for sample in samples]
+    # pad with NaNs to make all samples have the same length
+    max_len = int(max([len(sample) for sample in new_samples]))
+    for i in range(len(new_samples)):
+        new_samples[i] = np.pad(new_samples[i], ((0, max_len - len(new_samples[i])), (0, 0)), 'constant',
+                                constant_values=np.nan)
+    # fill the third dimension with iteration number
+    stacked_samples = np.vstack([new_samples[i] for i in range(len(new_samples))])
+    third_dim_indices = np.repeat(np.arange(len(new_samples)), new_samples[0].shape[0])
+    new_samples = np.hstack([stacked_samples, third_dim_indices[:, np.newaxis]])
+
+    # convert the array into a pandas dataframe
+    new_names = param_names + ['Iter']
+    df = pd.DataFrame(new_samples, columns=new_names)
 
     # plot the parameter distribution in a scatter plot
-    fig = sns.PairGrid(df, diag_sharey=False)
+    fig = sns.PairGrid(df, diag_sharey=False, hue="Iter", palette='flare')
     fig.map_upper(sns.scatterplot, s=15)
-    fig.map_lower(sns.kdeplot)
+    fig.map_lower(sns.kdeplot, thresh=1e-3, levels=5)
     fig.map_diag(sns.kdeplot, lw=2)
+    fig.add_legend(loc='upper right')
     fig.fig.canvas.manager.set_window_title('Estimated posterior probability density function')
 
+    fig.tight_layout()
     if save_fig:
-        plt.savefig(f'{fig_name}_scatterplot.png')
-    else:
-        plt.show()
+        fig.savefig(f'{fig_name}_scatterplot.png')
 
 
 def close_plots(save_fig=0):
