@@ -190,6 +190,10 @@ class SMC:
         self.compute_effective_sample_size()
         return (self.ess[-1] - self.ess_target) ** 2
 
+    def set_posteriors(self, posteriors: np.ndarray = None):
+        """Set the posterior distribution"""
+        self.posteriors = posteriors
+
     def compute_effective_sample_size(self):
         """Compute the effective sample size"""
         # compute the effective sample size for every time step
