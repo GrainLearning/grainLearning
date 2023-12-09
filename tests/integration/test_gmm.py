@@ -27,7 +27,9 @@ def test_gmm():
                 "param_names": ['a', 'b'],
             },
             "calibration": {
-                "inference": {"ess_target": 0.3},
+                "inference": {
+                    "ess_target": 0.3,
+                    "scale_cov_with_max": True},
                 "sampling": {
                     "max_num_components": 1,
                     "covariance_type": "full",
