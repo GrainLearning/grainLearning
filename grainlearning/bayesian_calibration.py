@@ -184,7 +184,10 @@ class BayesianCalibration:
     def load_all(self):
         """Simply load all previous iterations of Bayesian calibration
         """
-        for _ in range(self.num_iter - 1):
+        self.load_system()
+        self.calibration.add_curr_param_data_to_list(self.system.param_data)
+        self.increase_curr_iter()
+        while self.curr_iter < self.num_iter:
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.load_system()
             self.calibration.add_curr_param_data_to_list(self.system.param_data)

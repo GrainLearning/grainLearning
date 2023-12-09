@@ -182,11 +182,11 @@ class GaussianMixtureModel:
             max_num_components=obj["max_num_components"],
             weight_concentration_prior=obj.get("weight_concentration_prior", None),
             covariance_type=obj.get("covariance_type", "tied"),
-            n_init=obj.get("n_init", 1),
+            n_init=obj.get("n_init", 10),
             tol=obj.get("tol", 1.0e-5),
             max_iter=obj.get("max_iter", 100),
             random_state=obj.get("random_state", None),
-            init_params=obj.get("init_params", "kmeans"),
+            init_params=obj.get("init_params", "k-means++"),
             warm_start=obj.get("warm_start", False),
             expand_factor=obj.get("expand_factor", 10),
             slice_sampling=obj.get("slice_sampling", False),
@@ -258,7 +258,7 @@ class GaussianMixtureModel:
         # resample until all parameters are within the upper and lower bounds
         test_num = system.num_samples
         while system.param_min and system.param_max and new_params.shape[0] < minimum_num_samples:
-            test_num = int(np.ceil(1.1 * test_num))
+            test_num = int(np.ceil(1.01 * test_num))
             new_params = self.draw_samples_within_bounds(system, test_num)
 
         return new_params
@@ -281,7 +281,7 @@ class GaussianMixtureModel:
 
             scores = self.gmm.score_samples(self.expanded_normalized_params)
             new_params = new_params[np.where(
-                self.gmm.score_samples(new_params) > scores.mean() - 2 * scores.std())]
+                self.gmm.score_samples(new_params) > scores.mean())]
 
         new_params *= self.max_params
 

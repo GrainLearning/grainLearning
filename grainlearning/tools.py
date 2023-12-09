@@ -574,7 +574,7 @@ def close_plots(save_fig=0):
     import matplotlib.pylab as plt
     if not save_fig:
         plt.show()
-    plt.close()
+    plt.close('all')
 
 
 def write_dict_to_file(data, file_name):

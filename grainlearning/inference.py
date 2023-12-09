@@ -21,7 +21,7 @@ class SMC:
         system_cls = SMC.from_dict(
             {
                 "ess_target": 0.3,
-                "scale_cov_with_max": True
+                "scale_cov_with_max": False
             }
         )
 
@@ -34,7 +34,7 @@ class SMC:
 
         system_cls = SMC(
                 ess_target = 0.3,
-                scale_cov_with_max = True
+                scale_cov_with_max = False
         )
 
     :param ess_target: Target effective sample size (w_0 / sum_i w_i^2)
@@ -49,7 +49,7 @@ class SMC:
     ess_target: float
 
     #: True if the covariance matrix is scaled with the maximum of the observations, defaults to True
-    scale_cov_with_max: bool = True
+    scale_cov_with_max: bool = False
 
     #: Covariance matrices of shape (num_steps, num_obs, num_obs)
     cov_matrices: np.array
@@ -66,7 +66,7 @@ class SMC:
     def __init__(
         self,
         ess_target: float,
-        scale_cov_with_max: bool = True,
+        scale_cov_with_max: bool = False,
         cov_matrices: np.array = None,
     ):
         """Initialize the SMC class"""
@@ -85,7 +85,7 @@ class SMC:
         """
         return cls(
             ess_target=obj["ess_target"],
-            scale_cov_with_max=obj.get("scale_cov_with_max", True),
+            scale_cov_with_max=obj.get("scale_cov_with_max", False),
             cov_matrices=obj.get("cov_matrices", None),
         )
 
