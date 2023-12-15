@@ -15,7 +15,7 @@ executable = f'./RBEP2D.out'
 def run_func(i, params, system, mag):
     description = 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)
     #print(" ".join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
-    os.system(' '.join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
+    os.system(' '.join([executable, "%.8e %.8e %.8e" % tuple(params), system.sim_name, description]))
 
 
 def run_sim(system):
@@ -32,8 +32,8 @@ def run_sim(system):
     os.system('for f in *sim.t*; do mv -- "$f" "${f%.txt*}.txt" 2> /dev/null; done')
     os.system('for f in *param.t*; do mv -- "$f" "${f%.txt*}.txt" 2> /dev/null; done')
 
-    for i, params in enumerate(system.param_data):
-        get_difference(system.sim_name+'_'+'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)+'_sim.txt', '1d_baseline.txt')
+    # for i, params in enumerate(system.param_data):
+    #     get_difference(system.sim_name+'_'+'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)+'_sim.txt', '1d_baseline.txt')
 
 
 
@@ -88,13 +88,13 @@ def get_difference(file_name: str, file_name2: str):
 def RBEP_calibration():
     calibration = BayesianCalibration.from_dict(
         {
-            "num_iter": 10,
+            "num_iter": 1,
             "system": {
                 "system_type": IODynamicSystem,
-                "param_min": [-0.5, -4.5],
-                "param_max": [0.5, -3],
-                "param_names": ['a', 'b'],
-                "num_samples": 100,
+                "param_min": [-0.5, -6.0, 0],
+                "param_max": [0.5, -4.0, 100],
+                "param_names": ['a', 'b', 'c'],
+                "num_samples": 5000,
                 "obs_data_file": PATH + '/linear_obs.dat',
                 "obs_names": ['f','g','h','i','j','k','l','m','n','o','p','q','s','t','t','v','w','x','y','z'],
                 "ctrl_name": 'u',
@@ -117,7 +117,7 @@ def RBEP_calibration():
                     "slice_sampling": False,
                 }
             },
-            "save_fig": -1,
+            "save_fig": 0,
         }
     )
     calibration.run()
@@ -130,9 +130,9 @@ def RBEP_calibration():
                          [f'{param}' for param in calibration.system.estimated_params[-1]]) + '\n')
 
 
-os.system('./RBEP2D.out 0.15 -3.55 linear obs a')
+os.system('./RBEP2D.out 0.15 -5.0 20 linear obs a')
 os.system('mv linear_obs_sim.txt linear_obs.dat 2> /dev/null')
-get_difference('linear_obs.dat', 'linear_obs_baseline.dat')
+# get_difference('linear_obs.dat', 'linear_obs_baseline.dat')
 
 for i in range(100):
     RBEP_calibration()
