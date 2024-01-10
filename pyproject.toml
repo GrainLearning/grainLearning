@@ -12,6 +12,9 @@ license = "GPLv2"
 homepage = "https://grainlearning.readthedocs.io/"
 repository = "https://github.com/GrainLearning/grainLearning"
 keywords = ["Bayesian inference", "Uncertainty quantification", "Non-parametric Gaussian mixture", "DEM", "Constitutive modeling", "Granular materials"]
+packages = [
+    { include = "grainlearning"}
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
@@ -44,7 +47,3 @@ visuals = ["seaborn"]
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-packages = [
-    { include = "grainlearning"}
-]
