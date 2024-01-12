@@ -46,6 +46,13 @@ GrainLearning [@Cheng2023] arises as a tool for Bayesian calibration of such com
 GrainLearning started in the geotechnical engineering community and was primarily used for granular materials in quasi-static, laboratory conditions [@Cheng2018a; @Cheng2019]. These include triaxial [@Hartmann2022; @LI2024105957] and oedometric [@Cheng2019] compressions of soil samples.
 In the particle technology community, attempts with GrainLearning have been made to identify contact parameters for polymer and pharmaceutical powders against angle-of-repose [@essay91991], shear cell [@Thornton2023], and sintering experiments [@ALVAREZ2022117000]. Satisfactory results have been obtained in simulation cases where the grains were in dynamic regimes or treated under multi-physical processes.
 
+# State of the field
+
+Conventionally, the calibration of contact parameters at the grain scale is accomplished by trial and error, by comparing the macroscopic responses between simulation and experiments. This is due to the difficulty of obtaining precise measurements at the contact level and the randomness of grain properties (e.g., shape, stiffness, and asphericity).
+In the last decade, optimization [@Do2018] and design-of-experiment [@Hanley2011] approaches such as Latin Hypercube sampling and genetic algorithms have been used. However, the amount of model runs is still too large.
+For this reason, Gaussian process regression [@Fransen2021] or artificial neural networks [@Benvenuti2016] were tested as surrogate- or meta-models for the DEM.
+GrainLearning combines probabilistic learning of parameter space and sampling to achieve Bayesian optimization efficiently.
+
 # Functionality
 
 - **Calibration**: By means of Sequential Monte Carlo filtering GrainLearning can infer and update model parameters. By learning the underlying distribution using a variational Gaussian model, highly probable zones are identified and sampled iteratively until a tolerance for the overall uncertainty is reached. This process requires the input of: a time series reference data, the ranges of the parameters to infer and a tolerance. The software iteratively minimizes the discrepancy between the model solution and the reference data.

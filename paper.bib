@@ -81,7 +81,6 @@ author = {Xin Li and George Kouretzis and Klaus Thoeni},
 keywords = {Buried pipelines, Discrete Element Method, Soil-pipe interaction, Triaxial compression test, Direct shear test, Calibration},
 abstract = {This paper presents a numerical methodology based on the Discrete Element Method developed for the efficient modelling of kinematic granular soil-pipe interaction at large deformations. The methodology is based on a robust Bayesian procedure for calibrating micromechanical contact parameters using standard triaxial compression tests, does not rely on the back-analysis of physical model experiments, and produces accurate “blind” predictions of independent experimental measurements. The latter is demonstrated by extensively validating DEM models against measurements obtained from direct shear tests on sand performed during this study and published measurements from 1-g physical model experiments of uplift of rigid pipes buried in dense sand. In addition, we introduce different approaches that allow efficient modelling of deeply buried pipes, and we employ the methodology to investigate how the reaction from sand to rigid pipe uplift varies as the pipe embedment depth increases. Detailed numerical predictions provide insights into the “flow-around” failure mechanism that develops around the deeply buried pipes and on the existence of a critical embedment depth, beyond which the normalised reaction does not further increase with increasing pipe embedment. The outcomes of this study are applicable to the stress analysis of deeply buried pipes in practice and to the modelling of a variety of problems relevant to rigid objects buried deeply in granular soil.}
 }
-
 @inproceedings{Thornton2023,
 author = {Thornton, Anthony and Nguyen, Q. and Polman, H. and Bisschop, J. and Weinhart-Mejia, R. and Vesal, M. and Weinhart, Thomas and Post, M. and Ostanin, Igor},
 year = {2023},
@@ -90,7 +89,6 @@ pages = {},
 title = {Simulating industrial scenarios: with the open-source software MercuryDPM},
 doi = {10.23967/c.particles.2023.015}
 }
-
 @software{Cheng2023,
   author       = {Cheng, H. and
                   Orozco, L. and
@@ -105,4 +103,62 @@ doi = {10.23967/c.particles.2023.015}
   version      = {v2.0.2},
   doi          = {10.5281/zenodo.8352544},
   url          = {https://doi.org/10.5281/zenodo.8352544}
+}
+@article{Do2018,
+   abstract = {In this research, a universal framework for automated calibration of microscopic properties of modeled granular materials is proposed. The proposed framework aims at industrial scale applications, where optimization of the computational time step is important. It can be generally applied to all types of DEM simulation setups. It consists of three phases: data base generation, parameter optimization, and verification. In the first phase, DEM simulations are carried out on a multi-dimensional grid of sampled input parameter values to generate a database of macroscopic material responses. The database and experimental data are then used to interpolate the objective functions with respect to an arbitrary set of parameters. In the second phase, the Non-dominated Sorting Genetic Algorithm II (NSGA-II) is used to solve the calibration multi-objective optimization problem. In the third phase, the DEM simulations using the results of the calibrated input parameters are carried out to calculate the macroscopic responses that are then compared with experimental measurements for verification and validation. The proposed calibration framework has been successfully demonstrated by a case study with two-objective optimization for the model accuracy and the simulation time. Based on the concept of Pareto dominance, the trade-off between these two conflicting objectives becomes apparent. Through verification and validation steps, the approach has proven to be successful for accurate calibration of material parameters with the optimal simulation time.},
+   author = {Huy Q. Do and Alejandro M. Aragón and Dingena L. Schott},
+   doi = {10.1016/J.APT.2018.03.001},
+   issn = {0921-8831},
+   issue = {6},
+   journal = {Advanced Powder Technology},
+   month = {6},
+   pages = {1393-1403},
+   publisher = {Elsevier},
+   title = {A calibration framework for discrete element model parameters using genetic algorithms},
+   volume = {29},
+   url = {https://www.sciencedirect.com/science/article/pii/S0921883118300773?via%3Dihub},
+   year = {2018},
+}
+@article{Hanley2011,
+   abstract = {Discrete element modelling (DEM) is commonly used for particle-scale modelling of granular or particulate materials. Creation of a DEM model requires the specification of a number of micro-structural parameters, including the particle contact stiffness and the interparticle friction. These parameters cannot easily be measured in the laboratory or directly related to measurable, physical material parameters. Therefore, a calibration process is typically used to select the values for use in simulations of physical systems. This paper proposes optimising the DEM calibration process by applying the Taguchi method to analyse the influence of the input parameters on the simulated response of powder agglomerates. The agglomerates were generated in both two and three dimensions by bonding disks and spheres together using parallel bonds. The mechanical response of each agglomerate was measured in a uniaxial compression test simulation where the particle was compressed quasi-statically between stiff, horizontal, frictionless platens. Using appropriate experimental designs revealed the most important parameters to consider for successful calibration of the 2D and 3D models. By analysing the interactive effects, it was also shown that the conventional calibration procedure using a “one at a time” analysis of the parameters is fundamentally erroneous. The predictive ability of this approach was confirmed with further simulations in both 2D and 3D. This demonstrates that a judicious strategy for application of Taguchi principles can provide a sound and effective calibration procedure.},
+   author = {Kevin J. Hanley and Catherine O'Sullivan and Jorge C. Oliveira and Kevin Cronin and Edmond P. Byrne},
+   doi = {10.1016/j.powtec.2011.03.023},
+   issn = {00325910},
+   issue = {3},
+   journal = {Powder Technology},
+   keywords = {Discrete element modelling,Experimental design,Simulation,Statistical analysis,Uniaxial compression},
+   month = {7},
+   pages = {230-240},
+   title = {Application of Taguchi methods to DEM calibration of bonded agglomerates},
+   volume = {210},
+   url = {http://www.sciencedirect.com/science/article/pii/S0032591011001380},
+   year = {2011},
+}
+@article{Fransen2021,
+   abstract = {Developments in discrete element modelling (DEM) enable detailed modelling of granular flows in bulk handling equipment (BHE) but due to the computational expense of DEM, wide use in analysing equipment performance is not yet feasible. Metamodels are a viable option to effectively use DEM in analysing BHE performance. Metamodels are able to approximate the behaviour of BHE efficiently for a wide range of design parameter values. We present a methodology to construct and validate DEM-based metamodels as well as a discharging hopper case study illustrating the use and benefits of metamodels in combination with DEM. For three different metamodels trained on a DEM data set, the results show that the metamodel quality highly depends on the number of samples and finding proper hyper-parameter values. The constructed metamodels are found capable of adequately representing the relation between performance and design parameters. It is concluded that methodically constructed metamodels are a valuable addition in describing BHE behaviour.},
+   author = {Marc P. Fransen and Matthijs Langelaar and Dingena L. Schott},
+   doi = {10.1016/J.POWTEC.2021.07.048},
+   issn = {0032-5910},
+   journal = {Powder Technology},
+   keywords = {Bulk handling equipment,DEM,Hopper discharge,Metamodel construction procedure,Metamodeling},
+   month = {11},
+   pages = {205-218},
+   publisher = {Elsevier},
+   title = {Application of DEM-based metamodels in bulk handling equipment design: Methodology and DEM case study},
+   volume = {393},
+   year = {2021},
+}
+@article{Benvenuti2016,
+   abstract = {In Discrete Element Method (DEM) simulations, particle–particle contact laws determine the macroscopic simulation results. Particle-based contact laws, in turn, commonly rely on semi-empirical parameters which are difficult to obtain by direct microscopic measurements. In this study, we present a method for the identification of DEM simulation parameters that uses artificial neural networks to link macroscopic experimental results to microscopic numerical parameters. In the first step, a series of DEM simulations with varying simulation parameters is used to train a feed-forward artificial neural network by backward-propagation reinforcement. In the second step, this artificial neural network is used to predict the macroscopic ensemble behaviour in relation to additional sets of particle-based simulation parameters. Thus, a comprehensive database is obtained which links particle-based simulation parameters to specific macroscopic bulk behaviours of the ensemble. The trained artificial neural network is able to predict the behaviours of additional sets of input parameters accurately and highly efficiently. Furthermore, this method can be used generically to identify DEM material parameters. For each set of calibration experiments, the neural network needs to be trained only once. After the training, the neural network provides a generic link between the macroscopic experimental results and the microscopic DEM simulation parameters. Based on these experiments, the DEM simulation parameters of any given non-cohesive granular material can be identified.},
+   author = {L. Benvenuti and C. Kloss and S. Pirker},
+   doi = {10.1016/j.powtec.2016.01.003},
+   issn = {00325910},
+   journal = {Powder Technology},
+   keywords = {Artificial neural networks,Discrete Element Method (DEM) simulations,Parameter identification},
+   month = {4},
+   pages = {456-465},
+   title = {Identification of DEM simulation parameters by Artificial Neural Networks and bulk experiments},
+   volume = {291},
+   url = {http://www.sciencedirect.com/science/article/pii/S003259101630002X},
+   year = {2016},
 }
