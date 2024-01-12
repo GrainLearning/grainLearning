@@ -1,0 +1,108 @@
+@article{Cheng2019,
+title = {An iterative Bayesian filtering framework for fast and automated calibration of DEM models},
+journal = {Computer Methods in Applied Mechanics and Engineering},
+volume = {350},
+pages = {268-294},
+year = {2019},
+issn = {0045-7825},
+doi = {10.1016/j.cma.2019.01.027},
+url = {https://www.sciencedirect.com/science/article/pii/S0045782519300520},
+author = {H. Cheng and Takayuki Shuku and Klaus Thoeni and Pamela Tempone and Stefan Luding and Vanessa Magnanimo}
+}
+@article{Cheng2018a,
+   abstract = {© 2018, The Author(s). The calibration of discrete element method (DEM) simulations is typically accomplished in a trial-and-error manner. It generally lacks objectivity and is filled with uncertainties. To deal with these issues, the sequential quasi-Monte Carlo (SQMC) filter is employed as a novel approach to calibrating the DEM models of granular materials. Within the sequential Bayesian framework, the posterior probability density functions (PDFs) of micromechanical parameters, conditioned to the experimentally obtained stress–strain behavior of granular soils, are approximated by independent model trajectories. In this work, two different contact laws are employed in DEM simulations and a granular soil specimen is modeled as polydisperse packing using various numbers of spherical grains. Knowing the evolution of physical states of the material, the proposed probabilistic calibration method can recursively update the posterior PDFs in a five-dimensional parameter space based on the Bayes’ rule. Both the identified parameters and posterior PDFs are analyzed to understand the effect of grain configuration and loading conditions. Numerical predictions using parameter sets with the highest posterior probabilities agree well with the experimental results. The advantage of the SQMC filter lies in the estimation of posterior PDFs, from which the robustness of the selected contact laws, the uncertainties of the micromechanical parameters and their interactions are all analyzed. The micro–macro correlations, which are byproducts of the probabilistic calibration, are extracted to provide insights into the multiscale mechanics of  dense granular materials.},
+   author = {H. Cheng and T. Shuku and K. Thoeni and H. Yamamoto},
+   doi = {10.1007/s10035-017-0781-y},
+   issn = {14347636},
+   issue = {1},
+   journal = {Granular Matter},
+   keywords = {Calibration,Data assimilation,Discrete element method,Sequential Monte Carlo,Triaxial compression},
+   title = {Probabilistic calibration of discrete element simulations using the sequential quasi-Monte Carlo filter},
+   volume = {20},
+   year = {2018},
+}
+@article{Hartmann2022,
+   abstract = {This work presents an efficient probabilistic framework for the Bayesian calibration of micro-mechanical parameters for Discrete Element Method (DEM) modelling. Firstly, the superior behaviour of the iterative Bayesian filter over the sequential Monte Carlo filter for calibrating micro-mechanical parameters is shown. The linear contact model with rolling resistance is used for simulating the triaxial responses of Toyoura sand under different confining pressures. Secondly, synthetic data from DEM simulations of triaxial compression are used to assess the reliability of iterative Bayesian filtering with respect to the user-defined parameters, such as the number of samples and predefined parameter ranges. Excellent calibration results with errors between 1 and 2% are obtained when the number of samples is chosen high enough. It is crucial that the sample size is representative for the distribution of individual parameters within the predefined parameter ranges. The wider the ranges, the more samples are required. The investigation also shows the necessity of including both stress and strain histories, at certain confidence levels, for estimation of the correct mechanical responses, especially the correct fabric responses. Finally, based on the findings of this work a fully-automated open-source calibration tool is developed and demonstrated for selected stress paths.},
+   author = {P. Hartmann and H. Cheng and K. Thoeni},
+   doi = {10.1016/j.compgeo.2021.104491},
+   issn = {18737633},
+   issue = {March 2021},
+   journal = {Computers and Geotechnics},
+   keywords = {Bayesian calibration,Convergence,Discrete Element Method (DEM),Machine learning,Multi-objective optimisation,Triaxial compression},
+   publisher = {Elsevier Ltd},
+   title = {Performance study of iterative Bayesian filtering to develop an efficient calibration framework for DEM},
+   volume = {141},
+   year = {2022},
+}
+@article{ALVAREZ2022117000,
+title = {Visco-elastic sintering kinetics in virgin and aged polymer powders},
+journal = {Powder Technology},
+volume = {397},
+pages = {117000},
+year = {2022},
+issn = {0032-5910},
+doi = {10.1016/j.powtec.2021.11.044},
+url = {https://www.sciencedirect.com/science/article/pii/S0032591021009980},
+author = {J.E. Alvarez and H. Snijder and T. Vaneker and H. Cheng and A.R. Thornton and S. Luding and T. Weinhart},
+keywords = {Polymer powders, Sintering, Visco-elastic kinetics, Discrete element method, Bayesian calibration},
+abstract = {This work provides a novel discrete element method (DEM) framework for modelling the visco-elastic sintering kinetics in virgin and aged polymer powders. The coalescence of particle pairs, over long times, is described by a combined three-stage model of the sintering process, where each stage is dominated by a different driving force: adhesive contact force, adhesive inter-surface force and surface tension. The proposed framework is implemented in MercuryDPM, an open-source package for discrete particle simulations. To quantitatively calibrate the particle-scale parameters, Bayesian filtering is used. Experimental data on Polystyrene (PS), Polyamide 12 (PA12), and PEEK powders, both virgin and aged, are analysed and confirm over a wide range of times the existence of the three distinct sintering mechanisms. In good agreement with the experimental observations, the estimation of sintering time is achieved with a significant accuracy compared to Frenkel's model. This study provides an efficient and reliable approach for future studies of strength evolution in powder-bed fusion processes.}
+}
+@misc{essay91991,
+     month = {July},
+    author = {Q.H. {Nguyen}},
+      year = {2022},
+     title = {Machine learning in the calibration process of discrete particle model},
+  abstract = {This research presents a comprehensive study on the use of machine learning in the calibration prob- lem of the Discrete Particle Model, with a particular focus on one bulk parameter: the static angle of repose. Three machine learning algorithms have been tested, including GrainLearning - the unsuper- vised algorithm explicitly developed for DPM calibration, and two other popular supervised learning algorithms: Neural Network and Random Forest regressor. With GrainLearning, multiple attempts have been made to analyze its ability to find the correct combinations of microparameters that can reproduce the experimental static angle of repose in DEM simulations. Meanwhile, after a training period consisting of hundreds of DEM simulations, the NN and RF are capable of providing a database that can be used to find the microparameters that correspond to the experimental static angle of re- pose. Subsequent validations of those combinations using DEM simulations indicate that multiple combinations are correct, paving the way for future research on adapting more supervised machine learning algorithms in the calibration problem with different contact laws and bulk parameters.},
+  url = {http://essay.utwente.nl/91991/}
+}
+@article{BARROS2023116040,
+title = {A novel BEM-DEM coupling in the time domain for simulating dynamic problems in continuous and discontinuous media},
+journal = {Computer Methods in Applied Mechanics and Engineering},
+volume = {410},
+pages = {116040},
+year = {2023},
+issn = {0045-7825},
+doi = {https://doi.org/10.1016/j.cma.2023.116040},
+url = {https://www.sciencedirect.com/science/article/pii/S0045782523001640},
+author = {Guilherme Barros and Victor Sapucaia and Philipp Hartmann and Andre Pereira and Jerzy Rojek and Klaus Thoeni},
+keywords = {Discrete Element Method (DEM), Boundary Element Method (BEM), Discontinuous materials, Wave propagation, Infinite domain, Monolithic coupling},
+abstract = {This work presents a novel scheme to couple the Boundary Element Method (BEM) and the Discrete Element Method (DEM) in the time domain. The DEM captures discontinuous material behaviour, such as fractured and granular media. However, applying the method to real-life applications embedded into infinite domains is challenging. The authors propose a solution to this challenge by coupling the DEM with the BEM. The capability of the BEM to model infinite domains accurately and efficiently, without the need for numerical artifices, makes it the perfect complement to the DEM. This study proposes a direct monolithic interface-based coupling method that resolves any incompatibilities between the two methods in two dimensions. The benchmark results show that the proposed methodology consistently produces results that align with analytical solutions. The final example in the paper showcases the full potential of this innovative methodology, where the DEM models a fracturing process, and the BEM evaluates its far-field effect.}
+}
+@article{LI2024105957,
+title = {Discrete Element Modelling of uplift of rigid pipes deeply buried in dense sand},
+journal = {Computers and Geotechnics},
+volume = {166},
+pages = {105957},
+year = {2024},
+issn = {0266-352X},
+doi = {10.1016/j.compgeo.2023.105957},
+url = {https://www.sciencedirect.com/science/article/pii/S0266352X23007140},
+author = {Xin Li and George Kouretzis and Klaus Thoeni},
+keywords = {Buried pipelines, Discrete Element Method, Soil-pipe interaction, Triaxial compression test, Direct shear test, Calibration},
+abstract = {This paper presents a numerical methodology based on the Discrete Element Method developed for the efficient modelling of kinematic granular soil-pipe interaction at large deformations. The methodology is based on a robust Bayesian procedure for calibrating micromechanical contact parameters using standard triaxial compression tests, does not rely on the back-analysis of physical model experiments, and produces accurate “blind” predictions of independent experimental measurements. The latter is demonstrated by extensively validating DEM models against measurements obtained from direct shear tests on sand performed during this study and published measurements from 1-g physical model experiments of uplift of rigid pipes buried in dense sand. In addition, we introduce different approaches that allow efficient modelling of deeply buried pipes, and we employ the methodology to investigate how the reaction from sand to rigid pipe uplift varies as the pipe embedment depth increases. Detailed numerical predictions provide insights into the “flow-around” failure mechanism that develops around the deeply buried pipes and on the existence of a critical embedment depth, beyond which the normalised reaction does not further increase with increasing pipe embedment. The outcomes of this study are applicable to the stress analysis of deeply buried pipes in practice and to the modelling of a variety of problems relevant to rigid objects buried deeply in granular soil.}
+}
+
+@inproceedings{Thornton2023,
+author = {Thornton, Anthony and Nguyen, Q. and Polman, H. and Bisschop, J. and Weinhart-Mejia, R. and Vesal, M. and Weinhart, Thomas and Post, M. and Ostanin, Igor},
+year = {2023},
+month = {01},
+pages = {},
+title = {Simulating industrial scenarios: with the open-source software MercuryDPM},
+doi = {10.23967/c.particles.2023.015}
+}
+
+@software{Cheng2023,
+  author       = {Cheng, H. and
+                  Orozco, L. and
+                  Lubbe, R. and
+                  Jansen, A. and
+                  Hartmann, P. and
+                  Thoeni, K.},
+  title        = {GrainLearning},
+  month        = sep,
+  year         = 2023,
+  publisher    = {Zenodo},
+  version      = {v2.0.2},
+  doi          = {10.5281/zenodo.8352544},
+  url          = {https://doi.org/10.5281/zenodo.8352544}
+}
