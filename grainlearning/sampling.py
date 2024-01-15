@@ -85,6 +85,8 @@ class GaussianMixtureModel:
         This can speed up convergence when fit is called several times on similar problems. See the Glossary.
     :param expand_factor: factor used when converting the ensemble from weighted to unweighted, defaults to 10, optional
     :param slice_sampling: flag to use slice sampling, defaults to False, optional
+    :param gmm: The class of the Gaussian Mixture Model
+    :param max_params: Current maximum values of the parameters
     """
     #: Maximum number of components
     max_num_components: int = 0
@@ -127,9 +129,9 @@ class GaussianMixtureModel:
 
     def __init__(
         self,
-        max_num_components,
-        weight_concentration_prior: float = None,
-        covariance_type: str = "tied",
+        max_num_components=0,
+        weight_concentration_prior: float = 0.2,
+        covariance_type: str = "full",
         n_init: int = 1,
         tol: float = 1.0e-5,
         max_iter: int = 100,
@@ -169,7 +171,7 @@ class GaussianMixtureModel:
 
         self.expanded_normalized_params = None
 
-        self.gmm = Type["BayesianGaussianMixture"]
+        self.gmm = None
 
     @classmethod
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):

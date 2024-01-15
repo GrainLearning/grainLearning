@@ -43,26 +43,10 @@ class SMC:
         with the maxima of the observations, defaults to True
     :param cov_matrices: Covariance matrices of shape (num_steps, num_obs, num_obs),
         defaults to None, Optional
+    :param likelihoods: Likelihood distributions of shape (num_steps, num_samples)
+    :param posteriors: Posterior distributions of shape (num_steps, num_samples)
+    :param ess: Time evolution of the effective sample size
     """
-
-    #: Target effective sample size
-    ess_target: float
-
-    #: True if the covariance matrix is scaled with the maximum of the observations, defaults to True
-    scale_cov_with_max: bool = False
-
-    #: Covariance matrices of shape (num_steps, num_obs, num_obs)
-    cov_matrices: np.array
-
-    #: Likelihood distributions of shape (num_steps, num_samples)
-    likelihoods: np.array
-
-    #: Posterior distributions of shape (num_steps, num_samples)
-    posteriors: np.array
-
-    #: Time evolution of the effective sample size
-    ess: np.array
-
     def __init__(
         self,
         ess_target: float,
@@ -75,6 +59,14 @@ class SMC:
         self.scale_cov_with_max = scale_cov_with_max
 
         self.cov_matrices = cov_matrices
+
+        self.likelihoods = None
+
+        self.posteriors = None
+
+        self.ess = None
+
+
 
     @classmethod
     def from_dict(cls: Type["SMC"], obj: dict):
