@@ -80,7 +80,6 @@ class BayesianCalibration:
 
         self.num_iter = num_iter
 
-
         self.save_fig = save_fig
 
         self.system = system

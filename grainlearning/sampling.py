@@ -88,50 +88,12 @@ class GaussianMixtureModel:
     :param gmm: The class of the Gaussian Mixture Model
     :param max_params: Current maximum values of the parameters
     """
-    #: Maximum number of components
-    max_num_components: int = 0
-
-    #: The dirichlet concentration of each component on the weight distribution (Dirichlet), default to None.
-    weight_concentration_prior: float = 0.0
-
-    #: String describing the type of covariance parameters to use.
-    covariance_type: str = "full"
-
-    #: number of initialization to perform, defaults to 1.
-    n_init: int = 1
-
-    #: tolerance threshold, defaults to 1.0e-3.
-    tol: float = 1.0e-3
-
-    #: maximum number of EM iterations to perform, defaults to 100
-    max_iter: int = 100
-
-    #: random seed given to the method chosen to initialize the weights, the means and the covariances.
-    random_state: int
-
-    #: The method used to initialize the weights, the means and the covariances.
-    init_params: str = "kmeans"
-
-    #: flag to use warm start, defaults to False.
-    warm_start: bool = False
-
-    #: the factor used when converting and populating the ensemble from weighted to unweighted, defaults to 10.
-    expand_factor: int = 10
-
-    #: flag to use slice sampling, defaults to False.
-    slice_sampling: False
-
-    #: The class of the Gaussian Mixture Model
-    gmm: Type["BayesianGaussianMixture"]
-
-    #: Current maximum values of the parameters
-    max_params = None
 
     def __init__(
         self,
         max_num_components=0,
         weight_concentration_prior: float = 0.2,
-        covariance_type: str = "full",
+        covariance_type: str = "tied",
         n_init: int = 1,
         tol: float = 1.0e-5,
         max_iter: int = 100,
