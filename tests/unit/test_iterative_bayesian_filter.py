@@ -130,7 +130,7 @@ def test_run_inference():
     #: Create the iterative bayesian filter from a dictionary
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.5},
+            "inference": {"ess_target": 0.5, "scale_cov_with_max": True},
             "sampling": {"max_num_components": 5},
             "initial_sampling": 'halton',
         }
@@ -151,7 +151,7 @@ def test_run_inference():
     #: Assert that the inference runs correctly if a proposal density is provided
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.5},
+            "inference": {"ess_target": 0.5, "scale_cov_with_max": True},
             "sampling": {"max_num_components": 5},
             "initial_sampling": 'halton',
             "proposal": np.array([0.5, 0.2, 0.3])

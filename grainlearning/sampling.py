@@ -98,7 +98,7 @@ class GaussianMixtureModel:
         tol: float = 1.0e-5,
         max_iter: int = 100,
         random_state: int = None,
-        init_params: str = "kmeans",
+        init_params: str = "k-means++",
         warm_start: bool = False,
         expand_factor: int = 10,
         slice_sampling: bool = False,
