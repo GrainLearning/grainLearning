@@ -66,8 +66,6 @@ class SMC:
 
         self.ess = None
 
-
-
     @classmethod
     def from_dict(cls: Type["SMC"], obj: dict):
         """Initialize the class using a dictionary style
