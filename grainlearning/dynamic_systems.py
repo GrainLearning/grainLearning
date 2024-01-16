@@ -179,7 +179,7 @@ class DynamicSystem:
         #### Uncertainty ####
 
         self.sigma_min =  1.0e-6
-        
+
         self.sigma_max = sigma_max
 
         self.sigma_tol = sigma_tol
@@ -383,7 +383,7 @@ class IODynamicSystem(DynamicSystem):
     :param inv_obs_weight: Inverse of the observation weight, defaults to None, optional
     :param param_data: Parameter data, defaults to None, optional
     :param sim_data: Simulation data, defaults to None, optional
-    :param sim_data_files: List pf simulation data files (num_samples), defaults to None, optional
+    :param sim_data_files: List of simulation data files (num_samples), defaults to None, optional
     """
 
     def __init__(
@@ -428,7 +428,7 @@ class IODynamicSystem(DynamicSystem):
             param_names
         )
         # TODO: reuse initialization from base class
-        
+
         ##### Parameters #####
 
         self.num_params = len(param_names)
