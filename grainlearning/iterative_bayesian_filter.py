@@ -73,39 +73,15 @@ class IterativeBayesianFilter:
     :param ess_tol: Tolerance for the target effective sample size to converge, defaults to 1.0e-2
     :param proposal: A proposal distribution to sample the state-parameter space, defaults to None
     :param proposal_data_file: Pickle that stores the previously trained proposal distribution, defaults to None
+    :param param_data_list: List of the parameter samples of shape (num_samples, num_params) generated in all iterations
+    :param sigma_list: List of sigma values optimized to satisfy the target effective sample size in all iterations
+    :param posterior: The posterior distribution of model states at the last time step
     """
-
-    #: The inference class quantify the evolution of the posterior distribution of model states over time
-    inference = Type["SMC"]
-
-    #: The sampling class generates new samples from the proposal density
-    sampling = Type["GaussianMixtureModel"]
-
-    #: List of the parameter samples of shape (num_samples, num_params) generated in all iterations
-    param_data_list: List = []
-
-    #: List of sigma values optimized to satisfy the target effective sample size in all iterations
-    sigma_list: List = []
-
-    #: This a tolerance to which the optimization algorithm converges.
-    ess_tol: float = 1.0e-2
-
-    #: The non-informative distribution to draw the initial samples
-    initial_sampling: str = "halton"
-
-    #: The current proposal distribution
-    proposal: np.ndarray = None
-
-    #: The next proposal distribution
-    posterior: np.ndarray = None
-
-    #: The name of the file that stores the current proposal distribution
-    proposal_data_file: str = None
 
     def __init__(
         self,
-        inference: Type["SMC"],
-        sampling: Type["GaussianMixtureModel"],
+        inference: Type["SMC"] = None,
+        sampling: Type["GaussianMixtureModel"] = None,
         ess_tol: float = 1.0e-2,
         initial_sampling: str = 'halton',
         proposal: np.ndarray = None,
@@ -124,6 +100,12 @@ class IterativeBayesianFilter:
         self.proposal = proposal
 
         self.proposal_data_file = proposal_data_file
+
+        self.param_data_list = []
+
+        self.sigma_list = []
+
+        self.posterior = None
 
     @classmethod
     def from_dict(cls: Type["IterativeBayesianFilter"], obj: dict):

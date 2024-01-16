@@ -67,39 +67,29 @@ class BayesianCalibration:
     :param curr_iter: Current iteration step
     :param save_fig: Flag for skipping (-1), showing (0), or saving (1) the figures
     """
-    #: Dynamic system whose parameters or hidden states are being inferred
-    system: Type["DynamicSystem"]
-
-    #: Calibration method (e.g, Iterative Bayesian Filter)
-    calibration: Type["IterativeBayesianFilter"]
-
-    #: Number of iterations
-    num_iter: int
-
-    #: Current calibration step
-    curr_iter: int = 0
-
-    #: Flag to save figures
-    save_fig: int = -1
-
     def __init__(
         self,
         system: Type["DynamicSystem"],
         calibration: Type["IterativeBayesianFilter"],
-        num_iter: int,
-        curr_iter: int,
-        save_fig: int
+        num_iter: int = 10,
+        curr_iter: int = 0,
+        save_fig: int = -1
     ):
         """Initialize the Bayesian calibration class"""
-        self.system = system
 
-        self.calibration = calibration
 
         self.num_iter = num_iter
 
-        self.set_curr_iter(curr_iter)
-
         self.save_fig = save_fig
+
+        self.system = system
+
+        self.system.curr_iter = curr_iter
+        
+        self.curr_iter = curr_iter
+        
+        self.calibration = calibration
+
 
     def run(self):
         """ This is the main calibration loop which does the following steps
@@ -271,14 +261,6 @@ class BayesianCalibration:
         """
         most_prob = argmax(self.calibration.posterior)
         return self.system.param_data[most_prob]
-
-    def set_curr_iter(self, curr_iter: int):
-        """Set the current iteration step
-
-        param curr_iter: Current iteration step
-        """
-        self.system.curr_iter = curr_iter
-        self.curr_iter = self.system.curr_iter
 
     def increase_curr_iter(self):
         """Increase the current iteration step by one
