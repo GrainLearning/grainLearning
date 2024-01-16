@@ -91,14 +91,14 @@ class GaussianMixtureModel:
 
     def __init__(
         self,
-        max_num_components=0,
-        weight_concentration_prior: float = 0.2,
+        max_num_components = 0,
+        weight_concentration_prior: float = 0.0,
         covariance_type: str = "tied",
         n_init: int = 1,
         tol: float = 1.0e-5,
         max_iter: int = 100,
         random_state: int = None,
-        init_params: str = "kmeans",
+        init_params: str = "k-means++",
         warm_start: bool = False,
         expand_factor: int = 10,
         slice_sampling: bool = False,
@@ -106,7 +106,7 @@ class GaussianMixtureModel:
         """ Initialize the Gaussian Mixture Model class"""
         self.max_num_components = max_num_components
 
-        if weight_concentration_prior is None:
+        if not weight_concentration_prior:
             self.weight_concentration_prior = 1.0 / max_num_components
         else:
             self.weight_concentration_prior = weight_concentration_prior
