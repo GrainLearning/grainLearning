@@ -8,22 +8,23 @@ x_obs = np.arange(100)
 y_obs = 0.2 * x_obs + 5.0
 
 
-def run_sim(system, **kwargs):
+def run_sim(calib):
     """This is the callback function that runs different realizations of the same model.
 
-    :param system: the system object
+    :param calib: The calibration object.
     """
     data = []
-    for params in system.param_data:
+    for params in calib.system.param_data:
         # Run the model
-        y_sim = params[0] * system.ctrl_data + params[1]
+        y_sim = params[0] * calib.system.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
-    system.set_sim_data(data)
+    calib.system.set_sim_data(data)
 
 
 calibration = BayesianCalibration.from_dict(
     {
         "num_iter": 10,
+        "callback": run_sim,
         "system": {
             "param_min": [0.001, 0.001],
             "param_max": [1, 10],
@@ -35,7 +36,6 @@ calibration = BayesianCalibration.from_dict(
             "ctrl_data": x_obs,
             "sim_name": 'linear',
             "sigma_tol": 0.01,
-            "callback": run_sim,
         },
         "calibration": {
             "inference": {"ess_target": 0.3},

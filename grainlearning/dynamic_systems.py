@@ -55,7 +55,6 @@ class DynamicSystem:
                 "num_samples": 14,
                 "obs_data": y_obs,
                 "ctrl_data": y_ctrl,
-                "callback": run_sim
             }
         )
 
@@ -204,7 +203,7 @@ class DynamicSystem:
         assert "num_samples" in obj.keys(), "Error no num_samples key found in input"
         assert "param_min" in obj.keys(), "Error no param_min key found in input"
         assert "param_max" in obj.keys(), "Error no param_max key found in input"
-        assert "callback" in obj.keys(), "Error no callback key found in input"
+        # assert "callback" in obj.keys(), "Error no callback key found in input"
 
         return cls(
             obs_data=obj["obs_data"],
@@ -223,11 +222,9 @@ class DynamicSystem:
             sigma_tol=obj.get("sigma_tol", 0.001),
         )
 
-    def run(self):
-        """Run the callback function
-
-        TODO design a better wrapper to avoid kwargs?
-        :param kwargs: keyword arguments to pass to the callback function
+    def run_callback(self):
+        """
+        Run the callback function
         """
 
         if self.callback is None:
@@ -309,12 +306,19 @@ class DynamicSystem:
         """Virtual function to load simulation data"""
 
     @classmethod
-    def write_params_to_table(cls):
+    def write_params_to_table(cls: Type["DynamicSystem"]):
         """Write the parameter data into a text file"""
 
     @classmethod
-    def backup_sim_data(cls):
+    def backup_sim_data(cls: Type["DynamicSystem"]):
         """Virtual function to backup simulation data"""
+
+    @classmethod
+    def actions_before_callback(cls: Type["DynamicSystem"]):
+        """Virtual function to perform actions before callback"""
+    @classmethod
+    def actions_after_callback(cls: Type["DynamicSystem"]):
+        """Virtual function to perform actions after callback"""
 
 
 class IODynamicSystem(DynamicSystem):
@@ -341,7 +345,6 @@ class IODynamicSystem(DynamicSystem):
                 "ctrl_name": 'y_ctrl
                 "sim_name": 'linear',
                 "sim_data_file_ext": '.txt',
-                "callback": run_sim
             }
         )
 
@@ -592,14 +595,10 @@ class IODynamicSystem(DynamicSystem):
             else:
                 raise RuntimeError(f'No data found for iteration {self.curr_iter}')
 
-    def run(self):
+    def actions_before_callback(self):
         """
-        Run the callback function
+        Create a directory to store simulation data and write the parameter data into a text file
         """
-
-        if self.callback is None:
-            raise ValueError("No callback function defined")
-
         # create a directory to store simulation data
         sim_data_dir = self.sim_data_dir.rstrip('/')
         sim_data_sub_dir = f'{sim_data_dir}/iter{self.curr_iter}'
@@ -608,8 +607,13 @@ class IODynamicSystem(DynamicSystem):
         # write the parameter data into a text file
         self.write_params_to_table()
 
-        # run the callback function
-        self.callback(self)
+    def actions_after_callback(self):
+        """
+        Move simulation data files and corresponding parameter table into the directory defined per iteration
+        """
+        # get the directory where simulation data are stored
+        sim_data_dir = self.sim_data_dir.rstrip('/')
+        sim_data_sub_dir = f'{sim_data_dir}/iter{self.curr_iter}'
 
         # move simulation data files and corresponding parameter table into the directory defined per iteration
         files = glob(f'{os.getcwd()}/{self.sim_name}_Iter{self.curr_iter}*{self.sim_data_file_ext}')
@@ -619,6 +623,17 @@ class IODynamicSystem(DynamicSystem):
 
         # redefine the parameter data file since its location is changed
         self.param_data_file = f'{sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
+
+    def run_callback(self):
+        """
+        Run the callback function
+        """
+
+        if self.callback is None:
+            raise ValueError("No callback function defined")
+        self.actions_before_callback()
+        self.callback(self)
+        self.actions_after_callback()
 
     def write_params_to_table(self):
         """Write the parameter data into a text file.

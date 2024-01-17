@@ -12,17 +12,18 @@ executable = 'yade-batch'
 yade_script = f'{PATH}/Collision.py'
 
 
-def run_sim(system, **kwargs):
+def run_sim(calib):
     """
     Run the external executable and passes the parameter sample to generate the output file.
     """
     print("*** Running external software YADE ... ***\n")
-    os.system(' '.join([executable, system.param_data_file, yade_script]))
+    os.system(' '.join([executable, calib.system.param_data_file, yade_script]))
 
 
 calibration = BayesianCalibration.from_dict(
     {
         "num_iter": 4,
+        "callback": run_sim,
         "system": {
             "system_type": IODynamicSystem,
             "param_min": [7, 0.0],
@@ -36,7 +37,6 @@ calibration = BayesianCalibration.from_dict(
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
             "sigma_tol": 0.01,
-            "callback": run_sim,
         },
         "calibration": {
             "inference": {"ess_target": 0.3},

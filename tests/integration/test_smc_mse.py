@@ -10,27 +10,27 @@ y_obs = p1 * x_obs + p2
 y_obs_w_noise = y_obs + np.random.rand(100) * 2.5
 
 
-def run_sim(model, **kwargs):
+def run_sim(calib):
     """Run the linear model"""
     data = []
-    for params in model.param_data:
-        y_sim = params[0] * model.ctrl_data + params[1]
+    for params in calib.system.param_data:
+        y_sim = params[0] * calib.system.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
 
-    model.set_sim_data(data)
+    calib.system.set_sim_data(data)
 
 
 def test_smc_mse():
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 0,
+            "callback": run_sim,
             "system": {
                 "param_min": [0, 0],
                 "param_max": [1, 10],
                 "num_samples": 13,
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
-                "callback": run_sim,
             },
             "calibration": {
                 "inference": {
