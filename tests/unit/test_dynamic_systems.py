@@ -68,7 +68,7 @@ class TestDynamicSystem:
         }
         system_cls = DynamicSystem.from_dict(config)
 
-        system_cls.run()
+        system_cls.run_callback()
 
         np.testing.assert_almost_equal(
             system_cls.sim_data,
@@ -257,7 +257,7 @@ class TestIODynamicSystem:
         system_cls.param_data = np.arange(1, system_cls.num_samples * 4 + 1, dtype=float).reshape(
             system_cls.num_samples, 4)
 
-        system_cls.run()
+        system_cls.run_callback()
 
         # check if the file that contains the parameter data has the right name
         assert path.normpath(system_cls.param_data_file) == path.normpath(

@@ -1,7 +1,7 @@
 """
 This module contains the Bayesian calibration class.
 """
-from typing import Type, Dict
+from typing import Type, Dict, Callable
 import os
 from numpy import argmax
 from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
@@ -28,6 +28,7 @@ class BayesianCalibration:
         bayesian_calibration = BayesianCalibration.from_dict(
             {
                 "num_iter": 8,
+                "callback": run_sim,
                 "system": {
                     "system_type": DynamicSystem,
                     "model_name": "test",
@@ -37,7 +38,6 @@ class BayesianCalibration:
                     "num_samples": 10,
                     "obs_data": [2,4,8,16],
                     "ctrl_data": [1,2,3,4],
-                    "callback": run_sim,
                 },
                 "calibration": {
                     "inference": {"ess_target": 0.3},
@@ -73,10 +73,10 @@ class BayesianCalibration:
         calibration: Type["IterativeBayesianFilter"],
         num_iter: int = 10,
         curr_iter: int = 0,
-        save_fig: int = -1
+        save_fig: int = -1,
+        callback: Callable = None,
     ):
         """Initialize the Bayesian calibration class"""
-
 
         self.num_iter = num_iter
 
@@ -85,11 +85,12 @@ class BayesianCalibration:
         self.system = system
 
         self.system.curr_iter = curr_iter
-        
+
         self.curr_iter = curr_iter
-        
+
         self.calibration = calibration
 
+        self.callback = callback
 
     def run(self):
         """ This is the main calibration loop which does the following steps
@@ -125,17 +126,33 @@ class BayesianCalibration:
         self.system.num_samples = self.system.param_data.shape[0]
 
         # Run the model realizations
-        self.system.run()
+        self.run_callback()
 
         # Load model data from disk
         self.load_system()
 
         # Estimate model parameters as a distribution
-        self.calibration.solve(self.system, )
+        self.calibration.solve(self.system)
         self.calibration.sigma_list.append(self.system.sigma_max)
 
         # Generate some plots
         self.plot_uq_in_time()
+
+    def run_callback(self):
+        """
+        Run the callback function
+        """
+
+        if self.callback is None and self.system.callback is None:
+            raise ValueError("No callback function defined")
+
+        if self.callback is not None:
+            self.system.actions_before_callback()
+            self.callback(self)
+            self.system.actions_after_callback()
+        else:
+            self.system.run_callback()
+
 
     def load_system(self):
         """Load existing simulation data from disk into the dynamic system
@@ -296,5 +313,6 @@ class BayesianCalibration:
             calibration=calibration,
             num_iter=obj["num_iter"],
             curr_iter=obj.get("curr_iter", 0),
-            save_fig=obj.get("save_fig", -1)
+            save_fig=obj.get("save_fig", -1),
+            callback=obj.get("callback", None)
         )

@@ -7,14 +7,14 @@ y_obs = 0.2 * x_obs + 5.0
 
 # y_obs += np.random.rand(100) * 2.5
 
-def run_sim(model, **kwargs):
+def run_sim(calib):
     """Run the linear model"""
     data = []
-    for params in model.param_data:
-        y_sim = params[0] * model.ctrl_data + params[1]
+    for params in calib.system.param_data:
+        y_sim = params[0] * calib.system.ctrl_data + params[1]
         data.append(np.array(y_sim, ndmin=2))
 
-    model.set_sim_data(data)
+    calib.system.set_sim_data(data)
 
 
 def test_lenreg():
@@ -22,6 +22,7 @@ def test_lenreg():
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
+            "callback": run_sim,
             "system": {
                 "param_min": [0.1, 0.1],
                 "param_max": [1, 10],
@@ -30,7 +31,6 @@ def test_lenreg():
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
                 "sim_name": 'linear',
-                "callback": run_sim,
             },
             "calibration": {
                 "inference": {"ess_target": 0.3},

@@ -12,17 +12,18 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 executable = f'python {PATH}/linear_model.py'
 
 
-def run_sim(model):
+def run_sim(calib):
     """
     Run the external executable and passes the parameter sample to generate the output file.
     """
+    system = calib.system
     # keep the naming convention consistent between iterations
-    mag = floor(log(model.num_samples, 10)) + 1
+    mag = floor(log(system.num_samples, 10)) + 1
     # check the software name and version
     print("*** Running external software... ***\n")
     # loop over and pass parameter samples to the executable
-    for i, params in enumerate(model.param_data):
-        description = 'Iter' + str(model.curr_iter) + '_Sample' + str(i).zfill(mag)
+    for i, params in enumerate(system.param_data):
+        description = 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)
         print(" ".join([executable, "%.8e %.8e" % tuple(params), description]))
         os.system(' '.join([executable, "%.8e %.8e" % tuple(params), description]))
 
@@ -32,6 +33,7 @@ def test_lenreg_IO():
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
+            "callback": run_sim,
             "system": {
                 "system_type": IODynamicSystem,
                 "param_min": [0.001, 0.001],
@@ -46,7 +48,6 @@ def test_lenreg_IO():
                 "sim_data_dir": PATH + '/sim_data/',
                 "sim_data_file_ext": '.txt',
                 "sigma_tol": 0.01,
-                "callback": run_sim,
             },
             "calibration": {
                 "inference": {"ess_target": 0.3},

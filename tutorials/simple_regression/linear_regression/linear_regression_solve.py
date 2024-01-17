@@ -11,10 +11,11 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 executable = f'python {PATH}/linear_model.py'
 
 
-def run_sim(system):
+def run_sim(calib):
     """
     Run the external executable and passes the parameter sample to generate the output file.
     """
+    system = calib.system
     # keep the naming convention consistent between iterations
     mag = floor(log(system.num_samples, 10)) + 1
     # check the software name and version
@@ -29,6 +30,7 @@ def run_sim(system):
 calibration = BayesianCalibration.from_dict(
     {
         "num_iter": 10,
+        "callback": run_sim,
         "system": {
             "system_type": IODynamicSystem,
             "param_min": [0.001, 0.001],
@@ -42,7 +44,6 @@ calibration = BayesianCalibration.from_dict(
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
             "sigma_tol": 0.01,
-            "callback": run_sim,
         },
         "calibration": {
             "inference": {"ess_target": 0.3},
