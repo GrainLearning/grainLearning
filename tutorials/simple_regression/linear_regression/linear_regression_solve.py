@@ -23,8 +23,12 @@ def run_sim(calib):
     # loop over and pass parameter samples to the executable
     for i, params in enumerate(system.param_data):
         description = 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)
-        print(" ".join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
-        os.system(' '.join([executable, "%.8e %.8e" % tuple(params), system.sim_name, description]))
+        linear(executable, params, system.sim_name, description)
+
+
+def linear(executable, params, sim_name, description):
+    print(" ".join([executable, "%.8e %.8e" % tuple(params), sim_name, description]))
+    os.system(' '.join([executable, "%.8e %.8e" % tuple(params), sim_name, description]))
 
 
 calibration = BayesianCalibration.from_dict(
