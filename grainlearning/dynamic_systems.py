@@ -36,9 +36,8 @@ class DynamicSystem:
     between :math:`x_t` and :math:`y_t`.
 
     Therefore, the :class:`.DynamicSystem` class is used to encapsulate the observation data
-    and the simulation data, which require specifying the number of samples,
-    the lower and upper bound of the parameters, and the callback function
-    that runs the forward predictions.
+    and the simulation data, which require specifying the number of samples and
+    the lower and upper bound of the parameters.
 
     There are two ways of initializing the class.
 
@@ -72,7 +71,6 @@ class DynamicSystem:
             num_samples = 14,
             obs_data = y_obs,
             ctrl_data = y_ctrl,
-            callback = run_sim
         )
 
     You can pass the simulation data to the class using the :meth:`.DynamicSystem.set_sim_data` method.
@@ -91,7 +89,6 @@ class DynamicSystem:
     :param num_ctrl: Number of control data (identical between simulation and observation)
     :param param_min: List of parameter lower bounds
     :param param_max: List of parameter Upper bounds
-    :param callback: Callback function to run simulations, defaults to None
     :param curr_iter: current iteration ID, defaults to 0
     :param ctrl_data: control data (e.g, time), defaults to None, optional
     :param obs_names: Column names of the observation data, defaults to None, optional
@@ -120,7 +117,6 @@ class DynamicSystem:
         inv_obs_weight: List[float] = None,
         sim_name: str = 'sim',
         sim_data: np.ndarray = None,
-        callback: Callable = None,
         curr_iter: int = 0,
         param_data: np.ndarray = None,
         param_names: List[str] = None,
@@ -155,8 +151,6 @@ class DynamicSystem:
         self.sim_name = sim_name
 
         self.sim_data = sim_data
-
-        self.callback = callback
 
         self.curr_iter = curr_iter
 
@@ -203,7 +197,6 @@ class DynamicSystem:
         assert "num_samples" in obj.keys(), "Error no num_samples key found in input"
         assert "param_min" in obj.keys(), "Error no param_min key found in input"
         assert "param_max" in obj.keys(), "Error no param_max key found in input"
-        # assert "callback" in obj.keys(), "Error no callback key found in input"
 
         return cls(
             obs_data=obj["obs_data"],
@@ -216,21 +209,10 @@ class DynamicSystem:
             inv_obs_weight=obj.get("inv_obs_weight", None),
             sim_name=obj.get("sim_name", 'sim'),
             sim_data=obj.get("sim_data", None),
-            callback=obj.get("callback", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
             sigma_tol=obj.get("sigma_tol", 0.001),
         )
-
-    def run_callback(self):
-        """
-        Run the callback function
-        """
-
-        if self.callback is None:
-            raise ValueError("No callback function defined")
-
-        self.callback(self)
 
     def set_sim_data(self, data: list):
         """Set the simulation data
@@ -314,11 +296,11 @@ class DynamicSystem:
         """Virtual function to backup simulation data"""
 
     @classmethod
-    def actions_before_callback(cls: Type["DynamicSystem"]):
-        """Virtual function to perform actions before callback"""
+    def set_up_sim_dir(cls: Type["DynamicSystem"]):
+        """Virtual function to set up simulation directory"""
     @classmethod
-    def actions_after_callback(cls: Type["DynamicSystem"]):
-        """Virtual function to perform actions after callback"""
+    def move_data_to_sim_dir(cls: Type["DynamicSystem"]):
+        """Virtual function to move data into simulation directory"""
 
 
 class IODynamicSystem(DynamicSystem):
@@ -365,7 +347,6 @@ class IODynamicSystem(DynamicSystem):
                 ctrl_name = 'y_ctrl',
                 sim_name = 'linear',
                 sim_data_file_ext = '.txt',
-                callback = run_sim
         )
 
     :param param_min: List of parameter lower bounds
@@ -378,7 +359,6 @@ class IODynamicSystem(DynamicSystem):
     :param sim_name: Name of the simulation, defaults to 'sim'
     :param sim_data_dir: Simulation data directory, defaults to './sim_data'
     :param sim_data_file_ext: Simulation data file extension, defaults to '.npy'
-    :param callback: Callback function, defaults to None
     :param curr_iter: Current iteration ID, defaults to 0
     :param param_data_file: Parameter data file, defaults to None, optional
     :param obs_data: observation or reference data, optional
@@ -404,7 +384,6 @@ class IODynamicSystem(DynamicSystem):
         ctrl_data: np.ndarray = None,
         inv_obs_weight: List[float] = None,
         sim_data: np.ndarray = None,
-        callback: Callable = None,
         curr_iter: int = 0,
         param_data_file: str = '',
         param_data: np.ndarray = None,
@@ -425,7 +404,6 @@ class IODynamicSystem(DynamicSystem):
             inv_obs_weight,
             sim_name,
             sim_data,
-            callback,
             curr_iter,
             param_data,
             param_names
@@ -443,6 +421,8 @@ class IODynamicSystem(DynamicSystem):
         self.sim_name = sim_name
 
         self.sim_data_dir = sim_data_dir
+
+        self.sim_data_sub_dir = None
 
         self.sim_data_file_ext = sim_data_file_ext
 
@@ -494,7 +474,6 @@ class IODynamicSystem(DynamicSystem):
             ctrl_data=obj.get("ctrl_data", None),
             inv_obs_weight=obj.get("inv_obs_weight", None),
             sim_data=obj.get("sim_data", None),
-            callback=obj.get("callback", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
         )
@@ -595,45 +574,31 @@ class IODynamicSystem(DynamicSystem):
             else:
                 raise RuntimeError(f'No data found for iteration {self.curr_iter}')
 
-    def actions_before_callback(self):
+    def set_up_sim_dir(self):
         """
         Create a directory to store simulation data and write the parameter data into a text file
         """
         # create a directory to store simulation data
         sim_data_dir = self.sim_data_dir.rstrip('/')
         sim_data_sub_dir = f'{sim_data_dir}/iter{self.curr_iter}'
+        self.sim_data_sub_dir = sim_data_sub_dir
         os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
         self.write_params_to_table()
 
-    def actions_after_callback(self):
+    def move_data_to_sim_dir(self):
         """
         Move simulation data files and corresponding parameter table into the directory defined per iteration
         """
-        # get the directory where simulation data are stored
-        sim_data_dir = self.sim_data_dir.rstrip('/')
-        sim_data_sub_dir = f'{sim_data_dir}/iter{self.curr_iter}'
-
         # move simulation data files and corresponding parameter table into the directory defined per iteration
         files = glob(f'{os.getcwd()}/{self.sim_name}_Iter{self.curr_iter}*{self.sim_data_file_ext}')
         for file in files:
             f_name = os.path.relpath(file, os.getcwd())
-            os.replace(f'{file}', f'{sim_data_sub_dir}/{f_name}')
+            os.replace(f'{file}', f'{self.sim_data_sub_dir}/{f_name}')
 
         # redefine the parameter data file since its location is changed
-        self.param_data_file = f'{sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
-
-    def run_callback(self):
-        """
-        Run the callback function
-        """
-
-        if self.callback is None:
-            raise ValueError("No callback function defined")
-        self.actions_before_callback()
-        self.callback(self)
-        self.actions_after_callback()
+        self.param_data_file = f'{self.sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
 
     def write_params_to_table(self):
         """Write the parameter data into a text file.

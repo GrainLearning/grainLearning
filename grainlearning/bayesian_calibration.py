@@ -3,6 +3,7 @@ This module contains the Bayesian calibration class.
 """
 from typing import Type, Dict, Callable
 import os
+from glob import glob
 from numpy import argmax
 from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
 from grainlearning.iterative_bayesian_filter import IterativeBayesianFilter
@@ -13,10 +14,20 @@ from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_dat
 class BayesianCalibration:
     """This is the Bayesian calibration class.
 
-    A Bayesian calibration class consists of the inference class and the (re)sampling class.
-    For instance, in GrainLearning, we have a calibration method called "iterative Bayesian filter"
-    which consists of "sequential Monte Carlo" for model parameter estimation
-    and "variational Gaussian mixture" for resampling.
+    A Bayesian calibration requires the following input:
+
+    1. The :class:`.DynamicSystem` that encapsulates the observation data and simulation data,
+
+    2. The inference method, for example, :class:`.IterativeBayesianFilter`,
+
+    3. The number of iterations
+
+    4. The current iteration number if the user simply wants to process their data with GrainLearning for one iteration
+    # or continue from that iteration (TODO)
+
+    # 5. A tolerance to stop the iterations if the maximum uncertainty is below the tolerance
+
+    5. and the flag for skipping (-1), showing (0), or saving (1) the figures.
 
     There are two ways of initializing a calibration toolbox class.
 
@@ -55,7 +66,7 @@ class BayesianCalibration:
     .. code-block:: python
 
         bayesian_calibration = BayesianCalibration(
-            num_iter = 10,
+            num_iter = 8,
             system = DynamicSystem(...),
             calibration = IterativeBayesianFilter(...)
             save_fig = -1
@@ -71,7 +82,7 @@ class BayesianCalibration:
         self,
         system: Type["DynamicSystem"],
         calibration: Type["IterativeBayesianFilter"],
-        num_iter: int = 10,
+        num_iter: int = 1,
         curr_iter: int = 0,
         save_fig: int = -1,
         callback: Callable = None,
@@ -143,16 +154,15 @@ class BayesianCalibration:
         Run the callback function
         """
 
-        if self.callback is None and self.system.callback is None:
-            raise ValueError("No callback function defined")
-
         if self.callback is not None:
-            self.system.actions_before_callback()
-            self.callback(self)
-            self.system.actions_after_callback()
+            if isinstance(self.system, IODynamicSystem):
+                self.system.set_up_sim_dir()
+                self.callback(self)
+                self.system.move_data_to_sim_dir()
+            else:
+                self.callback(self)
         else:
-            self.system.run_callback()
-
+            raise ValueError("No callback function defined")
 
     def load_system(self):
         """Load existing simulation data from disk into the dynamic system

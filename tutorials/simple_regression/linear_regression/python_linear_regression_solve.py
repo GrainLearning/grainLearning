@@ -16,9 +16,13 @@ def run_sim(calib):
     data = []
     for params in calib.system.param_data:
         # Run the model
-        y_sim = params[0] * calib.system.ctrl_data + params[1]
+        y_sim = linear(calib.system.ctrl_data, params)
         data.append(np.array(y_sim, ndmin=2))
     calib.system.set_sim_data(data)
+
+
+def linear(x, params):
+    return params[0] * x + params[1]
 
 
 calibration = BayesianCalibration.from_dict(

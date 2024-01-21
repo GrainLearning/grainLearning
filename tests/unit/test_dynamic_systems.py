@@ -1,13 +1,7 @@
 """Test the dynamic system module."""
 from os import path
-from shutil import rmtree
-from math import floor, log
 import numpy as np
 from grainlearning import DynamicSystem, IODynamicSystem
-from grainlearning.tools import write_dict_to_file
-
-PATH = path.abspath(path.dirname(__file__))
-GL_PATH = path.abspath(path.join(__file__, "../../.."))
 
 
 class TestDynamicSystem:
@@ -31,7 +25,6 @@ class TestDynamicSystem:
             "obs_data": [[12, 3, 4, 4], [12, 4, 5, 4]],
             "ctrl_data": [1, 2, 3, 4],
             "num_samples": 10,
-            "callback": None,
         }
         system_dct = DynamicSystem.from_dict(config)
 
@@ -46,36 +39,6 @@ class TestDynamicSystem:
                 [0.0, 0.70710678],
             ],
             0.00001,
-        )
-
-    def test_run(self):
-        """Test if the callback function works as expected"""
-
-        def run_sim(system):
-            system.sim_data = [
-                [[12, 3, 4, 4]],
-                [[11, 24, 4, 3]],
-            ]  # must be of shape (num_samples,num_obs,num_steps), thus adding a dummy dimension
-
-        config = {
-            "param_min": [1, 2],
-            "param_max": [3, 4],
-            "obs_data": [2, 4, 6, 7],
-            "ctrl_data": [1, 2, 3, 4],
-            "inv_obs_weigh": [0.5, 0.25],
-            "num_samples": 2,
-            "callback": run_sim,
-        }
-        system_cls = DynamicSystem.from_dict(config)
-
-        system_cls.run_callback()
-
-        np.testing.assert_almost_equal(
-            system_cls.sim_data,
-            [
-                [[12, 3, 4, 4]],
-                [[11, 24, 4, 3]],
-            ],
         )
 
     def test_compute_inv_normalized_sigma(self):
@@ -217,70 +180,6 @@ class TestIODynamicSystem:
 
         np.testing.assert_equal(system_cls.__dict__, system_dct.__dict__)
 
-    def test_run(self):
-        """Test if the callback function works as expected"""
-
-        def run_sim(system):
-            """Run the simulation"""
-            # Initialize the data list
-            data = []
-            # Get the ctrl data
-            x = system.ctrl_data
-            # Get the simulation name
-            sim_name = system.sim_name
-            # Loop over the parameter samples
-            for i, param in enumerate(system.param_data):
-                # Get the description of the current sample
-                mag = floor(log(system.num_samples, 10)) + 1
-                description = 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)
-                # Run the model
-                y = param[0] + param[1] * x + param[2] * x ** 2 + param[3] * x ** 3
-                # Append the data to the list
-                data.append(np.array(y, ndmin=2))
-                # Write the data to a file
-                data_file_name = f'{sim_name}_' + description + '_sim.txt'
-                write_dict_to_file({'f': list(y)}, data_file_name)
-                # Write the parameters to a file
-                data_param_name = f'{sim_name}_' + description + '_param.txt'
-                param_data = {'a': [param[0]], 'b': [param[1]], 'c': [param[2]], 'd': [param[3]]}
-                write_dict_to_file(param_data, data_param_name)
-            # Set the simulation data
-            system.set_sim_data(data)
-
-        system_cls = IODynamicSystem(sim_name='test', sim_data_dir=PATH + '/sim_data/', sim_data_file_ext='.txt',
-                                     obs_data_file=path.abspath(
-                                         path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
-                                     obs_names=['f'], ctrl_name='u', num_samples=10, param_min=[None, None, None, None],
-                                     param_max=[None, None, None, None], callback=run_sim,
-                                     param_names=['a', 'b', 'c', 'd'])
-
-        system_cls.param_data = np.arange(1, system_cls.num_samples * 4 + 1, dtype=float).reshape(
-            system_cls.num_samples, 4)
-
-        system_cls.run_callback()
-
-        # check if the file that contains the parameter data has the right name
-        assert path.normpath(system_cls.param_data_file) == path.normpath(
-            path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0', 'test_Iter0_Samples.txt'))
-
-        # check if the simulations data are stored with the right name
-        system_cls.get_sim_data_files()
-        mag = floor(log(system_cls.num_samples, 10)) + 1
-        for i, f in enumerate(system_cls.sim_data_files):
-            description = 'Iter' + str(0) + '_Sample' + str(i).zfill(mag)
-            assert path.normpath(f) == path.normpath(
-                path.join(GL_PATH, 'tests', 'unit', 'sim_data', 'iter0', f'test_{description}_sim.txt'))
-
-        # check if the parameter data are correctly stored
-        param_data_backup = np.copy(system_cls.param_data)
-        system_cls.load_param_data()
-        np.testing.assert_array_equal(param_data_backup, system_cls.param_data)
-
-        # check if the simulation data are correctly stored
-        sim_data_backup = np.copy(system_cls.sim_data)
-        system_cls.load_sim_data()
-        np.testing.assert_array_equal(sim_data_backup, system_cls.sim_data)
-
     def test_get_obs_data(self):
         """Test if the observation data is read correctly"""
         config = {
@@ -317,17 +216,12 @@ class TestIODynamicSystem:
             0.00001,
         )
 
-    def test_cleanup(self):
-        """Remove the temporary dumpy data directory"""
-        rmtree(GL_PATH + '/tests/unit/sim_data/')
-
 
 def test_dynamic_system():
     """Test the dynamic system class"""
     # run all tests
     test_cls = TestDynamicSystem()
     test_cls.test_init()
-    test_cls.test_run()
     test_cls.test_compute_inv_normalized_sigma()
     test_cls.test_compute_estimated_params()
 
@@ -337,6 +231,4 @@ def test_io_dynamic_system():
     # run all tests
     test_cls = TestIODynamicSystem()
     test_cls.test_init()
-    test_cls.test_run()
     test_cls.test_get_obs_data()
-    test_cls.test_cleanup()
