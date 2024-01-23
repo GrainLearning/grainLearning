@@ -142,7 +142,7 @@ def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.ker
             restore_best_weights=True,
         )
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
-                path_save_data,
+                str(path_save_data),
                 monitor='val_loss',
                 save_best_only=True,
                 save_weights_only=config['save_weights_only']

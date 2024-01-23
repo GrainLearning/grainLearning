@@ -512,10 +512,15 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
         for j in (-posteriors[-1, :]).argsort()[:3]:
             plt.plot(ctrl_data, sim_data[j, i, :], label=f'sim No. {j:d}')
 
+        if len(ctrl_data) < 20:
+            markevery = 1
+        else:
+            markevery = int(len(ctrl_data) / 10.)
+
         plt.plot(ctrl_data,
                  obs_data[i, :], 'ok',
                  label='obs.',
-                 markevery=int(len(ctrl_data) / 10.)
+                 markevery=markevery
                  )
 
         plt.xlabel(ctrl_name)

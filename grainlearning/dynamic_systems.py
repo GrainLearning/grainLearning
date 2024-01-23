@@ -87,9 +87,12 @@ class DynamicSystem:
 
     :param obs_data: observation or reference data
     :param num_samples: Sample size of the ensemble of model evaluations
+    :param num_steps: Number of steps or sequence size in the dataset
+    :param num_obs:  Number of observations in the dataset
+    :param num_ctrl: Number of control data (identical between simulation and observation)
     :param param_min: List of parameter lower bounds
     :param param_max: List of parameter Upper bounds
-    :param callback: Callback function, defaults to None
+    :param callback: Callback function to run simulations, defaults to None
     :param curr_iter: current iteration ID, defaults to 0
     :param ctrl_data: control data (e.g, time), defaults to None, optional
     :param obs_names: Column names of the observation data, defaults to None, optional
@@ -101,91 +104,11 @@ class DynamicSystem:
     :param sigma_max: Maximum uncertainty, defaults to 1.0e6, optional
     :param sigma_tol: Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional
     :param sim_name: Name of the simulation, defaults to 'sim', optional
+    :param sigma_min: Minimum uncertainty, defaults to 1.0e-6, optional
+    :param _inv_normalized_sigma:  Calculated normalized sigma to weigh the covariance matrix
+    :param estimated_params: Estimated parameter as the first moment of the distribution (:math:`x_\mu = \sum_i w_i * x_i`), defaults to None, optional
+    :param estimated_params_cv: Estimated parameter coefficient of variation as the second moment of the distribution (:math:`x_\sigma = \sqrt{\sum_i w_i * (x_i - x_\mu)^2} / x_\mu`), defaults to None, optional
     """
-
-    ##### Parameters #####
-
-    #: Parameter data of shape (num_samples, num_params)
-    param_data: np.ndarray
-
-    #: Parameter data of previous iteration
-    param_data_prev: np.ndarray
-
-    #: Number of unknown parameters
-    num_params: int
-
-    #: Lower bound of the parameters
-    param_min: List
-
-    #: Upper bound of the parameters
-    param_max: List
-
-    #: Names of the parameters
-    param_names: List[str]
-
-    ##### Observations #####
-
-    #: Observation (or reference) data of shape (num_obs, num_steps)
-    obs_data: np.ndarray
-
-    #: Observation keys
-    obs_names: List[str]
-
-    #: Inverse of the observation weight
-    inv_obs_weight: List[float]
-
-    #: Number of steps or sequence size in the dataset
-    num_steps: int
-
-    #: Number of observations in the dataset
-    num_obs: int
-
-    #: Control dataset (num_ctrl, num_steps)
-    ctrl_data: np.ndarray
-
-    #: Observation control (e.g., time)
-    ctrl_name: str
-
-    #: Number of control data (identical between simulation and observation)
-    num_ctrl: int
-
-    ##### Simulations #####
-
-    #: Name of the simulation (e.g., sim)
-    sim_name: str = 'sim'
-
-    #: Simulation data of shape (num_samples, num_obs, num_steps)
-    sim_data: np.ndarray
-
-    #: Number of samples (usually specified by user)
-    num_samples: int
-
-    #: Callback function to run the forward predictions
-    callback: Callable
-
-    #: Current iteration ID
-    curr_iter: int
-
-    ##### Uncertainty #####
-
-    #: Minimum value of the uncertainty
-    sigma_min: float = 1.0e-6
-
-    #: Maximum value of the uncertainty
-    sigma_max: float = 1.0e6
-
-    #: Sigma tolerance
-    sigma_tol: float = 1.0e-3
-
-    #: Calculated normalized sigma to weigh the covariance matrix
-    _inv_normalized_sigma: np.array
-
-    #: Estimated parameter as the first moment of the distribution (:math:`x_\mu = \sum_i w_i * x_i`)
-    estimated_params: np.ndarray = None
-
-    #: Parameter uncertainty as the second moment of the distribution (:math:`x_\sigma = \sum_i w_i \cdot (x_i - x_\mu)^2 / x_\mu`)
-    estimated_params_cv: np.ndarray = None
-
     def __init__(
         self,
         obs_data: np.ndarray,
@@ -196,7 +119,7 @@ class DynamicSystem:
         obs_names: List[str] = None,
         ctrl_name: str = None,
         inv_obs_weight: List[float] = None,
-        sim_name: str = None,
+        sim_name: str = 'sim',
         sim_data: np.ndarray = None,
         callback: Callable = None,
         curr_iter: int = 0,
@@ -211,8 +134,7 @@ class DynamicSystem:
             obs_data, ndmin=2
         )  # ensure data is of shape (num_obs,num_step).
 
-        if ctrl_data is not None:
-            self.ctrl_data = ctrl_data
+        self.ctrl_data = ctrl_data
 
         self.obs_names = obs_names
 
@@ -247,6 +169,8 @@ class DynamicSystem:
 
         if param_min:
             self.num_params = len(param_min)
+        else:
+            self.num_params = 0
 
         self.param_data = param_data
 
@@ -254,11 +178,19 @@ class DynamicSystem:
 
         #### Uncertainty ####
 
+        self.sigma_min =  1.0e-6
+
         self.sigma_max = sigma_max
 
         self.sigma_tol = sigma_tol
 
+        self._inv_normalized_sigma = None
+
         self.compute_inv_normalized_sigma()
+
+        self.estimated_params = None
+
+        self.estimated_params_cv = None
 
     @classmethod
     def from_dict(cls: Type["DynamicSystem"], obj: dict):
@@ -283,7 +215,7 @@ class DynamicSystem:
             obs_names=obj.get("obs_names", None),
             ctrl_name=obj.get("ctrl_name", None),
             inv_obs_weight=obj.get("inv_obs_weight", None),
-            sim_name=obj.get("sim_name", None),
+            sim_name=obj.get("sim_name", 'sim'),
             sim_data=obj.get("sim_data", None),
             callback=obj.get("callback", None),
             param_data=obj.get("param_data", None),
@@ -316,6 +248,18 @@ class DynamicSystem:
         :param data: parameter data of shape (num_samples, num_params)
         """
         self.param_data = np.array(data)
+
+    def set_obs_data(self, data: list):
+        """Set the observation data
+        :param data: observation data of shape (num_obs, num_steps)
+        """
+        self.obs_data = np.array(data,ndmin=2)
+
+    def set_ctrl_data(self, data: list):
+        """Set the control data
+        :param data: control data of shape (num_ctrl, num_steps)
+        """
+        self.ctrl_data = np.array(data)
 
     def compute_inv_normalized_sigma(self):
         """Compute the inverse of the matrix that apply different weights on the observables"""
@@ -439,28 +383,8 @@ class IODynamicSystem(DynamicSystem):
     :param inv_obs_weight: Inverse of the observation weight, defaults to None, optional
     :param param_data: Parameter data, defaults to None, optional
     :param sim_data: Simulation data, defaults to None, optional
+    :param sim_data_files: List of simulation data files (num_samples), defaults to None, optional
     """
-
-    ##### Parameters #####
-
-    #: Name of the parameter data file
-    param_data_file: str
-
-    ##### Observations #####
-
-    #: Name of the observation data file
-    obs_data_file: str
-
-    ##### Simulations #####
-
-    #: Simulation data files (num_samples)
-    sim_data_files: List[str]
-
-    #: Name of the directory where simulation data is stored
-    sim_data_dir: str = './sim_data'
-
-    #: Extension of simulation data files
-    sim_data_file_ext: str = '.npy'
 
     def __init__(
         self,
@@ -503,6 +427,7 @@ class IODynamicSystem(DynamicSystem):
             param_data,
             param_names
         )
+        # TODO: reuse initialization from base class
 
         ##### Parameters #####
 
@@ -534,6 +459,8 @@ class IODynamicSystem(DynamicSystem):
             self.inv_obs_weight = inv_obs_weight
 
         self.compute_inv_normalized_sigma()
+
+        self.sim_data_files = []
 
     @classmethod
     def from_dict(cls: Type["IODynamicSystem"], obj: dict):
