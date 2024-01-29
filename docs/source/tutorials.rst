@@ -20,7 +20,7 @@ Linear regression with a Python model
 `````````````````````````````````````
 
 To work with GrainLearning in the Python environment,
-we need to write a callback function of the :class:`.DynamicSystem` where the model :math:`y = a\times{x}+b` is called.
+we need to write a callback function of the :class:`.BayesianCalibration` class where the model :math:`y = a\times{x}+b` is called.
 
 .. code-block:: python
 
@@ -64,6 +64,7 @@ Check out the documentation of :class:`.BayesianCalibration` for more details.
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
+            "callback": run_sim,
             "system": {
                 "param_min": [0.1, 0.1],
                 "param_max": [1, 10],
@@ -71,7 +72,6 @@ Check out the documentation of :class:`.BayesianCalibration` for more details.
                 "num_samples": 20,
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
-                "callback": run_sim,
             },
           "calibration": {
               "inference": {"ess_target": 0.3},
@@ -106,7 +106,7 @@ Linear regression with a "software" model
 Linking GrainLearning with external software is done with the :class:`.IODynamicSystem`
 Now let us look at the same example, using the :class:`.IODynamicSystem` and a linear function implemented in a separate file
 :download:`linear_model.py <../../tutorials/simple_regression/linear_regression/linear_model.py>`.
-This Python "software" will be run from command line by the callback function of a :class:`.IODynamicSystem` object
+This Python "software" will be run from command line by the callback function of :class:`.BayesianCalibration`
 and take the command-line arguments as model parameters.
 Download :download:`this script <../../tutorials/simple_regression/linear_regression/linear_model.py>`
 and :download:`the observation data <../../tutorials/simple_regression/linear_regression/linear_obs.dat>`,
@@ -155,6 +155,7 @@ Now let us define the calibration tool. Note that the system type is changed :cl
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 10,
+            "callback": run_sim,            
             "system": {
                 "system_type": IODynamicSystem,
                 "param_min": [0.1, 0.1],
@@ -167,7 +168,6 @@ Now let us define the calibration tool. Note that the system type is changed :cl
                 "sim_name": 'linear',
                 "sim_data_dir": './sim_data/',
                 "sim_data_file_ext": '.txt',
-                "callback": run_sim,
             },
             "calibration": {
                 "inference": {"ess_target": 0.3},
@@ -291,6 +291,7 @@ and then create a new `calibration` object using :class:`.DynamicSystem`.
     calibration = BayesianCalibration.from_dict(
         {
             "num_iter": 0,
+            "callback": None,
             "system": {
                 "system_type": DynamicSystem,
                 "param_min": [0.1, 0.1],
@@ -303,7 +304,6 @@ and then create a new `calibration` object using :class:`.DynamicSystem`.
                 "obs_names": ['f'],
                 "sim_name": 'linear',
                 "sim_data": sim_data,
-                "callback": None,
             },
             "calibration": {
                 "inference": {"ess_target": 0.3},

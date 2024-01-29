@@ -234,7 +234,7 @@ The essential steps include
 1. Generating the initial samples using :attr:`a low-discrepancy sequence <.IterativeBayesianFilter.initialize>`,
 2. Running the instances of the predictive (forward) model via a user-defined :ref:`callback function <dynamic_systems:Interact with third-party software via callback function>`,
 3. Estimating the time evolution of :attr:`the posterior distribution <.IterativeBayesianFilter.run_inference>`,
-4. Generateing new samples from :attr:`the proposal density <.IterativeBayesianFilter.run_sampling>`, trained with the previous ensemble (i.e., samples and associated weights), 
+4. Generating new samples from :attr:`the proposal density <.IterativeBayesianFilter.run_sampling>`, trained with the previous ensemble (i.e., samples and associated weights), 
 5. Check whether the posterior expecation of the model parameters has converged to a certain value, and stop the iteration if so.
 6. If not, repeating step 1--5 (combined into the function :attr:`.IterativeBayesianFilter.solve`)
 

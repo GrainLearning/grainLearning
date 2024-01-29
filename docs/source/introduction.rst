@@ -37,7 +37,7 @@ The following figure shows the main modules of GrainLearning and their interconn
   :width: 400
   :alt: GrainLearning modules
 
-Users only need to write a :attr:`callback function <.IODynamicSystem.callback>`
+Users only need to write a callback function and pass it to :class:`.BayesianCalibration`
 where parameter samples are sent to an external "software" or Python model.
 Examples of this can be found for :ref:`YADE <examples:Run DEM simulations guided by GrainLearning>`
 (`Yet Another Dynamic Engine <http://yade-dem.org/>`_).
