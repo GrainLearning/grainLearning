@@ -40,7 +40,7 @@ We consider both errors together in the covariance matrix :attr:`.SMC.cov_matric
 Interact with third-party software via callback function
 --------------------------------------------------------
 
-Interaction with an external "software" model can be done via the callback function of :class:`.DynamicSystem` or :class:`.IODynamicSystem`.
+Interaction with an external "software" model can be done via the callback function of :class:`.BayesianCalibration`.
 You can define your own callback function
 and pass *samples* (combinations of parameters) to the **model implemented in Python** or to the software from the **command line**.
 The figure below shows how the callback function is called in the execution loop of :class:`.BayesianCalibration`. 
@@ -71,8 +71,8 @@ The following code snippet shows how to define a callback function that runs a l
        system.set_sim_data(data)
 
 
-The function `run_sim` is assigned to the :attr:`.DynamicSystem.callback` attribute of the :class:`.DynamicSystem` class
-and is is called every time the :attr:`.DynamicSystem.run` function is called (see :ref:`the figure <execution_loop>` above).
+The function `run_sim` is assigned to the `callback` parameter of the :class:`.BayesianCalibration` class
+and is is called every time the :attr:`.BayesianCalibration.run_callback` function is called (see :ref:`the figure <execution_loop>` above).
 
 
 Interact with non-Python software
@@ -80,8 +80,7 @@ Interact with non-Python software
 
 The :class:`.IODynamicSystem` class inherits from :class:`.DynamicSystem` and is intended to work with external software packages
 via the command line.
-The :attr:`.IODynamicSystem.run` function overrides the :attr:`.DynamicSystem.run` function of the :class:`.DynamicSystem` class.
-Parameter samples are written into a text file and used by :attr:`.IODynamicSystem.callback` to execute the third-party software.
+Parameter samples are written into a text file and used by :attr:`.BayesianCalibration.run_callback` to execute the third-party software.
 Users only need to write a for-loop to pass each parameter sample to this external software, e.g., as command-line arguments (see the example below).
 
 .. code-block:: python

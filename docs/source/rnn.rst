@@ -383,7 +383,7 @@ How does it work?
 A simple example can be found in `tutorials <https://github.com/GrainLearning/grainLearning/tree/main/tutorials/rnn>`_. Such tutorial has three main parts:
 
 1. **Prepare the pre-trained model:** Load a model using ``grainlearning.rnn.predict.get_pretrained_model()``.
-2. **Create a callback function to link to `DynamicSystem`:** Function in which the predictions are going to be drawn.
+2. **Create a callback function to link to `BayesianCalibration`:** Function in which the predictions are going to be drawn.
 3. **GrainLearning calibration loop.**
 
 In this case, `synthetic data` was considered: we took one example from our triaxial compression DEM simulations. 

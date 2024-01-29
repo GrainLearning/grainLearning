@@ -77,6 +77,7 @@ class BayesianCalibration:
     :param num_iter: Number of iteration steps
     :param curr_iter: Current iteration step
     :param save_fig: Flag for skipping (-1), showing (0), or saving (1) the figures
+    :param callback: A callback function that runs the external software and passes the parameter sample to generate outputs
     """
     def __init__(
         self,
