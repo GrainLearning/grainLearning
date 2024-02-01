@@ -20,7 +20,7 @@ def rnn_model(
     Takes in a load sequence and contact parameters, and outputs the macroscopic responses.
     The contact parameters are used to initialize the hidden state of the LSTM.
 
-    :param input_shapes: Dictionary containing `'num_load_features'`, `'num_contact_params'`,
+    :param input_shapes: Dictionary containing `'num_input_features'`, `'num_params'`,
         `'num_labels'`. It can contain other keys but hese are the ones used here.
     :param window_size: Length of time window.
     :param lstm_units: Number of units of the hidden state of the LSTM.
@@ -34,8 +34,8 @@ def rnn_model(
 
     sequence_length = window_size
     load_sequence = layers.Input(
-            shape=(sequence_length, input_shapes['num_load_features']), name='load_sequence')
-    contact_params = layers.Input(shape=(input_shapes['num_contact_params'],), name='contact_parameters')
+            shape=(sequence_length, input_shapes['num_input_features']), name='inputs')
+    contact_params = layers.Input(shape=(input_shapes['num_params'],), name='params')
 
     # compute hidden state of LSTM based on contact parameters
     state_h = layers.Dense(lstm_units, activation='tanh', name='state_h')(contact_params)
