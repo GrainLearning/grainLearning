@@ -68,7 +68,7 @@ def get_pretrained_model(path_to_model: str):
     :return:
         - model: keras model ready to use.
         - train_stats: Array containing the values used to standardize the data (if config.standardize_outputs = True),
-          and lenghts of sequences, load_features, contact_params, labels, window_size and window_step.
+          and lengths of sequences, input_features, params, labels, window_size and window_step.
         - config: dictionary with the model configuration
     """
     path_to_model = Path(path_to_model)
@@ -166,7 +166,7 @@ def predict_macroscopics(
     If 'standardize_outputs' in config, rescale the predictions to their original units.
 
     :param model: Keras RNN model
-    :param data: Tensorflow dataset containing inputs: 'load_sequence' and 'contact_parameters', and outputs.
+    :param data: Tensorflow dataset containing inputs: 'inputs' and 'params', and outputs.
     :param train_stats: Dictionary containing statistics of the training set.
     :param config: Dictionary containing the configuration with which the model was trained.
     :param batch_size: Size of batches to use.
@@ -177,18 +177,18 @@ def predict_macroscopics(
     inputs = list(data)[0][0]
 
     # Check that input sizes of data correspond to those of the pre-trained model
-    if inputs['load_sequence'].shape[2] != train_stats['num_load_features']:
-        raise ValueError(f"Number of elements in load_sequence of data does not match the model load_sequence shape. \
-            Got {inputs['load_sequence'].shape[2]}, expected {train_stats['num_load_features']}.")
+    if inputs['inputs'].shape[2] != train_stats['num_input_features']:
+        raise ValueError(f"Number of elements in inputs of data does not match the model inputs shape. \
+            Got {inputs['inputs'].shape[2]}, expected {train_stats['num_input_features']}.")
 
-    if inputs['contact_parameters'].shape[1] != train_stats['num_contact_params']:
-        raise ValueError(f"Number of elements in contact_parameters of data does not match the model \
-            contact_parameters shape. \
-            Got {inputs['contact_parameters'].shape[2]}, expected {train_stats['num_contact_params']}.")
+    if inputs['params'].shape[1] != train_stats['num_params']:
+        raise ValueError(f"Number of elements in params of data does not match the model \
+            params shape. \
+            Got {inputs['params'].shape[2]}, expected {train_stats['num_params']}.")
 
-    if inputs['load_sequence'].shape[1] != train_stats['sequence_length']:
+    if inputs['inputs'].shape[1] != train_stats['sequence_length']:
         raise ValueError(f"Sequence length of the train_stats {train_stats['sequence_length']} does not match \
-            that of the data {inputs['load_sequence'].shape[1]}. If the train_stats are does of the model, \
+            that of the data {inputs['inputs'].shape[1]}. If the train_stats are does of the model, \
             check pad_length. Can be that the trained model is not compatible.")
 
     predictions = predict_over_windows(inputs, model, config['window_size'], train_stats['sequence_length'])

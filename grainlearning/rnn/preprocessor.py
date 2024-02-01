@@ -2,6 +2,7 @@ import h5py
 import numpy as np
 import tensorflow as tf
 import warnings
+from typing import Type
 
 from abc import ABC, abstractmethod
 
@@ -12,6 +13,15 @@ class Preprocessor(ABC):
     def __init__(self):
         pass
 
+    @classmethod
+    def from_dict(cls: Type["Preprocessor"], obj: dict):
+        """ Initialize the class using a dictionary style
+
+        :param obj: Dictionary object
+        :return: Preprocessor: Preprocessor object
+        """
+        raise NotImplementedError
+
     @abstractmethod
     def prepare_datasets(self, **kwargs):
         """
@@ -20,7 +30,7 @@ class Preprocessor(ABC):
 
           * ``data_split``: Dictionary with keys ``'train'``, ``'val'``, ``'test'``, and values of the corresponding tensorflow Datasets.
           * ``train_stats``: Dictionary containing the shape of the data:
-                  ``sequence_length``, ``num_input_features``, ``num_contact_params``, ``num_labels``,
+                  ``sequence_length``, ``num_input_features``, ``num_params``, ``num_labels``,
                   and ``'mean'`` and ``'std'`` of the training set, in case ``standardize_outputs`` is True.
         """
         pass
@@ -31,8 +41,8 @@ class Preprocessor(ABC):
         Abstract class to be implemented in each of the child classes.
         Must return a Tensorflow dataset containing a Tuple (inputs, outputs)
 
-          * ``inputs``: Dictionary with keys ``'load_sequence'``, ``'contact_parameters'``, that are the
-            corresponding tensorflow Datasets to input to an rnn model.
+          * ``inputs``: Dictionary with keys ``'input_sequence'``, ``'parameters'``, that are the
+            corresponding tensorflow Datasets to input to a rnn model.
 
           * ``outputs``: tensorflow Dataset containing the outputs or labels.
         """
@@ -48,7 +58,7 @@ class Preprocessor(ABC):
         :param key: string of the key in dictionary ``config`` to look for.
         :param config: Dictionary containing keys and values
         :param default: default value associated to the key in config.
-        :param add_default_to_config: Wether to add the default value and the key to config in case it does not exists.
+        :param add_default_to_config: Whether to add the default value and the key to config in case it does not exist.
 
         :return: Updated ``config`` dictionary.
         """
@@ -68,8 +78,7 @@ class Preprocessor(ABC):
     def make_splits(cls, dataset: tuple, train_frac: float, val_frac: float, seed: int):
         """
         Split data into training, validation, and test sets.
-        The split is done on a sample by sample basis, so sequences are not broken up.
-        It is done randomly across all pressures and experiment types present.
+        The split is done on a sample-by-sample basis, so sequences are not broken up.
 
         :param dataset: Full dataset to split on, in form of a tuple (inputs, outputs),
                 where inputs is a dictionary and its keys and the outputs are numpy arrays.
@@ -92,8 +101,8 @@ class Preprocessor(ABC):
                              f"lead to have {n_tot - n_train - n_val} samples in test dataset.")
 
         np.random.seed(seed=seed)
-        inds = np.random.permutation(np.arange(n_tot))
-        i_train, i_val, i_test = inds[:n_train], inds[n_train:n_train + n_val], inds[n_train + n_val:]
+        ids = np.random.permutation(np.arange(n_tot))
+        i_train, i_val, i_test = ids[:n_train], ids[n_train:n_train + n_val], ids[n_train + n_val:]
         split_data = {
                      'train': cls.get_split(dataset, i_train),
                      'val': cls.get_split(dataset, i_val),
@@ -102,21 +111,21 @@ class Preprocessor(ABC):
         return split_data
 
     @classmethod
-    def get_split(cls, dataset:tuple, inds: np.array):
+    def get_split(cls, dataset:tuple, ids: np.array):
         """
-        Given a dataset and the indexes, return  the sub-dataset containing only the elements of indexes in ``inds``.
+        Given a dataset and the indexes, return  the sub-dataset containing only the elements of indexes in ``ids``.
         The returned dataset respects the format of ``inputs`` and ``outputs`` (see more info in return).
 
         :param dataset: Full dataset to split on, in form of a tuple ``(inputs, outputs)``,
           where ``inputs`` is a dictionary and its keys and ``outputs`` are numpy arrays.
-        :param inds: Indexes of the elements in ``dataset`` that are going to be gathered in this specific split.
+        :param ids: Indexes of the elements in ``dataset`` that are going to be gathered in this specific split.
 
         :return: tuple of the split, 2 dimensions:
           * inputs: dictionary containing ``'load_sequence'`` and ``'contact_params'``.
           * outputs: Labels
         """
-        X = {key: tf.gather(val, inds) for key, val in dataset[0].items()}
-        y = tf.gather(dataset[1], inds)
+        X = {key: tf.gather(val, ids) for key, val in dataset[0].items()}
+        y = tf.gather(dataset[1], ids)
 
         return X, y
 
@@ -128,7 +137,7 @@ class Preprocessor(ABC):
         of the same size.
 
         :param array: Array that is going to be modified
-        :param pad_lenght: number of copies of the initial state to be added at the beggining of ``array``.
+        :param pad_length: number of copies of the initial state to be added at the beginning of ``array``.
 
         :return: Modified array
         """
@@ -142,7 +151,7 @@ class Preprocessor(ABC):
     def standardize_outputs(cls, split_data: dict):
         """
         Standardize outputs of ``split_data`` using the mean and std of the training data
-        taken over both the samples and the timesteps.
+        taken over both the samples and the time steps.
         The 3 datasets ``'train'``, ``'val'``, ``'test'`` will be standardized.
 
         :param split_data: dictionary containing ``'train'``, ``'val'``, ``'test'`` keys and the respective datasets.
@@ -175,18 +184,162 @@ class Preprocessor(ABC):
         :param data: The dataset to extract from.
 
         :return: Dictionary containing:
-                sequence_length, num_load_features, num_contact_params, num_labels
+                sequence_length, num_input_features, num_params, num_labels
         """
         train_sample = next(iter(data))  # just to extract a single batch
-        sequence_length, num_load_features = train_sample[0]['load_sequence'].shape
-        num_contact_params = train_sample[0]['contact_parameters'].shape[0]
+        sequence_length, num_input_features = train_sample[0]['inputs'].shape
+        num_params = train_sample[0]['params'].shape[0]
         num_labels = train_sample[1].shape[-1]
 
         return {'sequence_length': sequence_length,
-                'num_load_features': num_load_features,
-                'num_contact_params': num_contact_params,
+                'num_input_features': num_input_features,
+                'num_params': num_params,
                 'num_labels': num_labels,
                 }
+
+    def get_default_config(self):
+        pass
+
+
+class PreprocessorLSTM(Preprocessor):
+    """
+    Class to preprocess data for LSTM models which requires certain windowizing, inheriting from abstract class :class:`Preprocessor`
+    """
+    def __init__(
+        self,
+        input_data: np.ndarray,
+        param_data: np.ndarray,
+        output_data: np.ndarray,
+        train_frac: float,
+        val_frac: float,
+        pad_length: int,
+        window_size: int,
+        window_step: int = 1,
+        standardize_outputs: bool = True,
+    ):
+        """
+        Constructor of the preprocessor for LSTM models.
+        Initializes the values of required attributes to preprocess the data, from kwargs:
+
+        :param input_data: input sequence
+        :param param_data: ndarray of parameters
+        :param output_data: ndarray of output data
+        :param train_frac: Fraction of data used in the training set.
+        :param val_frac: Fraction of the data used in the validation set.
+        :param pad_length: Amount by which to pad the sequences from the start.
+        :param window_size: Number of time steps to include in a window.
+        :param window_step: Offset between subsequent windows.
+        :param standardize_outputs: Whether to transform the training set labels to have zero mean and unit variance.
+        """
+        super().__init__()
+        # reshape input_data to be of shape (sequence_length, num_input_features)
+        input_data = np.reshape(input_data, (input_data.shape[0], 1))
+        self.input_data = input_data
+        self.param_data = param_data
+        # swap the last two axes of the output data
+        output_data = np.swapaxes(output_data, 1, 2)
+        self.output_data = output_data
+        self.train_frac = train_frac
+        self.val_frac = val_frac
+        self.pad_length = pad_length
+        self.window_size = window_size
+        self.window_step = window_step
+        self.standardize_outputs = standardize_outputs
+
+    @classmethod
+    def from_dict(cls: Type["PreprocessorLSTM"], obj: dict):
+        """ Initialize the class using a dictionary style
+
+        :param obj: Dictionary object
+        :return: PreprocessorLSTM: PreprocessorLSTM object
+        """
+
+        assert "input_data" in obj.keys(), "Error no raw_data key found in input"
+        assert "param_data" in obj.keys(), "Error no train_frac key found in input"
+        assert "output_data" in obj.keys(), "Error no val_frac key found in input"
+        assert "train_frac" in obj.keys(), "Error no train_frac key found in input"
+        assert "val_frac" in obj.keys(), "Error no val_frac key found in input"
+        assert "window_size" in obj.keys(), "Error no window_size key found in input"
+        assert "window_step" in obj.keys(), "Error no window_step key found in input"
+        assert "standardize_outputs" in obj.keys(), "Error no standardize_outputs key found in input"
+
+        return cls(
+            input_data=obj["input_data"],
+            param_data=obj["param_data"],
+            output_data=obj["output_data"],
+            train_frac=obj["train_frac"],
+            val_frac=obj["val_frac"],
+            window_size=obj["window_size"],
+            pad_length=obj.get("pad_length", 0),
+            window_step=obj.get("window_step", 1),
+            standardize_outputs=obj.get("standardize_outputs", True),
+        )
+
+    def prepare_datasets(self, seed: int = 42):
+        """
+        Convert raw data into preprocessed split datasets.
+        First split the data into `train`, `val` and `test` datasets
+        and then apply the `Sliding windows` transformation.
+        This is to avoid having some parts of a dataset in `train` and some in `val` and/or in `test` (i.e. data leak).
+
+        :param seed: Random seed used to split the datasets.
+
+        :return: Tuple (split_data, train_stats)
+
+          * ``split_data``: Dictionary with keys ``'train'``, ``'val'``, ``'test'``, and values the
+            corresponding tensorflow Datasets.
+
+          * ``train_stats``: Dictionary containing the shape of the data:
+            ``sequence_length``, ``num_load_features``, ``num_contact_params``, ``num_labels``,
+            and ``'mean'`` and ``'std'`` of the training set, in case ``standardize_outputs`` is True.
+        """
+        if self.pad_length > 0:
+            self.input_data = super().pad_initial(self.input_data, self.pad_length)
+            self.output_data = super().pad_initial(self.output_data, self.pad_length)
+
+        self.input_data = np.repeat(self.input_data[np.newaxis, :, :], self.output_data.shape[0], axis=0)
+
+        dataset = ({'inputs': self.input_data, 'params': self.param_data}, self.output_data)
+        split_data = super().make_splits(dataset, self.train_frac, self.val_frac, seed)
+
+        if self.standardize_outputs:
+            split_data, train_stats = super().standardize_outputs(split_data)
+        else:
+            train_stats = {}
+
+        split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
+        train_stats.update(self.get_dimensions(split_data['train']))
+        split_data = windows.windowize_train_val_test(split_data, self.window_size, self.window_step)
+
+        return split_data, train_stats
+
+    def prepare_single_dataset(self):
+        """
+        Convert raw data into a tensorflow dataset with compatible format to predict and evaluate a rnn model.
+        """
+        if self.pad_length > 0:
+            self.input_data = super().pad_initial(self.input_data, self.pad_length)
+            self.output_data = super().pad_initial(self.output_data, self.pad_length)
+
+        dataset = ({'inputs': self.input_data, 'params': self.param_data}, self.output_data)
+        return tf.data.Dataset.from_tensor_slices(dataset)
+
+    @classmethod
+    def get_default_config(cls):
+        """
+        :return: Dictionary containing default values of the arguments that the user can set.
+        """
+        return {
+            'input_data': None,
+            'param_data': None,
+            'output_data': None,
+            'train_frac': 0.7,
+            'val_frac': 0.3,
+            'pad_length': 0,
+            'window_size': 10,
+            'window_step': 1,
+            'standardize_outputs': True
+        }
 
 
 class PreprocessorTriaxialCompression(Preprocessor):
@@ -220,6 +373,7 @@ class PreprocessorTriaxialCompression(Preprocessor):
 
         :param add_experiment_type: Wether to add the experiment type to contact parameters.
         """
+        super().__init__()
         config = self.check_config(kwargs)
 
         # creates an attribute per each element in config
@@ -254,7 +408,7 @@ class PreprocessorTriaxialCompression(Preprocessor):
             inputs = super().pad_initial(inputs, self.pad_length)
             outputs = super().pad_initial(outputs, self.pad_length)
 
-        dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
+        dataset = ({'inputs': inputs, 'params': contacts}, outputs)
         split_data = super().make_splits(dataset, self.train_frac, self.val_frac, seed)
 
         if self.standardize_outputs:
@@ -263,7 +417,7 @@ class PreprocessorTriaxialCompression(Preprocessor):
             train_stats = {}
 
         split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
-        train_stats.update(super().get_dimensions(split_data['train']))
+        train_stats.update(self.get_dimensions(split_data['train']))
         split_data = windows.windowize_train_val_test(split_data, self.window_size, self.window_step)
 
         return split_data, train_stats
@@ -288,7 +442,7 @@ class PreprocessorTriaxialCompression(Preprocessor):
             inputs = super().pad_initial(inputs, self.pad_length)
             outputs = super().pad_initial(outputs, self.pad_length)
 
-        dataset = ({'load_sequence': inputs, 'contact_parameters': contacts}, outputs)
+        dataset = ({'inputs': inputs, 'params': contacts}, outputs)
         return tf.data.Dataset.from_tensor_slices(dataset)
 
     @classmethod

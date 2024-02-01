@@ -27,7 +27,7 @@ def windowize_single_dataset(
         seed: int = 42,
         **_):
     """
-    Take a dataset ((inputs, contact_params),outputs) of sequences of shape N, S, L and output
+    Take a dataset ((inputs, params),outputs) of sequences of shape N, S, L and output
     another dataset of shorter sequences of size ``window_size``, taken at intervals ``window_step``.
     The resulting dataset will have ``M=((sequence_length - window_size)/window_step) + 1)`` samples,
     corresponding to independent windows in the given dataset.
@@ -48,18 +48,18 @@ def windowize_single_dataset(
       * ``inputs`` of shape: (M, window_size, ``num_load_features``), with M >> N.
       * ``outputs`` of shape: (M, L_outputs)
     """
-    load_sequences, contact_parameters, outputs = extract_tensors(data)
+    inputs, params, outputs = extract_tensors(data)
     _, sequence_length, _ = outputs.shape
 
     if window_size >= sequence_length:
         raise ValueError(f"window_size {window_size} >= sequence_length {sequence_length}.")
 
-    # For brevity denote load_sequence, contacts, outputs as x, c, y
+    # For brevity denote inputs, params, outputs as x, c, y
     xs, cs, ys = [], [], []
     for end in range(window_size, sequence_length + 1, window_step):
-        xs.append(load_sequences[:, end - window_size:end]) # input window
+        xs.append(inputs[:, end - window_size:end]) # input window
         ys.append(outputs[:, end - 1]) # final output
-        cs.append(contact_parameters)
+        cs.append(params)
 
     xs = np.array(xs)
     cs = np.array(cs)
@@ -75,7 +75,7 @@ def windowize_single_dataset(
     # finally shuffle the windows
     xs, cs, ys =  _shuffle(xs, cs, ys, seed)
     # and convert back into a tensorflow dataset
-    return tf.data.Dataset.from_tensor_slices(({'load_sequence': xs, 'contact_parameters': cs}, ys))
+    return tf.data.Dataset.from_tensor_slices(({'inputs': xs, 'params': cs}, ys))
 
 
 def _shuffle(xs, cs, ys, seed):
@@ -98,7 +98,7 @@ def predict_over_windows(
     Note the length of the output sequence will be shorter by the window_size than
     the input sequence.
 
-    :param inputs: dict containing inputs: `'load_sequence'` and `'contact_parameters'`, both being tensorflow.Tensor.
+    :param inputs: dict containing inputs: `'load_sequence'` and `'params'`, both being tensorflow.Tensor.
     :param model: The model to predict with.
     :param window_size: Number of timesteps in a single window.
     :param sequence_length: Number of timesteps in a full sequence.
@@ -106,7 +106,7 @@ def predict_over_windows(
     :return: tensorflow.Tensor of predicted sequences.
     """
     predictions = [
-        model([inputs['load_sequence'][:, end - window_size:end], inputs['contact_parameters']])
+        model([inputs['inputs'][:, end - window_size:end], inputs['params']])
         for end in range(window_size, sequence_length)
         ]
     predictions = tf.stack(predictions, axis=1)
@@ -123,8 +123,8 @@ def extract_tensors(data: tf.data.Dataset):
     """
     inputs, contacts, outputs = [], [], []
     for _inputs, _outputs in iter(data):
-        inputs.append(_inputs['load_sequence'])
-        contacts.append(_inputs['contact_parameters'])
+        inputs.append(_inputs['inputs'])
+        contacts.append(_inputs['params'])
         outputs.append(_outputs)
 
     return np.array(inputs), np.array(contacts), np.array(outputs)
