@@ -7,8 +7,9 @@ from matplotlib import pyplot as plt
 from grainlearning.rnn.evaluate_model import plot_predictions
 import tensorflow as tf
 
-x_obs = np.arange(120)
-y_obs = 0.2 * x_obs + 5.0
+x_obs = np.arange(100)
+# hyperbola in a form similar to the Duncan-Chang material model, q = \eps / (a * 100 + b * \eps)
+y_obs = x_obs / (0.2 * 100 + 5.0 * x_obs)
 
 
 def run_sim(calib):
@@ -19,13 +20,13 @@ def run_sim(calib):
     data = []
     for params in calib.system.param_data:
         # Run the model
-        y_sim = linear(calib.system.ctrl_data, params)
+        y_sim = nonlinear(calib.system.ctrl_data, params)
         data.append(np.array(y_sim, ndmin=2))
     calib.system.set_sim_data(data)
 
 
-def linear(x, params):
-    return params[0] * x + params[1]
+def nonlinear(x, params):
+    return x / (params[0] * 100 + params[1] * x)
 
 
 calibration = BayesianCalibration.from_dict(
@@ -45,7 +46,10 @@ calibration = BayesianCalibration.from_dict(
             "sigma_tol": 0.01,
         },
         "calibration": {
-            "inference": {"ess_target": 0.3},
+            "inference": {
+                "ess_target": 0.3,
+                "scale_cov_with_max": True,
+            },
             "sampling": {
                 "max_num_components": 1,
                 "n_init": 1,
