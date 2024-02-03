@@ -110,3 +110,4 @@ error = np.mean((predictions - calibration.system.sim_data[:, :, config['window_
 plt.plot(error)
 plt.xlabel("sample")
 plt.ylabel("MSE")
+plt.show()
