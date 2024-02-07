@@ -212,7 +212,6 @@ class PreprocessorLSTM(Preprocessor):
         output_data: np.ndarray,
         train_frac: float,
         val_frac: float,
-        pad_length: int,
         window_size: int,
         window_step: int = 1,
         standardize_outputs: bool = True,
@@ -241,7 +240,7 @@ class PreprocessorLSTM(Preprocessor):
         self.output_data = output_data
         self.train_frac = train_frac
         self.val_frac = val_frac
-        self.pad_length = pad_length
+        self.pad_length = window_size
         self.window_size = window_size
         self.window_step = window_step
         self.standardize_outputs = standardize_outputs
@@ -270,7 +269,6 @@ class PreprocessorLSTM(Preprocessor):
             train_frac=obj["train_frac"],
             val_frac=obj["val_frac"],
             window_size=obj["window_size"],
-            pad_length=obj.get("pad_length", 0),
             window_step=obj.get("window_step", 1),
             standardize_outputs=obj.get("standardize_outputs", True),
         )
@@ -323,6 +321,22 @@ class PreprocessorLSTM(Preprocessor):
 
         dataset = ({'inputs': self.input_data, 'params': self.param_data}, self.output_data)
         return tf.data.Dataset.from_tensor_slices(dataset)
+
+    def prepare_input_data(self, param_data: np.ndarray):
+        """
+        Prepare the input data for the model.
+
+        :param param_data: ndarray of parameters
+
+        :return: Tuple of input data
+        """
+        # if the number of samples is different, update self.input_data
+        if param_data.shape[0] != self.input_data.shape[0]:
+            input_data = self.input_data[0, :, :]
+            self.input_data = np.repeat(input_data[np.newaxis, :, :], param_data.shape[0], axis=0)
+        data_inputs = ({'inputs': self.input_data, 'params': param_data}, self.input_data)
+        data_inputs = tf.data.Dataset.from_tensor_slices(data_inputs)
+        return data_inputs
 
     @classmethod
     def get_default_config(cls):
