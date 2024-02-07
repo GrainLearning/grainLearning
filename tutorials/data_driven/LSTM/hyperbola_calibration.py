@@ -4,7 +4,6 @@ from grainlearning.rnn import preprocessor
 import numpy as np
 from grainlearning import BayesianCalibration
 from matplotlib import pyplot as plt
-from grainlearning.rnn.evaluate_model import plot_predictions
 import tensorflow as tf
 
 x_obs = np.arange(100)
@@ -34,7 +33,7 @@ calibration = BayesianCalibration.from_dict(
         "num_iter": 1,
         "callback": run_sim,
         "system": {
-            "param_min": [0.001, 0.001],
+            "param_min": [0.1, 1],
             "param_max": [1, 10],
             "param_names": ['a', 'b'],
             "num_samples": 100,
@@ -42,7 +41,7 @@ calibration = BayesianCalibration.from_dict(
             "ctrl_name": 'u',
             "obs_data": y_obs,
             "ctrl_data": x_obs,
-            "sim_name": 'linear',
+            "sim_name": 'hyperbola',
             "sigma_tol": 0.01,
         },
         "calibration": {
@@ -71,6 +70,8 @@ my_config = {
     'output_data': calibration.system.sim_data,
     'train_frac': 0.7,
     'val_frac': 0.2,
+    # TODO: hide `pad_length` from the user
+    'pad_length': 10,
     'window_size': 10,
     'window_step': 1,
     'patience': 25,
@@ -102,16 +103,39 @@ model, train_stats, config = predict_rnn.get_pretrained_model('outputs')
 data_inputs = ({'inputs': preprocessor.input_data, 'params': calibration.system.param_data}, preprocessor.input_data)
 data_inputs = tf.data.Dataset.from_tensor_slices(data_inputs)
 
-predictions = predict_rnn.predict_macroscopics(model, data_inputs, train_stats, config,
-                                               batch_size=calibration.system.num_samples)
+predictions = predict_rnn.predict_batch(model, data_inputs, train_stats, config,
+                                        batch_size=calibration.system.num_samples)
 # converting the predictions to GL format (temporal dimension at the end)
 predictions = np.moveaxis(predictions, 1, -1)
 
 # compute the mean square error per sample
-error = np.mean((predictions - calibration.system.sim_data[:, :, config['window_size']:]) ** 2, axis=-1)
+error = np.mean((predictions - calibration.system.sim_data) ** 2, axis=-1)
 
 # plot the error
 plt.plot(error)
 plt.xlabel("sample")
 plt.ylabel("MSE")
 plt.show()
+
+
+# define the callback function using the ML surrogate
+def run_sim_surrogate(calib):
+    # extend the first dimension of the input data to the number of samples (TODO: hide this from the user)
+    input_data = preprocessor.input_data[0, :, :]
+    preprocessor.input_data = np.repeat(input_data[np.newaxis, :, :], calib.system.num_samples, axis=0)
+    data_inputs = ({'inputs': preprocessor.input_data, 'params': calib.system.param_data}, preprocessor.input_data)
+    data_inputs = tf.data.Dataset.from_tensor_slices(data_inputs)
+    # make predictions with the trained model
+    sim_data = predict_rnn.predict_batch(model, data_inputs, train_stats, config, batch_size=calib.system.num_samples)
+    # converting the predictions to GL format (temporal dimension at the end)
+    sim_data = np.moveaxis(sim_data, 1, -1)
+    # update sim_data in system
+    calib.system.set_sim_data(sim_data)
+
+
+calibration.callback = run_sim_surrogate
+
+# continue the calibration with the surrogate
+calibration.num_iter = 10
+calibration.save_fig = 0
+calibration.run()

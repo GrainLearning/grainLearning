@@ -154,7 +154,7 @@ def load_model(path_to_model: Path, train_stats: dict, config: dict):
     return model
 
 
-def predict_macroscopics(
+def predict_batch(
         model: tf.keras.Model,
         data: tf.data.Dataset,
         train_stats: dict,
