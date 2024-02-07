@@ -293,11 +293,11 @@ class PreprocessorLSTM(Preprocessor):
             ``sequence_length``, ``num_load_features``, ``num_contact_params``, ``num_labels``,
             and ``'mean'`` and ``'std'`` of the training set, in case ``standardize_outputs`` is True.
         """
+        self.input_data = np.repeat(self.input_data[np.newaxis, :, :], self.output_data.shape[0], axis=0)
+
         if self.pad_length > 0:
             self.input_data = super().pad_initial(self.input_data, self.pad_length)
             self.output_data = super().pad_initial(self.output_data, self.pad_length)
-
-        self.input_data = np.repeat(self.input_data[np.newaxis, :, :], self.output_data.shape[0], axis=0)
 
         dataset = ({'inputs': self.input_data, 'params': self.param_data}, self.output_data)
         split_data = super().make_splits(dataset, self.train_frac, self.val_frac, seed)
