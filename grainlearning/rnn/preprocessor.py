@@ -331,6 +331,7 @@ class PreprocessorLSTM(Preprocessor):
         :return: Tuple of input data
         """
         # if the number of samples is different, update self.input_data
+        self.param_data = param_data
         if param_data.shape[0] != self.input_data.shape[0]:
             input_data = self.input_data[0, :, :]
             self.input_data = np.repeat(input_data[np.newaxis, :, :], param_data.shape[0], axis=0)
