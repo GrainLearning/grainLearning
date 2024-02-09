@@ -19,8 +19,8 @@ During the installation of grainLearning activate extra `rnn`:
 
 There are three main usages of RNN module:
 
-1. [Train a RNN with your own data.](/tutorials/rnn/train_rnn.ipynb)
-2. [Make a prediction with a pre-trained model.](/tutorials/rnn/predict.ipynb)
-3. [Use a trained RNN in grainLearning calibration process.](/tutorials/rnn/rnn_calibration_GL.ipynb)
+1. [Train a RNN with your own data.](/tutorials/data_driven/LSTM/train_rnn.ipynb)
+2. [Make a prediction with a pre-trained model.](/tutorials/data_driven/LSTM/predict.ipynb)
+3. [Use a trained RNN in grainLearning calibration process.](/tutorials/data_driven/LSTM/rnn_calibration_GL.ipynb)
 
 For more details about how are these model built check the [documentation](https://grainlearning.readthedocs.io/en/latest).
