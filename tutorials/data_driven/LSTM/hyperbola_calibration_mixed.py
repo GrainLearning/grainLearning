@@ -3,7 +3,6 @@ import grainlearning.rnn.predict as predict_rnn
 from grainlearning.rnn import preprocessor
 import numpy as np
 from grainlearning import BayesianCalibration
-from matplotlib import pyplot as plt
 
 x_obs = np.arange(100)
 # hyperbola in a form similar to the Duncan-Chang material model, q = \eps / (a * 100 + b * \eps)

@@ -35,11 +35,11 @@ def rnn_model(
     sequence_length = window_size
     load_sequence = layers.Input(
             shape=(sequence_length, input_shapes['num_input_features']), name='inputs')
-    contact_params = layers.Input(shape=(input_shapes['num_params'],), name='params')
+    params = layers.Input(shape=(input_shapes['num_params'],), name='params')
 
     # compute hidden state of LSTM based on contact parameters
-    state_h = layers.Dense(lstm_units, activation='tanh', name='state_h')(contact_params)
-    state_c = layers.Dense(lstm_units, activation='tanh', name='state_c')(contact_params)
+    state_h = layers.Dense(lstm_units, activation='tanh', name='state_h')(params)
+    state_c = layers.Dense(lstm_units, activation='tanh', name='state_c')(params)
     initial_state = [state_h, state_c]
 
     X = load_sequence
@@ -49,7 +49,7 @@ def rnn_model(
     X = layers.Dense(dense_units, activation='relu')(X)
     outputs = layers.Dense(input_shapes['num_labels'])(X)
 
-    model = Model(inputs=[load_sequence, contact_params], outputs=outputs)
+    model = Model(inputs=[load_sequence, params], outputs=outputs)
 
     return model
 
