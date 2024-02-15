@@ -155,50 +155,77 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
 .. code-block:: python
    :caption: my_sweep.py
 
-   import wandb
    import grainlearning.rnn.train as train_rnn
+   from grainlearning.rnn.train import HyperTuning
    from grainlearning.rnn import preprocessor
-
+   import wandb
+   import os
+   
+   
    def my_training_function():
-     """ A function that wraps the training process"""
-     preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**wandb.config)
-     train_rnn.train(preprocessor_TC)
+       """ A function that wraps the training process"""
+       # update window_size of my_config from wandb (only needed for the LSTM model)
+       with wandb.init():
+           my_config['window_size'] = wandb.config['window_size']
+       preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**my_config)
+       train_rnn.train(preprocessor_TC)
+  
+  
+   # 1. Create my dictionary of configuration
+   my_config = {
+       'raw_data': 'triaxial_compression_variable_input.hdf5',
+       'pressure': '0.2e6',
+       'experiment_type': 'drained',
+       'add_experiment_type': False,
+       'add_pressure': True,
+       'add_e0': True,
+       'train_frac': 0.1,
+       'val_frac': 0.1,
+       'window_size': 20,
+       'pad_length': 10,
+       'window_step': 1,
+       'patience': 25,
+       'epochs': 10,
+       'learning_rate': 1e-4,
+       'lstm_units': 250,
+       'dense_units': 250,
+       'batch_size': 256,
+       'standardize_outputs': True,
+       'save_weights_only': True
+   }
+  
+  
+   # 2. Define the sweep configuration
+   sweep_config = {
+       'method': 'random',
+       'metric': {'goal': 'minimize', 'name': 'mae'},
+       'early_terminate': {
+           'type': 'hyperband',
+           's': 2,
+           'eta': 3,
+           'max_iter': 27
+       }
+   }
+  
+   search_space = {
+       'learning_rate': {
+           # a flat distribution between 1e-4 and 1e-2
+           'distribution': 'q_log_uniform_values',
+           'q': 1e-4,
+           'min': 1e-4,
+           'max': 1e-2
+       },
+       'lstm_units': {
+           'distribution': 'q_log_uniform_values',
+           'q': 1,
+           'min': 32,
+           'max': 256
+       },
+   }
 
-   if __name__ == '__main__':
-      wandb.login()
-      sweep_configuration = {
-      'method': 'bayes',
-      'name': 'sweep',
-      'metric': {'goal': 'maximize', 'name': 'val_acc'},
-      'parameters':
-         {
-         'raw_data': 'my_path_to_dataset.hdf5',
-         'pressure': 'All',
-         'experiment_type': 'All',
-         'add_e0': False,
-         'add_pressure': True,
-         'add_experiment_type': True,
-         'train_frac': 0.7,
-         'val_frac': 0.15,
-         'window_size': 10,
-         'window_step': 1,
-         'pad_length': 0,
-         'lstm_units': 200,
-         'dense_units': 200,
-         'patience': 5,
-         'epochs': 100,
-         'learning_rate': 1e-3,
-         'batch_size': 256,
-         'standardize_outputs': True,
-         'save_weights_only': False
-         }
-      }
-      
-      # create a new sweep, here you can also configure your project and entity.
-      sweep_id = wandb.sweep(sweep=sweep_configuration)
-
-      # run an agent
-      wandb.agent(sweep_id, function=my_training_function, count=4)
+   # 3. Run the sweep
+   hyper_tuner = HyperTuning(sweep_config, search_space, my_config, project_name='my_sweep')
+   hyper_tuner.run_sweep(my_training_function, count=100)
 
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_sweep.py``.
 
