@@ -270,3 +270,85 @@ def _get_optimizer_config(config):
             config_optimizer[key] = config[key]
 
     return config_optimizer
+
+
+class HyperTuning:
+    """
+    Class to run hyperparameter tuning with wandb.
+    """
+    def __init__(self, sweep_config, search_space, other_config = None, project_name = 'my_sweep'):
+        """
+        :param sweep_config: Dictionary containing the configuration of the sweep.
+
+            For example:
+
+            .. highlight:: python
+            .. code-block:: python
+
+            sweep_config = {
+                'method': 'random',
+                'name': my_sweep,
+                'metric': {'goal': 'minimize', 'name': 'mae'},
+                'early_terminate': {
+                    'type': 'hyperband',
+                    's': 2,
+                    'eta': 3,
+                    'max_iter': 27
+                }
+            }
+
+        :param search_space: Dictionary containing the search space of the sweep.
+
+            For example:
+
+            .. highlight:: python
+            .. code-block:: python
+
+            search_space = {
+                'learning_rate': {
+                    'distribution': 'q_log_uniform_values',
+                    'q': 1e-4,
+                    'min': 1e-4,
+                    'max': 1e-2
+                },
+                'lstm_units': {
+                    'distribution': 'q_log_uniform_values',
+                    'q': 1,
+                    'min': 32,
+                    'max': 256
+                },
+            }
+
+        :param other_config: Dictionary containing other relevant configuration parameters.
+        :param project_name: Name of the project in wandb.
+        """
+        # Log in to wandb
+        wandb.login()
+        # Set the configuration
+        self.sweep_config = sweep_config
+        self.search_space = search_space
+        self.other_config = other_config
+        self.project_name = project_name
+        self.sweep_id = None
+
+    def get_sweep_id(self):
+        """
+        Returns the sweep_id of a sweep created with the configuration specified in sweep_config and search_space.
+        """
+        # update sweep_config with the parameters to be searched and their distributions
+        self.sweep_config['parameters'] = self.search_space
+        # add default parameters from my_config into sweep_config, use 'values' as the key
+        for key, value in self.other_config.items():
+            self.sweep_config['parameters'].update({key: {'values': [value]}})
+        # create the sweep
+        sweep_id = wandb.sweep(self.sweep_config, project=self.project_name)
+        self.sweep_id = sweep_id
+
+    def run_sweep(self, training_func, count = 100):
+        """
+        Function to run hyperparameter tuning with `training_func`
+        """
+        # Configure the sweep
+        self.get_sweep_id()
+        # Run an agent
+        wandb.agent(self.sweep_id, function=training_func, count=count)
