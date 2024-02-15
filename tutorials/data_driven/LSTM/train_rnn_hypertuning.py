@@ -1,6 +1,7 @@
-import wandb
 import grainlearning.rnn.train as train_rnn
+from grainlearning.rnn.train import HyperTuning
 from grainlearning.rnn import preprocessor
+import wandb
 import os
 
 os.environ["WANDB_MODE"] = "offline"
@@ -39,70 +40,52 @@ my_config = {
 }
 
 
-# 2. A function to specify the sweep configuration, returning a sweep_id
-def get_sweep_id(method):
-    sweep_config = {
-        'method': 'random',
-        'name': method,
-        # TODO: @Luisa: how does user know what metric is defined in the model?
-        'metric': {'goal': 'minimize', 'name': 'mae'},
-        'parameters': {},
-        'early_terminate': {
-            'type': 'hyperband',
-            's': 2,
-            'eta': 3,
-            'max_iter': 27
-        }
+# 2. Define the sweep configuration
+sweep_config = {
+    'method': 'random',
+    'metric': {'goal': 'minimize', 'name': 'mae'},
+    'early_terminate': {
+        'type': 'hyperband',
+        's': 2,
+        'eta': 3,
+        'max_iter': 27
     }
-    # add default parameters from my_config into sweep_config, use 'values' as the key
-    for key, value in my_config.items():
-        sweep_config['parameters'].update({key: {'values': [value]}})
-    # update sweep_config with the parameters to be searched and their distributions
-    # check the documentation https://docs.wandb.ai/guides/sweeps/sweep-config-keys#distribution-options-for-random-and-bayesian-search on how to define the search space
-    search_space = {
-        'learning_rate': {
-            # a flat distribution between 1e-4 and 1e-2
-            'distribution': 'q_log_uniform_values',
-            'q': 1e-4,
-            'min': 1e-4,
-            'max': 1e-2
-        },
-        'lstm_units': {
-            'distribution': 'q_log_uniform_values',
-            'q': 1,
-            'min': 32,
-            'max': 256
-        },
-        'dense_units': {
-            'distribution': 'q_log_uniform_values',
-            'q': 1,
-            'min': 32,
-            'max': 256
-        },
-        'batch_size': {
-            'distribution': 'q_log_uniform_values',
-            'q': 1,
-            'min': 32,
-            'max': 256
-        },
-        'window_size': {
-            'distribution': 'q_uniform',
-            'q': 2,
-            'min': 4,
-            'max': 30
-        },
-    }
-    sweep_config['parameters'].update(search_space)
-    # create the sweep
-    sweep_id = wandb.sweep(sweep_config, project='triax_sweep')
-    return sweep_id
+}
 
+search_space = {
+    'learning_rate': {
+        # a flat distribution between 1e-4 and 1e-2
+        'distribution': 'q_log_uniform_values',
+        'q': 1e-4,
+        'min': 1e-4,
+        'max': 1e-2
+    },
+    'lstm_units': {
+        'distribution': 'q_log_uniform_values',
+        'q': 1,
+        'min': 32,
+        'max': 256
+    },
+    # 'dense_units': {
+    #     'distribution': 'q_log_uniform_values',
+    #     'q': 1,
+    #     'min': 32,
+    #     'max': 256
+    # },
+    # 'batch_size': {
+    #     'distribution': 'q_log_uniform_values',
+    #     'q': 1,
+    #     'min': 32,
+    #     'max': 256
+    # },
+    'window_size': {
+        'distribution': 'q_uniform',
+        'q': 2,
+        'min': 4,
+        'max': 30
+    },
+}
 
-# 3. Log in to wandb
-wandb.login()
-
-# 4. Configure the sweep
-sweep_id = get_sweep_id('random')
-
-# 5. Run an agent
-wandb.agent(sweep_id, function=my_training_function, count=100)
+# 3. Run the sweep
+hyper_tuner = HyperTuning(sweep_config, search_space, my_config, project_name='my_sweep')
+hyper_tuner.run_sweep(my_training_function, count=100)
