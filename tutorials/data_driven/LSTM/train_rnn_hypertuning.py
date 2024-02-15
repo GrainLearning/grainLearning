@@ -4,8 +4,6 @@ from grainlearning.rnn import preprocessor
 import wandb
 import os
 
-os.environ["WANDB_MODE"] = "offline"
-
 
 def my_training_function():
     """ A function that wraps the training process"""
@@ -38,7 +36,6 @@ my_config = {
     'standardize_outputs': True,
     'save_weights_only': True
 }
-
 
 # 2. Define the sweep configuration
 sweep_config = {

@@ -322,8 +322,6 @@ class HyperTuning:
         :param other_config: Dictionary containing other relevant configuration parameters.
         :param project_name: Name of the project in wandb.
         """
-        # Log in to wandb
-        wandb.login()
         # Set the configuration
         self.sweep_config = sweep_config
         self.search_space = search_space
@@ -335,11 +333,12 @@ class HyperTuning:
         """
         Returns the sweep_id of a sweep created with the configuration specified in sweep_config and search_space.
         """
-        # update sweep_config with the parameters to be searched and their distributions
-        self.sweep_config['parameters'] = self.search_space
         # add default parameters from my_config into sweep_config, use 'values' as the key
+        self.sweep_config['parameters'] = {}
         for key, value in self.other_config.items():
             self.sweep_config['parameters'].update({key: {'values': [value]}})
+        # update sweep_config with the parameters to be searched and their distributions
+        self.sweep_config['parameters'].update(self.search_space)
         # create the sweep
         sweep_id = wandb.sweep(self.sweep_config, project=self.project_name)
         self.sweep_id = sweep_id
@@ -348,6 +347,8 @@ class HyperTuning:
         """
         Function to run hyperparameter tuning with `training_func`
         """
+        # Log in to wandb
+        wandb.login()
         # Configure the sweep
         self.get_sweep_id()
         # Run an agent
