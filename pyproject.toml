@@ -39,7 +39,7 @@ ipykernel = {version = "*", optional = true}
 
 [tool.poetry.extras]
 docs = ["Sphinx", "sphinx-autodoc-typehints", "sphinx-mdinclude", "sphinx-rtd-theme"]
-dev = ["pytest", "pytest-cov", "prospector", "pyroma", "h5py", "tensorflow", "wandb"]
+dev = ["pytest", "pytest-cov", "prospector", "pyroma", "h5py", "tensorflow", "wandb", "ipykernel"]
 rnn = ["wandb", "tensorflow"]
 tutorials = ["ipykernel"]
 visuals = ["seaborn"]
