@@ -12,7 +12,7 @@ def my_training_function():
     with wandb.init():
         my_config['window_size'] = wandb.config['window_size']
     preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**my_config)
-    train_rnn.train(preprocessor_TC)
+    train_rnn.train(preprocessor_TC, config=my_config)
 
 
 # 1. Create my dictionary of configuration
