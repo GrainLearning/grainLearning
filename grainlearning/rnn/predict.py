@@ -1,6 +1,7 @@
 """
 Module containing functions to load a trained RNN model and make a prediction.
 """
+import glob
 import os
 from pathlib import Path
 
@@ -11,21 +12,21 @@ import wandb
 import yaml
 
 from grainlearning.rnn.models import rnn_model
-#from grainlearning.rnn.preprocessing import prepare_datasets
 from grainlearning.rnn.windows import predict_over_windows
-from grainlearning.rnn.preprocessor import Preprocessor, PreprocessorTriaxialCompression
+from grainlearning.rnn.preprocessor import Preprocessor
 
 # Constants
 NAME_MODEL_H5 = 'model-best.h5'
 NAME_TRAIN_STATS = 'train_stats.npy'
 
 
-def get_best_run_from_sweep(entity_project_sweep_id: str, preprocessor: Preprocessor = None):
+def get_best_run_from_sweep(entity_project_sweep_id: str, order: str = None, preprocessor: Preprocessor = None):
     """
     Load the best performing model found with a weights and biases sweep.
     Also load the data splits it was trained on.
 
     :param entity_project_sweep_id: string of form <user>/<project>/<sweep_id>
+    :param order: string of the metric to use to select the best run.
     :param preprocessor: Preprocessor object to load and prepare the data.
       If None is given, then a PreprocessorTriaxialCompression will be considered
 
@@ -36,25 +37,28 @@ def get_best_run_from_sweep(entity_project_sweep_id: str, preprocessor: Preproce
         - config: The configuration dictionary used to train the model.
     """
     sweep = wandb.Api().sweep(entity_project_sweep_id)
-    best_run = sweep.best_run()
+    best_run = sweep.best_run(order=order)
     best_model = wandb.restore(
             NAME_MODEL_H5,  # this saves the model locally under this name
-            run_path=entity_project_sweep_id + best_run.id,
+            run_path=entity_project_sweep_id + '/' + best_run.id,
             replace=True,
         )
     config = best_run.config
-    if preprocessor is None:
-        preprocessor = PreprocessorTriaxialCompression(**config)
 
-    if os.path.exists(Path(best_model.dir)/NAME_TRAIN_STATS):
-        train_stats = np.load(Path(best_model.dir)/NAME_TRAIN_STATS, allow_pickle=True).item()
-        data, _ = preprocessor.prepare_datasets()
+    # get the training statistics file from local directories
+    # (best_model from wandb only gives the model not other files)
+    stat_files = glob.glob(str(Path(f'wandb/*{best_run.id}*/files/*{NAME_TRAIN_STATS}')))
+    if len(stat_files) == 1:
+        train_stats = np.load(stat_files[0], allow_pickle=True).item()
+    elif len(stat_files) > 1:
+        raise ValueError(f"Multiple files found with name {NAME_TRAIN_STATS} in the wandb directory. \
+            Please check the duplicates and try again.")
     else:
-        data, train_stats = preprocessor.prepare_datasets()
+        raise FileNotFoundError(f"File {NAME_TRAIN_STATS} was not found in the wandb directory.")
 
     model = rnn_model(train_stats, **config)
     model.load_weights(best_model.name)
-    return model, data, train_stats, config
+    return model, train_stats, config
 
 
 def get_pretrained_model(path_to_model: str):

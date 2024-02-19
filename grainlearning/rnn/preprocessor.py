@@ -11,7 +11,7 @@ from grainlearning.rnn import windows
 class Preprocessor(ABC):
 
     def __init__(self):
-        pass
+        self.run_dir = None
 
     @classmethod
     def from_dict(cls: Type["Preprocessor"], obj: dict):
