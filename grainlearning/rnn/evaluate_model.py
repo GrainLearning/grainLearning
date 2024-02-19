@@ -2,7 +2,7 @@ import numpy as np
 import random
 import tensorflow as tf
 from matplotlib import pyplot as plt
-
+from sklearn.metrics import mean_absolute_error
 from grainlearning.rnn import predict
 
 
@@ -65,7 +65,7 @@ def plot_predictions(model: tf.keras.Model, data: tf.data.Dataset, train_stats: 
     for i_s, color in zip(representative_idxs,
             ['blue', 'green', 'purple', 'darkgreen', 'navy', 'yellowgreen']):
 
-        p_label, e_label = _get_p_e_labels(config, test_inputs['contact_parameters'][i_s])
+        p_label, e_label = _get_p_e_labels(config, test_inputs['params'][i_s])
 
         _plot_sequence(0, 0, 'e', i_s=i_s, color=color)
         _plot_sequence(0, 1, 'f_0', i_s=i_s, color=color)
@@ -129,7 +129,7 @@ def _find_representatives(input_data, add_e0: bool, add_pressure: bool, add_expe
         global P_INDEX, E_INDEX
 
         representatives = []
-        contact_params = input_data['contact_parameters']
+        contact_params = input_data['params']
         if add_e0:
             P_INDEX -= 1
             E_INDEX -= 1
@@ -150,7 +150,7 @@ def _find_representatives(input_data, add_e0: bool, add_pressure: bool, add_expe
 
 
 def _find_random_samples(input_data, num_samples):
-    return np.random.choice(len(input_data['contact_parameters']), num_samples, replace=False)
+    return np.random.choice(len(input_data['params']), num_samples, replace=False)
 
 def _checks_extra_contact_params(config: dict):
     """
@@ -174,3 +174,17 @@ def _get_p_e_labels(config: dict, contact_params):
     if add_experiment_type: e_label = 'drained' if contact_params[E_INDEX]==1 else 'undrained'
     else: e_label = config['experiment_type']
     return p_label, e_label
+
+
+def plot_metric_distribution(data, predictions, config):
+    """
+    Plot the histogram of the scores.
+    """
+    test_inputs, labels = next(iter(data.batch(len(data))))
+    scores = [mean_absolute_error(labels[i, config['window_size']:, :].numpy(), predictions.numpy()[i, :, :])
+              for i in range(labels.numpy().shape[0])]
+    fig, ax = plt.subplots(1, 1)
+    ax.set_xlabel('Mean Absolute Error')
+    ax.set_ylabel('Frequency')
+    ax.hist(scores)
+    return fig

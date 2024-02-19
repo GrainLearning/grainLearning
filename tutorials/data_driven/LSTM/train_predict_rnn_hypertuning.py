@@ -1,8 +1,9 @@
 import grainlearning.rnn.train as train_rnn
 from grainlearning.rnn.train import HyperTuning
 from grainlearning.rnn import preprocessor
+from grainlearning.rnn.predict import get_best_run_from_sweep, predict_batch
+from grainlearning.rnn.evaluate_model import plot_metric_distribution
 import wandb
-import os
 
 
 def my_training_function():
@@ -22,8 +23,8 @@ my_config = {
     'add_experiment_type': False,
     'add_pressure': True,
     'add_e0': True,
-    'train_frac': 0.1,
-    'val_frac': 0.1,
+    'train_frac': 0.7,
+    'val_frac': 0.15,
     'window_size': 20,
     'pad_length': 10,
     'window_step': 1,
@@ -87,3 +88,19 @@ search_space = {
 # 3. Run the sweep
 hyper_tuner = HyperTuning(sweep_config, search_space, my_config, project_name='my_sweep')
 hyper_tuner.run_sweep(my_training_function, count=100)
+
+# 4. Get the best model
+# change metric to validation loss
+hyper_tuner.sweep_config['metric']['name'] = 'val_loss'
+entity_project_sweep_id = f"{hyper_tuner.entity_name}/{hyper_tuner.project_name}/{hyper_tuner.sweep_id}"
+model, train_stats, config = get_best_run_from_sweep(entity_project_sweep_id)
+config['pressure'] = my_config['pressure']
+
+# 5. Load input data to predict from
+preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
+data = preprocessor_TC.prepare_single_dataset()
+
+# 6. Make and plot predictions
+predictions = predict_batch(model, data, train_stats, config, batch_size=len(data))
+fig = plot_metric_distribution(data, predictions, config)
+fig.show()
