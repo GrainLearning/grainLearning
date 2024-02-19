@@ -4,12 +4,26 @@ RNN Module
 We implemented a `Recurrent Neural Network (RNN) <https://stanford.edu/~shervine/teaching/cs-230/cheatsheet-recurrent-neural-networks>`_ model
 in the tensorflow framework. For more information about the model go to section `The RNN model`_.
 
-There are four main usages of the RNN module:
+There are four main usages of the RNN module (click on the links to download the scripts):
 
 1. `Train a RNN with your own data`_.
 2. `Make a prediction with a pre-trained model`_.
 3. `Use a trained RNN model in grainLearning calibration process`_.
-   
+
+We have made one tutorial that demonstrates
+how to combine :download:`training and predicting <../../tutorials/data_driven/LSTM/train_predict_rnn.py>` of ML models within one script.
+and another one on performing click :download:`hyperparameter optimization <../../tutorials/data_driven/LSTM/train_predict_rnn_hypertuning.py>`
+before making predictions.
+
+We provide two simple tutorial to demonstrate how to:
+
+- use an LSTM model that mimic hyperbolic curves for GL Bayesian Calibration workflow 
+  (click :download:`here <../../tutorials/data_driven/LSTM/hyperbola_calibration_lstm.py>`)
+- and partly replace the close-form solution of the hyperbolic model (click :download:`here <../../tutorials/data_driven/LSTM/hyperbola_calibration_mixed.py>`) with the LSTM, 
+
+in addition to the example (click :download:`here <../../tutorials/data_driven/LSTM/rnn_GL_calibration.ipynb>`) where
+an LSTM is pretrained to predict the triaxial response of a granular material and then used in the calibration process.
+
 Train a RNN with your own data
 ------------------------------
 
@@ -129,7 +143,7 @@ Create `my_train.py` where you would like to run the training. Be aware to confi
    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**my_config)
    
    # 3. Run the training Tensorflow and reporting to wandb
-   train_rnn.train(preprocessor_TC, config=my_config)
+   history_wandb = train_rnn.train(preprocessor_TC, config=my_config)
 
 Open a terminal where you have your file, activate the environment where grainLearning and rnn dependencies has been installed and run: ``python my_train.py``
 
@@ -173,14 +187,14 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
   
    # 1. Create my dictionary of configuration
    my_config = {
-       'raw_data': 'triaxial_compression_variable_input.hdf5',
+       'raw_data': 'my_path_to_dataset.hdf5',
        'pressure': '0.2e6',
        'experiment_type': 'drained',
        'add_experiment_type': False,
        'add_pressure': True,
        'add_e0': True,
-       'train_frac': 0.1,
-       'val_frac': 0.1,
+       'train_frac': 0.7,
+       'val_frac': 0.15,
        'window_size': 20,
        'pad_length': 10,
        'window_step': 1,
@@ -194,11 +208,10 @@ Create `my_sweep.py` where you would like to run the training. Configure the swe
        'save_weights_only': True
    }
   
-  
    # 2. Define the sweep configuration
    sweep_config = {
        'method': 'random',
-       'metric': {'goal': 'minimize', 'name': 'mae'},
+       'metric': {'goal': 'minimize', 'name': 'val_loss'},
        'early_terminate': {
            'type': 'hyperband',
            's': 2,
@@ -338,22 +351,24 @@ In this example, we are going to load the same dataset that we used for training
 
    from pathlib import Path
 
-   import grainlearning.rnn.predict as predict_rnn
+   from grainlearning.rnn.predict import predict_batch, plot_metric_distribution
    from grainlearning.rnn import preprocessor
 
    # 1. Define the location of the model to use
-   path_to_trained_model = Path('C:/trained_models/My_model_1')
+   path_to_trained_model = Path('my_path_to_run_directory')
 
    # 2. Get the model information
    model, train_stats, config = predict_rnn.get_pretrained_model(path_to_trained_model)
 
    # 3. Load input data to predict from
-   config['raw_data'] = '../train/data/my_database.hdf5'
+   config['raw_data'] = 'my_path_to_dataset.hdf5'
    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
    data, _ = preprocessor_TC.prepare_datasets()
 
-   #4. Make a prediction
-   predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
+   # 4. Make a prediction and plot the histogram of errors
+   predictions = predict_rnn.predict_batch(model, data['test'], train_stats, config, batch_size=len(data['test']))
+   fig = plot_metric_distribution(data, predictions, config)
+   fig.show()
 
 If the model was trained with ``standardize_outputs = True``, ``predictions`` are going to be unstandardized (i.e. no values between [0, 1] but with the original scale). 
 In our example, ``predictions`` is a tensorflow tensor of size ``(batch_size, length_sequences - window_size, num_labels)``.
@@ -372,18 +387,20 @@ Often this looks like `<entity>/<project>/<sweep_id>`.
    from grainlearning.rnn import preprocessor
 
    # 1. Define which sweep to look into
-   entity_project_sweep_id = 'grainlearning-escience/grainLearning-grainlearning_rnn/6zrc0vjb'
+   entity_project_sweep_id = 'grainlearning/project/sweep_id'
 
    # 2. Chose the best model from a sweep, and get the model information
-   model, data, train_stats, config = predict_rnn.get_best_run_from_sweep(entity_project_sweep_id)
+   model, train_stats, config = predict_rnn.get_best_run_from_sweep(entity_project_sweep_id)
 
    # 3. Load input data to predict from
-   config['raw_data'] = '../train/data/sequences.hdf5'
+   config['raw_data'] = 'my_path_to_dataset.hdf5'
    preprocessor_TC = preprocessor.PreprocessorTriaxialCompression(**config)
    data, _ = preprocessor_TC.prepare_datasets()
 
-   #4. Make a prediction
-   predictions = predict_rnn.predict_macroscopics(model, data['test'], train_stats, config,batch_size=256, single_batch=True)
+   # 4. Make a prediction and plot the histogram of errors
+   predictions = predict_rnn.predict_batch(model, data['test'], train_stats, config, batch_size=len(data['test']))
+   fig = plot_metric_distribution(data, predictions, config)
+   fig.show()
 
 This can fail if you have deleted some runs or if your wandb folder is not present in this folder. We advise to copy `config.yaml`, `train_stats.py` and `model_best.h5` from `wandb/runXXX/files` to another location and follow `Saved model`_ instructions. These files can also be downloaded from the wandb dashboard.
 

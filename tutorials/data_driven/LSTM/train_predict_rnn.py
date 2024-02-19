@@ -10,18 +10,18 @@ my_config = {
      'experiment_type': 'drained',
      'add_pressure': True,
      'add_e0': True,
-     'train_frac': 0.8,
-     'val_frac': 0.1,
-     'window_size': 10,
+     'train_frac': 0.7,
+     'val_frac': 0.15,
+     'window_size': 20,
      'window_step': 1,
      'patience': 25,
      'epochs': 10,
-     'learning_rate': 0.006200000000000001,
-     'lstm_units': 122,
-     'dense_units': 224,
-     'batch_size': 216,
+     'learning_rate': 1e-4,
+     'lstm_units': 250,
+     'dense_units': 250,
+     'batch_size': 256,
      'standardize_outputs': True,
-     'save_weights_only': False
+     'save_weights_only': True
  }
 
 # 2. Create an object Preprocessor to pre-process my data

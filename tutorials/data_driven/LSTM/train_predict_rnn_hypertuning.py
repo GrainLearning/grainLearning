@@ -42,7 +42,7 @@ my_config = {
 sweep_config = {
     'method': 'random',
     # TODO: how does the user know about the metric?
-    'metric': {'goal': 'minimize', 'name': 'mae'},
+    'metric': {'goal': 'minimize', 'name': 'val_loss'},
     'early_terminate': {
         'type': 'hyperband',
         's': 2,
