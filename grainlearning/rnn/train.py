@@ -347,7 +347,7 @@ class HyperTuning:
         # update sweep_config with the parameters to be searched and their distributions
         self.sweep_config['parameters'].update(self.search_space)
         # create the sweep
-        sweep_id = wandb.sweep(self.sweep_config, project=self.project_name)
+        sweep_id = wandb.sweep(self.sweep_config, entity=self.entity_name, project=self.project_name)
         self.sweep_id = sweep_id
 
     def run_sweep(self, training_func, count=100):
