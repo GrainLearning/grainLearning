@@ -281,8 +281,7 @@ class HyperTuning:
     Class to run hyperparameter tuning with wandb.
     """
 
-    def __init__(self, sweep_config, search_space, other_config=None, entity_name='grainlearning',
-                 project_name='my_sweep'):
+    def __init__(self, sweep_config, search_space, other_config=None, entity_name='', project_name='my_sweep'):
         """
         :param sweep_config: Dictionary containing the configuration of the sweep.
 
@@ -343,7 +342,9 @@ class HyperTuning:
         # add default parameters from my_config into sweep_config, use 'values' as the key
         self.sweep_config['parameters'] = {}
         for key, value in self.other_config.items():
-            self.sweep_config['parameters'].update({key: {'values': [value]}})
+            # if key is not listed in the following list which should be excluded
+            if key not in ['input_data', 'param_data', 'output_data']:
+                self.sweep_config['parameters'].update({key: {'values': [value]}})
         # update sweep_config with the parameters to be searched and their distributions
         self.sweep_config['parameters'].update(self.search_space)
         # create the sweep
