@@ -86,7 +86,7 @@ search_space = {
 }
 
 # 3. Run the sweep
-hyper_tuner = HyperTuning(sweep_config, search_space, my_config, project_name='my_sweep')
+hyper_tuner = HyperTuning(sweep_config, search_space, my_config, entity_name='grainlearning', project_name='my_sweep')
 hyper_tuner.run_sweep(my_training_function, count=100)
 
 # 4. Get the best model

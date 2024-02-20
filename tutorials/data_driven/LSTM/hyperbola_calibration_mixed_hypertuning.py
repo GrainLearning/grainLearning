@@ -23,8 +23,8 @@ my_config = {
     'val_frac': 0.2,
     'window_size': 10,
     'window_step': 1,
-    'patience': 25,
-    'epochs': 20,
+    'patience': 5,
+    'epochs': 10,
     'learning_rate': 1e-4,
     'lstm_units': 128,
     'dense_units': 128,
@@ -83,14 +83,18 @@ def run_sim_original(x, params):
 
 
 def my_training_function():
+    # update window_size of my_config from wandb
+    with wandb.init():
+        my_config['window_size'] = wandb.config['window_size']
     preprocessor_lstm = preprocessor.PreprocessorLSTM.from_dict(my_config)
     train_rnn.train(preprocessor_lstm, config=my_config)
 
 
 def hyper_train():
     """Train the ML surrogate using hyperparameter tuning."""
-    hyper_tuner = train_rnn.HyperTuning(sweep_config, search_space, my_config, project_name='hyperbola_sweep')
-    hyper_tuner.run_sweep(my_training_function, count=10)
+    hyper_tuner = train_rnn.HyperTuning(sweep_config, search_space, my_config, entity_name='grainlearning',
+                                        project_name='hyperbola_sweep')
+    hyper_tuner.run_sweep(my_training_function, count=1)
 
     hyper_tuner.sweep_config['metric']['name'] = 'val_loss'
     entity_project_sweep_id = f"{hyper_tuner.entity_name}/{hyper_tuner.project_name}/{hyper_tuner.sweep_id}"
@@ -189,7 +193,7 @@ calibration = BayesianCalibration.from_dict(
             },
             "initial_sampling": "halton",
         },
-        "save_fig": 0,
+        "save_fig": -1,
     }
 )
 
