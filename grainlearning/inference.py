@@ -119,9 +119,9 @@ class SMC:
         for stp_id in range(system.num_steps):
             # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multivariate_normal.html
             likelihood = multivariate_normal.pdf(
-                system.sim_data[:, :, stp_id],
-                mean=system.obs_data[:, stp_id],
-                cov=cov_matrices[stp_id],
+                system.sim_data[:, :, stp_id] * system.normalization_factor[stp_id],
+                mean=system.obs_data[:, stp_id] * system.normalization_factor[stp_id],
+                cov=cov_matrices[stp_id] * system.normalization_factor[stp_id] ** 2
             )
             likelihoods[stp_id, :] = likelihood / likelihood.sum()
 

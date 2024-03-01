@@ -121,7 +121,8 @@ class DynamicSystem:
         param_data: np.ndarray = None,
         param_names: List[str] = None,
         sigma_max: float = 1.0e6,
-        sigma_tol: float = 1.0e-3
+        sigma_tol: float = 1.0e-3,
+        sigma_min: float = 1.0e-6
     ):
         """Initialize the dynamic system class"""
         #### Observations ####
@@ -138,6 +139,8 @@ class DynamicSystem:
         self.num_obs, self.num_steps = self.obs_data.shape
 
         self.num_ctrl, _ = self.obs_data.shape
+
+        self.normalization_factor = np.ones(self.num_steps)
 
         if inv_obs_weight is None:
             self.inv_obs_weight = list(np.ones(self.num_obs))
@@ -171,7 +174,7 @@ class DynamicSystem:
 
         #### Uncertainty ####
 
-        self.sigma_min =  1.0e-6
+        self.sigma_min = sigma_min
 
         self.sigma_max = sigma_max
 
@@ -212,6 +215,8 @@ class DynamicSystem:
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
             sigma_tol=obj.get("sigma_tol", 0.001),
+            sigma_max=obj.get("sigma_max", 1.0e6),
+            sigma_min=obj.get("sigma_min", 1.0e-6),
         )
 
     def set_sim_data(self, data: list):
@@ -302,6 +307,10 @@ class DynamicSystem:
     def move_data_to_sim_dir(cls: Type["DynamicSystem"]):
         """Virtual function to move data into simulation directory"""
 
+    @classmethod
+    def set_normalization_factor(cls: Type["DynamicSystem"]):
+        """Virtual method to normalize the simulation and observation data"""
+
 
 class IODynamicSystem(DynamicSystem):
     """
@@ -388,6 +397,9 @@ class IODynamicSystem(DynamicSystem):
         param_data_file: str = '',
         param_data: np.ndarray = None,
         param_names: List[str] = None,
+        sigma_max=1.0e6,
+        sigma_tol=1.0e-3,
+        sigma_min=1.0e-6
     ):
         """Initialize the IO dynamic system class"""
 
@@ -406,7 +418,10 @@ class IODynamicSystem(DynamicSystem):
             sim_data,
             curr_iter,
             param_data,
-            param_names
+            param_names,
+            sigma_max,
+            sigma_tol,
+            sigma_min
         )
         # TODO: reuse initialization from base class
 
@@ -468,7 +483,7 @@ class IODynamicSystem(DynamicSystem):
             ctrl_name=obj["ctrl_name"],
             param_data_file=obj.get("param_data_file", ''),
             obs_data=obj.get("obs_data", None),
-            num_samples=obj.get("num_samples", None),
+            num_samples=obj.get("num_samples"),
             param_min=obj.get("param_min", None),
             param_max=obj.get("param_max", None),
             ctrl_data=obj.get("ctrl_data", None),
@@ -476,6 +491,9 @@ class IODynamicSystem(DynamicSystem):
             sim_data=obj.get("sim_data", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
+            sigma_tol=obj.get("sigma_tol", 0.001),
+            sigma_max=obj.get("sigma_max", 1.0e6),
+            sigma_min=obj.get("sigma_min", 1.0e-6),
         )
 
     def get_obs_data(self):
@@ -497,6 +515,9 @@ class IODynamicSystem(DynamicSystem):
             self.obs_data = np.zeros([self.num_obs, self.num_steps])
             for i, key in enumerate(self.obs_names):
                 self.obs_data[i, :] = keys_and_data[key]
+            # set normalization factor to default (ones)
+            self.normalization_factor = np.ones(self.num_steps)
+            self.set_normalization_factor()
         else:
             self.obs_data = np.genfromtxt(self.obs_data_file)
             # if only one observation data vector exists, reshape it with (1, num_steps)
