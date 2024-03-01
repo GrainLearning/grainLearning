@@ -15,7 +15,7 @@ from grainlearning.rnn.preprocessor import Preprocessor
 from grainlearning.rnn.windows import windowize_single_dataset
 
 
-def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = None):
+def train(preprocessor: Preprocessor, config=None, model: tf.keras.Model = None):
     """
     Train a model and report to weights and biases.
 
@@ -38,6 +38,7 @@ def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = Non
         config = wandb.config
         config = _check_config(config, preprocessor)
         config_optimizer = _get_optimizer_config(config)
+        preprocessor.run_dir = wandb.run.dir
 
         # preprocess data
         split_data, train_stats = preprocessor.prepare_datasets()
@@ -49,10 +50,10 @@ def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = Non
 
         optimizer = tf.keras.optimizers.Adam(**config_optimizer)
         model.compile(
-                optimizer=optimizer,
-                loss='mse',
-                metrics=['mae'],
-            )
+            optimizer=optimizer,
+            loss='mse',
+            metrics=['mae'],
+        )
 
         # create batches
         for split in ['train', 'val']:  # do not batch test set
@@ -60,25 +61,25 @@ def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = Non
 
         # set up training
         early_stopping = tf.keras.callbacks.EarlyStopping(
-                monitor='val_loss',
-                patience=config.patience,
-                restore_best_weights=True,
-            )
+            monitor='val_loss',
+            patience=config.patience,
+            restore_best_weights=True,
+        )
         wandb_callback = wandb.keras.WandbCallback(
-                monitor='val_loss',
-                save_model=True,
-                save_weights_only=config.save_weights_only,
-                validation_data=split_data['val'],
-            )
+            monitor='val_loss',
+            save_model=True,
+            save_weights_only=config.save_weights_only,
+            validation_data=split_data['val'],
+        )
         callbacks = [wandb_callback, early_stopping]
 
         # train
         history = model.fit(
-                split_data['train'],
-                epochs=config.epochs,
-                validation_data=split_data['val'],
-                callbacks=callbacks,
-            )
+            split_data['train'],
+            epochs=config.epochs,
+            validation_data=split_data['val'],
+            callbacks=callbacks,
+        )
 
         # Evaluate in test dataset and log to wandb the metrics
         test_data = windowize_single_dataset(split_data['test'], **config)
@@ -88,7 +89,8 @@ def train(preprocessor: Preprocessor, config = None, model: tf.keras.Model = Non
 
         return history
 
-def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.keras.Model = None):
+
+def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras.Model = None):
     """
     Train a model locally: no report to wandb.
     Saves either the model or its weight to folder outputs.
@@ -108,7 +110,8 @@ def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.ker
     if os.path.exists(path_save_data):
         delete_outputs = input(f"The contents of {path_save_data} will be permanently deleted,\
                                  do you want to proceed? [y/n]: ")
-        if delete_outputs == "y": shutil.rmtree(path_save_data)
+        if delete_outputs == "y":
+            shutil.rmtree(path_save_data)
         else:
             raise SystemExit("Cancelling training")
 
@@ -116,8 +119,8 @@ def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.ker
 
     # preprocess data
     split_data, train_stats = preprocessor.prepare_datasets()
-    np.save(path_save_data/'train_stats.npy', train_stats)
-    np.save(path_save_data/'config.npy', config)
+    np.save(path_save_data / 'train_stats.npy', train_stats)
+    np.save(path_save_data / 'config.npy', config)
 
     # set up the model
     if model is None:
@@ -125,36 +128,36 @@ def train_without_wandb(preprocessor: Preprocessor, config = None, model: tf.ker
 
     optimizer = tf.keras.optimizers.Adam(**config_optimizer)
     model.compile(
-            optimizer=optimizer,
-            loss='mse',
-            metrics=['mae'],
-        )
+        optimizer=optimizer,
+        loss='mse',
+        metrics=['mae'],
+    )
 
     # create batches
     for split in ['train', 'val']:  # do not batch test set
         split_data[split] = split_data[split].batch(config['batch_size'])
 
     # set up training
-    if config['save_weights_only'] : path_save_data = path_save_data/"weights.h5"
+    if config['save_weights_only']: path_save_data = path_save_data / "weights.h5"
     early_stopping = tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss',
-            patience=config['patience'],
-            restore_best_weights=True,
-        )
+        monitor='val_loss',
+        patience=config['patience'],
+        restore_best_weights=True,
+    )
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
-                str(path_save_data),
-                monitor='val_loss',
-                save_best_only=True,
-                save_weights_only=config['save_weights_only']
-            )
+        str(path_save_data),
+        monitor='val_loss',
+        save_best_only=True,
+        save_weights_only=config['save_weights_only']
+    )
 
     # train
     history = model.fit(
-            split_data['train'],
-            epochs=config['epochs'],
-            validation_data=split_data['val'],
-            callbacks=[early_stopping, checkpoint],
-        )
+        split_data['train'],
+        epochs=config['epochs'],
+        validation_data=split_data['val'],
+        callbacks=[early_stopping, checkpoint],
+    )
 
     # Evaluate in test dataset and print the metrics
     test_data = windowize_single_dataset(split_data['test'], **config)
@@ -238,15 +241,16 @@ def _check_config(config: dict, preprocessor: Preprocessor):
     return config
 
 
-def _warning_config_field(key, config, default, add_default_to_config = False):
+def _warning_config_field(key, config, default, add_default_to_config=False):
     """
     Raises a warning if key is not included in config dictionary.
     Also informs the default value that will be used.
     If add_default_to_config=True, then it adds the key and its default value to config.
     """
+
     # customized warning to print -only- the warning message
     def _custom_format_warning(msg, *_):
-        return str(msg) + '\n' # ignore everything except the message
+        return str(msg) + '\n'  # ignore everything except the message
 
     warnings.formatwarning = _custom_format_warning
 
@@ -270,3 +274,94 @@ def _get_optimizer_config(config):
             config_optimizer[key] = config[key]
 
     return config_optimizer
+
+
+class HyperTuning:
+    """
+    Class to run hyperparameter tuning with wandb.
+    """
+
+    def __init__(self, sweep_config, search_space, other_config=None, entity_name='', project_name='my_sweep'):
+        """
+        :param sweep_config: Dictionary containing the configuration of the sweep.
+
+            For example:
+
+            .. highlight:: python
+            .. code-block:: python
+
+            sweep_config = {
+                'method': 'random',
+                'name': my_sweep,
+                'metric': {'goal': 'minimize', 'name': 'mae'},
+                'early_terminate': {
+                    'type': 'hyperband',
+                    's': 2,
+                    'eta': 3,
+                    'max_iter': 27
+                }
+            }
+
+        :param search_space: Dictionary containing the search space of the sweep.
+
+            For example:
+
+            .. highlight:: python
+            .. code-block:: python
+
+            search_space = {
+                'learning_rate': {
+                    'distribution': 'q_log_uniform_values',
+                    'q': 1e-4,
+                    'min': 1e-4,
+                    'max': 1e-2
+                },
+                'lstm_units': {
+                    'distribution': 'q_log_uniform_values',
+                    'q': 1,
+                    'min': 32,
+                    'max': 256
+                },
+            }
+
+        :param other_config: Dictionary containing other relevant configuration parameters.
+        :param project_name: Name of the project in wandb.
+        """
+        # Set the configuration
+        self.sweep_config = sweep_config
+        self.search_space = search_space
+        self.other_config = other_config
+        self.project_name = project_name
+        self.entity_name = entity_name
+        self.sweep_id = None
+
+    def get_sweep_id(self):
+        """
+        Returns the sweep_id of a sweep created with the configuration specified in sweep_config and search_space.
+        """
+        # add default parameters from my_config into sweep_config, use 'values' as the key
+        self.sweep_config['parameters'] = {}
+        for key, value in self.other_config.items():
+            # if key is not listed in the following list which should be excluded
+            if key not in ['input_data', 'param_data', 'output_data']:
+                self.sweep_config['parameters'].update({key: {'values': [value]}})
+        # update sweep_config with the parameters to be searched and their distributions
+        self.sweep_config['parameters'].update(self.search_space)
+        # create the sweep
+        sweep_id = wandb.sweep(self.sweep_config, entity=self.entity_name, project=self.project_name)
+        self.sweep_id = sweep_id
+
+    def run_sweep(self, training_func, count=100):
+        """
+        Function to run hyperparameter tuning with `training_func`
+        """
+        # Log in to wandb
+        wandb.login()
+        # Configure the sweep
+        self.get_sweep_id()
+        # Run an agent
+        wandb.agent(self.sweep_id, function=training_func, count=count)
+        # Close the wandb session
+        wandb.finish()
+        # write the data of the HyperTuning object to a npy file
+        np.save(f'wandb/{self.entity_name}_{self.project_name}_{self.sweep_id}.npy', self.__dict__)

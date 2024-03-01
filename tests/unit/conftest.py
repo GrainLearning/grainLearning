@@ -20,21 +20,21 @@ def hdf5_test_file():
 
         # group 0.2e5
         inputs, outputs, contact_params = create_dataset(num_samples=2, sequence_length=3,
-                                            num_load_features=2, num_labels=4, num_contact_params=5)
+                                            num_input_features=2, num_labels=4, num_params=5)
         file['0.2e5/drained/inputs'] = inputs
         file['0.2e5/drained/outputs'] = outputs
         file['0.2e5/drained/contact_params'] = contact_params
 
         # group 1000000
         inputs, outputs, contact_params = create_dataset(num_samples=10, sequence_length=3,
-                                            num_load_features=2, num_labels=4, num_contact_params=5)
+                                            num_input_features=2, num_labels=4, num_params=5)
         file['1000000/undrained/inputs'] = inputs
         file['1000000/undrained/outputs'] = outputs
         file['1000000/undrained/contact_params'] = contact_params
 
         # group 2000000.6
         inputs, outputs, contact_params = create_dataset(num_samples=4, sequence_length=3,
-                                            num_load_features=2, num_labels=4, num_contact_params=5)
+                                            num_input_features=2, num_labels=4, num_params=5)
         file['2000000.6/undrained/inputs'] = inputs
         file['2000000.6/undrained/outputs'] = outputs
         file['2000000.6/undrained/contact_params'] = contact_params
@@ -42,15 +42,15 @@ def hdf5_test_file():
     return target
 
 
-def create_dataset(num_samples: int, sequence_length: int, num_load_features: int,
-                   num_labels: int, num_contact_params: int):
+def create_dataset(num_samples: int, sequence_length: int, num_input_features: int,
+                   num_labels: int, num_params: int):
     """
     Creates a dataset (numpy) with random numbers between 0-1, given the dimensions.
     We set the seed so that the creation of the dataset is deterministic.
     """
     np.random.seed(42)
-    inputs = np.random.rand(num_samples, sequence_length, num_load_features)
+    inputs = np.random.rand(num_samples, sequence_length, num_input_features)
     outputs = np.random.rand(num_samples, sequence_length, num_labels)
-    contact_params = np.random.rand(num_samples, num_contact_params)
+    contact_params = np.random.rand(num_samples, num_params)
 
     return inputs, outputs, contact_params

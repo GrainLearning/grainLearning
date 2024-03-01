@@ -9,8 +9,8 @@ from grainlearning.rnn import preprocessor
 @pytest.fixture(scope="session")
 def dummy_dataset():
     inputs, outputs, contact_params = create_dataset(num_samples = 100, sequence_length = 10,
-                              num_load_features = 4, num_labels = 3, num_contact_params = 5)
-    return ({'load_sequence': inputs, 'contact_parameters': contact_params}, outputs)
+                              num_input_features = 4, num_labels = 3, num_params = 5)
+    return ({'inputs': inputs, 'params': contact_params}, outputs)
 
 @pytest.fixture(scope="function")
 def default_config(hdf5_test_file):
@@ -37,9 +37,9 @@ def dummy_preprocessor(default_config):
 def test_make_splits(dummy_dataset, dummy_preprocessor):
     num_samples = 100
     sequence_length = 10
-    num_load_features = 4
+    num_input_features = 4
     num_labels = 3
-    num_contact_params = 5
+    num_params = 5
 
     train_frac_list = [0.5, 0.7, 0.1]
     val_frac_list = [0.25, 0.15, 0.5]
@@ -61,8 +61,8 @@ def test_make_splits(dummy_dataset, dummy_preprocessor):
 
         # Check that the other dimensions of the arrays are still correct
         for key, n_samples in zip(split_data.keys(), [n_train, n_val, n_test]):
-            assert split_data[key][0]['load_sequence'].shape == (n_samples, sequence_length, num_load_features)
-            assert split_data[key][0]['contact_parameters'].shape == (n_samples, num_contact_params)
+            assert split_data[key][0]['inputs'].shape == (n_samples, sequence_length, num_input_features)
+            assert split_data[key][0]['params'].shape == (n_samples, num_params)
             assert split_data[key][1].shape == (n_samples, sequence_length, num_labels)
 
     with pytest.raises(ValueError): # check that it is not possible to have a 0 length validation dataset
@@ -75,12 +75,12 @@ def test_get_dimensions(dummy_dataset, dummy_preprocessor):
     for data_i in split_data.values():
         dimensions = dummy_preprocessor.get_dimensions(data_i)
 
-        assert dimensions.keys() == {'sequence_length', 'num_load_features', 'num_contact_params', 'num_labels'}
+        assert dimensions.keys() == {'sequence_length', 'num_input_features', 'num_params', 'num_labels'}
 
         # from dimensions of dummy_dataset
         assert dimensions['sequence_length'] == 10
-        assert dimensions['num_load_features'] == 4
-        assert dimensions['num_contact_params'] == 5
+        assert dimensions['num_input_features'] == 4
+        assert dimensions['num_params'] == 5
         assert dimensions['num_labels'] == 3
 
 def test_merge_datasets(hdf5_test_file, default_config):
@@ -89,22 +89,22 @@ def test_merge_datasets(hdf5_test_file, default_config):
         config_TC = default_config.copy()
         preprocessor_TC_1 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
 
-        inputs, outputs, contact_parameters = preprocessor_TC_1._merge_datasets(datafile)
+        inputs, outputs, params = preprocessor_TC_1._merge_datasets(datafile)
         # check total (sum) num of samples, and that pressure and experiment type have been added to contact_params
         # Values to be modified if hdf5_test_file changes
         assert inputs.shape == (2 + 10 + 4, 3, 2) # num_samples, sequence_length, load_features
         assert outputs.shape == (2 + 10 + 4, 3, 4) # num_samples, sequence_length, num_labels
-        assert contact_parameters.shape == (2 + 10 + 4, 5 + 2) # num_samples, num_contact_params + 2 (pressure, experiment_type)
+        assert params.shape == (2 + 10 + 4, 5 + 2) # num_samples, num_params + 2 (pressure, experiment_type)
 
         # Case specific pressure and experiment
         config_TC["pressure"] = '0.2e5'
         config_TC["experiment_type"] = 'drained'
         preprocessor_TC_2 = preprocessor.PreprocessorTriaxialCompression(**config_TC)
 
-        inputs, outputs, contact_parameters = preprocessor_TC_2._merge_datasets(datafile)
+        inputs, outputs, params = preprocessor_TC_2._merge_datasets(datafile)
         assert inputs.shape == (2, 3, 2) # num_samples, sequence_length, load_features
         assert outputs.shape == (2, 3, 4) # num_samples, sequence_length, num_labels
-        assert contact_parameters.shape == (2, 5 + 2) # num_samples, num_contact_params + 2 (pressure, experiment_type)
+        assert params.shape == (2, 5 + 2) # num_samples, num_params + 2 (pressure, experiment_type)
 
 def test_prepare_datasets(default_config):
     config_TC = default_config.copy()
@@ -124,11 +124,11 @@ def test_prepare_datasets(default_config):
 
     # Test train_stats
     assert isinstance(train_stats, dict)
-    assert train_stats.keys() == {'mean', 'std', 'sequence_length', 'num_load_features',
-                                  'num_contact_params', 'num_labels'}
+    assert train_stats.keys() == {'mean', 'std', 'sequence_length', 'num_input_features',
+                                  'num_params', 'num_labels'}
     assert train_stats['sequence_length'] > 0
-    assert train_stats['num_load_features'] > 0
-    assert train_stats['num_contact_params'] > 0
+    assert train_stats['num_input_features'] > 0
+    assert train_stats['num_params'] > 0
     assert train_stats['num_labels'] > 0
 
     # Test length of contact parameters when adding e0, pressure, experiment type
@@ -157,9 +157,9 @@ def test_prepare_datasets(default_config):
     split_data_3, train_stats_3 = preprocessor_TC_3.prepare_datasets()
 
     # Comparison against train_stats: No additional contact parameters.
-    assert train_stats_1['num_contact_params'] == train_stats['num_contact_params'] + 1
-    assert train_stats_2['num_contact_params'] == train_stats['num_contact_params'] + 1
-    assert train_stats_3['num_contact_params'] == train_stats['num_contact_params'] + 1
+    assert train_stats_1['num_params'] == train_stats['num_params'] + 1
+    assert train_stats_2['num_params'] == train_stats['num_params'] + 1
+    assert train_stats_3['num_params'] == train_stats['num_params'] + 1
 
     # Test that standardize_outputs is applied correctly when standardize_outputs=False
     assert 'mean' not in train_stats_1
@@ -181,9 +181,9 @@ def test_prepare_datasets(default_config):
 def test_windowize_single_dataset(dummy_dataset, dummy_preprocessor):
     # dimensions with which dummy_dataset was generated.
     sequence_length = 10
-    num_load_features = 4
+    num_input_features = 4
     num_labels = 3
-    num_contact_params = 5
+    num_params = 5
 
     split_data = dummy_preprocessor.make_splits(dummy_dataset, train_frac=0.7, val_frac=0.15, seed=42)
     split_data = {key: tf.data.Dataset.from_tensor_slices(val) for key, val in split_data.items()}
@@ -202,9 +202,9 @@ def test_windowize_single_dataset(dummy_dataset, dummy_preprocessor):
         expected_num_indep_samples = 70 * int(((sequence_length - window_size)/window_step) + 1)
 
         assert len(dataset) == expected_num_indep_samples
-        assert len(inputs) == 2 # load_sequence and contact_params
-        assert inputs['load_sequence'].shape == (expected_num_indep_samples, window_size, num_load_features) # num_samples, window_size, num_load_features
-        assert inputs['contact_parameters'].shape == (expected_num_indep_samples, num_contact_params) # num_samples, window_size, num_contact_params
+        assert len(inputs) == 2 # inputs and contact_params
+        assert inputs['inputs'].shape == (expected_num_indep_samples, window_size, num_input_features) # num_samples, window_size, num_input_features
+        assert inputs['params'].shape == (expected_num_indep_samples, num_params) # num_samples, window_size, num_params
         assert outputs.shape == (expected_num_indep_samples, num_labels) # num_samples, num_labels
 
     with pytest.raises(ValueError): # expect "window_size bigger than sequence_length."
