@@ -68,4 +68,7 @@ For more details check [the iterative bayesian filter section of GrainLearning's
 
 The last author would like to thank the Netherlands eScience Center for the funding provided under grant number NLESC.OEC.2021.032.
 
+# Author contributions
+All authors have contributed substantially to the development of GrainLearning. H. Cheng was responsible for the main idea and is the main contributor. R. Lubbe and H. Cheng designed the code structure, including the inference and sampling modules and tutorials and examples to facilitate understanding. A. Jansen and L. Orozco contributed to the conceptualization, implementation, testing and documentation of the machine learning module, as well as the improvement of best software practices.
+
 # References
