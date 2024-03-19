@@ -53,13 +53,14 @@ GrainLearning combines probabilistic learning of parameter space and sampling to
 
 # Functionality
 
+GrainLearning's core functionality is illustrated in \autoref{fig:calibration_diagram}.
 GrainLearning started in the geotechnical engineering community and was primarily used for granular materials in quasi-static, laboratory conditions [@Cheng2018a; @Cheng2019]. These include triaxial [@Hartmann2022; @LI2024105957] and oedometric [@Cheng2019] compressions of soil samples.
 In the particle technology community, attempts with GrainLearning have been made to identify contact parameters for polymer and pharmaceutical powders against angle-of-repose [@essay91991], shear cell [@Thornton2023], and sintering experiments [@ALVAREZ2022117000]. Satisfactory results have been obtained in simulation cases where the grains were in dynamic regimes or treated under multi-physical processes.
 
 - **Calibration or parameter inference**: By means of Sequential Monte Carlo filtering GrainLearning can infer and update model parameters. By learning the underlying distribution using a variational Gaussian model, highly probable zones are identified and sampled iteratively until a tolerance for the overall uncertainty is reached. This process requires the input of: a time series reference data, the ranges of the parameters to infer and a tolerance. The software iteratively minimizes the discrepancy between the model solution and the reference data.
 
 ![Elements of the trade in the calibration process. 1. Draw initial values of the parameters to calibrate. 2. Run the dynamic system with the parameters. 3. With the reference data or observation, estimate the posterior distribution via the bayesian filtering. 4. Check convergence of the parameter inference, if the process has not converged: 5. Define a gaussian mixture from the examples of this iteration and sample the parameters for the next iteration. 6. Next iteration step.
-For more details check [the iterative bayesian filter section of GrainLearning's documentation].(https://grainlearning.readthedocs.io/en/latest/bayesian_filtering.html#iterative-bayesian-filter)
+For more details check [the iterative bayesian filter section of GrainLearning's documentation](https://grainlearning.readthedocs.io/en/latest/bayesian_filtering.html#iterative-bayesian-filter).
 \label{fig:calibration_diagram}](calibration_diagram.png)
 
 - **Surrogate modeling**: Besides using direct simulation results (e.g. DEM) GrainLearning offers the capability of building surrogates (e.g. recurrent neural networks) as an alternative to computationally expensive DEM simulations, effectively reducing the cost by several orders of magnitude.
