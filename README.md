@@ -42,7 +42,7 @@ Browse to the [GrainLearning documentation](https://grainlearning.readthedocs.io
 
 1. Clone the repository: `git clone https://github.com/GrainLearning/grainLearning.git`
 1. Go to the source code directory: `cd grainLearning`
-1. Activate the virtual environment: `conda create --name grainlearning python=3.8 && conda activate grainlearning`
+1. Activate the virtual environment: `conda create --name grainlearning python=3.11 && conda activate grainlearning`
 1. Install GrainLearning and its dependencies: `pip install .`
 
 __Developers__ please refer to [README.dev.md](README.dev.md).
