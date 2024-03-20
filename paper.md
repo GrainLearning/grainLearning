@@ -19,7 +19,6 @@ authors:
     affiliation: 2
   - name: Hongyang Cheng
     orcid: 0000-0001-7652-8600
-    equal-contrib: true
     affiliation: 2
 affiliations:
  - name: Netherlands eScience center, The Netherlands
