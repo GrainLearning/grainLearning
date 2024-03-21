@@ -1,8 +1,8 @@
 Installation
 ============
 
-GrainLearning can be installed with poetry and pip, on Windows, Mac, and Linux OS, with a Python version higher than 3.8.
-We have tested GrainLearning with Python versions 3.8, 3.9, and 3.10.
+GrainLearning can be installed with poetry and pip, on Windows, Mac, and Linux OS, with a Python version higher than 3.9.
+We have tested GrainLearning with Python versions 3.9, 3.10, and 3.11.
 
 Package management and dependencies
 -----------------------------------
@@ -29,6 +29,8 @@ First, install poetry following `these instructions <https://python-poetry.org/d
 
    # You are done. Try any examples in the ./tutorials directory
    poetry run python <example.py>
+
+.. note:: In windows systems, if you experience problems installing `tensorflow` using poetry, try using pip.
 
 Install using pip
 `````````````````
@@ -106,7 +108,7 @@ Online
 You can check the online documentation `here <https://grainlearning.readthedocs.io/en/latest/>`_.
 
 Build the documentation locally
-```````````````````````
+```````````````````````````````
 
 .. code-block:: bash
   
