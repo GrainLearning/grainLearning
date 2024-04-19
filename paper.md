@@ -20,11 +20,19 @@ authors:
   - name: Hongyang Cheng
     orcid: 0000-0001-7652-8600
     affiliation: 2
+  - name: Philipp Hartmann
+    orcid: 0000-0002-2524-8024
+    affiliation: 3
+  - name: Klaus Thoeni
+    orcid: 0000-0001-7351-7447
+    affiliation: 3
 affiliations:
  - name: Netherlands eScience center, The Netherlands
    index: 1
  - name: Soil Micro Mechanics (SMM), Faculty of Engineering Technology, MESA+, University of Twente, The Netherlands
    index: 2
+ - name: University of Newcastle, Callaghan, NSW, AU
+   index: 3
 date: 13 January 2024
 bibliography: paper.bib
 ---
