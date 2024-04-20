@@ -51,7 +51,7 @@ To install GrainLearning including the RNN module capabilities check [grainlearn
 
 ### For Windows users
 
-- Installation using Windows Subsystem for Linx (WSL)
+- Installation using Windows Subsystem for Linux (WSL)
   - Enable WSL1 or WSL2 according to the
     instructions [here](https://learn.microsoft.com/en-us/windows/wsl/install-manual)
   - Install GrainLearning using [poetry](#install-using-poetry) or [pip](#install-using-pip)
@@ -97,7 +97,7 @@ However, you still need to clone the GrainLearning repository to run the tutoria
 
 Please choose from the following:
 
-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123966.svg)](https://doi.org/10.5281/zenodo.7123966) A DOI for
+- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123965.svg)](https://doi.org/10.5281/zenodo.7123965) A DOI for
   citing the software
 - H. Cheng, T. Shuku, K. Thoeni, P. Tempone, S. Luding, V. Magnanimo. **An iterative Bayesian filtering framework for
   fast and automated calibration of DEM models**. _Comput. Methods Appl. Mech. Eng.,_ 350 (2019), pp.

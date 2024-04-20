@@ -39,7 +39,7 @@ authors:
     email: klaus.thoeni@newcastle.edu.au
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.7123966
+    value: 10.5281/zenodo.7123965
 repository-code: 'https://github.com/GrainLearning/grainLearning/'
 url: 'https://grainlearning.readthedocs.io/'
 abstract: >-
