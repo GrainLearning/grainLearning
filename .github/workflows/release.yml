@@ -67,7 +67,7 @@ jobs:
           - name: Checkout the contents of your repository
             uses: actions/checkout@v4
           - name: Create a draft snapshot of the repository contents as a new
-                  version in collection 7123966 on Zenodo using metadata
+                  version in concept 7123966 on Zenodo using metadata
                   from repository file .zenodo.json
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -75,7 +75,7 @@ jobs:
             uses: zenodraft/action@0.13.3
             with:
               compression: zip
-              collection: 7123966
+              concept: 7123966
               metadata: .zenodo.json
               publish: false
               upsert-doi: true
