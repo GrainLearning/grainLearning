@@ -8,18 +8,18 @@ tags:
   - Uncertainty Quantification
   - Multi-particle simulation
 authors:
+  - name: Hongyang Cheng
+    orcid: 0000-0001-7652-8600
+    affiliation: 2
   - name: Luisa Orozco
     orcid: 0000-0002-9153-650X
     corresponding: true # corresponding author
     affiliation: 1
+  - name: Retief Lubbe
+    affiliation: 2
   - name: Aron Jansen
     orcid: 0000-0002-4764-9347
     affiliation: 1
-  - name: Retief Lubbe
-    affiliation: 2
-  - name: Hongyang Cheng
-    orcid: 0000-0001-7652-8600
-    affiliation: 2
   - name: Philipp Hartmann
     orcid: 0000-0002-2524-8024
     affiliation: 3
