@@ -27,11 +27,11 @@ authors:
     orcid: 0000-0001-7351-7447
     affiliation: 3
 affiliations:
- - name: Netherlands eScience center, The Netherlands
+ - name: Netherlands eScience center, Amsterdam, The Netherlands
    index: 1
- - name: Soil Micro Mechanics (SMM), Faculty of Engineering Technology, MESA+, University of Twente, The Netherlands
+ - name: Soil Micro Mechanics (SMM), Faculty of Engineering Technology, MESA+, University of Twente, Enschede, The Netherlands
    index: 2
- - name: University of Newcastle, Callaghan, NSW, AU
+ - name: University of Newcastle, Callaghan, NSW, Australia
    index: 3
 date: 13 January 2024
 bibliography: paper.bib
@@ -66,8 +66,8 @@ In the particle technology community, attempts with GrainLearning have been made
 
 - **Calibration or parameter inference**: By means of Sequential Monte Carlo filtering GrainLearning can infer and update model parameters. By learning the underlying distribution using a variational Gaussian model, highly probable zones are identified and sampled iteratively until a tolerance for the overall uncertainty is reached. This process requires the input of: a time series reference data, the ranges of the parameters to infer and a tolerance. The software iteratively minimizes the discrepancy between the model solution and the reference data.
 
-![Elements of the trade in the calibration process. 1. Draw initial values of the parameters to calibrate. 2. Run the dynamic system with the parameters. 3. With the reference data or observation, estimate the posterior distribution via the bayesian filtering. 4. Check convergence of the parameter inference, if the process has not converged: 5. Define a gaussian mixture from the examples of this iteration and sample the parameters for the next iteration. 6. Next iteration step.
-For more details check [the iterative bayesian filter section of GrainLearning's documentation](https://grainlearning.readthedocs.io/en/latest/bayesian_filtering.html#iterative-bayesian-filter).
+![Elements of the trade in the calibration process. 1. Draw initial values of the parameters to calibrate. 2. Run the dynamic system with the parameters. 3. With the reference data or observation, estimate the posterior distribution via the Bayesian filtering. 4. Check convergence of the parameter inference, if the process has not converged: 5. Define a Gaussian mixture from the examples of this iteration and sample the parameters for the next iteration. 6. Next iteration step.
+For more details check [the iterative Bayesian filter section of GrainLearning's documentation](https://grainlearning.readthedocs.io/en/latest/bayesian_filtering.html#iterative-bayesian-filter).
 \label{fig:calibration_diagram}](calibration_diagram.png)
 
 - **Surrogate modeling**: Besides using direct simulation results (e.g. DEM) GrainLearning offers the capability of building surrogates (e.g. recurrent neural networks) as an alternative to computationally expensive DEM simulations, effectively reducing the cost by several orders of magnitude.
