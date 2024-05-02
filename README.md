@@ -9,6 +9,7 @@
 | howfairis                    | [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)|
 | Documentation                | [![Documentation Status](https://readthedocs.org/projects/grainlearning/badge/?version=latest)](https://grainlearning.readthedocs.io/en/latest/?badge=latest)|
 | Code Quality                | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=GrainLearning_grainLearning&metric=coverage)](https://sonarcloud.io/summary/new_code?id=GrainLearning_grainLearning) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GrainLearning_grainLearning&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=GrainLearning_grainLearning) |
+| Paper | [![DOI](https://joss.theoj.org/papers/10.21105/joss.06338/status.svg)](https://doi.org/10.21105/joss.06338) |
 
 Bayesian uncertainty quantification for discrete and continuum numerical models of granular materials,
 developed by various projects of the University of Twente (NL), the Netherlands eScience Center (NL), University of
@@ -98,15 +99,16 @@ However, you still need to clone the GrainLearning repository to run the tutoria
 Please choose from the following:
 
 - [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7123965.svg)](https://doi.org/10.5281/zenodo.7123965) A DOI for
-  citing the software
+  citing the software.
+- The software paper: Cheng et al., (2024). GrainLearning: **A Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials**. *Journal of Open Source Software*, 9(97), 6338, [10.21105/joss.06338](https://doi.org/10.21105/joss.06338)
 - H. Cheng, T. Shuku, K. Thoeni, P. Tempone, S. Luding, V. Magnanimo. **An iterative Bayesian filtering framework for
   fast and automated calibration of DEM models**. _Comput. Methods Appl. Mech. Eng.,_ 350 (2019), pp.
   268-294, [10.1016/j.cma.2019.01.027](https://doi.org/10.1016/j.cma.2019.01.027)
 
 ## Software using GrainLearning
 
-- YADE: http://yade-dem.org/
-- MercuryDPM: https://www.mercurydpm.org/
+- [YADE](http://yade-dem.org/)
+- [MercuryDPM](https://www.mercurydpm.org/)
 
 ## Community
 
