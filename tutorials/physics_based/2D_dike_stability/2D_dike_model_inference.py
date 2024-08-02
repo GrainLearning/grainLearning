@@ -9,7 +9,7 @@ import numpy as np
 
 from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
-from grainlearning.tools import plot_pdf
+from grainlearning.tools import plot_pdf, plot_param_data
 import matplotlib.pylab as plt
 
 from joblib import Parallel, delayed
@@ -31,6 +31,52 @@ def run_sim(calib):
     Parallel(n_jobs=num_cores)(
         delayed(dike)(params, system.sim_name, 'Iter' + str(system.curr_iter) + '_Sample' + str(i).zfill(mag)) for
         i, params in enumerate(system.param_data))
+    # plot the samples and the comparison between observation and prediction
+    if calib.curr_iter == 0:
+        return
+
+    # get the path to save the figures
+    path = f'{system.sim_data_dir}/iter{calib.curr_iter}' \
+        if isinstance(system, IODynamicSystem) \
+        else f'./{system.sim_name}/iter{calib.curr_iter}'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    fig_name = f'{path}/{system.sim_name}'
+
+    # get the id of sample that has the highest probability
+    most_prob_params_id = np.argmax(calib.calibration.posterior)
+    sim_data = system.sim_data[most_prob_params_id, :, :]
+    obs_data = system.obs_data
+
+    # compute the error norm
+    sim_data_norm = np.sqrt(sim_data[0::2] ** 2 + sim_data[1::2] ** 2)
+    obs_data_norm = np.sqrt(obs_data[0::2] ** 2 + obs_data[1::2] ** 2)
+    error_norm = sim_data_norm - obs_data_norm
+
+    # plot ground truth, inferred field, and error
+    lims_truth = dict(cmap='RdBu_r', vmin=obs_data_norm.min(), vmax=obs_data_norm.max())
+    lims_error = dict(cmap='RdBu_r', vmin=error_norm.min(), vmax=error_norm.max())
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(12, 4))
+    im0 = ax[0].scatter(coords[:, 0], coords[:, 1], 100, obs_data_norm, edgecolor='w', lw=0.1, **lims_truth)
+    im1 = ax[1].scatter(coords[:, 0], coords[:, 1], 100, sim_data_norm, edgecolor='w', lw=0.1, **lims_truth)
+    fig.colorbar(im1, ax=ax[1])
+    im2 = ax[2].scatter(coords[:, 0], coords[:, 1], 100, error_norm, edgecolor='w', lw=0.1, **lims_error)
+    fig.colorbar(im2, ax=ax[2])
+    for j in range(3):
+        ax[j].set_xlabel('x')
+        ax[j].set_ylabel('y')
+        ax[0].set_title('Ground truth')
+        ax[1].set_title('Inferred field')
+        ax[2].set_title('Error')
+
+    # plot resampling in parameter space
+    plot_param_data(
+        fig_name,
+        system.param_names,
+        calib.calibration.param_data_list,
+        save_fig=0
+    )
+    plt.show()
 
 
 def dike(params, sim_name, description):
@@ -63,6 +109,9 @@ with open(f'{sim_name}_{description}_sim.txt', 'r') as file:
     first_line = file.readline()
 ctrl_name = first_line.split()[1]
 obs_names = first_line.split()[2:]
+coords = np.load(f'{sim_name}_{description}_input_coords.npy')
+n_iter = int(coords.shape[0] / num_obs)
+coords = coords[np.arange(0, coords.shape[0], coords.shape[0] / num_obs, dtype=int)]
 
 param_names = ['E', 'phi', 'coh']
 num_samples = int(5 * len(param_names) * log(len(param_names)))
@@ -70,7 +119,7 @@ num_samples = int(5 * len(param_names) * log(len(param_names)))
 # %% Define the calibration
 calibration = BayesianCalibration.from_dict(
     {
-        "num_iter": 4,
+        "num_iter": 10,
         "callback": run_sim,
         "system": {
             "system_type": IODynamicSystem,
@@ -96,9 +145,9 @@ calibration = BayesianCalibration.from_dict(
                 "random_state": 0,
                 "slice_sampling": True,
             },
-            "initial_sampling": "halton",
+            "initial_sampling": "sobol",
         },
-        "save_fig": 0,
+        "save_fig": -1,
     }
 )
 

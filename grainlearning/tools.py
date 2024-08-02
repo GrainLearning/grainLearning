@@ -324,7 +324,7 @@ def stratified_resample(weights, expand_num=10):
 def systematic_resample(weights, expand_num=10):
     """ Performs the systemic resampling algorithm used by particle filters.
     This algorithm separates the sample space into N divisions. A single random
-    offset is used to to choose where to sample from for all divisions. This
+    offset is used to choose where to sample from for all divisions. This
     guarantees that every sample is exactly 1/N apart.
     Parameters
     ----------
