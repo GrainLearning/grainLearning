@@ -1521,16 +1521,15 @@ def single_run(ks_soil, phi_soil, coh_soil, L, free, pile, inter, phi_pile, phi_
     output_features = np.stack([displ_ad[:, 0], displ_ad[:, 1]], axis=1)
 
     # save input coordinates and input and output features into a npy file
-    np.save(f'{sim_name}_{description}_ml_input_coords.npy', input_coords)
-    np.save(f'{sim_name}_{description}_ml_input_feature.npy', input_features)
-    np.save(f'{sim_name}_{description}_ml_output_feature.npy', output_features)
+    np.save(f'{sim_name}_{description}_input_coords.npy', input_coords)
+    np.save(f'{sim_name}_{description}_input_feature.npy', input_features)
+    np.save(f'{sim_name}_{description}_output_feature.npy', output_features)
 
     # save simulation data and parameter data for the inference
     # uniformly pick 1000 points from the input coordinates
-    n_iter = int(input_coords.shape[0] / num_obs)
     data_file_name = f'{sim_name}_{description}_sim.txt'
     sim_data = {'t': [1]}
-    for i, _ in enumerate(input_coords[::n_iter, 0]):
+    for i in np.arange(0, input_coords.shape[0], input_coords.shape[0]/num_obs, dtype=int):
         sim_data[f'displ_x_{i}'] = [displ_ad[i, 0]]
         sim_data[f'displ_y_{i}'] = [displ_ad[i, 1]]
         # sim_data[f'pwp_x_{i}'] = [pwp_ad[i, 1]]

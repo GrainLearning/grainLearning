@@ -121,7 +121,7 @@ class BayesianCalibration:
             self.increase_curr_iter()
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.run_one_iteration()
-            if self.system.sigma_max < self.system.sigma_tol:
+            if abs(self.system.sigma_max - self.system.sigma_tol) / self.system.sigma_tol < 1e-2:
                 self.num_iter = self.curr_iter + 1
                 break
 
