@@ -6,6 +6,7 @@ from pickle import dump, load
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
+from scipy.optimize import minimize_scalar
 from grainlearning.dynamic_systems import DynamicSystem
 
 
@@ -219,17 +220,27 @@ class GaussianMixtureModel:
         :param system: Dynamic system class
         :return: Resampled parameter data
         """
+        # Train the model using the provided weight and parameters from the dynamic system
         self.train(weight, system)
 
+        # Minimum number of samples required
         minimum_num_samples = system.num_samples
 
-        new_params = self.draw_samples_within_bounds(system, system.num_samples)
+        def sample_count_obj(num_samples):
+            """Objective function to minimize the number of samples drawn."""
+            num_samples = int(np.ceil(num_samples))  # Ensure we have an integer number of samples
+            samples = self.draw_samples_within_bounds(system, num_samples)
+            valid_samples_count = samples.shape[0]
+            # Return the difference between required and obtained samples
+            return (minimum_num_samples - valid_samples_count) ** 2
 
-        # resample until all parameters are within the upper and lower bounds
-        test_num = system.num_samples
-        while system.param_min and system.param_max and new_params.shape[0] < minimum_num_samples:
-            test_num = int(np.ceil(1.01 * test_num))
-            new_params = self.draw_samples_within_bounds(system, test_num)
+        # Perform optimization to find the minimum number of samples needed
+        result = minimize_scalar(sample_count_obj, bounds=(system.num_samples_max, 100 * system.num_samples_max),
+                                 method='bounded')
+        system.num_samples_max = result.x
+
+        # Draw the required number of samples
+        new_params = self.draw_samples_within_bounds(system, int(np.ceil(result.x)))
 
         return new_params
 
@@ -323,12 +334,12 @@ def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method:
     sampler = Halton(system.num_params, scramble=False)
 
     if method == "sobol":
-        sampler = Sobol(system.num_params,seed=seed)
+        sampler = Sobol(system.num_params, seed=seed)
         random_base = round(np.log2(num_samples))
         num_samples = 2 ** random_base
 
     elif method == "LH":
-        sampler = LatinHypercube(system.num_params,seed=seed)
+        sampler = LatinHypercube(system.num_params, seed=seed)
 
     param_table = sampler.random(n=num_samples)
 

@@ -151,6 +151,8 @@ class DynamicSystem:
 
         self.num_samples = num_samples
 
+        self.num_samples_max = num_samples
+
         self.sim_name = sim_name
 
         self.sim_data = sim_data
