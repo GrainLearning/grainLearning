@@ -133,15 +133,14 @@ calibration = BayesianCalibration.from_dict(
             "sim_name": sim_name,
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
-            "sigma_tol": 0.01,
-            "sigma_min": 0.01,
+            "sigma_tol": 0.1,
+            "sigma_min": 0.1,
             "sigma_max": 10,
         },
         "calibration": {
             "inference": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
-                "n_init": 1,
                 "random_state": 0,
                 "slice_sampling": True,
             },

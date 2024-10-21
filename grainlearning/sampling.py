@@ -6,7 +6,7 @@ from pickle import dump, load
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
-from scipy.optimize import minimize_scalar
+from scipy.optimize import minimize_scalar, root_scalar
 from grainlearning.dynamic_systems import DynamicSystem
 
 
@@ -90,6 +90,9 @@ class GaussianMixtureModel:
         scores.mean() - deviation_factor * scores.std(), for slice sampling, defaults to 0.0, optional
     :param gmm: The class of the Gaussian Mixture Model
     :param max_params: Current maximum values of the parameters
+    :param min_params: Current minimum values of the parameters
+    :param expanded_normalized_params: Normalized parameters expanded from the importance weights
+    :param scores: Scores of the Gaussian Mixture Model
     """
 
     def __init__(
@@ -137,9 +140,13 @@ class GaussianMixtureModel:
 
         self.max_params = None
 
+        self.min_params = None
+
         self.expanded_normalized_params = None
 
         self.gmm = None
+
+        self.scores = None
 
     @classmethod
     def from_dict(cls: Type["GaussianMixtureModel"], obj: dict):
@@ -183,13 +190,14 @@ class GaussianMixtureModel:
         expanded_parameters = system.param_data[indices]
 
         max_params = np.amax(expanded_parameters, axis=0)  # find max along axis
+        min_params = np.amin(expanded_parameters, axis=0)  # find min along axis
 
-        normalized_parameters = (
-            expanded_parameters / max_params
-        )  # and do array broadcasting to divide by max
+        # Normalize the parameters from 0 to 1
+        normalized_parameters = (expanded_parameters - min_params) / (max_params - min_params)
 
         self.expanded_normalized_params = normalized_parameters
         self.max_params = max_params
+        self.min_params = min_params
 
     def train(self, weight: np.ndarray, system: Type["DynamicSystem"]):
         """Train the Gaussian mixture model.
@@ -213,6 +221,8 @@ class GaussianMixtureModel:
 
         self.gmm.fit(self.expanded_normalized_params)
 
+        self.scores = self.gmm.score_samples(self.expanded_normalized_params)
+
     def regenerate_params(self, weight: np.ndarray, system: Type["DynamicSystem"]):
         """Regenerating new samples by training and sampling from a Gaussian mixture model.
 
@@ -232,15 +242,15 @@ class GaussianMixtureModel:
             samples = self.draw_samples_within_bounds(system, num_samples)
             valid_samples_count = samples.shape[0]
             # Return the difference between required and obtained samples
-            return (minimum_num_samples - valid_samples_count) ** 2
+            return valid_samples_count - minimum_num_samples
 
         # Perform optimization to find the minimum number of samples needed
-        result = minimize_scalar(sample_count_obj, bounds=(system.num_samples_max, 100 * system.num_samples_max),
-                                 method='bounded')
-        system.num_samples_max = result.x
+        result = root_scalar(sample_count_obj, x0=system.num_samples_max, x1=100 * system.num_samples_max,
+                             method='secant')
+        system.num_samples_max = int(np.ceil(result.root))
 
         # Draw the required number of samples
-        new_params = self.draw_samples_within_bounds(system, int(np.ceil(result.x)))
+        new_params = self.draw_samples_within_bounds(system, int(np.ceil(result.root)))
 
         return new_params
 
@@ -257,15 +267,14 @@ class GaussianMixtureModel:
         # use the slice sampling scheme for resampling
         else:
             # compute the minimum of score_samples as the threshold for slice sampling
-            new_params = generate_params_qmc(system, num)
-            new_params /= self.max_params
-
-            scores = self.gmm.score_samples(self.expanded_normalized_params)
+            new_params = self.scale_qmc_to_gmm_range(generate_qmc(system, num))
             new_params = new_params[np.where(
-                self.gmm.score_samples(new_params) > scores.mean() - self.deviation_factor * scores.std())]
+                self.gmm.score_samples(new_params) >= self.scores.mean() - self.deviation_factor * self.scores.std())]
 
-        new_params *= self.max_params
+        # Un-normalize the parameters
+        new_params = new_params * (self.max_params - self.min_params) + self.min_params
 
+        # Ensure the parameters are within the user-defined bounds
         if system.param_min and system.param_max:
             params_above_min = new_params > np.array(system.param_min)
             params_below_max = new_params < np.array(system.param_max)
@@ -277,33 +286,17 @@ class GaussianMixtureModel:
         else:
             return new_params
 
-    # def regenerate_params_with_gmm(
-    #     self, posterior_weight: np.ndarray, system: Type["DynamicSystem"]
-    # ) -> np.ndarray:
-    #     """Regenerate the parameters by fitting the Gaussian Mixture model (for testing against the old approach)
-    #
-    #     :param posterior_weight: Posterior found by the data assimilation
-    #     :param system: Dynamic system class
-    #     :return: Expanded parameters
-    #     """
-    #
-    #     new_params, self.gmm = regenerate_params_with_gmm(
-    #         posterior_weight,
-    #         system.param_data,
-    #         system.num_samples,
-    #         self.max_num_components,
-    #         self.weight_concentration_prior,
-    #         self.covariance_type,
-    #         unweighted_resample,
-    #         system.param_min,
-    #         system.param_max,
-    #         self.n_init,
-    #         self.tol,
-    #         self.max_iter,
-    #         self.random_state,
-    #     )
-    #
-    #     return new_params
+    def scale_qmc_to_gmm_range(self, qmc_samples: np.ndarray):
+        """Scale the quasi-random number samples to the range of data generated by the sampleGaussian Mixture Model."""
+
+        # Generate trial samples to estimate the maximum and minimum samples generated by gmm
+        samples, _ = self.gmm.sample(100 * self.expanded_normalized_params.shape[0])
+        max_gmm_samples = np.amax(samples, axis=0)  # find max along axis
+        min_gmm_samples = np.amin(samples, axis=0)  # find min along axis
+
+        # Scale the quasi-random number samples to the range of data generated by the sampleGaussian Mixture Model
+        qmc_samples = qmc_samples * (max_gmm_samples - min_gmm_samples) + min_gmm_samples
+        return qmc_samples
 
     def save_gmm_to_file(self, proposal_data_file: str = "proposal_density.pkl"):
         """Save the Gaussian mixture model to a file."""
@@ -319,7 +312,7 @@ class GaussianMixtureModel:
             self.max_params, self.gmm = load(f)
 
 
-def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method: str = "halton", seed=None):
+def generate_qmc(system: Type["DynamicSystem"], num_samples: int, method: str = "halton", seed=None):
     """This is the class to uniformly draw samples in n-dimensional space from
     a low-discrepancy sequence or a Latin hypercube.
 
@@ -335,13 +328,29 @@ def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method:
 
     if method == "sobol":
         sampler = Sobol(system.num_params, seed=seed)
-        random_base = round(np.log2(num_samples))
+        random_base = int(np.ceil(np.log2(num_samples)))
         num_samples = 2 ** random_base
 
     elif method == "LH":
         sampler = LatinHypercube(system.num_params, seed=seed)
 
     param_table = sampler.random(n=num_samples)
+    return np.array(param_table, ndmin=2)
+
+
+def generate_params_qmc(system: Type["DynamicSystem"], num_samples: int, method: str = "halton", seed=None):
+    """This is the class to uniformly draw samples in n-dimensional space from
+    a low-discrepancy sequence or a Latin hypercube.
+
+    See `Quasi-Monte Carlo <https://docs.scipy.org/doc/scipy/reference/stats.qmc.html>`_.
+
+    :param system: Dynamic system class
+    :param num_samples: Number of samples to draw
+    :param method: Method to use for Quasi-Monte Carlo sampling. Options are "halton", "sobol", and "LH"
+    :param seed: Seed for the random number generator
+    """
+
+    param_table = generate_qmc(system, num_samples, method, seed)
 
     for param_i in range(system.num_params):
         for sim_i in range(num_samples):
