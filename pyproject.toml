@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "GrainLearning"
-version = "2.0.1"
+version = "2.0.3"
 description = "A Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials"
 authors = [
     "Hongyang Cheng <h.cheng@utwente.nl>",

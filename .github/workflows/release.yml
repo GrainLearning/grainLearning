@@ -8,12 +8,13 @@ on:
       
 jobs:
   build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: '3.10'
           
       - uses: actions/cache@v3
         with:
@@ -64,17 +65,17 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Checkout the contents of your repository
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
           - name: Create a draft snapshot of the repository contents as a new
-                  version in collection 7123966 on Zenodo using metadata
+                  version in concept 7123966 on Zenodo using metadata
                   from repository file .zenodo.json
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_TOKEN }}
-            uses: zenodraft/action@0.10.0
+            uses: zenodraft/action@0.13.3
             with:
               compression: zip
-              collection: 7123966
+              concept: 7123966
               metadata: .zenodo.json
               publish: false
               upsert-doi: true
