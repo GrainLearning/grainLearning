@@ -2,7 +2,7 @@ Installation
 ============
 
 GrainLearning can be installed with poetry and pip, on Windows, Mac, and Linux OS, with a Python version higher than 3.9.
-We have tested GrainLearning with Python versions 3.9, 3.10, and 3.11.
+We have tested GrainLearning with Python versions 3.9, 3.10, 3.11, and 3.12
 
 Package management and dependencies
 -----------------------------------
