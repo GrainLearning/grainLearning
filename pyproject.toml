@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "GrainLearning"
-version = "2.0.3"
+version = "2.0.4"
 description = "A Bayesian uncertainty quantification toolbox for discrete and continuum numerical models of granular materials"
 authors = [
     "Hongyang Cheng <h.cheng@utwente.nl>",
@@ -17,7 +17,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.14"
+python = ">=3.9,<3.14"
 numpy = "^1.23.2"
 scipy = "^1.9.1"
 scikit-learn = "^1.1.3"

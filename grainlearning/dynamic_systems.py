@@ -596,6 +596,7 @@ class IODynamicSystem(DynamicSystem):
                     self.param_data[i, :] = params
             else:
                 raise RuntimeError(f'No data found for iteration {self.curr_iter}')
+        self.num_samples_max = self.num_samples
 
     def set_up_sim_dir(self):
         """
