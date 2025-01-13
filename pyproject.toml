@@ -20,9 +20,9 @@ packages = [
 python = ">=3.9,<3.14"
 numpy = "^1.23.2"
 scipy = "^1.9.1"
-scikit-learn = "^1.1.3"
+scikit-learn = "^1.6.0"
 matplotlib = "^3.6.0"
-seaborn = '^0.12.2'
+seaborn = '^0.13.2'
 
 Sphinx = {version = "^5.1.1", optional = true}
 sphinx-autodoc-typehints = {version = "^1.19.2", optional = true}

@@ -169,20 +169,21 @@ def test_run_inference():
 
 
 def test_save_and_load_proposal():
+    from scipy.stats import multivariate_normal
     """Test if the proposal density can be loaded from a file"""
     #: Initialize a system object (note the observed data is not used in this test)
     system_cls = IODynamicSystem(sim_name='test_ibf', sim_data_dir=PATH + '/sim_data/', sim_data_file_ext='.txt',
                                  obs_data_file=os.path.abspath(
                                      os.path.join(__file__, "../..")) + '/data/linear_sim_data/linear_obs.dat',
-                                 obs_names=['f'], ctrl_name='u', num_samples=10, param_min=[1e6, 0.2],
-                                 param_max=[1e7, 0.5], obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]], ctrl_data=[1, 2, 3, 4],
+                                 obs_names=['f'], ctrl_name='u', num_samples=1000, param_min=[6, 0.2],
+                                 param_max=[7, 0.5], obs_data=[[12, 3, 4, 4], [12, 4, 5, 4]], ctrl_data=[1, 2, 3, 4],
                                  param_names=['a', 'b'])
 
     #: Assert that the inference runs correctly if a proposal density is provided
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.5},
-            "sampling": {"max_num_components": 1, "expand_factor": 10},
+            "inference": {"ess_target": 1.0},
+            "sampling": {"max_num_components": 1, "expand_factor": 100},
             "initial_sampling": "halton",
             "proposal_data_file": "test_proposal.pkl"
         }
@@ -192,8 +193,28 @@ def test_save_and_load_proposal():
     ibf_cls.initialize(system=system_cls)
 
     #: Set a dummy proposal density
-    dummy_proposal = np.ones(system_cls.num_samples) / system_cls.num_samples
+    mean = np.mean(system_cls.param_data, axis=0)
+    cov = np.array([[1, 0], [0, 1]]) * mean
+    rv = multivariate_normal(mean, cov, allow_singular=True)
+    dummy_proposal = rv.pdf(system_cls.param_data)
+    dummy_proposal /= np.sum(dummy_proposal)
+
+    #: Train the proposal density
     ibf_cls.sampling.train(dummy_proposal, system_cls)
+
+    #: Correct the scores
+    covs_ref = dummy_proposal.dot((system_cls.param_data - dummy_proposal.dot(system_cls.param_data))**2)
+    ibf_cls.sampling.scores = ibf_cls.sampling.correct_scores(covs_ref, system_cls, tol=1e-6)
+    
+    #: Assert that empirical covariance and the covariance esimated by GMM are the same for one Gaussian component
+    empirical_cov = np.cov(ibf_cls.sampling.expanded_normalized_params.T)
+    gmm_cov = ibf_cls.sampling.gmm.covariances_
+    np.testing.assert_array_almost_equal(empirical_cov, gmm_cov, 0.0001)
+
+    #: Assert if the dummy proposal density is the same as the one trained
+    trained_proposal = np.exp(ibf_cls.sampling.scores)
+    trained_proposal /= trained_proposal.sum()
+    np.testing.assert_allclose(trained_proposal, dummy_proposal, 0.01)
 
     #: Save the Gaussian Mixture Model to a file
     sim_data_sub_dir = f'{system_cls.sim_data_dir}/iter{-1}'
@@ -205,7 +226,7 @@ def test_save_and_load_proposal():
     ibf_cls.load_proposal_from_file(system_cls)
 
     #: Check if the loaded proposal density is the same as the original one
-    np.testing.assert_allclose(ibf_cls.proposal, dummy_proposal, 0.18)
+    np.testing.assert_allclose(ibf_cls.proposal, dummy_proposal, 0.01)
 
     #: Delete the temporary file and directory
     rmtree(PATH + '/sim_data/')
