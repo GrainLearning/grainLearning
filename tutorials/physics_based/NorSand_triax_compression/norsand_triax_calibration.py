@@ -159,7 +159,7 @@ calibration = BayesianCalibration.from_dict(
                 "random_state": 0,
                 "slice_sampling": False,
             },
-            "initial_sampling": "sobol",
+            "initial_sampling": "LH",
         },
         "save_fig": 0,
     }

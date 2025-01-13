@@ -138,7 +138,7 @@ def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras
         split_data[split] = split_data[split].batch(config['batch_size'])
 
     # set up training
-    if config['save_weights_only']: path_save_data = path_save_data / "weights.h5"
+    if config['save_weights_only']: path_save_data = path_save_data / "model.weights.h5"
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         patience=config['patience'],

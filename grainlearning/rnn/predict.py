@@ -150,9 +150,9 @@ def load_model(path_to_model: Path, train_stats: dict, config: dict):
 
     elif os.path.exists(path_to_model / 'saved_model.pb'): # Model has been saved directly using tf.keras
         model = tf.keras.models.load_model(path_to_model)
-    elif os.path.exists(path_to_model / 'weights.h5'): # Model's weights have been saved directly using tf.keras
+    elif os.path.exists(path_to_model / 'model.weights.h5'): # Model's weights have been saved directly using tf.keras
         model = rnn_model(train_stats, **config)
-        model.load_weights(path_to_model / 'weights.h5')
+        model.load_weights(path_to_model / 'model.weights.h5')
     else: raise FileNotFoundError("Could not find a model to load")
 
     return model

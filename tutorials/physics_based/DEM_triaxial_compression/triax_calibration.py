@@ -40,7 +40,7 @@ calibration = BayesianCalibration.from_dict(
             "sigma_tol": 0.01,
         },
         "calibration": {
-            "inference": {"ess_target": 0.3},
+            "inference": {"ess_target": 0.3, "scale_cov_with_max": True},
             "sampling": {
                 "max_num_components": 2,
                 "n_init": 1,

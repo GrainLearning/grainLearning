@@ -204,7 +204,7 @@ class GaussianMixtureModel:
         :return: Normalized parameters
         """
         return (params - self.min_params) / (self.max_params - self.min_params)
-    
+
     def train(self, weight: np.ndarray, system: Type["DynamicSystem"]):
         """Train the Gaussian mixture model.
 
@@ -237,7 +237,7 @@ class GaussianMixtureModel:
         """Correct the covariance (preceision) matrices and the scores of the Gaussian Mixture Model.
 
         :param covs_ref: Reference covariance from the current ensemble
-        :param samples: Samples to estimat the covariance        
+        :param system: Dynamic system class that contains the parameter samples
         :param tol: Tolerance threshold on the difference between the sample covariance and the covariance estimated by GMM , defaults to 0.1, optional
         """
         # raise an error is the GMM is not initialized or not converged
