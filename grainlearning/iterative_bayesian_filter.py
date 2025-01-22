@@ -145,7 +145,7 @@ class IterativeBayesianFilter:
             args=(system, self.proposal),
             method="bounded",
             # tol=self.ess_tol,
-            bounds=(system.sigma_min, system.sigma_max),
+            bounds=(system.sigma_lower_bound, system.sigma_max),
         )
         system.sigma_max = result.x
 
@@ -204,15 +204,15 @@ class IterativeBayesianFilter:
         self.sampling.load_gmm_from_file(f'{system.sim_data_dir}/iter{system.curr_iter-1}/{self.proposal_data_file}')
 
         samples = np.copy(system.param_data)
-        
+
         # normalize the parameter samples
         samples_normalized = self.sampling.normalize(samples)
 
         self.proposal = np.exp(self.sampling.gmm.score_samples(samples_normalized))
-        
+
         self.proposal /= self.proposal.sum()
 
-        ## turn off the proposal density to probability mass correction because quai-random sampling is used by default
+        ## turn off the proposal density to probability mass correction because quasi-random sampling is used by default
         # proposal *= voronoi_vols(samples)
 
         # # assign the maximum vol to open regions (use a uniform proposal distribution if Voronoi fails)

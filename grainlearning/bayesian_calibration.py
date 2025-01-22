@@ -76,6 +76,8 @@ class BayesianCalibration:
     :param calibration: An iterative Bayesian Filter that iteratively sample the parameter space
     :param num_iter: Number of iteration steps
     :param curr_iter: Current iteration step
+    :param error_tol: Tolerance to check the sample with the smallest mean absolute percentage error
+    :param gl_error_tol: Tolerance to check the GrainLearning ensemble percentage error
     :param save_fig: Flag for skipping (-1), showing (0), or saving (1) the figures
     :param callback: A callback function that runs the external software and passes the parameter sample to generate outputs
     """
@@ -85,6 +87,8 @@ class BayesianCalibration:
         calibration: Type["IterativeBayesianFilter"],
         num_iter: int = 1,
         curr_iter: int = 0,
+        error_tol: float = None,
+        gl_error_tol: float = None,
         save_fig: int = -1,
         callback: Callable = None,
     ):
@@ -100,9 +104,17 @@ class BayesianCalibration:
 
         self.curr_iter = curr_iter
 
+        self.error_tol = error_tol
+
+        self.gl_error_tol = gl_error_tol
+
         self.calibration = calibration
 
         self.callback = callback
+
+        self.error_arrays = None
+
+        self.gl_errors = []
 
     def run(self):
         """ This is the main calibration loop which does the following steps
@@ -112,18 +124,23 @@ class BayesianCalibration:
         # Move existing simulation data to the backup folder
         self.system.backup_sim_data()
 
-        print(f"Bayesian calibration iter No. {self.curr_iter}")
-        # First iteration
-        self.run_one_iteration()
-
         # Bayesian calibration continue until curr_iter = num_iter or sigma_max < tolerance
-        for _ in range(self.num_iter - 1):
-            self.increase_curr_iter()
+        for _ in range(self.num_iter):
             print(f"Bayesian calibration iter No. {self.curr_iter}")
-            self.run_one_iteration()
-            if abs(self.system.sigma_max - self.system.sigma_tol) / self.system.sigma_tol < 1e-2:
-                self.num_iter = self.curr_iter + 1
+            stopping_criteria_met = self.run_one_iteration()
+            if stopping_criteria_met:
                 break
+
+        # Print the errors after all iterations are done
+        if not stopping_criteria_met:
+            error_most_probable = min(self.error_arrays)
+            gl_error = self.gl_errors[-1]
+            print(f"\n"
+                    f"Stopping criteria met: \n"
+                    f"sigma = {self.system.sigma_max},\n"
+                    f"Smallest mean absolute percentage error = {error_most_probable: .3e},\n"
+                    f"GrainLearning ensemble percentage error = {gl_error: .3e}\n\n"
+                    f"Ending Bayesian calibration.")
 
     def run_one_iteration(self, index: int = -1):
         """Run Bayesian calibration for one iteration.
@@ -149,6 +166,31 @@ class BayesianCalibration:
 
         # Generate some plots
         self.plot_uq_in_time()
+
+        self.compute_errors()
+
+        # Defining stopping criterion
+        error_most_probable = min(self.error_arrays)
+        gl_error = self.gl_errors[-1]
+
+        # If any stopping condition is met
+        # Check stopping criteria
+        normalized_sigma_met = self.system.sigma_max < self.system.sigma_tol
+        most_probable_error_met = error_most_probable < self.error_tol if self.error_tol is not None else False
+        ensemble_error_met = gl_error < self.gl_error_tol if self.gl_error_tol is not None else False
+
+        if normalized_sigma_met or most_probable_error_met or ensemble_error_met:
+            print(f"\n"
+                    f"Stopping criteria met: \n"
+                    f"sigma = {self.system.sigma_max},\n"
+                    f"Smallest mean absolute percentage error = {error_most_probable: .3e},\n"
+                    f"GrainLearning ensemble percentage error = {gl_error: .3e}\n\n"
+                    f"Ending Bayesian calibration.")
+            self.num_iter = self.curr_iter + 1
+            return True
+        else:
+            self.increase_curr_iter()
+            return False
 
     def run_callback(self):
         """
@@ -282,6 +324,13 @@ class BayesianCalibration:
 
         close_plots(self.save_fig)
 
+    def get_most_prob_params_id(self):
+        """Return the most probable set of parameters
+
+        :return: Estimated parameter values
+        """
+        return argmax(self.calibration.posterior)
+
     def get_most_prob_params(self):
         """Return the most probable set of parameters
 
@@ -295,6 +344,34 @@ class BayesianCalibration:
         """
         self.system.curr_iter += 1
         self.curr_iter += 1
+
+
+    def compute_errors(self):
+        """Compute the mean absolute percentage error per sample and the ensemble error
+        """
+        from sklearn.metrics import mean_absolute_error
+        import numpy as np
+
+        # compute mean absolute percentage error
+        sim_data = self.system.sim_data
+        num_samples = self.system.num_samples
+
+        # compute GrainLearning errors
+        self.error_arrays = np.zeros(num_samples)
+        # loop over all samples to compute sample percentage errors
+        # if observation data is a time series
+        if self.system.num_steps == 1:
+            obs_maxs = np.max(self.system.obs_data)
+            obs_mins = np.min(self.system.obs_data)
+        else:
+            obs_maxs = np.max(self.system.obs_data, axis=1)
+            obs_mins = np.min(self.system.obs_data, axis=1)
+        obs_range = obs_maxs - obs_mins
+        for i in range(num_samples):
+            self.error_arrays[i] = mean_absolute_error(self.system.obs_data.T/obs_range, sim_data[i, :, :].T/obs_range)
+
+        # compute the ensemble error
+        self.gl_errors.append(np.dot(self.error_arrays, self.calibration.posterior))
 
     @classmethod
     def from_dict(
@@ -324,6 +401,8 @@ class BayesianCalibration:
             calibration=calibration,
             num_iter=obj["num_iter"],
             curr_iter=obj.get("curr_iter", 0),
+            error_tol=obj.get("error_tol", None),
+            gl_error_tol=obj.get("gl_error_tol", None),
             save_fig=obj.get("save_fig", -1),
             callback=obj.get("callback", None)
         )

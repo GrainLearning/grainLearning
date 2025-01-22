@@ -134,7 +134,7 @@ num_samples = int(5 * len(param_names) * log(len(param_names)))
 
 calibration = BayesianCalibration.from_dict(
     {
-        "num_iter": 8,
+        "num_iter": 10,
         "callback": run_sim,
         "system": {
             "param_min": [0.7, 0.01, 1.2, 0.2, 25, 2, 100, 0.1],

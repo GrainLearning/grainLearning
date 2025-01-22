@@ -133,8 +133,7 @@ calibration = BayesianCalibration.from_dict(
             "sim_name": sim_name,
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
-            "sigma_tol": 0.1,
-            "sigma_min": 0.1,
+            "sigma_tol": 0.01,
             "sigma_max": 10,
         },
         "calibration": {

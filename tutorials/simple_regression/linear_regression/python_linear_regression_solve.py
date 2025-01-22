@@ -28,6 +28,8 @@ def linear(x, params):
 calibration = BayesianCalibration.from_dict(
     {
         "num_iter": 10,
+#        "error_tol": 0.01,
+#        "gl_error_tol": 0.01,
         "callback": run_sim,
         "system": {
             "param_min": [0.001, 0.001],
