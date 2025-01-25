@@ -4,9 +4,10 @@ This module contains various methods to sample the state-parameter space of a dy
 from typing import Type
 from pickle import dump, load
 import numpy as np
+import warnings
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
-from scipy.optimize import minimize_scalar, root_scalar
+from scipy.optimize import root_scalar
 from grainlearning.dynamic_systems import DynamicSystem
 
 
@@ -292,8 +293,17 @@ class GaussianMixtureModel:
             return valid_samples_count - minimum_num_samples
 
         # Perform optimization to find the minimum number of samples needed
-        result = root_scalar(sample_count_obj, x0=system.num_samples_max, x1=100*system.num_samples_max,
-                             method='secant')
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            result = root_scalar(
+                sample_count_obj,
+                x0=system.num_samples_max,
+                x1=100*system.num_samples_max,
+                method='secant',
+                rtol=1e-3,
+                maxiter=int(1e5)
+            )
+
         system.num_samples_max = int(np.ceil(result.root))
 
         # Draw the required number of samples

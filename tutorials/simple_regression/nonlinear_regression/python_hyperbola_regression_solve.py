@@ -57,8 +57,8 @@ calibration = BayesianCalibration.from_dict(
             "sim_name": 'nonlinear',
             "sigma_tol": 0.01,
         },
-        "calibration": {
-            "inference": {
+        "inference": {
+            "Bayes_filter": {
                 "ess_target": 0.3,
                 "scale_cov_with_max": True,
             },

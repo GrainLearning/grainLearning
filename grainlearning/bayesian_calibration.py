@@ -50,8 +50,8 @@ class BayesianCalibration:
                     "obs_data": [2,4,8,16],
                     "ctrl_data": [1,2,3,4],
                 },
-                "calibration": {
-                    "inference": {"ess_target": 0.3},
+                "inference": {
+                    "Bayes_filter": {"ess_target": 0.3},
                     "sampling": {"max_num_components": 1},
                 },
                 "save_fig": -1,
@@ -68,12 +68,12 @@ class BayesianCalibration:
         bayesian_calibration = BayesianCalibration(
             num_iter = 8,
             system = DynamicSystem(...),
-            calibration = IterativeBayesianFilter(...)
+            inference = IterativeBayesianFilter(...)
             save_fig = -1
         )
 
     :param system: A `dynamic system <https://en.wikipedia.org/wiki/Particle_filter#Approximate_Bayesian_computation_models>`_ whose observables and hidden states evolve dynamically over "time"
-    :param calibration: An iterative Bayesian Filter that iteratively sample the parameter space
+    :param inference: An inference method to determine unknown parameters in state-parameter space. Currently, only the iterative Bayesian Filter is available.
     :param num_iter: Number of iteration steps
     :param curr_iter: Current iteration step
     :param error_tol: Tolerance to check the sample with the smallest mean absolute percentage error
@@ -84,7 +84,7 @@ class BayesianCalibration:
     def __init__(
         self,
         system: Type["DynamicSystem"],
-        calibration: Type["IterativeBayesianFilter"],
+        inference: Type["IterativeBayesianFilter"],
         num_iter: int = 1,
         curr_iter: int = 0,
         error_tol: float = None,
@@ -108,11 +108,11 @@ class BayesianCalibration:
 
         self.gl_error_tol = gl_error_tol
 
-        self.calibration = calibration
+        self.inference = inference
 
         self.callback = callback
 
-        self.error_arrays = None
+        self.error_array = None
 
         self.gl_errors = []
 
@@ -133,10 +133,10 @@ class BayesianCalibration:
 
         # Print the errors after all iterations are done
         if not stopping_criteria_met:
-            error_most_probable = min(self.error_arrays)
+            error_most_probable = min(self.error_array)
             gl_error = self.gl_errors[-1]
             print(f"\n"
-                    f"Stopping criteria met: \n"
+                    f"Stopping criteria NOT met: \n"
                     f"sigma = {self.system.sigma_max},\n"
                     f"Smallest mean absolute percentage error = {error_most_probable: .3e},\n"
                     f"GrainLearning ensemble percentage error = {gl_error: .3e}\n\n"
@@ -149,9 +149,9 @@ class BayesianCalibration:
         """
         # Initialize the samples if it is the first iteration
         if self.curr_iter == 0:
-            self.calibration.initialize(self.system)
+            self.inference.initialize(self.system)
         # Fetch the parameter values from a stored list
-        self.system.param_data = self.calibration.param_data_list[index]
+        self.system.param_data = self.inference.param_data_list[index]
         self.system.num_samples = self.system.param_data.shape[0]
 
         # Run the model realizations
@@ -161,8 +161,8 @@ class BayesianCalibration:
         self.load_system()
 
         # Estimate model parameters as a distribution
-        self.calibration.solve(self.system)
-        self.calibration.sigma_list.append(self.system.sigma_max)
+        self.inference.solve(self.system)
+        self.inference.sigma_list.append(self.system.sigma_max)
 
         # Generate some plots
         self.plot_uq_in_time()
@@ -170,7 +170,7 @@ class BayesianCalibration:
         self.compute_errors()
 
         # Defining stopping criterion
-        error_most_probable = min(self.error_arrays)
+        error_most_probable = min(self.error_array)
         gl_error = self.gl_errors[-1]
 
         # If any stopping condition is met
@@ -224,10 +224,10 @@ class BayesianCalibration:
            unlike being assumed as an input for `load_and_process(...)`
         """
         self.load_system()
-        self.calibration.add_curr_param_data_to_list(self.system.param_data)
-        self.calibration.solve(self.system)
+        self.inference.add_curr_param_data_to_list(self.system.param_data)
+        self.inference.solve(self.system)
         self.system.write_params_to_table()
-        self.calibration.sigma_list.append(self.system.sigma_max)
+        self.inference.sigma_list.append(self.system.sigma_max)
         self.plot_uq_in_time()
 
     def load_and_process(self, sigma: float = 0.1):
@@ -236,23 +236,23 @@ class BayesianCalibration:
         :param sigma: assumed uncertainty coefficient, defaults to 0.1
         """
         self.load_system()
-        self.calibration.add_curr_param_data_to_list(self.system.param_data)
-        self.calibration.load_proposal_from_file(self.system)
-        self.calibration.inference.data_assimilation_loop(sigma, self.system)
-        self.system.compute_estimated_params(self.calibration.inference.posteriors)
+        self.inference.add_curr_param_data_to_list(self.system.param_data)
+        self.inference.load_proposal_from_file(self.system)
+        self.inference.Bayes_filter.data_assimilation_loop(sigma, self.system)
+        self.system.compute_estimated_params(self.inference.Bayes_filter.posteriors)
 
     def load_all(self):
         """Simply load all previous iterations of Bayesian calibration
         """
         self.load_system()
-        self.calibration.add_curr_param_data_to_list(self.system.param_data)
+        self.inference.add_curr_param_data_to_list(self.system.param_data)
         self.increase_curr_iter()
         while self.curr_iter < self.num_iter:
             print(f"Bayesian calibration iter No. {self.curr_iter}")
             self.load_system()
-            self.calibration.add_curr_param_data_to_list(self.system.param_data)
-            self.calibration.run_inference(self.system)
-            self.calibration.sigma_list.append(self.system.sigma_max)
+            self.inference.add_curr_param_data_to_list(self.system.param_data)
+            self.inference.run_inference(self.system)
+            self.inference.sigma_list.append(self.system.sigma_max)
             self.plot_uq_in_time()
             self.increase_curr_iter()
 
@@ -262,9 +262,9 @@ class BayesianCalibration:
 
         :return: Combinations of resampled parameter values
         """
-        self.calibration.posterior = self.calibration.inference.get_posterior_at_time()
-        self.calibration.run_sampling(self.system, )
-        resampled_param_data = self.calibration.param_data_list[-1]
+        self.inference.posterior = self.inference.Bayes_filter.get_posterior_at_time()
+        self.inference.run_sampling(self.system, )
+        resampled_param_data = self.inference.param_data_list[-1]
         self.system.write_params_to_table()
         return resampled_param_data
 
@@ -293,14 +293,14 @@ class BayesianCalibration:
             fig_name,
             self.system.param_names,
             self.system.param_data,
-            self.calibration.inference.posteriors,
+            self.inference.Bayes_filter.posteriors,
             self.save_fig
         )
 
         plot_param_data(
             fig_name,
             self.system.param_names,
-            self.calibration.param_data_list,
+            self.inference.param_data_list,
             self.save_fig
         )
 
@@ -311,14 +311,14 @@ class BayesianCalibration:
             self.system.ctrl_data,
             self.system.obs_data,
             self.system.sim_data,
-            self.calibration.inference.posteriors,
+            self.inference.Bayes_filter.posteriors,
             self.save_fig
         )
 
         plot_pdf(
             fig_name,
             self.system.param_names,
-            self.calibration.param_data_list,
+            self.inference.param_data_list,
             self.save_fig,
         )
 
@@ -329,14 +329,14 @@ class BayesianCalibration:
 
         :return: Estimated parameter values
         """
-        return argmax(self.calibration.posterior)
+        return argmax(self.inference.posterior)
 
     def get_most_prob_params(self):
         """Return the most probable set of parameters
 
         :return: Estimated parameter values
         """
-        most_prob = argmax(self.calibration.posterior)
+        most_prob = argmax(self.inference.posterior)
         return self.system.param_data[most_prob]
 
     def increase_curr_iter(self):
@@ -357,7 +357,7 @@ class BayesianCalibration:
         num_samples = self.system.num_samples
 
         # compute GrainLearning errors
-        self.error_arrays = np.zeros(num_samples)
+        self.error_array = np.zeros(num_samples)
         # loop over all samples to compute sample percentage errors
         # if observation data is a time series
         if self.system.num_steps == 1:
@@ -368,10 +368,10 @@ class BayesianCalibration:
             obs_mins = np.min(self.system.obs_data, axis=1)
         obs_range = obs_maxs - obs_mins
         for i in range(num_samples):
-            self.error_arrays[i] = mean_absolute_error(self.system.obs_data.T/obs_range, sim_data[i, :, :].T/obs_range)
+            self.error_array[i] = mean_absolute_error(self.system.obs_data.T/obs_range, sim_data[i, :, :].T/obs_range)
 
         # compute the ensemble error
-        self.gl_errors.append(np.dot(self.error_arrays, self.calibration.posterior))
+        self.gl_errors.append(np.dot(self.error_array, self.inference.posterior))
 
     @classmethod
     def from_dict(
@@ -393,12 +393,12 @@ class BayesianCalibration:
         # Create a system object
         system = system_type.from_dict(obj["system"])
 
-        # Create a calibration object
-        calibration = IterativeBayesianFilter.from_dict(obj["calibration"])
+        # Create a inference object
+        inference = IterativeBayesianFilter.from_dict(obj["inference"])
 
         return cls(
             system=system,
-            calibration=calibration,
+            inference=inference,
             num_iter=obj["num_iter"],
             curr_iter=obj.get("curr_iter", 0),
             error_tol=obj.get("error_tol", None),

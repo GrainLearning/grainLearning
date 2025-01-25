@@ -73,8 +73,8 @@ Check out the documentation of :class:`.BayesianCalibration` for more details.
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
             },
-          "calibration": {
-              "inference": {"ess_target": 0.3},
+          "inference": {
+              "Bayes_filter": {"ess_target": 0.3},
               "sampling": {
                   "max_num_components": 1,
                 }
@@ -169,8 +169,8 @@ Now let us define the calibration tool. Note that the system type is changed :cl
                 "sim_data_dir": './sim_data/',
                 "sim_data_file_ext": '.txt',
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "random_state": 0,
@@ -249,8 +249,8 @@ Open a Python console in the same directory where you executed the previous tuto
                 "sim_data_file_ext": sim_data_file_ext,
                 "param_names": ['a', 'b'],
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                 },
@@ -305,8 +305,8 @@ and then create a new `calibration` object using :class:`.DynamicSystem`.
                 "sim_name": 'linear',
                 "sim_data": sim_data,
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                 },
@@ -333,8 +333,8 @@ This can be done by setting :attr:`.GaussianMixtureModel.random_state` to a cons
 .. code-block:: python
 
     # create a calibration tool
-    "calibration": {
-        "inference": {"ess_target": 0.3},
+    "inference": {
+        "Bayes_filter": {"ess_target": 0.3},
         "sampling": {
             "max_num_components": 1,
             "random_state": 0,

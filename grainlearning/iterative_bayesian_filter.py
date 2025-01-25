@@ -45,7 +45,7 @@ class IterativeBayesianFilter:
 
         ibf_cls = IterativeBayesianFilter.from_dict(
             {
-                "inference":{
+                "Bayes_filter":{
                     "ess_target": 0.3,
                     "scale_cov_with_max": True
                 },
@@ -63,11 +63,11 @@ class IterativeBayesianFilter:
     .. code-block:: python
 
         system_cls = IterativeBayesianFilter(
-                inference = SMC(...),
+                Bayes_filter = SMC(...),
                 sampling = GaussianMixtureModel(...)
         )
 
-    :param inference: Sequential Monte Carlo class (SMC)
+    :param Bayes_filter: A Bayesian filtering algorithm. Currently, only the sequential Monte Carlo class (SMC) is available
     :param sampling: Gaussian Mixture Model class (GMM)
     :param initial_sampling: The initial sampling method, defaults to Halton
     :param ess_tol: Tolerance for the target effective sample size to converge, defaults to 1.0e-2
@@ -80,7 +80,7 @@ class IterativeBayesianFilter:
 
     def __init__(
         self,
-        inference: Type["SMC"] = None,
+        Bayes_filter: Type["SMC"] = None,
         sampling: Type["GaussianMixtureModel"] = None,
         ess_tol: float = 1.0e-2,
         initial_sampling: str = 'halton',
@@ -89,7 +89,7 @@ class IterativeBayesianFilter:
     ):
         """Initialize the Iterative Bayesian Filter."""
 
-        self.inference = inference
+        self.Bayes_filter = Bayes_filter
 
         self.initial_sampling = initial_sampling
 
@@ -115,7 +115,7 @@ class IterativeBayesianFilter:
         :return: an iBF object
         """
         return cls(
-            inference=SMC.from_dict(obj["inference"]),
+            Bayes_filter=SMC.from_dict(obj["Bayes_filter"]),
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
             ess_tol=obj.get("ess_tol", 1.0e-2),
             initial_sampling=obj.get("initial_sampling", "halton"),
@@ -141,7 +141,7 @@ class IterativeBayesianFilter:
             self.load_proposal_from_file(system)
 
         result = optimize.minimize_scalar(
-            self.inference.data_assimilation_loop,
+            self.Bayes_filter.data_assimilation_loop,
             args=(system, self.proposal),
             method="bounded",
             # tol=self.ess_tol,
@@ -151,15 +151,15 @@ class IterativeBayesianFilter:
 
         # use the optimized sigma value to compute the posterior distribution
         if system.sigma_max > system.sigma_tol:
-            self.inference.data_assimilation_loop(system.sigma_max, system, self.proposal)
+            self.Bayes_filter.data_assimilation_loop(system.sigma_max, system, self.proposal)
         else:
-            self.inference.data_assimilation_loop(system.sigma_tol, system, self.proposal)
+            self.Bayes_filter.data_assimilation_loop(system.sigma_tol, system, self.proposal)
 
         # get the posterior distribution at the last time step
-        self.posterior = self.inference.get_posterior_at_time(-1)
+        self.posterior = self.Bayes_filter.get_posterior_at_time(-1)
 
         # compute the estimated means and coefficient of variation from the posterior distribution
-        system.compute_estimated_params(self.inference.posteriors)
+        system.compute_estimated_params(self.Bayes_filter.posteriors)
 
     def run_sampling(self, system: Type["DynamicSystem"]):
         """Generate new samples from a proposal density.

@@ -26,8 +26,8 @@ def test_gmm():
                 "sim_data_dir": sim_data_dir,
                 "param_names": ['a', 'b'],
             },
-            "calibration": {
-                "inference": {
+            "inference": {
+                "Bayes_filter": {
                     "ess_target": 0.3,
                     "scale_cov_with_max": True},
                 "sampling": {
@@ -49,11 +49,11 @@ def test_gmm():
     # reproduce the result with a given sigma value
     calibration.load_and_process(sigma_ref)
     resampled_param_data = calibration.resample()
-    posterior = calibration.calibration.inference.posteriors
+    posterior = calibration.inference.Bayes_filter.posteriors
 
     # %%
     # check (co)variance and posterior distribution
-    cov_matrices = calibration.calibration.inference.get_covariance_matrices(sigma_ref, calibration.system)
+    cov_matrices = calibration.inference.Bayes_filter.get_covariance_matrices(sigma_ref, calibration.system)
     np.testing.assert_allclose(cov_matrix_ref, cov_matrices[-1], err_msg="The (co)variances do not match.")
     np.testing.assert_allclose(posterior, posterior_ref, err_msg="The posterior distributions do not match.")
 

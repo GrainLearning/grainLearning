@@ -49,8 +49,8 @@ def test_lenreg_IO():
                 "sim_data_file_ext": '.txt',
                 "sigma_tol": 0.01,
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 2,
                     "n_init": 1,

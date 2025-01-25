@@ -32,8 +32,8 @@ def test_lenreg():
                 "ctrl_data": x_obs,
                 "sim_name": 'linear',
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "n_init": 1,
@@ -57,7 +57,7 @@ def test_lenreg():
     # print(calibration.sigma_list)
 
     # %%
-    most_prob = np.argmax(calibration.calibration.posterior)
+    most_prob = np.argmax(calibration.inference.posterior)
 
     # %%
     most_prob_params = calibration.system.param_data[most_prob]
@@ -73,7 +73,7 @@ def test_lenreg():
         f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
 
     # 2. Checking sigma
-    assert calibration.calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
+    assert calibration.inference.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
 
     # %% Test other stopping criteria
     calibration = BayesianCalibration.from_dict(
@@ -90,8 +90,8 @@ def test_lenreg():
                 "ctrl_data": x_obs,
                 "sim_name": 'linear',
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "n_init": 1,
@@ -120,8 +120,8 @@ def test_lenreg():
                 "ctrl_data": x_obs,
                 "sim_name": 'linear',
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "n_init": 1,
