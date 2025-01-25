@@ -228,7 +228,7 @@ class GaussianMixtureModel:
 
         self.gmm.fit(self.expanded_normalized_params)
 
-        self.scores = self.gmm.score_samples(np.unique(self.expanded_normalized_params, axis=1))
+        self.scores = self.gmm.score_samples(np.unique(self.expanded_normalized_params, axis=0))
         # FIXME: Gaussian mixture model introduces bias leading to covariances resulting from the trained probability density not matching the sample covariances
         # means_ref = weight.dot(system.param_data)
         # covs_ref = weight.dot((system.param_data - means_ref)**2)

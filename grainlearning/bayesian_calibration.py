@@ -268,8 +268,10 @@ class BayesianCalibration:
         self.system.write_params_to_table()
         return resampled_param_data
 
-    def plot_uq_in_time(self):
+    def plot_uq_in_time(self, verbose: bool = False):
         """Plot the evolution of uncertainty moments and distribution over time
+        
+        param verbose: plot also the detailed statistics, defaults to False
         """
         if self.save_fig < 0:
             return
@@ -282,27 +284,29 @@ class BayesianCalibration:
             os.makedirs(path)
 
         fig_name = f'{path}/{self.system.sim_name}'
-        plot_param_stats(
-            fig_name, self.system.param_names,
-            self.system.estimated_params,
-            self.system.estimated_params_cv,
-            self.save_fig
-        )
+        
+        if verbose:
+            plot_param_stats(
+                fig_name, self.system.param_names,
+                self.system.estimated_params,
+                self.system.estimated_params_cv,
+                self.save_fig
+            )
 
-        plot_posterior(
-            fig_name,
-            self.system.param_names,
-            self.system.param_data,
-            self.inference.Bayes_filter.posteriors,
-            self.save_fig
-        )
+            plot_posterior(
+                fig_name,
+                self.system.param_names,
+                self.system.param_data,
+                self.inference.Bayes_filter.posteriors,
+                self.save_fig
+            )
 
-        plot_param_data(
-            fig_name,
-            self.system.param_names,
-            self.inference.param_data_list,
-            self.save_fig
-        )
+            plot_param_data(
+                fig_name,
+                self.system.param_names,
+                self.inference.param_data_list,
+                self.save_fig
+            )
 
         plot_obs_and_sim(
             fig_name,

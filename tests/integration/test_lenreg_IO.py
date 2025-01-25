@@ -58,11 +58,15 @@ def test_lenreg_IO():
                     "covariance_type": "full",
                 }
             },
-            "save_fig": 1,
+            "save_fig": -1,
         }
     )
 
     calibration.run()
+    
+    calibration.save_fig = 1
+    
+    calibration.plot_uq_in_time(verbose=True)
 
     most_prob_params = calibration.get_most_prob_params()
     print(f'Most probable parameter values: {most_prob_params}')
@@ -77,18 +81,19 @@ def test_lenreg_IO():
         error[
             1]) / 5.0 < error_tolerance, f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
     #: Check if the figures are saved
+    sub_dir = f'/sim_data/iter{calibration.curr_iter}/'
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_param_means.png'), "Figure is not saved"
+        PATH + sub_dir + '/linear_param_means.png'), "Figure is not saved"
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_param_covs.png'), "Figure is not saved"
+        PATH + sub_dir + '/linear_param_covs.png'), "Figure is not saved"
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_posterior_a.png'), "Figure is not saved"
+        PATH + sub_dir + '/linear_posterior_a.png'), "Figure is not saved"
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_posterior_b.png'), "Figure is not saved"
+        PATH + sub_dir + '/linear_posterior_b.png'), "Figure is not saved"
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_param_space.png'), "Figure is not saved"
+        PATH + sub_dir + '/linear_param_space.png'), "Figure is not saved"
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_obs_and_sim.png'), "Figure is not saved"
+        PATH + sub_dir + '/linear_obs_and_sim.png'), "Figure is not saved"
 
     # Remove the generated files
     rmtree(PATH + '/sim_data/')
