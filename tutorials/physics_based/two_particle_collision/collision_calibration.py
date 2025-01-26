@@ -8,10 +8,10 @@ from grainlearning import BayesianCalibration
 from grainlearning.dynamic_systems import IODynamicSystem
 
 PATH = os.path.abspath(os.path.dirname(__file__))
-executable = 'yade-batch'
+executable = 'yadedaily-batch'
 yade_script = f'{PATH}/Collision.py'
 
-
+# define the callback function which GrainLearning uses to run YADE simulations
 def run_sim(calib):
     """
     Run the external executable and passes the parameter sample to generate the output file.
@@ -19,16 +19,24 @@ def run_sim(calib):
     print("*** Running external software YADE ... ***\n")
     os.system(' '.join([executable, calib.system.param_data_file, yade_script]))
 
+param_names = ['E_m', 'nu']
+num_samples = int(5 * len(param_names) * log(len(param_names)))
 
+# define the Bayesian Calibration object
 calibration = BayesianCalibration.from_dict(
     {
-        "num_iter": 4,
+        # maximum number of GL iterations
+        "num_iter": 5,
+        # error tolerance to stop the calibration
+        "error_tol": 0.1,
+        # call back function to run YADE 
         "callback": run_sim,
+        # DEM model as a dynamic system
         "system": {
             "system_type": IODynamicSystem,
             "param_min": [7, 0.0],
             "param_max": [11, 0.5],
-            "param_names": ['E_m', 'nu'],
+            "param_names": param_names,
             "num_samples": 10,
             "obs_data_file": PATH + '/collision_obs.dat',
             "obs_names": ['f'],
@@ -39,15 +47,25 @@ calibration = BayesianCalibration.from_dict(
             "sigma_tol": 0.01,
         },
         "inference": {
-            "Bayes_filter": {"ess_target": 0.3},
+            "Bayes_filter": {
+                # scale the covariance matrix with the maximum observation data or not
+                "scale_cov_with_max": False,
+            },
             "sampling": {
-                "max_num_components": 2,
-                "n_init": 1,
+                # maximum number of distribution components
+                "max_num_components": 1,
+                # fix the seed for reproducibility
                 "random_state": 0,
+                # type of covariance matrix
                 "covariance_type": "full",
+                # use slice sampling (set to False if faster convergence is designed. However, the results could be biased)
+                "slice_sampling": True,
             }
         },
+        # flag to save the figures (-1: no, 0: yes but only show the figures , 1: yes)
         "save_fig": 0,
+        # number of threads to be used by the external software
+        "threads": 16,
     }
 )
 

@@ -295,8 +295,11 @@ class DynamicSystem:
         """Virtual function to load simulation data"""
 
     @classmethod
-    def write_params_to_table(cls: Type["DynamicSystem"]):
-        """Write the parameter data into a text file"""
+    def write_params_to_table(cls: Type["DynamicSystem"], threads: int):
+        """Write the parameter data into a text file
+        
+        :param threads: Number of threads to use
+        """
 
     @classmethod
     def backup_sim_data(cls: Type["DynamicSystem"]):
@@ -598,7 +601,7 @@ class IODynamicSystem(DynamicSystem):
                 raise RuntimeError(f'No data found for iteration {self.curr_iter}')
         self.num_samples_max = self.num_samples
 
-    def set_up_sim_dir(self):
+    def set_up_sim_dir(self, threads: int):
         """
         Create a directory to store simulation data and write the parameter data into a text file
         """
@@ -609,7 +612,7 @@ class IODynamicSystem(DynamicSystem):
         os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
-        self.write_params_to_table()
+        self.write_params_to_table(threads)
 
     def move_data_to_sim_dir(self):
         """
@@ -624,7 +627,7 @@ class IODynamicSystem(DynamicSystem):
         # redefine the parameter data file since its location is changed
         self.param_data_file = f'{self.sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
 
-    def write_params_to_table(self):
+    def write_params_to_table(self, threads: int):
         """Write the parameter data into a text file.
 
         :return param_data_file: The name of the parameter data file
@@ -633,7 +636,9 @@ class IODynamicSystem(DynamicSystem):
             self.sim_name,
             self.param_data,
             self.param_names,
-            self.curr_iter)
+            self.curr_iter,
+            threads=threads,
+        )
 
     def backup_sim_data(self):
         """Backup simulation data files to a backup directory."""

@@ -49,7 +49,7 @@ class SMC:
     """
     def __init__(
         self,
-        ess_target: float,
+        ess_target: float = 0.3,
         scale_cov_with_max: bool = False,
         cov_matrices: np.array = None,
     ):
@@ -74,7 +74,7 @@ class SMC:
         :return: an SMC object
         """
         return cls(
-            ess_target=obj["ess_target"],
+            ess_target=obj.get("ess_target", 0.3),
             scale_cov_with_max=obj.get("scale_cov_with_max", False),
             cov_matrices=obj.get("cov_matrices", None),
         )

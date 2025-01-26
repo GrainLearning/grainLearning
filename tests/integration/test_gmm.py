@@ -59,7 +59,7 @@ def test_gmm():
 
     # %%
     # write new parameter table to the simulation directory
-    calibration.system.write_params_to_table()
+    calibration.system.write_params_to_table(calibration.threads)
 
     # %%
     check_list = np.isclose(resampled_param_data_ref, resampled_param_data)

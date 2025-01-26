@@ -90,6 +90,7 @@ class BayesianCalibration:
         error_tol: float = None,
         gl_error_tol: float = None,
         save_fig: int = -1,
+        threads: int = 4,
         callback: Callable = None,
     ):
         """Initialize the Bayesian calibration class"""
@@ -97,6 +98,8 @@ class BayesianCalibration:
         self.num_iter = num_iter
 
         self.save_fig = save_fig
+
+        self.threads = threads
 
         self.system = system
 
@@ -199,7 +202,7 @@ class BayesianCalibration:
 
         if self.callback is not None:
             if isinstance(self.system, IODynamicSystem):
-                self.system.set_up_sim_dir()
+                self.system.set_up_sim_dir(self.threads)
                 self.callback(self)
                 self.system.move_data_to_sim_dir()
             else:
@@ -226,7 +229,7 @@ class BayesianCalibration:
         self.load_system()
         self.inference.add_curr_param_data_to_list(self.system.param_data)
         self.inference.solve(self.system)
-        self.system.write_params_to_table()
+        self.system.write_params_to_table(self.threads)
         self.inference.sigma_list.append(self.system.sigma_max)
         self.plot_uq_in_time()
 
@@ -265,7 +268,7 @@ class BayesianCalibration:
         self.inference.posterior = self.inference.Bayes_filter.get_posterior_at_time()
         self.inference.run_sampling(self.system, )
         resampled_param_data = self.inference.param_data_list[-1]
-        self.system.write_params_to_table()
+        self.system.write_params_to_table(self.threads)
         return resampled_param_data
 
     def plot_uq_in_time(self, verbose: bool = False):
@@ -408,5 +411,6 @@ class BayesianCalibration:
             error_tol=obj.get("error_tol", None),
             gl_error_tol=obj.get("gl_error_tol", None),
             save_fig=obj.get("save_fig", -1),
+            threads=obj.get("threads", 4),
             callback=obj.get("callback", None)
         )

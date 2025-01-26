@@ -98,7 +98,7 @@ class GaussianMixtureModel:
 
     def __init__(
         self,
-        max_num_components = 0,
+        max_num_components: int = 1,
         weight_concentration_prior: float = 0.0,
         covariance_type: str = "tied",
         n_init: int = 1,
@@ -157,7 +157,7 @@ class GaussianMixtureModel:
         :return: a GMM object
         """
         return cls(
-            max_num_components=obj["max_num_components"],
+            max_num_components=obj.get("max_num_components", 1),
             weight_concentration_prior=obj.get("weight_concentration_prior", None),
             covariance_type=obj.get("covariance_type", "tied"),
             n_init=obj.get("n_init", 10),

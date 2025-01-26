@@ -95,7 +95,7 @@ O.engines = [
 # set initial timestep
 O.dt = table.safe * PWaveTimeStep()
 # move particle 1
-O.bodies[1].state.vel = Vector3(0, 0, -0.01)
+O.bodies[1].state.vel = Vector3(0, 0, -1)
 
 # run DEM simulation
 O.run()
