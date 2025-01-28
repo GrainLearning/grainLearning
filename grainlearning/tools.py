@@ -411,8 +411,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.xlabel("'Time' step")
         plt.ylabel(f'Mean of {param_names[i]}')
         plt.grid(True)
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_param_means.png')
 
@@ -423,8 +421,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.xlabel("'Time' step")
         plt.ylabel(f'Coefficient of variation of {param_names[i]}')
         plt.grid(True)
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_param_covs.png')
 
@@ -453,8 +449,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
             plt.xlabel(r'$' + name + '$')
             plt.ylabel('Posterior probability mass')
             plt.grid(True)
-        mng = plt.get_current_fig_manager()
-        mng.full_screen_toggle()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
 
@@ -476,8 +470,6 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
             plt.xlabel(r'$' + param_names[j] + '$')
             plt.ylabel(r'$' + param_names[j + 1] + '$')
             plt.legend()
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_param_space.png')
 
@@ -530,8 +522,6 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
             plt.legend()
         plt.grid(True)
 
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_obs_and_sim.png')
 
