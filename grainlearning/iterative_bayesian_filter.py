@@ -62,7 +62,7 @@ class IterativeBayesianFilter:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = IterativeBayesianFilter(
+        ibf_cls = IterativeBayesianFilter(
                 Bayes_filter = SMC(...),
                 sampling = GaussianMixtureModel(...)
         )

@@ -18,7 +18,10 @@ readParamsFromTable(
 
 # import modules
 import numpy as np
+
 from yade.params import table
+from yade import plot
+
 from grainlearning.tools import write_dict_to_file
 
 # check if run in batch mode
@@ -42,8 +45,7 @@ def add_sim_data():
     u = inter.geom.penetrationDepth
     # check current penetration depth against the target value
     if u > obs_ctrl_data[-1]:
-        sim_data['u'].append(u)
-        sim_data['f'].append(inter.phys.normalForce.norm())
+        plot.addData(u=u, f=inter.phys.normalForce.norm())
         obs_ctrl_data.pop()
     if not obs_ctrl_data:
         data_file_name = f'{description}_sim.txt'
@@ -53,7 +55,7 @@ def add_sim_data():
         for name in table.__all__:
             param_data[name] = eval('table.' + name)
         # write simulation data into a text file
-        write_dict_to_file(sim_data, data_file_name)
+        write_dict_to_file(plot.data, data_file_name)
         write_dict_to_file(param_data, data_param_name)
         O.pause()
 
@@ -66,9 +68,7 @@ obs_ctrl_data = np.loadtxt(obs_file)[:, 0].tolist()
 obs_ctrl_data.reverse()
 
 # create dictionary to store simulation data
-sim_data = {}
-sim_data['u'] = []
-sim_data['f'] = []
+plot.plots={'u':'f'}
 
 # create materials
 O.materials.append(

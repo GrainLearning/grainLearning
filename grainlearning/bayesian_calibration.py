@@ -20,14 +20,13 @@ class BayesianCalibration:
 
     2. The inference method, for example, :class:`.IterativeBayesianFilter`,
 
-    3. The number of iterations
+    3. The number of iterations,
 
-    4. The current iteration number if the user simply wants to process their data with GrainLearning for one iteration
-    # or continue from that iteration (TODO)
+    4. The current iteration number if the user simply wants to process their data with GrainLearning for one iteration,
 
-    # 5. A tolerance to stop the iterations if the maximum uncertainty is below the tolerance
-
-    5. and the flag for skipping (-1), showing (0), or saving (1) the figures.
+    5. the flag for skipping (-1), showing (0), or saving (1) the figures,
+    
+    6. and the tolerances for stopping the calibration based on the mean absolute percentage error and the ensemble percentage error.
 
     There are two ways of initializing a calibration toolbox class.
 
@@ -175,6 +174,10 @@ class BayesianCalibration:
         # Defining stopping criterion
         error_most_probable = min(self.error_array)
         gl_error = self.gl_errors[-1]
+        print(f"\n"
+                f"sigma = {self.system.sigma_max},\n"
+                f"Smallest mean absolute percentage error = {error_most_probable: .3e},\n"
+                f"GrainLearning ensemble percentage error = {gl_error: .3e}\n")
 
         # If any stopping condition is met
         # Check stopping criteria
@@ -183,12 +186,7 @@ class BayesianCalibration:
         ensemble_error_met = gl_error < self.gl_error_tol if self.gl_error_tol is not None else False
 
         if normalized_sigma_met or most_probable_error_met or ensemble_error_met:
-            print(f"\n"
-                    f"Stopping criteria met: \n"
-                    f"sigma = {self.system.sigma_max},\n"
-                    f"Smallest mean absolute percentage error = {error_most_probable: .3e},\n"
-                    f"GrainLearning ensemble percentage error = {gl_error: .3e}\n\n"
-                    f"Ending Bayesian calibration.")
+            print(f"\nStopping criteria are met. Ending Bayesian calibration!\n")
             self.num_iter = self.curr_iter + 1
             return True
         else:

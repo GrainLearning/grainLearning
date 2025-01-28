@@ -4,11 +4,10 @@
 """
 import os
 from math import floor, log
-from grainlearning import BayesianCalibration
-from grainlearning.dynamic_systems import IODynamicSystem
+from grainlearning import BayesianCalibration, IODynamicSystem, IterativeBayesianFilter, SMC, GaussianMixtureModel
 
 PATH = os.path.abspath(os.path.dirname(__file__))
-executable = 'yadedaily-batch'
+executable = 'yade-batch'
 yade_script = f'{PATH}/Collision.py'
 
 # define the callback function which GrainLearning uses to run YADE simulations
@@ -20,7 +19,7 @@ def run_sim(calib):
     os.system(' '.join([executable, calib.system.param_data_file, yade_script]))
 
 param_names = ['E_m', 'nu']
-num_samples = int(5 * len(param_names) * log(len(param_names)))
+num_samples = int(6 * len(param_names) * log(len(param_names)))
 
 # define the Bayesian Calibration object
 calibration = BayesianCalibration.from_dict(
@@ -37,19 +36,18 @@ calibration = BayesianCalibration.from_dict(
             "param_min": [7, 0.0],
             "param_max": [11, 0.5],
             "param_names": param_names,
-            "num_samples": 10,
+            "num_samples": num_samples,
             "obs_data_file": PATH + '/collision_obs.dat',
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'collision',
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
-            "sigma_tol": 0.01,
         },
         "inference": {
             "Bayes_filter": {
                 # scale the covariance matrix with the maximum observation data or not
-                "scale_cov_with_max": False,
+                "scale_cov_with_max": True,
             },
             "sampling": {
                 # maximum number of distribution components
@@ -64,10 +62,41 @@ calibration = BayesianCalibration.from_dict(
         },
         # flag to save the figures (-1: no, 0: yes but only show the figures , 1: yes)
         "save_fig": 0,
-        # number of threads to be used by the external software
-        "threads": 16,
+        # number of threads to be used per simulation
+        "threads": 1,
     }
 )
+
+# calibration = BayesianCalibration(
+#     num_iter=5,
+#     error_tol=0.1,
+#     callback=run_sim,
+#     save_fig=0,
+#     threads=1,
+#     system=IODynamicSystem(
+#         param_min=[7, 0.0],
+#         param_max=[11, 0.5],
+#         param_names=param_names,
+#         num_samples=num_samples,
+#         obs_data_file=PATH + '/collision_obs.dat',
+#         obs_names=['f'],
+#         ctrl_name='u',
+#         sim_name='collision',
+#         sim_data_dir=PATH + '/sim_data/',
+#         sim_data_file_ext='.txt',
+#     ),
+#     inference=IterativeBayesianFilter(
+#         SMC(
+#             scale_cov_with_max=True,
+#         ),
+#         GaussianMixtureModel(
+#             max_num_components=1,
+#             random_state=0,
+#             covariance_type="full",
+#             slice_sampling=True,
+#         ),
+#     ),    
+# )
 
 calibration.run()
 
