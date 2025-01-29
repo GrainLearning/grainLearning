@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install poetry
-          poetry lock --no-update
+          poetry lock
           poetry install -E dev -E rnn
       - name: Check style against standards using prospector
         run: poetry run prospector
