@@ -60,7 +60,7 @@ def add_sim_data():
         O.pause()
 
 
-obs_file = "collision_obs.dat"
+obs_file = "collision_obs.txt"
 # get data for simulation control
 obs_ctrl_data = np.loadtxt(obs_file)[:, 0].tolist()
 

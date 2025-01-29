@@ -5,6 +5,7 @@
 import os
 from math import floor, log
 from grainlearning import BayesianCalibration, IODynamicSystem, IterativeBayesianFilter, SMC, GaussianMixtureModel
+# from grainlearning.tools import run_yade_from_shell
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 executable = 'yade-batch'
@@ -16,6 +17,9 @@ def run_sim(calib):
     Run the external executable and passes the parameter sample to generate the output file.
     """
     print("*** Running external software YADE ... ***\n")
+    # alternatively, you can use shell scripts to run YADE (in /scripts_tools/platform_shells/) through the `run_yade_from_shell` function
+    # os.system('cp ../../../scripts_tools/platform_shells/desktop/yadeDesktop.sh .')
+    # run_yade_from_shell(calib.system.param_data_file, yade_script)
     os.system(' '.join([executable, calib.system.param_data_file, yade_script]))
 
 param_names = ['E_m', 'nu']
@@ -28,7 +32,7 @@ calibration = BayesianCalibration.from_dict(
         "num_iter": 5,
         # error tolerance to stop the calibration
         "error_tol": 0.1,
-        # call back function to run YADE 
+        # call back function to run YADE
         "callback": run_sim,
         # DEM model as a dynamic system
         "system": {
@@ -95,7 +99,7 @@ calibration = BayesianCalibration.from_dict(
 #             covariance_type="full",
 #             slice_sampling=True,
 #         ),
-#     ),    
+#     ),
 # )
 
 calibration.run()
