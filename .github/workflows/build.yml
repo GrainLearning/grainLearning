@@ -28,6 +28,7 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           python -m pip install poetry
           poetry lock
           poetry install -E dev -E rnn -E visuals
