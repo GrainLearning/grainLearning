@@ -11,39 +11,27 @@ from sklearn.mixture import BayesianGaussianMixture
 from scipy.spatial import Voronoi, ConvexHull
 
 
-# def startSimulations(platform, software, tableName, fileName):
-#     # platform desktop, aws or rcg    # software so far only yade
-#     argument = tableName + " " + fileName
-#     if platform == 'desktop':
-#         # Definition where shell script can be found
-#         path_to_shell = os.getcwd() + '/platform_shells/desktop'
-#         if software == 'yade':
-#             command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
-#             subprocess.call(command, shell=True)
-#         else:
-#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-#             sys.exit
-#
-#     elif platform == 'aws':
-#         path_to_shell = os.getcwd() + '/platform_shells/aws'
-#         if software == 'yade':
-#             command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
-#             subprocess.call(command, shell=True)
-#         else:
-#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-#             sys.exit
-#
-#     elif platform == 'rcg':
-#         path_to_shell = os.getcwd() + '/platform_shells/rcg'
-#         if software == 'yade':
-#             command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
-#             subprocess.call(command, shell=True)
-#         else:
-#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-#             sys.exit
-#     else:
-#         print('Exit code. Hardware for yade simulations not properly defined')
-#         quit()
+def run_yade_from_shell(table_file_name, model_script, path_to_shell=None, platform='desktop'):
+    # platform desktop, aws or rcg    # software so far only yade
+    if not path_to_shell:
+        path_to_shell = os.getcwd()
+    argument = table_file_name + " " + model_script
+    if platform == 'desktop':
+        # Definition where shell script can be found
+        command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
+        subprocess.call(command, shell=True)
+
+    elif platform == 'aws':
+        command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
+        subprocess.call(command, shell=True)
+
+    elif platform == 'rcg':
+        command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
+        subprocess.call(command, shell=True)
+    else:
+        RuntimeError(
+            "Chosen 'platform' has not been implemented yet. Check 'run_yade_from_shell()' in 'tools.py'")
+        exit()
 
 
 def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
@@ -411,8 +399,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.xlabel("'Time' step")
         plt.ylabel(f'Mean of {param_names[i]}')
         plt.grid(True)
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_param_means.png')
 
@@ -423,8 +409,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.xlabel("'Time' step")
         plt.ylabel(f'Coefficient of variation of {param_names[i]}')
         plt.grid(True)
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_param_covs.png')
 
@@ -453,8 +437,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
             plt.xlabel(r'$' + name + '$')
             plt.ylabel('Posterior probability mass')
             plt.grid(True)
-        mng = plt.get_current_fig_manager()
-        mng.full_screen_toggle()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
 
@@ -476,8 +458,6 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
             plt.xlabel(r'$' + param_names[j] + '$')
             plt.ylabel(r'$' + param_names[j + 1] + '$')
             plt.legend()
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_param_space.png')
 
@@ -530,8 +510,6 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
             plt.legend()
         plt.grid(True)
 
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
     if save_fig:
         plt.savefig(f'{fig_name}_obs_and_sim.png')
 

@@ -100,7 +100,7 @@ class DynamicSystem:
     :param sigma_max: Maximum uncertainty, defaults to 1.0e6, optional
     :param sigma_tol: Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional
     :param sim_name: Name of the simulation, defaults to 'sim', optional
-    :param sigma_min: Minimum uncertainty, defaults to 1.0e-6, optional
+    :param sigma_lower_bound: Minimum uncertainty, defaults to 1.0e-6, optional
     :param _inv_normalized_sigma:  Calculated normalized sigma to weigh the covariance matrix
     :param estimated_params: Estimated parameter as the first moment of the distribution (:math:`x_\mu = \sum_i w_i * x_i`), defaults to None, optional
     :param estimated_params_cv: Estimated parameter coefficient of variation as the second moment of the distribution (:math:`x_\sigma = \sqrt{\sum_i w_i * (x_i - x_\mu)^2} / x_\mu`), defaults to None, optional
@@ -122,7 +122,7 @@ class DynamicSystem:
         param_names: List[str] = None,
         sigma_max: float = 1.0e6,
         sigma_tol: float = 1.0e-3,
-        sigma_min: float = 1.0e-6
+        sigma_lower_bound: float = 1.0e-6
     ):
         """Initialize the dynamic system class"""
         #### Observations ####
@@ -176,7 +176,7 @@ class DynamicSystem:
 
         #### Uncertainty ####
 
-        self.sigma_min = sigma_min
+        self.sigma_lower_bound = sigma_lower_bound
 
         self.sigma_max = sigma_max
 
@@ -216,9 +216,9 @@ class DynamicSystem:
             sim_data=obj.get("sim_data", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
-            sigma_tol=obj.get("sigma_tol", 0.001),
+            sigma_tol=obj.get("sigma_tol", 1.0e-3),
             sigma_max=obj.get("sigma_max", 1.0e6),
-            sigma_min=obj.get("sigma_min", 1.0e-6),
+            sigma_lower_bound=obj.get("sigma_lower_bound", 1.0e-6),
         )
 
     def set_sim_data(self, data: list):
@@ -295,8 +295,11 @@ class DynamicSystem:
         """Virtual function to load simulation data"""
 
     @classmethod
-    def write_params_to_table(cls: Type["DynamicSystem"]):
-        """Write the parameter data into a text file"""
+    def write_params_to_table(cls: Type["DynamicSystem"], threads: int):
+        """Write the parameter data into a text file
+        
+        :param threads: Number of threads to use
+        """
 
     @classmethod
     def backup_sim_data(cls: Type["DynamicSystem"]):
@@ -401,7 +404,7 @@ class IODynamicSystem(DynamicSystem):
         param_names: List[str] = None,
         sigma_max=1.0e6,
         sigma_tol=1.0e-3,
-        sigma_min=1.0e-6
+        sigma_lower_bound=1.0e-6
     ):
         """Initialize the IO dynamic system class"""
 
@@ -423,7 +426,7 @@ class IODynamicSystem(DynamicSystem):
             param_names,
             sigma_max,
             sigma_tol,
-            sigma_min
+            sigma_lower_bound
         )
         # TODO: reuse initialization from base class
 
@@ -495,7 +498,7 @@ class IODynamicSystem(DynamicSystem):
             param_names=obj.get("param_names", None),
             sigma_tol=obj.get("sigma_tol", 0.001),
             sigma_max=obj.get("sigma_max", 1.0e6),
-            sigma_min=obj.get("sigma_min", 1.0e-6),
+            sigma_lower_bound=obj.get("sigma_lower_bound", 1.0e-6),
         )
 
     def get_obs_data(self):
@@ -598,7 +601,7 @@ class IODynamicSystem(DynamicSystem):
                 raise RuntimeError(f'No data found for iteration {self.curr_iter}')
         self.num_samples_max = self.num_samples
 
-    def set_up_sim_dir(self):
+    def set_up_sim_dir(self, threads: int):
         """
         Create a directory to store simulation data and write the parameter data into a text file
         """
@@ -609,7 +612,7 @@ class IODynamicSystem(DynamicSystem):
         os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
-        self.write_params_to_table()
+        self.write_params_to_table(threads)
 
     def move_data_to_sim_dir(self):
         """
@@ -624,7 +627,7 @@ class IODynamicSystem(DynamicSystem):
         # redefine the parameter data file since its location is changed
         self.param_data_file = f'{self.sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
 
-    def write_params_to_table(self):
+    def write_params_to_table(self, threads: int):
         """Write the parameter data into a text file.
 
         :return param_data_file: The name of the parameter data file
@@ -633,7 +636,9 @@ class IODynamicSystem(DynamicSystem):
             self.sim_name,
             self.param_data,
             self.param_names,
-            self.curr_iter)
+            self.curr_iter,
+            threads=threads,
+        )
 
     def backup_sim_data(self):
         """Backup simulation data files to a backup directory."""

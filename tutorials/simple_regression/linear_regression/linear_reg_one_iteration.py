@@ -26,8 +26,8 @@ calibration = BayesianCalibration.from_dict(
             "sim_data_file_ext": ".npy",
             "param_names": ['a', 'b'],
         },
-        "calibration": {
-            "inference": {"ess_target": 0.3},
+        "inference": {
+            "Bayes_filter": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
                 "covariance_type": "full",
@@ -64,8 +64,8 @@ calibration = BayesianCalibration.from_dict(
             "sim_data": sim_data,
             "callback": None,
         },
-        "calibration": {
-            "inference": {"ess_target": 0.3},
+        "inference": {
+            "Bayes_filter": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
             },

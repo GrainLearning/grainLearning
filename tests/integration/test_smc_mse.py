@@ -32,8 +32,8 @@ def test_smc_mse():
                 "obs_data": y_obs,
                 "ctrl_data": x_obs,
             },
-            "calibration": {
-                "inference": {
+            "inference": {
+                "Bayes_filter": {
                     "ess_target": 0.3,
                     "scale_cov_with_max": True
                 },
@@ -43,7 +43,7 @@ def test_smc_mse():
     )
 
     calibration.run_one_iteration()
-    most_prob = np.argmax(calibration.calibration.posterior)
+    most_prob = np.argmax(calibration.inference.posterior)
     # most_prob_params = calibration.system.param_data[most_prob]
     least_err = np.argmin(
         [mse(calibration.system.sim_data[sid, 0, :], y_obs) for sid in range(calibration.system.num_samples)])

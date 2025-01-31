@@ -44,7 +44,7 @@ def run_sim(calib):
     fig_name = f'{path}/{system.sim_name}'
 
     # get the id of sample that has the highest probability
-    most_prob_params_id = np.argmax(calib.calibration.posterior)
+    most_prob_params_id = np.argmax(calib.inference.posterior)
     sim_data = system.sim_data[most_prob_params_id, :, :]
     obs_data = system.obs_data
 
@@ -73,7 +73,7 @@ def run_sim(calib):
     plot_param_data(
         fig_name,
         system.param_names,
-        calib.calibration.param_data_list,
+        calib.inference.param_data_list,
         save_fig=0
     )
     plt.show()
@@ -134,11 +134,10 @@ calibration = BayesianCalibration.from_dict(
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
             "sigma_tol": 0.1,
-            "sigma_min": 0.1,
             "sigma_max": 10,
         },
-        "calibration": {
-            "inference": {"ess_target": 0.3},
+        "inference": {
+            "Bayes_filter": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
                 "random_state": 0,
@@ -164,6 +163,6 @@ for error, true_param, prob_param in zip(errors, true_params, most_prob_params):
         error) / true_param < error_tolerance, \
         f"Model parameters are not correct, expected {true_param} but got {prob_param}"
 
-plot_pdf('2D_dike', param_names, calibration.calibration.param_data_list, save_fig=0,
+plot_pdf('2D_dike', param_names, calibration.inference.param_data_list, save_fig=0,
          true_params=true_params)
 plt.show()

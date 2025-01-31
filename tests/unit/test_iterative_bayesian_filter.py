@@ -20,7 +20,7 @@ def test_init():
     gmm_cls = GaussianMixtureModel(max_num_components=5)
     #: Create the iterative bayesian filter
     ibf_cls = IterativeBayesianFilter(
-        inference=smc_cls,
+        Bayes_filter=smc_cls,
         sampling=gmm_cls,
         initial_sampling='halton',
         proposal=np.ones(10),
@@ -30,7 +30,7 @@ def test_init():
     #: Create the iterative bayesian filter from a dictionary
     ibf_dct = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.1},
+            "Bayes_filter": {"ess_target": 0.1},
             "sampling": {"max_num_components": 5},
             "initial_sampling": 'halton',
             "proposal": np.ones(10),
@@ -41,16 +41,16 @@ def test_init():
     #: Assert that the object is of the correct type
     assert isinstance(ibf_dct, IterativeBayesianFilter)
     assert isinstance(ibf_dct.sampling, GaussianMixtureModel)
-    assert isinstance(ibf_dct.inference, SMC)
+    assert isinstance(ibf_dct.Bayes_filter, SMC)
 
     raw_ibf_dct = ibf_dct.__dict__
     raw_ibf_cls = ibf_cls.__dict__
 
     # TODO @Retief: why do we have to remove these member objects for the assert to work?
-    raw_ibf_dct.pop("inference")
+    raw_ibf_dct.pop("Bayes_filter")
     raw_ibf_dct.pop("sampling")
     raw_ibf_cls.pop("sampling")
-    raw_ibf_cls.pop("inference")
+    raw_ibf_cls.pop("Bayes_filter")
 
     #: Assert that the two iterative Bayesian filter objects are equal
     np.testing.assert_equal(raw_ibf_dct, raw_ibf_cls)
@@ -61,7 +61,7 @@ def test_initialize():
     #: Create the iterative bayesian filter from a dictionary
     ibf_dct = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.1},
+            "Bayes_filter": {"ess_target": 0.1},
             "sampling": {"max_num_components": 5},
             "initial_sampling": 'halton'
         }
@@ -130,7 +130,7 @@ def test_run_inference():
     #: Create the iterative bayesian filter from a dictionary
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.5, "scale_cov_with_max": True},
+            "Bayes_filter": {"ess_target": 0.5, "scale_cov_with_max": True},
             "sampling": {"max_num_components": 5},
             "initial_sampling": 'halton',
         }
@@ -151,7 +151,7 @@ def test_run_inference():
     #: Assert that the inference runs correctly if a proposal density is provided
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 0.5, "scale_cov_with_max": True},
+            "Bayes_filter": {"ess_target": 0.5, "scale_cov_with_max": True},
             "sampling": {"max_num_components": 5},
             "initial_sampling": 'halton',
             "proposal": np.array([0.5, 0.2, 0.3])
@@ -182,7 +182,7 @@ def test_save_and_load_proposal():
     #: Assert that the inference runs correctly if a proposal density is provided
     ibf_cls = IterativeBayesianFilter.from_dict(
         {
-            "inference": {"ess_target": 1.0},
+            "Bayes_filter": {"ess_target": 1.0},
             "sampling": {"max_num_components": 1, "expand_factor": 100},
             "initial_sampling": "halton",
             "proposal_data_file": "test_proposal.pkl"
@@ -205,7 +205,7 @@ def test_save_and_load_proposal():
     #: Correct the scores
     covs_ref = dummy_proposal.dot((system_cls.param_data - dummy_proposal.dot(system_cls.param_data))**2)
     ibf_cls.sampling.scores = ibf_cls.sampling.correct_scores(covs_ref, system_cls, tol=1e-6)
-    
+
     #: Assert that empirical covariance and the covariance esimated by GMM are the same for one Gaussian component
     empirical_cov = np.cov(ibf_cls.sampling.expanded_normalized_params.T)
     gmm_cov = ibf_cls.sampling.gmm.covariances_

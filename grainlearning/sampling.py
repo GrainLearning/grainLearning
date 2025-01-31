@@ -4,9 +4,10 @@ This module contains various methods to sample the state-parameter space of a dy
 from typing import Type
 from pickle import dump, load
 import numpy as np
+import warnings
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
-from scipy.optimize import minimize_scalar, root_scalar
+from scipy.optimize import root_scalar
 from grainlearning.dynamic_systems import DynamicSystem
 
 
@@ -97,7 +98,7 @@ class GaussianMixtureModel:
 
     def __init__(
         self,
-        max_num_components = 0,
+        max_num_components: int = 1,
         weight_concentration_prior: float = 0.0,
         covariance_type: str = "tied",
         n_init: int = 1,
@@ -156,7 +157,7 @@ class GaussianMixtureModel:
         :return: a GMM object
         """
         return cls(
-            max_num_components=obj["max_num_components"],
+            max_num_components=obj.get("max_num_components", 1),
             weight_concentration_prior=obj.get("weight_concentration_prior", None),
             covariance_type=obj.get("covariance_type", "tied"),
             n_init=obj.get("n_init", 10),
@@ -204,7 +205,7 @@ class GaussianMixtureModel:
         :return: Normalized parameters
         """
         return (params - self.min_params) / (self.max_params - self.min_params)
-    
+
     def train(self, weight: np.ndarray, system: Type["DynamicSystem"]):
         """Train the Gaussian mixture model.
 
@@ -227,7 +228,7 @@ class GaussianMixtureModel:
 
         self.gmm.fit(self.expanded_normalized_params)
 
-        self.scores = self.gmm.score_samples(np.unique(self.expanded_normalized_params, axis=1))
+        self.scores = self.gmm.score_samples(np.unique(self.expanded_normalized_params, axis=0))
         # FIXME: Gaussian mixture model introduces bias leading to covariances resulting from the trained probability density not matching the sample covariances
         # means_ref = weight.dot(system.param_data)
         # covs_ref = weight.dot((system.param_data - means_ref)**2)
@@ -237,7 +238,7 @@ class GaussianMixtureModel:
         """Correct the covariance (preceision) matrices and the scores of the Gaussian Mixture Model.
 
         :param covs_ref: Reference covariance from the current ensemble
-        :param samples: Samples to estimat the covariance        
+        :param system: Dynamic system class that contains the parameter samples
         :param tol: Tolerance threshold on the difference between the sample covariance and the covariance estimated by GMM , defaults to 0.1, optional
         """
         # raise an error is the GMM is not initialized or not converged
@@ -292,8 +293,17 @@ class GaussianMixtureModel:
             return valid_samples_count - minimum_num_samples
 
         # Perform optimization to find the minimum number of samples needed
-        result = root_scalar(sample_count_obj, x0=system.num_samples_max, x1=100*system.num_samples_max,
-                             method='secant')
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            result = root_scalar(
+                sample_count_obj,
+                x0=system.num_samples_max,
+                x1=100*system.num_samples_max,
+                method='secant',
+                rtol=1e-3,
+                maxiter=int(1e5)
+            )
+
         system.num_samples_max = int(np.ceil(result.root))
 
         # Draw the required number of samples

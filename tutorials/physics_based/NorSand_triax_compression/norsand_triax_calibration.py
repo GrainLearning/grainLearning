@@ -134,7 +134,7 @@ num_samples = int(5 * len(param_names) * log(len(param_names)))
 
 calibration = BayesianCalibration.from_dict(
     {
-        "num_iter": 8,
+        "num_iter": 10,
         "callback": run_sim,
         "system": {
             "param_min": [0.7, 0.01, 1.2, 0.2, 25, 2, 100, 0.1],
@@ -148,25 +148,25 @@ calibration = BayesianCalibration.from_dict(
             "sim_name": 'triax',
             "sigma_tol": 0.01,
         },
-        "calibration": {
-            "inference": {
+        "inference": {
+            "Bayes_filter": {
                 "ess_target": 0.3,
                 "scale_cov_with_max": True,
             },
             "sampling": {
-                "max_num_components": 10,
-                "n_init": 1,
+                "max_num_components": 1,
                 "random_state": 0,
+                # FIXME slice sampling requires rejecting samples whose likelihood are low. However, this process becomes very slow if dimensionality is high.
                 "slice_sampling": False,
             },
-            "initial_sampling": "sobol",
+            "initial_sampling": "LH",
         },
-        "save_fig": 0,
+        "save_fig": -1,
     }
 )
 
 calibration.run()
 
 true_params = [gamma, lambda_val, M_tc, N, H, Xim_tc, Ir, nu]
-plot_pdf('norsand_triax', param_names, calibration.calibration.param_data_list, save_fig=0, true_params=true_params)
+plot_pdf('norsand_triax', param_names, calibration.inference.param_data_list, save_fig=0, true_params=true_params)
 plt.show()

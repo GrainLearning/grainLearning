@@ -233,8 +233,8 @@ calibration = BayesianCalibration.from_dict(
             "sim_name": 'triax',
             "sigma_tol": 0.01,
         },
-        "calibration": {
-            "inference": {
+        "inference": {
+            "Bayes_filter": {
                 "ess_target": 0.3,
                 "scale_cov_with_max": True,
             },
@@ -256,9 +256,9 @@ import matplotlib.pylab as plt
 from grainlearning.tools import plot_posterior, plot_param_data, plot_pdf
 
 plot_posterior('test', param_names, calibration.system.param_data[calibration.ids_surrogate],
-               calibration.calibration.inference.posteriors[:, calibration.ids_surrogate])
+               calibration.inference.Bayes_filter.posteriors[:, calibration.ids_surrogate])
 plot_posterior('test', param_names, calibration.system.param_data[calibration.ids_origin],
-               calibration.calibration.inference.posteriors[:, calibration.ids_origin])
+               calibration.inference.Bayes_filter.posteriors[:, calibration.ids_origin])
 plt.show()
 
 plot_pdf('test', param_names, [calibration.system.param_data[calibration.ids_surrogate],

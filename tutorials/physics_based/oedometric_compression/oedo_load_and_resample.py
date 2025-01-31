@@ -26,8 +26,8 @@ calibration = BayesianCalibration.from_dict(
             "param_max": [200e9, 0.5, 1e4, 0.5],
             "inv_obs_weight": [1, 1, 0.01],
         },
-        "calibration": {
-            "inference": {"ess_target": 0.2},
+        "inference": {
+            "Bayes_filter": {"ess_target": 0.2},
             "sampling": {
                 "max_num_components": 10,
                 "weight_concentration_prior": 0.01,

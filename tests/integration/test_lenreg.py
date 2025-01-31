@@ -32,8 +32,8 @@ def test_lenreg():
                 "ctrl_data": x_obs,
                 "sim_name": 'linear',
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "n_init": 1,
@@ -57,13 +57,10 @@ def test_lenreg():
     # print(calibration.sigma_list)
 
     # %%
-    most_prob = np.argmax(calibration.calibration.posterior)
+    most_prob = np.argmax(calibration.inference.posterior)
 
     # %%
     most_prob_params = calibration.system.param_data[most_prob]
-
-    print(f'Most probable parameter values: {most_prob_params}')
-    # %%
 
     # tests
     error_tolerance = 0.01
@@ -76,8 +73,66 @@ def test_lenreg():
         f"Model parameters are not correct, expected 5.0 but got {most_prob_params[1]}"
 
     # 2. Checking sigma
-    assert calibration.calibration.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
+    assert calibration.inference.sigma_list[-1] < error_tolerance, "Final sigma is bigger than tolerance."
 
+    # %% Test other stopping criteria
+    calibration = BayesianCalibration.from_dict(
+        {
+            "num_iter": 10,
+            "error_tol": 0.01,
+            "callback": run_sim,
+            "system": {
+                "param_min": [0.1, 0.1],
+                "param_max": [1, 10],
+                "param_names": ['a', 'b'],
+                "num_samples": 20,
+                "obs_data": y_obs,
+                "ctrl_data": x_obs,
+                "sim_name": 'linear',
+            },
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
+                "sampling": {
+                    "max_num_components": 1,
+                    "n_init": 1,
+                    "covariance_type": "full",
+                    "random_state": 0,
+                }
+            }
+        }
+    )
+    calibration.run()
+    assert np.min(calibration.error_array) < 0.01, "Error tolerance is not met."
+
+
+    # %% Test other stopping criteria
+    calibration = BayesianCalibration.from_dict(
+        {
+            "num_iter": 10,
+            "gl_error_tol": 0.01,
+            "callback": run_sim,
+            "system": {
+                "param_min": [0.1, 0.1],
+                "param_max": [1, 10],
+                "param_names": ['a', 'b'],
+                "num_samples": 20,
+                "obs_data": y_obs,
+                "ctrl_data": x_obs,
+                "sim_name": 'linear',
+            },
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
+                "sampling": {
+                    "max_num_components": 1,
+                    "n_init": 1,
+                    "covariance_type": "full",
+                    "random_state": 0,
+                }
+            }
+        }
+    )
+    calibration.run()
+    assert calibration.gl_errors[-1] < 0.01, "Error tolerance is not met."
 
 # %%
 test_lenreg()
