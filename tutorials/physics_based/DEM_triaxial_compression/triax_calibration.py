@@ -44,6 +44,7 @@ calibration = BayesianCalibration.from_dict(
             "Bayes_filter": {"scale_cov_with_max": True},
             "sampling": {
                 "max_num_components": 5,
+                "covariance_type": "tied",
                 "slice_sampling": True,
             },
         },
@@ -77,8 +78,8 @@ calibration = BayesianCalibration.from_dict(
 #         GaussianMixtureModel(
 #             max_num_components=5,
 #             slice_sampling=True,
+#             covariance_type=tied,
 #         ),
-#         initial_sampling="LH",
 #     ),    
 # )
 

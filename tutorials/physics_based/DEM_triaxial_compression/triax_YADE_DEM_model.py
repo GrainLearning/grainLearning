@@ -26,6 +26,8 @@ from yade.params import table
 from yade import pack, plot
 from grainlearning.tools import get_keys_and_data, write_dict_to_file
 
+PATH = '/home/hcheng/GrainLearning/grainLearning/tutorials/physics_based/DEM_triaxial_compression'
+
 # check if run in batch mode
 isBatch = runningInBatch()
 if isBatch:
@@ -39,18 +41,18 @@ dScaling = 1e3  # density scaling
 e = 0.68  # initial void ratio
 conf_init = 1e3  # very small initial confining pressure
 conf = table.conf  # confining pressure
-rate = 0.1  # strain rate (decrease this for serious calculations)
+rate = 1.0  # strain rate (decrease this for serious calculations)
 damp = 0.2  # damping coefficient
-stabilityRatio = 1.e-2  # threshold for quasi-static condition (decrease this for serious calculations)
-stressTolRatio = 1.e-2  # tolerance for stress goal
-initStabilityRatio = 1.e-2  # initial stability threshold
+stabilityRatio = 1.e-3  # threshold for quasi-static condition (decrease this for serious calculations)
+stressTolRatio = 1.e-3  # tolerance for stress goal
+initStabilityRatio = 1.e-3  # initial stability threshold
 obsCtrl = 'e_z'  # key for simulation control
 lowDamp = 0.2  # damping coefficient
 highDamp = 0.9
 debug = False
 
 #: load strain/stress data for quasi-static loading
-obs_ctrl_data = np.linspace(0.01, 0.4, 40).tolist()
+obs_ctrl_data = np.linspace(0.01, 0.3, 59).tolist()
 obs_ctrl_data.reverse()
 
 #: Soil sphere parameters
@@ -73,7 +75,7 @@ plot.plots={'e_z': ('e', 'e_v', 's33_over_s11')}
 #: define the periodic box where a certain configuration of particles is loaded
 O.periodic = True
 sp = pack.SpherePack()
-cfg_file = 'PeriSp_' + str(num) + f'_{e}.txt'
+cfg_file = f'{PATH}/PeriSp_' + str(num) + f'_{e}.txt'
 with open(cfg_file, 'r') as f:
     first_line = f.readline()
     sizes = first_line.split()[1:]

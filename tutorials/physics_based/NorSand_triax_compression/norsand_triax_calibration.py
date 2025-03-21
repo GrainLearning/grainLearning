@@ -159,9 +159,8 @@ calibration = BayesianCalibration.from_dict(
                 # FIXME slice sampling requires rejecting samples whose likelihood are low. However, this process becomes very slow if dimensionality is high.
                 "slice_sampling": False,
             },
-            "initial_sampling": "LH",
         },
-        "save_fig": -1,
+        "save_fig": 1,
     }
 )
 

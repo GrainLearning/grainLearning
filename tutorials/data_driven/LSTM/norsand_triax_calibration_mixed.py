@@ -3,10 +3,12 @@ import grainlearning.rnn.predict as predict_rnn
 from grainlearning.rnn import preprocessor
 import numpy as np
 from grainlearning import BayesianCalibration
+import matplotlib.pylab as plt
+from grainlearning.tools import plot_posterior, plot_pdf
 from math import log
 
 
-def norsand(x, params):
+def norsand(x, e0, params):
     # norsand parameters
     gamma = params[0]  # [0.9 - 1.4] 'altitude of CSL @ 1kPa'
     lambda_val = params[1]  # [0.01 - 0.07] 'slope CSL defined on natural log'
@@ -82,7 +84,7 @@ def norsand(x, params):
 
 # CD input
 p0 = 130.0  # [kPa] 'inital pressure'
-e0 = 0.60  # [-] 'init void ratio'
+e0 = [0.60, 0.80]  # [-] 'init void ratio'
 eqp_tot = 15.0  # [%] 'total applied plastic deviatoric strain'
 lst = int(1e3)  # [-] 'loadsteps'
 
@@ -99,7 +101,9 @@ nu = 0.20  # [0.1 0.3] 'Poissons ratio'
 # generate synthetic data
 x_obs = np.arange(lst + 1) / lst * eqp_tot
 x_obs = x_obs[::int(lst / 100)]
-y_obs = norsand(x_obs, [gamma, lambda_val, M_tc, N, H, Xim_tc, Ir, nu])
+y_obs_1 = norsand(x_obs, e0[0], [gamma, lambda_val, M_tc, N, H, Xim_tc, Ir, nu])
+y_obs_2 = norsand(x_obs, e0[1], [gamma, lambda_val, M_tc, N, H, Xim_tc, Ir, nu])
+y_obs = np.concatenate([y_obs_1, y_obs_2], axis=0)
 
 # Define the configuration dictionary for the ML surrogate
 my_config = {
@@ -129,9 +133,11 @@ def run_sim_original(x, params):
     """
     data = []
     for params in params:
+        y_i = []
         # Run the model
-        y = norsand(x, params)
-        data.append(np.array(y, ndmin=2))
+        for e in e0:
+            y_i.append(norsand(x, e, params))
+        data.append(np.concatenate(y_i, axis=0))
     return np.array(data)
 
 
@@ -177,7 +183,6 @@ def run_sim_mixed(calib):
 
     :param calib: The calibration object.
     """
-    calib.system.num_steps = 101
     # if first iteration, run the original function
     if calib.curr_iter == 0:
         sim_data = run_sim_original(calib.system.ctrl_data, calib.system.param_data)
@@ -187,6 +192,9 @@ def run_sim_mixed(calib):
         my_config['output_data'] = calib.system.sim_data
         calibration.model = None
     else:
+        # plot the posterior probabilities over the norsand and its surrogate model
+        if calib.curr_iter > 1:
+            plot_norsand_and_lstm_posterior()
         # split samples into two subsets to be used with the original function and the ML surrogate
         np.random.seed()
         ids = np.random.permutation(len(calib.system.param_data))
@@ -203,19 +211,23 @@ def run_sim_mixed(calib):
         sim_data_surrogate = run_sim_surrogate(param_data_origin, sim_data_origin, param_data_surrogate)
 
         # put the two subsets of simulation data together according to the original order
-        sim_data = np.zeros(
-            [calib.system.num_samples, calib.system.num_obs, calib.system.num_steps - my_config['window_size']])
+        sim_data = np.zeros([calib.system.num_samples, calib.system.num_obs, calib.system.num_steps])
         sim_data[ids_surrogate] = sim_data_surrogate
-        sim_data[ids_origin] = sim_data_origin[:, :, :-my_config['window_size']]
+        sim_data[ids_origin] = sim_data_origin
 
         # set `sim_data` to system
         calib.system.set_sim_data(sim_data)
-        calib.system.num_steps = sim_data.shape[2]
+
+def plot_norsand_and_lstm_posterior():
+    plot_posterior('lstm', param_names, calibration.system.param_data[calibration.ids_surrogate],
+                calibration.inference.Bayes_filter.posteriors[:, calibration.ids_surrogate])
+    plot_posterior('norsand', param_names, calibration.system.param_data[calibration.ids_origin],
+                calibration.inference.Bayes_filter.posteriors[:, calibration.ids_origin])
 
 
 num_cores = 18
 param_names = ['gamma', 'lambda', 'M', 'N', 'H', 'Xim', 'Ir', 'nu']
-num_samples = int(10 * len(param_names) * log(len(param_names)))
+num_samples = int(5 * len(param_names) * log(len(param_names)))
 
 calibration = BayesianCalibration.from_dict(
     {
@@ -226,7 +238,7 @@ calibration = BayesianCalibration.from_dict(
             "param_max": [1.4, 0.07, 1.5, 0.5, 500, 5, 600, 0.3],
             "param_names": param_names,
             "num_samples": num_samples,
-            "obs_names": ['q/p', 'e'],
+            "obs_names": ['q/p (0.6)', 'e (0.6)', 'q/p (0.8)', 'e (0.8)'],
             "ctrl_name": 'u',
             "obs_data": y_obs,
             "ctrl_data": x_obs,
@@ -237,29 +249,20 @@ calibration = BayesianCalibration.from_dict(
             "Bayes_filter": {
                 "ess_target": 0.3,
                 "scale_cov_with_max": True,
+                "init_inference_step": my_config['window_size'] + 1,
             },
             "sampling": {
-                "max_num_components": 10,
-                "n_init": 1,
+                "max_num_components": 1,
                 "random_state": 0,
+                # FIXME slice sampling requires rejecting samples whose likelihood are low. However, this process becomes very slow if dimensionality is high.
                 "slice_sampling": False,
             },
-            "initial_sampling": "halton",
         },
         "save_fig": -1,
     }
 )
 
 calibration.run()
-
-import matplotlib.pylab as plt
-from grainlearning.tools import plot_posterior, plot_param_data, plot_pdf
-
-plot_posterior('test', param_names, calibration.system.param_data[calibration.ids_surrogate],
-               calibration.inference.Bayes_filter.posteriors[:, calibration.ids_surrogate])
-plot_posterior('test', param_names, calibration.system.param_data[calibration.ids_origin],
-               calibration.inference.Bayes_filter.posteriors[:, calibration.ids_origin])
-plt.show()
 
 plot_pdf('test', param_names, [calibration.system.param_data[calibration.ids_surrogate],
                                calibration.system.param_data[calibration.ids_origin]])

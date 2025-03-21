@@ -52,6 +52,7 @@ class SMC:
         ess_target: float = 0.3,
         scale_cov_with_max: bool = False,
         cov_matrices: np.array = None,
+        init_inference_step: int = 0,
     ):
         """Initialize the SMC class"""
         self.ess_target = ess_target
@@ -59,6 +60,8 @@ class SMC:
         self.scale_cov_with_max = scale_cov_with_max
 
         self.cov_matrices = cov_matrices
+
+        self.init_inference_step = init_inference_step
 
         self.likelihoods = None
 
@@ -77,6 +80,7 @@ class SMC:
             ess_target=obj.get("ess_target", 0.3),
             scale_cov_with_max=obj.get("scale_cov_with_max", False),
             cov_matrices=obj.get("cov_matrices", None),
+            init_inference_step=obj.get("init_inference_step", 0),
         )
 
     def get_covariance_matrices(self, sigma: float, system: Type["DynamicSystem"]):
@@ -103,8 +107,7 @@ class SMC:
 
         return cov_matrices
 
-    @staticmethod
-    def get_likelihoods(system: Type["DynamicSystem"], cov_matrices: np.array):
+    def get_likelihoods(self, system: Type["DynamicSystem"], cov_matrices: np.array):
         """Compute the likelihood distributions of simulation data as a multivariate normal
         centered around the observation.
 
@@ -114,9 +117,9 @@ class SMC:
         :param cov_matrices: Covariance matrices of shape (num_steps, num_obs, num_obs)
         :return: Likelihood matrices of shape (num_steps, num_samples) considering all time steps
         """
-        likelihoods = np.zeros((system.num_steps, system.num_samples))
+        likelihoods = np.ones((system.num_steps, system.num_samples)) / system.num_samples
 
-        for stp_id in range(system.num_steps):
+        for stp_id in range(self.init_inference_step, system.num_steps):
             # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multivariate_normal.html
             likelihood = multivariate_normal.pdf(
                 system.sim_data[:, :, stp_id] * system.normalization_factor[stp_id],
@@ -127,8 +130,7 @@ class SMC:
 
         return likelihoods
 
-    @staticmethod
-    def get_posteriors(system: Type["DynamicSystem"], likelihoods: np.array, proposal: np.array = None):
+    def get_posteriors(self, system: Type["DynamicSystem"], likelihoods: np.array, proposal: np.array = None):
         """Compute the posterior distributions from the likelihood for all the time steps
 
         This function is vectorized for all time steps

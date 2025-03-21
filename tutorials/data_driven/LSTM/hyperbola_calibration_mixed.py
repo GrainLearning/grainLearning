@@ -23,8 +23,10 @@ my_config = {
     'window_size': 10,
     'window_step': 1,
     'patience': 25,
+    # increase number of epochs for serious training 
     'epochs': 20,
-    'learning_rate': 1e-4,
+    # a large learning rate
+    'learning_rate': 1e-3,
     'lstm_units': 128,
     'dense_units': 128,
     'batch_size': 64,
@@ -118,7 +120,7 @@ calibration = BayesianCalibration.from_dict(
             "param_min": [0.1, 0.1],
             "param_max": [1, 10],
             "param_names": ['a', 'b'],
-            "num_samples": 20,
+            "num_samples": 10,
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "obs_data": y_obs,
