@@ -155,12 +155,14 @@ class BayesianCalibration:
         # Fetch the parameter values from a stored list
         self.system.param_data = self.inference.param_data_list[index]
         self.system.num_samples = self.system.param_data.shape[0]
+        self.system.sim_data = None
 
         # Run the model realizations
         self.run_callback()
 
-        # Load model data from disk
-        self.load_system()
+        # Load model data from disk if sim_data is not already set in the callback function
+        if self.system.sim_data is None:
+            self.load_system()
 
         # Estimate model parameters as a distribution
         self.inference.solve(self.system)

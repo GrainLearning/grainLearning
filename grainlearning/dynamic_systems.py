@@ -529,14 +529,20 @@ class IODynamicSystem(DynamicSystem):
             if len(self.obs_data) == 1:
                 self.obs_data = self.obs_data.reshape([1, self.obs_data.shape[0]])
 
-    def get_sim_data_files(self):
+    def get_sim_data_files(self, length: int=None):
         """
         Get the simulation data files from the simulation data directory.
+
+        :param length: Number of simulation data files to load
         """
+        # if length is not given, load all simulation data files
+        if length is None:
+            length = self.num_samples
+        
         mag = floor(log(self.num_samples, 10)) + 1
         self.sim_data_files = []
 
-        for i in range(self.num_samples):
+        for i in range(length):
             if self.sim_data_file_ext != '.npy':
                 sim_data_file_ext = '_sim' + self.sim_data_file_ext
             else:
@@ -551,20 +557,34 @@ class IODynamicSystem(DynamicSystem):
                 raise RuntimeError("Found more than one files with the name " + file_name)
             self.sim_data_files.append(files[0])
 
-    def load_sim_data(self):
+    def load_sim_data(self, length: int=None, ids_origin: np.ndarray=None):
         """Load the simulation data from the simulation data files.
 
         The function does the following:
         1. Load simulation data into an IO dynamic system object
         2. Check if parameter values read from the table matches those used to creat the simulation data
+        
+        :param length: Number of simulation data files to load
+        :param ids_origin: Indices of the selected parameter data
         """
-        self.sim_data = np.zeros([self.num_samples, self.num_obs, self.num_steps])
+        # if length is not given, load all simulation data files
+        if length is None:
+            length = self.num_samples
+
+        # if ids_origin is given, select part of the param_data corresponding to the ids_origin
+        if ids_origin is not None:
+            param_data = self.param_data[ids_origin]
+        else:
+            param_data = self.param_data
+
+        self.sim_data = np.zeros([length, self.num_obs, self.num_steps])
+
         for i, sim_data_file in enumerate(self.sim_data_files):
             if self.sim_data_file_ext != '.npy':
                 data = get_keys_and_data(sim_data_file)
-                param_data = get_keys_and_data(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
+                param_data_per_sample = get_keys_and_data(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
                 for key in self.param_names:
-                    data[key] = param_data[key][0]
+                    data[key] = param_data_per_sample[key][0]
             else:
                 data = np.load(sim_data_file, allow_pickle=True).item()
 
@@ -572,7 +592,7 @@ class IODynamicSystem(DynamicSystem):
                 self.sim_data[i, j, :] = data[key]
 
             params = np.array([data[key] for key in self.param_names])
-            np.testing.assert_allclose(params, self.param_data[i, :], rtol=1e-5)
+            np.testing.assert_allclose(params, param_data[i, :], rtol=1e-5)
 
     def load_param_data(self):
         """
