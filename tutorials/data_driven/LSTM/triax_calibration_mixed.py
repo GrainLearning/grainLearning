@@ -13,7 +13,7 @@ from grainlearning.tools import write_to_table
 
 
 PATH = '/home/hcheng/GrainLearning/grainLearning/tutorials/physics_based/DEM_triaxial_compression'
-executable = 'yade-batch'
+executable = 'yadedaily-batch'
 yade_script = f'{PATH}/triax_YADE_DEM_model.py'
 
 
@@ -176,14 +176,6 @@ calibration = BayesianCalibration.from_dict(
     }
 )
 
-calibration.load_and_run_one_iteration()
-
-# Define the configuration dictionary for the ML surrogate
-my_config['input_data'] = calibration.system.ctrl_data
-my_config['param_data'] = calibration.system.param_data
-my_config['output_data'] = calibration.system.sim_data
-
-calibration.increase_curr_iter()
 calibration.run()
 
 import matplotlib.pylab as plt
