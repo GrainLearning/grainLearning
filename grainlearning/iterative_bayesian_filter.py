@@ -144,7 +144,7 @@ class IterativeBayesianFilter:
             self.Bayes_filter.data_assimilation_loop,
             args=(system, self.proposal),
             method="bounded",
-            # tol=self.ess_tol,
+            options={"xatol": 0.01},
             bounds=(system.sigma_lower_bound, system.sigma_max),
         )
         system.sigma_max = result.x

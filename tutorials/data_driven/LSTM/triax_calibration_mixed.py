@@ -13,7 +13,7 @@ from grainlearning.tools import write_to_table
 
 
 PATH = '/home/hcheng/GrainLearning/grainLearning/tutorials/physics_based/DEM_triaxial_compression'
-executable = 'yadedaily-batch'
+executable = 'yade-batch'
 yade_script = f'{PATH}/triax_YADE_DEM_model.py'
 
 

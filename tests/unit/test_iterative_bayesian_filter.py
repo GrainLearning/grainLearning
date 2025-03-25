@@ -145,7 +145,7 @@ def test_run_inference():
     #: Assert that the inference runs correctly
     np.testing.assert_array_almost_equal(
         ibf_cls.posterior,
-        np.array([0.06544328, 0.13135752, 0.8031992]),
+        np.array([0.065373, 0.131263, 0.803364]),
     )
 
     #: Assert that the inference runs correctly if a proposal density is provided
@@ -164,7 +164,7 @@ def test_run_inference():
     #: Assert that the inference runs correctly
     np.testing.assert_array_almost_equal(
         ibf_cls.posterior,
-        np.array([0.032076, 0.169955, 0.797969])
+        np.array([0.032105, 0.170057, 0.797837])
     )
 
 

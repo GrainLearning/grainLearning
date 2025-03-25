@@ -55,7 +55,7 @@ def test_lenreg_IO():
                     "max_num_components": 2,
                     "n_init": 1,
                     "random_state": 0,
-                    "covariance_type": "full",
+                    "covariance_type": "tied",
                 }
             },
             "save_fig": -1,

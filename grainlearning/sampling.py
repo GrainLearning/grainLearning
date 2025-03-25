@@ -284,13 +284,28 @@ class GaussianMixtureModel:
         # Minimum number of samples required
         minimum_num_samples = system.num_samples
 
+        last_samples = None
+
+        # Update the upper bound x1 for the root scalar optimization
+        x1 = 100 * system.num_samples_max
+        while self.draw_samples_within_bounds(system, x1).shape[0] < minimum_num_samples:
+            x1 *= 10
+
         def sample_count_obj(num_samples):
             """Objective function to minimize the number of samples drawn."""
-            num_samples = int(np.ceil(num_samples))  # Ensure we have an integer number of samples
+            nonlocal last_samples
+            # Ensure we have an integer number of samples
+            num_samples = max(int(np.ceil(num_samples)), minimum_num_samples)
             samples = self.draw_samples_within_bounds(system, num_samples)
             valid_samples_count = samples.shape[0]
-            # Return the difference between required and obtained samples
-            return valid_samples_count - minimum_num_samples
+            last_samples = samples
+
+            if valid_samples_count < minimum_num_samples:
+                # Strong negative penalty to ensure root_scalar sees a negative value
+                return -1e3 - (minimum_num_samples - valid_samples_count)
+            else:
+                # Root is when this becomes zero
+                return valid_samples_count - minimum_num_samples
 
         # Perform optimization to find the minimum number of samples needed
         with warnings.catch_warnings():
@@ -298,18 +313,16 @@ class GaussianMixtureModel:
             result = root_scalar(
                 sample_count_obj,
                 x0=system.num_samples_max,
-                x1=100*system.num_samples_max,
+                x1=x1,
                 method='secant',
-                rtol=1e-3,
+                xtol=1.0,
                 maxiter=int(1e5)
             )
 
         system.num_samples_max = int(np.ceil(result.root))
 
-        # Draw the required number of samples
-        new_params = self.draw_samples_within_bounds(system, int(np.ceil(result.root)))
-
-        return new_params
+        # Low discrepancy should be preserved after the truncation
+        return last_samples[:minimum_num_samples]
 
     def draw_samples_within_bounds(self, system: Type["DynamicSystem"], num: int = 1):
         """Draw new parameter samples within the user-defined upper and lower bounds
