@@ -53,12 +53,12 @@ calibration = BayesianCalibration.from_dict(
     }
 )
 
+# Instead of loading an calibration object from a dictionary (or a JSON or YAML config file), we can call the constructor directly
+
 # calibration = BayesianCalibration(
 #     num_iter=5,
 #     error_tol=0.1,
 #     callback=run_sim,
-#     save_fig=-1,
-#     threads=1,
 #     system=IODynamicSystem(
 #         param_min=[0.0, 0.0, 10.0],
 #         param_max=[10.0, 1.0, 60.0],
@@ -77,10 +77,12 @@ calibration = BayesianCalibration.from_dict(
 #         ),
 #         GaussianMixtureModel(
 #             max_num_components=5,
+#             covariance_type='tied',
 #             slice_sampling=True,
-#             covariance_type=tied,
 #         ),
-#     ),    
+#     ),
+#     save_fig=-1,
+#     threads=1,
 # )
 
 calibration.run()

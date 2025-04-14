@@ -32,6 +32,7 @@ simulationsRunning=true
 while $simulationsRunning
 do 
     echo "Simulations not done yet"
+    # 2 minutes sleep for medium/long lasting simulations
     sleep 120s
     # get number of .npy files 
     numNPY=`find $pwd  -maxdepth 1 -iname '*.npy'| wc -l`
