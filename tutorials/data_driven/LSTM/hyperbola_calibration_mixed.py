@@ -93,20 +93,20 @@ def run_sim_mixed(calib):
         np.random.seed()
         ids = np.random.permutation(len(calib.system.param_data))
         split_index = int(len(ids) * 0.5)
-        ids_origin, ids_surrogate = ids[:split_index], ids[split_index:]
+        calib.ids_origin, calib.ids_surrogate = ids[:split_index], ids[split_index:]
 
         # run the original function for the first half of the samples
-        param_data_origin = calib.system.param_data[ids_origin]
+        param_data_origin = calib.system.param_data[calib.ids_origin]
         sim_data_origin = run_sim_original(calib.system.ctrl_data, param_data_origin)
 
         # run the surrogate for the second half of the samples
-        param_data_surrogate = calib.system.param_data[ids_surrogate]
+        param_data_surrogate = calib.system.param_data[calib.ids_surrogate]
         sim_data_surrogate = run_sim_surrogate(param_data_origin, sim_data_origin, param_data_surrogate)
 
         # put the two subsets of simulation data together according to the original order
         sim_data = np.zeros([calib.system.num_samples, calib.system.num_obs, calib.system.num_steps])
-        sim_data[ids_surrogate] = sim_data_surrogate
-        sim_data[ids_origin] = sim_data_origin
+        sim_data[calib.ids_surrogate] = sim_data_surrogate
+        sim_data[calib.ids_origin] = sim_data_origin
 
         # set `sim_data` to system
         calib.system.set_sim_data(sim_data)

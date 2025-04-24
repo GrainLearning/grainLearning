@@ -441,6 +441,38 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
             plt.savefig(f'{fig_name}_posterior_{name}.png')
 
 
+def plot_hybrid_posterior(fig_name, param_names, param_data, posterior, ids_origin, ids_surrogate, save_fig=0):
+    """
+    Plot the evolution of discrete posterior distribution over the parameters in time.
+    :param fig_name: string
+    :param param_names: parameter names
+    :param param_data: ndarray
+    :param ids_origin: ndarray
+    :param ids_surrogate: ndarray
+    :param posterior: ndarray
+    :param save_fig: bool defaults to False
+    """
+    try:
+        import matplotlib.pylab as plt
+    except ImportError:
+        print(
+            'matplotlib is not installed, cannot plot posterior distribution. Please install with grainlearning[plot]')
+    num_steps = posterior.shape[0]
+    for i, name in enumerate(param_names):
+        plt.figure(f'Posterior distribution of {name}')
+        for j in range(6):
+            plt.subplot(2, 3, j + 1)
+            plt.plot(param_data[ids_origin, i], posterior[int(num_steps * (j + 1) / 6 - 1), ids_origin], 'o', label='Original')
+            plt.plot(param_data[ids_surrogate, i], posterior[int(num_steps * (j + 1) / 6 - 1), ids_surrogate], 'x', label='Surrogate')
+            plt.title(f"'Time' step {int(num_steps * (j + 1) / 6 - 1):3d} ")
+            plt.xlabel(r'$' + name + '$')
+            plt.ylabel('Posterior probability mass')
+            plt.legend()
+            plt.grid(True)
+        if save_fig:
+            plt.savefig(f'{fig_name}_posterior_{name}.png')
+
+
 def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     import matplotlib.pylab as plt
     import seaborn as sns

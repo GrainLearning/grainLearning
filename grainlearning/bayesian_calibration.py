@@ -8,7 +8,7 @@ from numpy import argmax
 from grainlearning.dynamic_systems import DynamicSystem, IODynamicSystem
 from grainlearning.iterative_bayesian_filter import IterativeBayesianFilter
 from grainlearning.tools import plot_param_stats, plot_posterior, plot_param_data, plot_obs_and_sim, plot_pdf, \
-    close_plots
+    close_plots, plot_hybrid_posterior
 
 
 class BayesianCalibration:
@@ -115,6 +115,10 @@ class BayesianCalibration:
         self.callback = callback
 
         self.error_array = None
+
+        self.ids_surrogate = None
+
+        self.ids_origin = None
 
         self.gl_errors = []
 
@@ -296,20 +300,24 @@ class BayesianCalibration:
                 self.save_fig
             )
 
-            plot_posterior(
-                fig_name,
-                self.system.param_names,
-                self.system.param_data,
-                self.inference.Bayes_filter.posteriors,
-                self.save_fig
-            )
-
-            plot_param_data(
-                fig_name,
-                self.system.param_names,
-                self.inference.param_data_list,
-                self.save_fig
-            )
+            if self.ids_surrogate is None:
+                plot_posterior(
+                    fig_name,
+                    self.system.param_names,
+                    self.system.param_data,
+                    self.inference.Bayes_filter.posteriors,
+                    self.save_fig
+                )
+            else:
+                plot_hybrid_posterior(
+                    fig_name,
+                    self.system.param_names,
+                    self.system.param_data,
+                    self.inference.Bayes_filter.posteriors,
+                    self.ids_origin,
+                    self.ids_surrogate,
+                    self.save_fig
+                )
 
         plot_obs_and_sim(
             fig_name,
