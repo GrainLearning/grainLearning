@@ -10,6 +10,7 @@ import numpy as np
 from sklearn.mixture import BayesianGaussianMixture
 from scipy.spatial import Voronoi, ConvexHull
 
+FIG_SIZE = (12, 6.75)
 
 def run_yade_from_shell(table_file_name, model_script, path_to_shell=None, platform='desktop'):
     # platform desktop, aws or rcg    # software so far only yade
@@ -392,23 +393,25 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
     import matplotlib.pylab as plt
     num = len(param_names)
     n_cols = int(np.ceil(num / 2))
-    plt.figure('Posterior means of the parameters')
+    plt.figure('Posterior means of the parameters', figsize=FIG_SIZE)
     for i in range(num):
         plt.subplot(2, n_cols, i + 1)
         plt.plot(means[:, i])
         plt.xlabel("'Time' step")
         plt.ylabel(f'Mean of {param_names[i]}')
         plt.grid(True)
+    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_means.png')
 
-    plt.figure('Posterior coefficients of variance of the parameters')
+    plt.figure('Posterior coefficients of variance of the parameters', figsize=FIG_SIZE)
     for i in range(num):
         plt.subplot(2, n_cols, i + 1)
         plt.plot(covs[:, i])
         plt.xlabel("'Time' step")
         plt.ylabel(f'Coefficient of variation of {param_names[i]}')
         plt.grid(True)
+    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_covs.png')
 
@@ -429,7 +432,7 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
             'matplotlib is not installed, cannot plot posterior distribution. Please install with grainlearning[plot]')
     num_steps = posterior.shape[0]
     for i, name in enumerate(param_names):
-        plt.figure(f'Posterior distribution of {name}')
+        plt.figure(f'Posterior distribution of {name}', figsize=FIG_SIZE)
         for j in range(6):
             plt.subplot(2, 3, j + 1)
             plt.plot(param_data[:, i], posterior[int(num_steps * (j + 1) / 6 - 1), :], 'o')
@@ -437,6 +440,7 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
             plt.xlabel(r'$' + name + '$')
             plt.ylabel('Posterior probability mass')
             plt.grid(True)
+        plt.tight_layout()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
 
@@ -459,7 +463,7 @@ def plot_hybrid_posterior(fig_name, param_names, param_data, posterior, ids_orig
             'matplotlib is not installed, cannot plot posterior distribution. Please install with grainlearning[plot]')
     num_steps = posterior.shape[0]
     for i, name in enumerate(param_names):
-        plt.figure(f'Posterior distribution of {name}')
+        plt.figure(f'Posterior distribution of {name}', figsize=FIG_SIZE)
         for j in range(6):
             plt.subplot(2, 3, j + 1)
             plt.plot(param_data[ids_origin, i], posterior[int(num_steps * (j + 1) / 6 - 1), ids_origin], 'o', label='Original')
@@ -469,6 +473,7 @@ def plot_hybrid_posterior(fig_name, param_names, param_data, posterior, ids_orig
             plt.ylabel('Posterior probability mass')
             plt.legend()
             plt.grid(True)
+        plt.tight_layout()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
 
@@ -481,7 +486,7 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
     n_cols = int(np.ceil(num / 2))
     num = num - 1
     num_iter = len(param_data_list)
-    plt.figure('Resampling the parameter space')
+    plt.figure('Resampling the parameter space', figsize=FIG_SIZE)
     for j in range(num):
         plt.subplot(2, n_cols, j + 1)
         for i in range(num_iter):
@@ -490,6 +495,7 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
             plt.xlabel(r'$' + param_names[j] + '$')
             plt.ylabel(r'$' + param_names[j + 1] + '$')
             plt.legend()
+    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_space.png')
 
@@ -512,7 +518,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     ensemble_std = np.sqrt(ensemble_std)
     num = len(obs_names)
     ncols = int(np.ceil(num / 2)) if num > 1 else 1
-    plt.figure('Model prediction versus observation')
+    plt.figure('Model prediction versus observation', figsize=FIG_SIZE)
     for i in range(num):
         plt.subplot(2, ncols, i + 1)
 
@@ -542,6 +548,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
             plt.legend()
         plt.grid(True)
 
+    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_obs_and_sim.png')
 

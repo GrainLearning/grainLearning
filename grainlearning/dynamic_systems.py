@@ -539,7 +539,7 @@ class IODynamicSystem(DynamicSystem):
         if length is None:
             length = self.num_samples
         
-        mag = floor(log(self.num_samples, 10)) + 1
+        mag = floor(log(length, 10)) + 1
         self.sim_data_files = []
 
         for i in range(length):

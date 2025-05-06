@@ -163,7 +163,7 @@ def run_sim_surrogate(params_origin, output_origin, params_surrogate):
 
     preprocessor_lstm = preprocessor.PreprocessorLSTM.from_dict(my_config)
     _ = train_rnn.train_without_wandb(preprocessor_lstm, model=calibration.model, config=my_config)
-    model, train_stats, config = predict_rnn.get_pretrained_model('outputs')
+    model, train_stats, config = predict_rnn.get_pretrained_model(my_config['output_dir'])
     calibration.model = model
 
     # run the surrogate for the second half of the samples
@@ -192,9 +192,6 @@ def run_sim_mixed(calib):
         my_config['output_data'] = calib.system.sim_data
         calibration.model = None
     else:
-        # plot the posterior probabilities over the norsand and its surrogate model
-        if calib.curr_iter > 1:
-            plot_norsand_and_lstm_posterior()
         # split samples into two subsets to be used with the original function and the ML surrogate
         np.random.seed()
         ids = np.random.permutation(len(calib.system.param_data))
@@ -207,6 +204,11 @@ def run_sim_mixed(calib):
         sim_data_origin = run_sim_original(calib.system.ctrl_data, param_data_origin)
 
         # run the surrogate for the second half of the samples
+        # create subdirector if it doesn't exist
+        import os
+        if not os.path.exists(f'norsand_triax/iter{calib.curr_iter}'):
+            os.makedirs(f'norsand_triax/iter{calib.curr_iter}')
+        my_config['output_dir'] = f'norsand_triax/iter{calib.curr_iter}/surrogate'
         param_data_surrogate = calib.system.param_data[ids_surrogate]
         sim_data_surrogate = run_sim_surrogate(param_data_origin, sim_data_origin, param_data_surrogate)
 
@@ -217,12 +219,6 @@ def run_sim_mixed(calib):
 
         # set `sim_data` to system
         calib.system.set_sim_data(sim_data)
-
-def plot_norsand_and_lstm_posterior():
-    plot_posterior('lstm', param_names, calibration.system.param_data[calibration.ids_surrogate],
-                calibration.inference.Bayes_filter.posteriors[:, calibration.ids_surrogate])
-    plot_posterior('norsand', param_names, calibration.system.param_data[calibration.ids_origin],
-                calibration.inference.Bayes_filter.posteriors[:, calibration.ids_origin])
 
 
 num_cores = 18
@@ -242,7 +238,7 @@ calibration = BayesianCalibration.from_dict(
             "ctrl_name": 'u',
             "obs_data": y_obs,
             "ctrl_data": x_obs,
-            "sim_name": 'triax',
+            "sim_name": 'norsand_triax',
             "sigma_tol": 0.01,
         },
         "inference": {

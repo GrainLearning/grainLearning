@@ -62,7 +62,7 @@ def run_sim_surrogate(params_origin, output_origin, params_surrogate):
 
     preprocessor_lstm = preprocessor.PreprocessorLSTM.from_dict(my_config)
     _ = train_rnn.train_without_wandb(preprocessor_lstm, config=my_config)
-    model, train_stats, config = predict_rnn.get_pretrained_model('outputs')
+    model, train_stats, config = predict_rnn.get_pretrained_model(my_config['output_dir'])
 
     # run the surrogate for the second half of the samples
     data_inputs = preprocessor_lstm.prepare_input_data(params_surrogate)
@@ -89,6 +89,7 @@ def run_sim_mixed(calib):
         my_config['param_data'] = calib.system.param_data
         my_config['output_data'] = calib.system.sim_data
     else:
+        my_config['output_dir'] = f'hyperbola/iter{calib.curr_iter}/surrogate'
         # split samples into two subsets to be used with the original function and the ML surrogate
         np.random.seed()
         ids = np.random.permutation(len(calib.system.param_data))

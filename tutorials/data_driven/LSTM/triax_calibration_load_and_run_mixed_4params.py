@@ -13,7 +13,7 @@ from grainlearning.tools import write_to_table
 
 
 PATH = '/home/hcheng/GrainLearning/grainLearning/tutorials/physics_based/DEM_triaxial_compression'
-executable = 'yade-batch'
+executable = 'yadedaily-batch'
 yade_script = f'{PATH}/triax_YADE_DEM_model.py'
 
 
@@ -26,8 +26,8 @@ my_config = {
     'val_frac': 0.2,
     'window_size': 20,
     'window_step': 1,
-    'patience': 25,
-    'epochs': 100,
+    'patience': 200,
+    'epochs': 500,
     'learning_rate': 1e-4,
     'lstm_units': 128,
     'dense_units': 128,
@@ -113,10 +113,11 @@ def run_sim_mixed(calib):
         my_config['output_data'] = calib.system.sim_data
     else:
         # split samples into two subsets to be used with the original function and the ML surrogate
-        np.random.seed()
-        ids = np.random.permutation(len(calib.system.param_data))
-        split_index = int(len(ids) * 0.5)
-        ids_origin, ids_surrogate = ids[:split_index], ids[split_index:]
+        # ids = np.random.permutation(len(calib.system.param_data))
+        # split_index = int(len(ids) * 0.5)
+        ids = np.arange(len(calib.system.param_data))
+        midpoint = int(np.ceil(ids.shape[0] / 2))
+        ids_origin, ids_surrogate = ids[:midpoint], ids[midpoint:]
         calib.ids_origin, calib.ids_surrogate = ids_origin, ids_surrogate
 
         # run the original function for the first half of the samples
@@ -137,7 +138,7 @@ def run_sim_mixed(calib):
         calib.system.set_sim_data(sim_data)
 
 
-param_names = ['kr', 'eta', 'mu']
+param_names = ['v', 'kr', 'eta', 'mu']
 num_samples = int(5 * len(param_names) * log(len(param_names)))
 obs_data = np.loadtxt(PATH + '/triax_DEM_test_run_sim.txt').T
 ctrl_data = obs_data[1]
@@ -146,19 +147,20 @@ calibration = BayesianCalibration.from_dict(
     {
         "curr_iter": 0,
         "num_iter": 5,
-        "error_tol": 0.1,
+        "error_tol": 0.05,
         "callback": run_sim_mixed,
         "system": {
             "system_type": IODynamicSystem,
-            "param_min": [0.0, 0.0, 1.0],
-            "param_max": [1.0, 1.0, 60.0],            
+            "param_min": [0.0, 0.0, 0.0, 1.0],
+            "param_max": [1.0, 1.0, 1.0, 60.0],
             "param_names": param_names,
             "num_samples": num_samples,
             "obs_data_file": PATH + '/triax_DEM_test_run_sim.txt',
             "obs_names": ['e', 's33_over_s11'],
+            "inv_obs_weight": [1, 0.2],
             "ctrl_name": 'e_z',
-            "sim_name": 'triax',
-            "sim_data_dir": PATH + '/sim_data/',
+            "sim_name": 'triax_base5_4params',
+            "sim_data_dir": PATH + '/sim_data_original_base5_4params/',
             "sim_data_file_ext": '.txt',
         },
         "inference": {

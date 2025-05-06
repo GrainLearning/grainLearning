@@ -106,7 +106,7 @@ def train_without_wandb(preprocessor: Preprocessor, config=None, model: tf.keras
     """
     config = _check_config(config, preprocessor)
     config_optimizer = _get_optimizer_config(config)
-    path_save_data = Path('outputs')
+    path_save_data = Path(config['output_dir'])
     if os.path.exists(path_save_data):
         delete_outputs = input(f"The contents of {path_save_data} will be permanently deleted,\
                                  do you want to proceed? [y/n]: ")
