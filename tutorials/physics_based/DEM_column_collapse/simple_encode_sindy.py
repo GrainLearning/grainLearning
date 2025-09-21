@@ -379,6 +379,13 @@ def main():
     A0_test = A_train[0, :]
     X_test_pred = simulate_and_reconstruct_autoencoder(model_train, dec, A0_test, t_eval=t,
                                                        integrator="solve_ivp", device="cuda")
+    # decrease the polynomial degree if the rollout is unstable
+    while X_test_pred.shape != X.shape:
+        print(f"Warning: test prediction shape {X_test_pred.shape} does not match original {X.shape}")
+        model_train = fit_sindy_continuous(A_train, t_train, poly_degree=1, thresh=1, diff="smoothed")
+        model_train.print()
+        X_test_pred = simulate_and_reconstruct_autoencoder(model_train, dec, A0_test, t_eval=t,
+                                                           integrator="solve_ivp", device="cuda")
 
     # Error metrics on test set
     print_error_metrics(X, X_test_pred)
