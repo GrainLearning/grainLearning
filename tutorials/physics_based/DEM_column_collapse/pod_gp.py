@@ -46,7 +46,7 @@ def _fit_predict_gp_sklearn(t_train, y_train, t_query):
     y_pred, _ = gp.predict(t_query.reshape(-1,1), return_std=True)
     return y_pred
 
-def simulate_and_reconstruct_gp(U_r, xbar, A, t_train, t_query):
+def simulate_and_reconstruct_gp(U_r, A, t_train, t_query, xbar=None):
     """
     Fit independent GPs for each mode coefficient a_j(t).
     Return X_pred over the same timeline as A.
@@ -58,37 +58,35 @@ def simulate_and_reconstruct_gp(U_r, xbar, A, t_train, t_query):
         yhat = _fit_predict_gp_sklearn(t_train, y, t_query)
         A_pred[:, j] = yhat
 
-    Xc_pred = (U_r @ A_pred.T)      # (D x T)
-    X_pred  = Xc_pred + xbar[:, None]
+    X_pred = (U_r @ A_pred.T)      # (D x T)
+    if xbar is not None:
+        X_pred  = X_pred + xbar[:, None]
     return X_pred
 
-def unpack_velocity(xvec, shape):
+def unpack_2d_field(xvec, shape):
     nx, ny = shape
     ux = xvec[:nx*ny].reshape(nx, ny)
     uy = xvec[nx*ny:].reshape(nx, ny)
     return ux, uy
 
-def visualize_velocity_magnitude(X_true, X_pred, shape, time_index, tag):
-    ux_t, uy_t = unpack_velocity(X_true[:, time_index], shape)
-    ux_p, uy_p = unpack_velocity(X_pred[:, time_index], shape)
+def visualize_2d_field_magnitude(X, X_pred, shape, time_index, name='2d_field'):
+    ux_t, uy_t = unpack_2d_field(X[:, time_index], shape)
+    ux_p, uy_p = unpack_2d_field(X_pred[:, time_index], shape)
     sp_true = np.hypot(ux_t, uy_t)
     sp_pred = np.hypot(ux_p, uy_p)
 
     fig, axs = plt.subplots(1,2, figsize=(8,4), constrained_layout=True)
     im0 = axs[0].imshow(sp_true.T, origin='lower'); axs[0].set_title('speed (true)')
-    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title(f'speed ({tag})')
+    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title('speed (SINDy)')
     fig.colorbar(im0, ax=axs[0], fraction=0.046); fig.colorbar(im1, ax=axs[1], fraction=0.046)
-    plt.savefig(f"velocity_magnitude_comparison_{tag}_{time_index}.png")
-    plt.close(fig)
+    plt.savefig(f"{name}_at_{time_index}.png")
 
-def rel_errors_over_time(X_true, X_pred):
-    T = X_true.shape[1]
-    errs = []
-    for k in range(T):
-        num = np.linalg.norm(X_true[:, k] - X_pred[:, k])
-        den = np.linalg.norm(X_true[:, k]) + 1e-12
-        errs.append(num/den)
-    return np.array(errs)
+def print_error_metrics(X, X_pred):
+    rel = np.linalg.norm(X - X_pred) / np.linalg.norm(X)
+    print(f"Global relative error: {rel:.4f}")
+    for k in range(X.shape[1]):
+        relk = np.linalg.norm(X[:, k] - X_pred[:, k]) / np.linalg.norm(X[:, k])
+        print(f"  step {k:4d} relative error: {relk:.4f}")
 
 # ---------- 5) End-to-end ----------
 def main():
@@ -97,11 +95,13 @@ def main():
     time_steps = list(output.keys())
     # Choose the channels you want to compress:
     # Example (as in your snippet): use rho & phi as two “channels”
-    Ux = np.array([output[k]['scalars']['rho'] for k in time_steps])  # (T, nx, ny)
-    Uy = np.array([output[k]['scalars']['phi'] for k in time_steps])  # (T, nx, ny)
+    # Ux = np.array([output[k]['scalars']['rho'] for k in time_steps])  # (T, nx, ny)
+    # Uy = np.array([output[k]['scalars']['phi'] for k in time_steps])  # (T, nx, ny)
     # For velocity instead, uncomment:
     # Ux = np.array([output[k]['vectors']['vel'][0] for k in time_steps])
     # Uy = np.array([output[k]['vectors']['vel'][1] for k in time_steps])
+    Ux = np.array([output[k]['vectors']['disp'][0] for k in time_steps])
+    Uy = np.array([output[k]['vectors']['disp'][1] for k in time_steps])
     # For stress instead, uncomment:
     # Ux = np.array([output[k]['tensors']['stress'][0][0] for k in time_steps])  # (T, nx, ny)
     # Uy = np.array([output[k]['tensors']['stress'][1][1] for k in time_steps])  # (T, nx, ny)
@@ -120,18 +120,14 @@ def main():
     num_modes = min(10, r_full)
     T = A.shape[0]
     t_query = np.arange(T) * dt
-    X_pred_gp = simulate_and_reconstruct_gp(U_r[:, :num_modes], xbar, A[:, :num_modes], t_query, t_query)
-    relB = np.linalg.norm(X - X_pred_gp) / (np.linalg.norm(X) + 1e-12)
-    errsB = rel_errors_over_time(X, X_pred_gp)
-    print(f"[POD+GP] global relative error: {relB:.4f}")
-    for k in range(len(errsB)):
-        print(f" Step {k:4d}: rel. err = {errsB[k]:.4f}")
+    X_pred_gp = simulate_and_reconstruct_gp(U_r[:, :num_modes], A[:, :num_modes], t_query, t_query, xbar=xbar)
 
-    visualize_velocity_magnitude(X, X_pred_gp, shape, time_index=T//2, tag=f"GP")
-    
-    errors = rel_errors_over_time(X, X_pred_gp)
-    for k in range(len(errors)):
-        print(f" Step {k:4d}: rel. err = {errors[k]:.4f}")
+    # Error metrics
+    print_error_metrics(X, X_pred_gp)
+
+    # Visualize the 2D field over time (10 snapshots)
+    for i in range(0, len(t_query), len(t_query)//10):
+        visualize_2d_field_magnitude(X, X_pred_gp, shape, time_index=i, name='vec_field')
 
     # Select every nth snapshot for train/test split
     # n = 5  # e.g., select every 5th snapshot
@@ -151,15 +147,14 @@ def main():
     # Fit GP on training POD coefficients
     num_modes = min(10, r_train)
     T = A_train.shape[0]
-    X_pred_gp = simulate_and_reconstruct_gp(U_r_train[:, :num_modes], xbar, A_train[:, :num_modes], t_train, t_query)
-    relB = np.linalg.norm(X - X_pred_gp) / (np.linalg.norm(X) + 1e-12)
-    errsB = rel_errors_over_time(X, X_pred_gp)
-    print(f"[POD+GP] global relative error: {relB:.4f}")
-    for k in range(len(errsB)):
-        print(f" Step {k:4d}: rel. err = {errsB[k]:.4f}")
+    X_pred_gp = simulate_and_reconstruct_gp(U_r_train[:, :num_modes], A_train[:, :num_modes], t_train, t_query, xbar=xbar)
 
-    # Visualize one test snapshot
-    visualize_velocity_magnitude(X, X_pred_gp, shape, time_index=T//2, tag=f"GP_train")
+    # Error metrics on test set
+    print_error_metrics(X, X_pred_gp)
+
+    # Visualize the 2D field over time (10 snapshots)
+    for i in range(0, len(t_query), len(t_query)//10):
+        visualize_2d_field_magnitude(X, X_pred_gp, shape, time_index=i, name='test_vec_field')
 
 if __name__ == "__main__":
     main()
