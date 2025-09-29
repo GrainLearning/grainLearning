@@ -7,13 +7,13 @@ def main():
     # Load data
     output = np.load("collumn_collapse_CG_fields.npy", allow_pickle=True).item()
     time_steps = list(output.keys())
-    Occ = np.array([output[k]['scalars']['occ'] for k in time_steps])  # (T, nx, ny)
-    # Ux = np.array([output[k]['scalars']['rho'] for k in time_steps])  # (T, nx, ny)
+    # Occ = np.array([output[k]['scalars']['occ'] for k in time_steps])  # (T, nx, ny)
+    Occ = np.array([output[k]['scalars']['rho'] for k in time_steps])  # (T, nx, ny)
     # Uy = np.array([output[k]['scalars']['phi'] for k in time_steps])  # (T, nx, ny)
-    Ux = np.array([output[k]['vectors']['disp'][0] for k in time_steps])  # (T, nx, ny)
-    Uy = np.array([output[k]['vectors']['disp'][1] for k in time_steps])  # (T, nx, ny)
-    # Ux = np.array([output[k]['vectors']['vel'][0]  for k in time_steps])  # (T, nx, ny)
-    # Uy = np.array([output[k]['vectors']['vel'][1]  for k in time_steps])  # (T, nx, ny)
+    # Ux = np.array([output[k]['vectors']['disp'][0] for k in time_steps])  # (T, nx, ny)
+    # Uy = np.array([output[k]['vectors']['disp'][1] for k in time_steps])  # (T, nx, ny)
+    Ux = np.array([output[k]['vectors']['vel'][0]  for k in time_steps])  # (T, nx, ny)
+    Uy = np.array([output[k]['vectors']['vel'][1]  for k in time_steps])  # (T, nx, ny)
     # Ux = np.array([output[k]['tensors']['stress'][0][0] for k in time_steps])  # (T, nx, ny)
     # Uy = np.array([output[k]['tensors']['stress'][1][1] for k in time_steps])  # (T, nx, ny)
 
@@ -39,12 +39,16 @@ def main():
     X_pred = simulate_and_reconstruct(model, U_r[:, :num_modes], A0, t_eval=t, xbar=xbar)
 
     # Error metrics
-    print_error_metrics(X, X_pred, tag="POD-SINDY")
+    tag = "POD-SINDY"
+    print_error_metrics(X, X_pred, tag=tag)
 
     # Visualize the 2D field over time (10 snapshots)
-    for i in range(0, len(t), max(1, len(t)//10)):
-        visualize_2d_field_magnitude(X, X_pred, shape, time_index=i, channels=[1, 2], name='vel_field_magnitude')
-        visualize_2d_field(X, X_pred, shape, time_index=i, channel=0, name='occ_field')
+    for i in range(0, len(t)):
+        visualize_2d_field_magnitude(X, X_pred, shape, time_index=i, channels=[1, 2], name=tag+'vel_field_magnitude')
+        visualize_2d_field(X, X_pred, shape, time_index=i, channel=0, name=tag+'rho_field')
+    from rom_io import create_gif_from_pngs
+    create_gif_from_pngs(name=tag+'vel_field_magnitude')
+    create_gif_from_pngs(name=tag+'rho_field')
 
     # Select every nth snapshot for train/test split
     # n = 5  # e.g., select every 5th snapshot
@@ -77,9 +81,12 @@ def main():
     print_error_metrics(X, X_test_pred, tag="")
 
     # Visualize the 2D field over time (10 snapshots)
-    for i in range(0, len(t), max(1, len(t)//10)):
-        visualize_2d_field_magnitude(X, X_test_pred, shape, time_index=i, channels=[1, 2], name='test_vel_field_magnitude')
-        visualize_2d_field(X, X_test_pred, shape, time_index=i, channel=0, name='test_occ_field')
+    for i in range(0, len(t)):
+        visualize_2d_field_magnitude(X, X_test_pred, shape, time_index=i, channels=[1, 2], name=tag+'test_vel_field_magnitude')
+        visualize_2d_field(X, X_test_pred, shape, time_index=i, channel=0, name=tag+'test_rho_field')
+    from rom_io import create_gif_from_pngs
+    create_gif_from_pngs(name=tag+'test_vel_field_magnitude')
+    create_gif_from_pngs(name=tag+'test_rho_field')
 
 if __name__ == "__main__":
     main()

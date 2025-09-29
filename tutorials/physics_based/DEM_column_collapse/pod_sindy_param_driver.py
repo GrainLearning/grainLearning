@@ -1,6 +1,6 @@
 import numpy as np
-from rom_pod_ae import build_master_pod
-from rom_sindy_gp import fit_sindycp_continuous, simulate_and_reconstruct_cp, fit_predict_gp_sklearn
+from rom_pod_ae import build_master_pod, build_master_snapshots
+from rom_sindy_gp import fit_sindycp_continuous, simulate_and_reconstruct_cp, multivariate_GP
 from rom_io import create_gif_from_pngs, print_global_error
 
 def POD_SINDy_parametric_time(file_list, u_list, t_list, channels="disp", energy=0.99, num_modes=10, t_max=-1):
@@ -53,16 +53,23 @@ def evaluate_parametric_rom(model, U_use, A0_list, X_list, shapes, u_list, t_lis
       - create_visual: whether to create GIFs of the field evolution
       - every: save every nth snapshot for GIF
     """
+    from rom_io import visualize_2d_field_magnitude
     avg_error = 0.0
+    errors = []
     for i, (A0, X, shape) in enumerate(zip(A0_list, X_list, shapes)):
         u  = u_list[i]
         X_pred = simulate_and_reconstruct_cp(model, U_use, A0, t_eval=t_list, u=u)
         tag = f"[run {i}]"
-        avg_error += print_global_error(X, X_pred, tag=tag)
+        error = print_global_error(X, X_pred, tag=tag)
+        errors.append(error)
+        avg_error += error
         # Save evolution of the 2D field into a GIF
         if create_visual:
-            create_gif_from_pngs(X, X_pred, shape, name=f"{channels}_Sample{i:02d}", every=every)
+            for j in range(0, X.shape[1], every):
+                visualize_2d_field_magnitude(X, X_pred, shape, time_index=j, name=f"{channels}_Sample{i:02d}")
+            create_gif_from_pngs(name=f"{channels}_Sample{i:02d}")
     print(f"Average error across all runs: {avg_error / len(A0_list):.4f}")
+    return errors
 
 def ROM_parametric_time():
     import glob, os
@@ -79,17 +86,18 @@ def ROM_parametric_time():
     # Extract time steps from the first file
     output0 = np.load(file_list[0], allow_pickle=True).item()
     dt = 1e3 * 1.97e-5
-    t_max = 200
+    t_max = 400
     t_list = (np.array(list(output0.keys())) + 1e4) * dt
     t_list = t_list[:t_max]
     # Prepare lists for trajectories
     channels = "disp"
     energy = 0.99    # retained energy for master POD
     num_modes = 10    # truncation for SINDy-CP training
-    # Build and evaluate the parametric ROM
-    model, U_use, A_list, X_list, shapes = POD_SINDy_parametric_time(file_list, u_list, t_list, channels=channels, energy=energy, num_modes=num_modes, t_max=t_max)
-    A0_list = [A[0] for A in A_list]
-    evaluate_parametric_rom(model, U_use, A0_list, X_list, shapes, u_list, t_list, channels=channels, create_visual=True, every=10)
+    # # Build and evaluate the parametric ROM
+    # model, U_use, A_list, X_list, shapes = POD_SINDy_parametric_time(
+    #     file_list, u_list, t_list, channels=channels, energy=energy, num_modes=num_modes, t_max=t_max)
+    # A0_list = [A[0] for A in A_list]
+    # errors = evaluate_parametric_rom(model, U_use, A0_list, X_list, shapes, u_list, t_list, channels=channels)
 
     # --------- Split data into train/test runs and evaluate ----------
     mid = len(file_list) // 2
@@ -97,14 +105,23 @@ def ROM_parametric_time():
     file_list_test = file_list[mid:]
     u_list_train = u_list[:mid]
     u_list_test = u_list[mid:]
-    # Build a GP to predict cofficients at time 0 for test runs
+    # Build the parametric ROM on training runs only
     model_train, U_use_train, A_list_train, X_list_train, shapes_train = POD_SINDy_parametric_time(
         file_list_train, u_list_train, t_list, channels=channels, energy=energy, num_modes=num_modes, t_max=t_max)
-    A0_train = np.array([A[0] for A in A_list_train])
-    A0_test = fit_predict_gp_sklearn(u_list_train, A0_train, u_list_test)
-    
+    # Use GP to predict coefficients at time 0 for test runs
+    GP = multivariate_GP()
+    A0_train = [A[0] for A in A_list_train]
+    A0_test = GP.fit(u_list_train, A0_train).predict(u_list_test)
+
+    # Get the snapshot matrices for test runs
+    _, shapes_test, X_list_test = build_master_snapshots(file_list_test, channels=channels, t_max=t_max)
+        
     # Evaluate on test runs
-    evaluate_parametric_rom(model_train, U_use_train, A_list_test, X_list_test, shapes_test, u_list_test, t_list, channels=channels, create_visual=False)
+    print("\nEvaluating parametric ROM on training runs:")
+    train_errors = evaluate_parametric_rom(model_train, U_use_train, A0_train, X_list_train, shapes_train, u_list_train, t_list, channels=channels, create_visual=False)
+
+    print("\nEvaluating parametric ROM on test runs:")
+    test_errors = evaluate_parametric_rom(model_train, U_use_train, A0_test, X_list_test, shapes_test, u_list_test, t_list, channels=channels, create_visual=True)
 
 if __name__ == "__main__":
     ROM_parametric_time()

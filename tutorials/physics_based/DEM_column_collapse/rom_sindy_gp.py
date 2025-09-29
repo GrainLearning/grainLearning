@@ -1,5 +1,6 @@
 import numpy as np
 import pysindy as ps
+from sklearn.preprocessing import StandardScaler
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKernel
 
@@ -7,8 +8,11 @@ from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKern
 # 2 Fit SINDy or GP on POD coeffs. 
 # ----------------------------
 def fit_sindy_continuous(A, t, poly_degree=3, thresh=0.5, diff="finite"):
-    """
-    Learn dynamics a'(t) = f(a(t)) using SINDy (continuous-time ODE).
+    """Fit a continuous-time SINDy model a'(t) = f(a) from sampled coefficients.
+
+    - A: (T, r) POD (or latent) coefficients over time.
+    - t: (T,) time vector.
+    - poly_degree, thresh, diff: library/optimizer and differentiation options.
     """
     if diff == "finite":
         diff_method = ps.FiniteDifference()
@@ -38,6 +42,12 @@ def fit_sindy_with_derivative(A, A_dot, t, poly_degree=3, thresh=0.5):
 
 def fit_sindycp_continuous(A_list, t_list, u_list, poly_deg_state=2, poly_deg_param=1,
                            thresh=0.1, diff="smoothed"):
+    """Fit a parameterized SINDy (SINDy-CP) model a'(t) = f(a, u).
+
+    - A_list: list of (T_i, r) trajectories.
+    - t_list: list/array of times (uniform assumed by PySINDy when given scalars).
+    - u_list: list of parameters per trajectory (vector or time series).
+    """
     if diff == "finite":
         diff_method = ps.FiniteDifference()
     elif diff == "smoothed":
@@ -72,6 +82,11 @@ def fit_sindycp_continuous(A_list, t_list, u_list, poly_deg_state=2, poly_deg_pa
     return model
 
 def fit_predict_gp_sklearn(t_train, y_train, t_query):
+    """Fit a 1D GP on (t_train, y_train) and predict at t_query using RBF+white kernel.
+
+    The kernel form is RBF + WhiteKernel; its hyperparameters are optimized via
+    scikit-learn's GaussianProcessRegressor (with restarts).
+    """
     kernel = C(1.0, (1e-3, 1e3)) * RBF(length_scale=0.2*np.ptp(t_train)+1e-12,
                                        length_scale_bounds=(1e-6, 1e6)) \
              + WhiteKernel(noise_level=1e-10, noise_level_bounds=(1e-12, 1e-3))
@@ -80,10 +95,94 @@ def fit_predict_gp_sklearn(t_train, y_train, t_query):
     y_pred, _ = gp.predict(t_query.reshape(-1,1), return_std=True)
     return y_pred
 
+class multivariate_GP:
+    """
+    Multivariable GP to map parameters to outputs via independent per-mode GPs.
+    For example, Learns A0(u): R^m -> R^r
+    """
+    def __init__(self, kernels=None, n_restarts=3, normalize_y=True, random_state=0):
+        # list of kernels per output dim, or None to auto-build
+        self.kernels = kernels
+        self.n_restarts = n_restarts
+        self.normalize_y = normalize_y
+        self.random_state = random_state
+        self.scaler_u = StandardScaler()
+        self.scaler_y = StandardScaler()
+        # list[GaussianProcessRegressor]
+        self.gps = []
+        self.r = None
+        self.m = None
+
+    def fit(self, U_list, A_list):
+        """
+        U_list: list of parameter vectors u_i (shape (m,))
+        A_list: list of output.
+            e.g., POD coeff trajectories A^(i) (T_i x r); we use A0 = A^(i)[0]
+        """
+        U = np.vstack([np.atleast_2d(u) for u in U_list])    # (N, m)
+        Y = np.vstack([A_list])       # (N, r)
+
+        self.m = U.shape[1]
+        self.r = Y.shape[1]
+
+        # scale inputs and outputs
+        Uz = self.scaler_u.fit_transform(U)
+        Yz = self.scaler_y.fit_transform(Y)
+
+        # build default kernels if not provided
+        if self.kernels is None:
+            # reasonable default: σ^2 * RBF(ℓ) + white noise
+            self.kernels = [
+                C(1.0, (1e-3, 1e3)) * RBF(length_scale=1.0, length_scale_bounds=(1e-3, 1e3))
+                + WhiteKernel(noise_level=1e-8, noise_level_bounds=(1e-10, 1e-2))
+                for _ in range(self.r)
+            ]
+
+        self.gps = []
+        for j in range(self.r):
+            gp = GaussianProcessRegressor(
+                kernel=self.kernels[j],
+                n_restarts_optimizer=self.n_restarts,
+                normalize_y=self.normalize_y,
+                random_state=self.random_state,
+                alpha=0.0,
+            )
+            gp.fit(Uz, Yz[:, j])
+            self.gps.append(gp)
+        return self
+
+    def predict(self, u_new, return_std=False):
+        """
+        u_new: (m,) or (N, m)
+        Returns output: (N, r), and optionally std: (N, r) in original scale.
+        """
+        Uq = np.atleast_2d(u_new)
+        Uqz = self.scaler_u.transform(Uq)
+
+        Yz_pred = np.zeros((Uqz.shape[0], self.r))
+        Yz_std  = np.zeros_like(Yz_pred) if return_std else None
+
+        for j, gp in enumerate(self.gps):
+            if return_std:
+                mu_j, std_j = gp.predict(Uqz, return_std=True)
+                Yz_pred[:, j] = mu_j
+                Yz_std[:, j]  = std_j
+            else:
+                Yz_pred[:, j] = gp.predict(Uqz, return_std=False)
+
+        # invert output scaling
+        Y_pred = self.scaler_y.inverse_transform(Yz_pred)
+        if return_std:
+            # std needs to be scaled by output std only (no mean shift)
+            scale = self.scaler_y.scale_[None, :]
+            return Y_pred, Yz_std * scale
+        return Y_pred
+
 # ----------------------------
 # 3) Rollout and reconstruct
 # ----------------------------
 def simulate_and_reconstruct(model, U_r, A0, t_eval, xbar=None):
+    """Roll out SINDy in coefficient space and reconstruct field with POD modes."""
     A_pred = model.simulate(A0, t_eval)
     X_pred = (U_r @ A_pred.T)
     if xbar is not None:
@@ -91,6 +190,7 @@ def simulate_and_reconstruct(model, U_r, A0, t_eval, xbar=None):
     return X_pred
 
 def simulate_and_reconstruct_derivative(model, U_r, A0, t_eval):
+    """Roll out SINDy and also return reconstructed time derivative via model.predict."""
     A_pred = model.simulate(A0, t_eval)
     A_dot_pred = model.predict(A_pred)
     X_pred = (U_r @ A_pred.T)
@@ -98,6 +198,7 @@ def simulate_and_reconstruct_derivative(model, U_r, A0, t_eval):
     return X_pred, V_pred
 
 def simulate_and_reconstruct_gp(U_r, A, t_train, t_query, xbar=None):
+    """Fit independent GPs a_j(t) and reconstruct X at t_query using the POD modes."""
     T, r = A.shape
     A_pred = np.zeros((t_query.shape[0], r))
     for j in range(r):
@@ -111,6 +212,7 @@ def simulate_and_reconstruct_gp(U_r, A, t_train, t_query, xbar=None):
     return X_pred
 
 def simulate_and_reconstruct_autoencoder(model, dec, A0, t_eval, xbar=None, integrator="solve_ivp", device="cpu"):
+    """Roll out SINDy in AE latent space and decode to full field using 'dec'."""
     import torch
     A_pred = model.simulate(A0, t_eval,
                             integrator=integrator,
@@ -124,6 +226,7 @@ def simulate_and_reconstruct_autoencoder(model, dec, A0, t_eval, xbar=None, inte
     return X_pred
 
 def simulate_and_reconstruct_cp(model, U_r, A0, u, t_eval, xbar=None):
+    """Simulate SINDy-CP with constant or time-varying parameters u and reconstruct X."""
     if np.ndim(u) == 1:
         def u_fun(tau, u_const=u):
             tau = np.atleast_1d(tau)

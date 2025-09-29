@@ -8,9 +8,14 @@ from torch.utils.data import DataLoader, TensorDataset
 # 1) Build snapshot matrix and build POD projection or Auto-econder/decoder
 # ------------------------------
 def build_snapshots(Ux, Uy):
-    """
-    Stack channels [Ux, Uy] into column snapshots.
-    Returns X (D, T) and shape=(nx, ny).
+    """Stack two channels [Ux, Uy] into a (D, T) snapshot matrix and return shape.
+
+    Parameters
+    - Ux, Uy: arrays of shape (T, nx, ny)
+
+    Returns
+    - X: (D, T) snapshot matrix with D = 2*nx*ny, columns are flattened [Ux_k, Uy_k]
+    - shape: (nx, ny)
     """
     T, nx, ny = Ux.shape
     D = 2 * nx * ny
@@ -21,9 +26,14 @@ def build_snapshots(Ux, Uy):
     return X, (nx, ny)
 
 def build_snapshots_from_list(U_list):
-    """
-    Stack channels in the list into column snapshots.
-    Returns X (D,T) uncentered and shape=(nx,ny)
+    """Stack an arbitrary list of channels into a (D, T) snapshot matrix and return shape.
+
+    Parameters
+    - U_list: list of arrays, each of shape (T, nx, ny), all with identical shapes
+
+    Returns
+    - X: (D, T) uncentered snapshot matrix with D = C*nx*ny where C=len(U_list)
+    - shape: (nx, ny)
     """
     n_channels = len(U_list)
     assert len(U_list) >= 1
@@ -43,10 +53,12 @@ def center_snapshots(X):
     return Xc, xbar.squeeze()
 
 def pod(Xc, energy=0.999):
-    """
-    SVD of (centered) snapshots: Xc = U S V^T
-    - U: spatial modes (D x r)
-    - A: time coefficients (T x r) given by A = (S V^T)^T
+    """Compute POD via SVD of centered snapshots Xc = U S V^T.
+
+    Returns
+    - U_r: (D, r) spatial modes capturing given energy fraction
+    - A: (T, r) time coefficients where A = (S V^T)^T truncated to r
+    - Sr: (r,) retained singular values
     """
     U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
     cum = np.cumsum(S**2) / np.sum(S**2)
@@ -58,38 +70,67 @@ def pod(Xc, energy=0.999):
     return U_r, A, Sr
 
 def project_data_to_modal_derivative(U_r, Vx, Vy):
+    """Project derivative snapshots [Vx, Vy] onto POD modes to obtain A_dot.
+
+    Parameters
+    - U_r: (D, r) POD basis
+    - Vx, Vy: arrays of shape (T, nx, ny) for time derivatives per channel
+
+    Returns
+    - A_dot: (T, r) modal time derivatives
+    """
     V, _ = build_snapshots(Vx, Vy)
     A_dot = V.T @ U_r
     return A_dot
 
-def build_master_pod(files, channels="disp", energy=0.99, t_max=-1):
+def build_master_snapshots(files, channels="disp", t_max=-1):
+    """Build a global snapshot matrix from multiple runs.
+
+    Parameters
+    - files: list of .npy file paths
+    - channels: which channels to load (see rom_io.load_2d_trajectory_from_file)
+    - t_max: optional cap on time steps per run
+
+    Returns
+    - X: (D, T_total) concatenated snapshot matrix from all runs
+    - shapes: list of (nx, ny) shapes per run
     """
-    Build a single POD basis from concatenated snapshots over all parameter runs.
-    Returns:
-      U_r: (D,r) common basis, r from energy
-      A_list: list of (T_i x r) POD coefficients per run
-      shapes, dts: ancillary info
-    """
-    from rom_io import load_2d_trajectory_from_file
+    from rom_io import load_2d_trajectory_from_file  # local import to avoid circular deps
     X_all = []
     shapes = []
-    traj_X = []
     for f in files:
         X, shape = load_2d_trajectory_from_file(f, channels=channels, t_max=t_max)
         X_all.append(X)
-        traj_X.append(X)
         shapes.append(shape)
     X_concat = np.concatenate(X_all, axis=1)
-    U_r, A_concat, Svals = pod(X_concat, energy=energy)
+    return X_concat, shapes, X_all
 
+def build_master_pod(files, channels="disp", energy=0.99, t_max=-1):
+    """Build a global POD basis from multiple runs and return per-run coefficients.
+
+    Parameters
+    - files: list of .npy file paths
+    - channels: which channels to load (see rom_io.load_2d_trajectory_from_file)
+    - energy: cumulative energy fraction for basis truncation
+    - t_max: optional cap on time steps per run
+
+    Returns
+    - U_r: (D, r) common basis, r chosen by energy
+    - A_list: list of (T_i, r) POD coefficients per run
+    - traj_X: list of (D, T_i) per-run snapshot matrices
+    - shapes: list of (nx, ny) per run
+    """
+    X_concat, shapes, X_all = build_master_snapshots(files, channels=channels, t_max=t_max)
+    U_r, A_concat, Svals = pod(X_concat, energy=energy)
     A_list = []
-    for X in traj_X:
+    for X in X_all:
         A_i = (X.T @ U_r)
         A_list.append(A_i)
-    return U_r, A_list, traj_X, shapes
+    return U_r, A_list, X_all, shapes
 
 # --- Autoencoder definition ---
 class Encoder(nn.Module):
+    """Simple MLP encoder mapping from full state (D) to latent (latent_dim)."""
     def __init__(self, in_dim, latent_dim=8):
         super().__init__()
         self.fc = nn.Sequential(
@@ -102,6 +143,7 @@ class Encoder(nn.Module):
         return self.fc(x)
 
 class Decoder(nn.Module):
+    """Simple MLP decoder mapping from latent (latent_dim) back to full state (D)."""
     def __init__(self, latent_dim=8, out_dim=0):
         super().__init__()
         self.fc = nn.Sequential(
@@ -125,6 +167,7 @@ def train_autoencoder(
     print_every=10,
     seed=0
 ):
+    """Train an autoencoder on snapshots, return enc/dec/latent A/history."""
     import math
     rng = np.random.RandomState(seed)
 

@@ -1,4 +1,4 @@
-import glob, re
+import os, glob, re
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -7,10 +7,21 @@ from PIL import Image
 # 0) Helper functions for input and output
 # ----------------------------------------
 def load_2d_trajectory_from_file(npy_path, channels="disp", t_max=-1):
-    """
-    Load (Ux,Uy) from a single npy file written by your CG pipeline.
-      channels='disp' | 'vel' | 'scalar_rho_phi' etc.
-    Returns X (D, T) and shape info from build_snapshots.
+    """Load a 2D trajectory and stack requested channels into a snapshot matrix.
+
+    Parameters
+    - npy_path: Path to a .npy file produced by the CG pipeline (dict keyed by time step index).
+    - channels: Which data to read, one of {'disp','vel','scalar_rho_phi'}.
+      'disp'/'vel' read 2D vector fields; 'scalar_rho_phi' reads two scalar fields.
+    - t_max: Optional cap on number of time steps to load (useful for quick tests).
+
+    Returns
+    - X: (D, T) snapshot matrix, with column k being flattened fields at time k.
+    - shape: (nx, ny) spatial grid shape for unpacking/plotting later.
+
+    Notes
+    - Uses rom_pod_ae.build_snapshots to construct X; mean-centering is not applied here.
+    - The order of channels is preserved as listed by 'channels' mapping above.
     """
     from rom_pod_ae import build_snapshots  # local import to avoid circular deps
     print(f"[load_2d_trajectory_from_file] Loading {npy_path} with channels={channels} until t_max={t_max}")
@@ -32,6 +43,16 @@ def load_2d_trajectory_from_file(npy_path, channels="disp", t_max=-1):
     return X, shape
 
 def unpack_2d_field(xvec, shape, channels):
+    """Slice flattened multi-channel vector into selected channel 2D arrays.
+
+    Parameters
+    - xvec: 1D array of length D = C*nx*ny, flattened stacked channels.
+    - shape: (nx, ny) original grid size.
+    - channels: list of integer channel indices to extract (0-based).
+
+    Returns
+    - List of 2D arrays, each of shape (nx, ny), in the same order as 'channels'.
+    """
     nx, ny = shape
     fields = []
     for c in channels:
@@ -39,6 +60,14 @@ def unpack_2d_field(xvec, shape, channels):
     return fields
 
 def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], name='2d_field'):
+    """Save side-by-side magnitude plots (true, predicted, relative error) at a time index.
+
+    - X, X_pred: (D, T) matrices (flattened stacked channels), same D and T.
+    - shape: (nx, ny) grid shape.
+    - time_index: integer time column to visualize.
+    - channels: two channel indices whose magnitude is computed via hypot.
+    - name: filename stem; file saved as '{name}_at_{time_index}.png'.
+    """
     # unpack the channels
     fields = unpack_2d_field(X[:, time_index], shape, channels)
     fields_pred = unpack_2d_field(X_pred[:, time_index], shape, channels)
@@ -61,6 +90,10 @@ def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], 
     plt.close()
 
 def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field'):
+    """Save side-by-side scalar field plots (true, predicted, relative error) for one channel.
+
+    Parameters mirror visualize_2d_field_magnitude, but for a single channel index.
+    """
     # unpack the channel
     fields = unpack_2d_field(X[:, time_index], shape, [channel])
     fields_pred = unpack_2d_field(X_pred[:, time_index], shape, [channel])
@@ -80,7 +113,7 @@ def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field')
 def natural_sort_key(s):
     return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
 
-def create_gif_from_pngs(name='2d_field'):
+def create_gif_from_pngs(name='2d_field', remove_pngs=True):
     png_files = sorted(glob.glob(f"{name}_at_*.png"), key=natural_sort_key)
     frames = [Image.open(p) for p in png_files]
     # Save as GIF
@@ -91,8 +124,16 @@ def create_gif_from_pngs(name='2d_field'):
         duration=200,  # ms per frame
         loop=0         # infinite loop
     )
+    # Optionally remove the individual PNG files
+    if remove_pngs:
+        for p in png_files:
+            os.remove(p)
 
 def print_error_metrics(X, X_pred, tag=""):
+    """Print global relative error and per-time-step relative errors.
+
+    - tag: optional prefix to label the evaluation block (e.g., '[test]').
+    """
     print_global_error(X, X_pred, tag=tag)
     for k in range(X.shape[1]):
         num = np.linalg.norm(X[:, k] - X_pred[:, k])
@@ -101,13 +142,16 @@ def print_error_metrics(X, X_pred, tag=""):
         print(f"  step {k:4d} relative error: {relk:.4f}")
 
 def print_global_error(X, X_pred, tag=""):
+    """Compute and print global relative error ||X-X_pred|| / ||X|| with small epsilon."""
     rel = np.linalg.norm(X - X_pred) / (np.linalg.norm(X) + 1e-12)
     print(f"{tag} Global relative error: {rel:.4f}")
     return rel
 
 def plot_ae_history(history, savepath="ae_loss_curve.png"):
-    """
-    Plot train vs val loss from history returned by train_autoencoder.
+    """Plot train vs val loss from history returned by train_autoencoder.
+
+    Expects keys 'train_loss' and 'val_loss' in the given history dict.
+    Saves a log-scaled MSE loss curve to 'savepath'.
     """
     if "train_loss" not in history or "val_loss" not in history:
         print("[plot_ae_history] No losses in history dict.")

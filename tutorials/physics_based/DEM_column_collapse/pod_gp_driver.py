@@ -9,13 +9,13 @@ def main():
     time_steps = list(output.keys())
     # Choose the channels you want to compress:
     # Example (as in your snippet): use rho & phi as two “channels”
-    Occ = np.array([output[k]['scalars']['occ'] for k in time_steps])  # (T, nx, ny)
-    # Uy = np.array([output[k]['scalars']['phi'] for k in time_steps])  # (T, nx, ny)
+    # Occ = np.array([output[k]['scalars']['occ'] for k in time_steps])  # (T, nx, ny)
+    Rho = np.array([output[k]['scalars']['rho'] for k in time_steps])  # (T, nx, ny)
     # For velocity instead, uncomment:
-    # Ux = np.array([output[k]['vectors']['vel'][0] for k in time_steps])
-    # Uy = np.array([output[k]['vectors']['vel'][1] for k in time_steps])
-    Ux = np.array([output[k]['vectors']['disp'][0] for k in time_steps])
-    Uy = np.array([output[k]['vectors']['disp'][1] for k in time_steps])
+    Ux = np.array([output[k]['vectors']['vel'][0] for k in time_steps])
+    Uy = np.array([output[k]['vectors']['vel'][1] for k in time_steps])
+    # Ux = np.array([output[k]['vectors']['disp'][0] for k in time_steps])
+    # Uy = np.array([output[k]['vectors']['disp'][1] for k in time_steps])
     # For stress instead, uncomment:
     # Ux = np.array([output[k]['tensors']['stress'][0][0] for k in time_steps])  # (T, nx, ny)
     # Uy = np.array([output[k]['tensors']['stress'][1][1] for k in time_steps])  # (T, nx, ny)
@@ -24,7 +24,7 @@ def main():
     dt = 1.97e-5 * (time_steps[1] - time_steps[0])
 
     # Build snapshots & POD (with proper centering and mean add-back later)
-    X, shape = build_snapshots_from_list([Occ, Ux, Uy])
+    X, shape = build_snapshots_from_list([Rho, Ux, Uy])
     Xc, xbar = center_snapshots(X)
     U_r, A, Svals = pod(Xc, energy=0.99)
     r_full = U_r.shape[1]
@@ -37,12 +37,16 @@ def main():
     X_pred_gp = simulate_and_reconstruct_gp(U_r[:, :num_modes], A[:, :num_modes], t_query, t_query, xbar=xbar)
 
     # Error metrics
-    print_error_metrics(X, X_pred_gp)
+    tag = "POD-GP"
+    print_error_metrics(X, X_pred_gp, tag=tag)
 
     # Visualize the 2D field over time (10 snapshots)
-    for i in range(0, len(t_query), max(1, len(t_query))):
-        visualize_2d_field(X, X_pred_gp, shape, time_index=i, channel=0, name='occ_field')
-        visualize_2d_field_magnitude(X, X_pred_gp, shape, time_index=i, channels=[1, 2], name='vel_field_magnitude')
+    for i in range(0, len(t_query)):
+        visualize_2d_field(X, X_pred_gp, shape, time_index=i, channel=0, name=tag+'rho_field')
+        visualize_2d_field_magnitude(X, X_pred_gp, shape, time_index=i, channels=[1, 2], name=tag+'vel_field_magnitude')
+    from rom_io import create_gif_from_pngs
+    create_gif_from_pngs(name=tag+'rho_field')
+    create_gif_from_pngs(name=tag+'vel_field_magnitude')
 
     # # Select every nth snapshot for train/test split
     # n = 5  # e.g., select every 5th snapshot
@@ -65,12 +69,14 @@ def main():
     X_pred_gp = simulate_and_reconstruct_gp(U_r_train[:, :num_modes], A_train[:, :num_modes], t_train, t_query, xbar=xbar_train)
 
     # Error metrics on test set
-    print_error_metrics(X, X_pred_gp)
+    print_error_metrics(X, X_pred_gp, tag=tag)
 
     # Visualize the 2D field over time (10 snapshots)
-    for i in range(0, len(t_query), max(1, len(t_query)//10)):
-        visualize_2d_field_magnitude(X, X_pred_gp, shape, time_index=i, channels=[1, 2], name='test_vel_field_magnitude')
-        visualize_2d_field(X, X_pred_gp, shape, time_index=i, channel=0, name='test_occ_field')
+    for i in range(0, len(t_query)):
+        visualize_2d_field_magnitude(X, X_pred_gp, shape, time_index=i, channels=[1, 2], name=tag+'test_vel_field_magnitude')
+        visualize_2d_field(X, X_pred_gp, shape, time_index=i, channel=0, name=tag+'test_rho_field')
+    create_gif_from_pngs(name=tag+'test_vel_field_magnitude')
+    create_gif_from_pngs(name=tag+'test_rho_field')
 
 if __name__ == "__main__":
     main()
