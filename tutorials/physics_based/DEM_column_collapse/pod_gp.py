@@ -176,15 +176,16 @@ def main():
 
     # Select every nth snapshot for train/test split
     # n = 5  # e.g., select every 5th snapshot
-    # Xc_train = Xc[:, ::n]
+    # X_train = X[:, ::n]
     # t_train = t_query[::n]
 
     # Select the first half for training
-    mid = Xc.shape[1] // 2
-    Xc_train = Xc[:, :mid]
+    mid = X.shape[1] // 2
+    X_train = X[:, :mid]
     t_train = t_query[:mid]
 
     # POD on training set
+    Xc_train, xbar_train = center_snapshots(X_train)
     U_r_train, A_train, Svals_train = pod(Xc_train, energy=0.99)
     r_train = U_r_train.shape[1]
     print(f"[POD] train: kept r = {r_train} modes (energy 99%)")
@@ -192,7 +193,7 @@ def main():
     # Fit GP on training POD coefficients
     num_modes = min(10, r_train)
     T = A_train.shape[0]
-    X_pred_gp = simulate_and_reconstruct_gp(U_r_train[:, :num_modes], A_train[:, :num_modes], t_train, t_query, xbar=xbar)
+    X_pred_gp = simulate_and_reconstruct_gp(U_r_train[:, :num_modes], A_train[:, :num_modes], t_train, t_query, xbar=xbar_train)
 
     # Error metrics on test set
     print_error_metrics(X, X_pred_gp)

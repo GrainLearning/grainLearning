@@ -474,7 +474,7 @@ def evaluate_parametric_rom(model, U_use, A0_list, X_list, shapes, u_list, t_lis
         # Save evolution of the 2D field into a GIF
         if create_visual:
             create_gif_from_pngs(X, X_pred, shape, name=f"{channels}_Sample{i:02d}", every=every)
-    print(f"Average error across all runs: {avg_error / len(A_list):.4f}")
+    print(f"Average error across all runs: {avg_error / len(A0_list):.4f}")
 
 def ROM_parametric_time():
     import glob, os
