@@ -22,20 +22,29 @@ def build_snapshots(Ux, Uy):
         X[:, k] = xk
     return X, (nx, ny)
 
-def build_snapshots_without_mean(Ux, Uy):
-    """
-    Stack channels [Ux, Uy] into column snapshots.
-    Returns X (D, T) and mean field xbar (D,)
-    """
-    T, nx, ny = Ux.shape
-    D = 2 * nx * ny
-    X = np.empty((D, T))
-    for k in range(T):
-        xk = np.concatenate([Ux[k].ravel(), Uy[k].ravel()])
-        X[:, k] = xk
+def center_snapshots(X):
     xbar = X.mean(axis=1, keepdims=True)
     Xc = X - xbar
-    return Xc, xbar.squeeze(), (nx, ny)
+    return Xc, xbar.squeeze()
+
+def build_snapshots_from_list(U_list):
+    """
+    Stack channels in the list into column snapshots.
+    Returns X (D,T) uncentered and shape=(nx,ny)
+    """
+    # assert the length of U_list is at least 1
+    n_channels = len(U_list)
+    assert len(U_list) >= 1
+    # assert all elements in U_list have the same shape
+    shapes = [u.shape for u in U_list]
+    assert all(s == shapes[0] for s in shapes), "All elements in U_list must have the same shape" 
+    T, nx, ny = shapes[0]
+    D = n_channels * nx * ny
+    X = np.empty((D, T))
+    for k in range(T):
+        xk = np.concatenate([u[k].ravel() for u in U_list])
+        X[:, k] = xk
+    return X, (nx, ny)
 
 def pod(Xc, energy=0.999):
     """
@@ -288,22 +297,48 @@ def simulate_and_reconstruct_autoencoder(model, dec, A0, t_eval, xbar=None, inte
         X_pred += xbar[:, None]
     return X_pred  # (D, T)
 
-def unpack_2d_field(xvec, shape):
+def unpack_2d_field(xvec, shape, channels):
     nx, ny = shape
-    ux = xvec[:nx*ny].reshape(nx, ny)
-    uy = xvec[nx*ny:].reshape(nx, ny)
-    return ux, uy
+    fields = []
+    for c in channels:
+        fields.append(xvec[c * nx * ny:(c + 1) * nx * ny].reshape(nx, ny))
+    return fields
 
-def visualize_2d_field_magnitude(X, X_pred, shape, time_index, name='2d_field'):
-    ux_t, uy_t = unpack_2d_field(X[:, time_index], shape)
-    ux_p, uy_p = unpack_2d_field(X_pred[:, time_index], shape)
-    sp_true = np.hypot(ux_t, uy_t)
-    sp_pred = np.hypot(ux_p, uy_p)
-
-    fig, axs = plt.subplots(1,2, figsize=(8,4), constrained_layout=True)
+def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], name='2d_field'):
+    # unpack the channels
+    fields = unpack_2d_field(X[:, time_index], shape, channels)
+    fields_pred = unpack_2d_field(X_pred[:, time_index], shape, channels)
+    # compute the magnitude
+    if len(fields) != 2 or len(fields_pred) != 2:
+        raise ValueError("channels must be of length 2 for magnitude visualization")
+    sp_true = np.hypot(fields[0], fields[1])
+    sp_pred = np.hypot(fields_pred[0], fields_pred[1])
+    # plot side-by-side true, pred, and relative error
+    fig, axs = plt.subplots(1,3, figsize=(12,4), constrained_layout=True)
     im0 = axs[0].imshow(sp_true.T, origin='lower'); axs[0].set_title('speed (true)')
-    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title('speed (SINDy)')
-    fig.colorbar(im0, ax=axs[0], fraction=0.046); fig.colorbar(im1, ax=axs[1], fraction=0.046)
+    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title('speed (GP)')
+    # error calculation should avoid elements where true is zero
+    valid = np.where(sp_true.T > 0)
+    error = np.zeros_like(sp_true.T)
+    error[valid] = np.abs(sp_true.T[valid] - sp_pred.T[valid]) / sp_true.T[valid]
+    im2 = axs[2].imshow(error, origin='lower', vmin=0, vmax=1); axs[2].set_title('relative error')
+    fig.colorbar(im0, ax=axs[0], fraction=0.046); fig.colorbar(im1, ax=axs[1], fraction=0.046); fig.colorbar(im2, ax=axs[2], fraction=0.046)
+    plt.savefig(f"{name}_at_{time_index}.png")
+
+def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field'):
+    # unpack the channel
+    fields = unpack_2d_field(X[:, time_index], shape, [channel])
+    fields_pred = unpack_2d_field(X_pred[:, time_index], shape, [channel])
+    # plot side-by-side true, pred, and relative error
+    fig, axs = plt.subplots(1,3, figsize=(12,4), constrained_layout=True)
+    im0 = axs[0].imshow(fields[0].T, origin='lower'); axs[0].set_title('field (true)')
+    im1 = axs[1].imshow(fields_pred[0].T, origin='lower'); axs[1].set_title('field (GP)')
+    # error calculation should avoid elements where true is zero
+    valid = np.where(fields[0].T > 0)
+    error = np.zeros_like(fields[0].T)
+    error[valid] = np.abs(fields[0].T[valid] - fields_pred[0].T[valid]) / fields[0].T[valid]
+    im2 = axs[2].imshow(error, origin='lower', vmin=0, vmax=1); axs[2].set_title('relative error')
+    fig.colorbar(im0, ax=axs[0], fraction=0.046); fig.colorbar(im1, ax=axs[1], fraction=0.046); fig.colorbar(im2, ax=axs[2], fraction=0.046)
     plt.savefig(f"{name}_at_{time_index}.png")
 
 def print_error_metrics(X, X_pred):
@@ -322,6 +357,7 @@ def main():
     time_steps = sorted(output.keys())
     # Ux = np.array([output[k]['scalars']['rho'] for k in time_steps])  # (T, nx, ny)
     # Uy = np.array([output[k]['scalars']['phi'] for k in time_steps])  # (T, nx, ny)
+    Occ = np.array([output[k]['scalars']['occ'] for k in time_steps])  # (T, nx, ny)
     Ux = np.array([output[k]['vectors']['disp'][0] for k in time_steps], dtype=np.float64)
     Uy = np.array([output[k]['vectors']['disp'][1] for k in time_steps], dtype=np.float64)
     # Ux = np.array([output[k]['vectors']['vel'][0]  for k in time_steps])  # (T, nx, ny)
@@ -335,9 +371,9 @@ def main():
     dt *= (time_steps[1] - time_steps[0])
 
     # Build centered snapshots and POD or Autoencoder
-    X, shape = build_snapshots(Ux, Uy)
+    X, shape = build_snapshots_from_list([Occ, Ux, Uy])
     epochs = 5000
-    enc, dec, A, hist = train_autoencoder(X, latent_dim=2, epochs=epochs, batch_size=64, lr=5e-4, device="cuda", val_split=0.2, patience=200, print_every=50)
+    enc, dec, A, hist = train_autoencoder(X, latent_dim=2, epochs=epochs, batch_size=64, lr=1e-4, device="cuda", val_split=0.2, patience=200, print_every=50)
     # Save and check the loss curves
     plot_ae_history(hist, savepath="ae_train_val_loss.png")
 
@@ -355,9 +391,10 @@ def main():
 
     # Visualize the 2D field over time (10 snapshots)
     for i in range(0, len(t), len(t)//10):
-        visualize_2d_field_magnitude(X, X_pred, shape, time_index=i, name='vec_field')
+        visualize_2d_field_magnitude(X, X_pred, shape, time_index=i, channels=[1, 2], name='vel_field_magnitude')
+        visualize_2d_field(X, X_pred, shape, time_index=i, channel=0, name='occ_field')
 
-    # # Select every nth snapshot for train/test split
+    # Select every nth snapshot for train/test split
     # n = 5  # e.g., select every 5th snapshot
     # X_train = X[:, ::n]
     # t_train = t[::n]
@@ -368,7 +405,7 @@ def main():
     t_train = t[:mid]
 
     # POD on training set
-    enc, dec, A_train, hist = train_autoencoder(X_train, latent_dim=2, epochs=epochs, batch_size=64, lr=5e-4, device="cuda", val_split=0.2, patience=200, print_every=50)
+    enc, dec, A_train, hist = train_autoencoder(X_train, latent_dim=2, epochs=epochs, batch_size=64, lr=1e-4, device="cuda", val_split=0.2, patience=200, print_every=50)
     plot_ae_history(hist, savepath="test_ae_train_val_loss.png")
 
     # Fit SINDy on training POD coefficients
@@ -392,7 +429,8 @@ def main():
 
     # Visualize the 2D field over time (10 snapshots)
     for i in range(0, len(t), len(t)//10):
-        visualize_2d_field_magnitude(X, X_test_pred, shape, time_index=i, name='test_vec_field')
+        visualize_2d_field_magnitude(X, X_test_pred, shape, time_index=i, channels=[1, 2], name='test_vel_field_magnitude')
+        visualize_2d_field(X, X_test_pred, shape, time_index=i, channel=0, name='test_occ_field')
 
 if __name__ == "__main__":
     main()

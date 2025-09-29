@@ -11,8 +11,12 @@ readParamsFromTable(
     kr=0.1,
     # rolling/bending plastic limit
     eta=0.7,
+    # initial friction coefficient
+    ctrMu=10,
     # final friction coefficient
     mu=30,
+    # wall friction coefficient
+    wallMu=60,    
     # number of particles
     num=1000,
     unknownOk=True
@@ -29,7 +33,7 @@ isBatch = runningInBatch()
 if isBatch:
     description = O.tags['description']
 else:
-    description = 'triax_DEM_test_run'
+    description = 'collapse_DEM_test_run'
 
 # Domain size
 width = 0.7
@@ -49,12 +53,10 @@ v = table.v  # micro Poisson's ratio
 kr = table.kr  # rolling/bending stiffness
 eta = table.eta  # rolling/bending plastic limit
 mu = radians(table.mu)  # contact friction during shear
-ctrMu = radians(table.mu)  # use small mu to prepare dense packing?
+ctrMu = radians(table.ctrMu)  # use small mu to prepare dense packing?
+wallMu = radians(table.wallMu)  # wall friction
 rho = 2650  # soil density
-
-# define wall properties
-frict_wall = mu
-density_wall = rho
+create_packing = False  # create a new packing or load an existing one?
 
 #: create materials
 spMat = O.materials.append(
@@ -62,7 +64,7 @@ spMat = O.materials.append(
                 alphaKr=kr, alphaKtw=kr, momentRotationLaw=True, etaRoll=eta, etaTwist=eta))
 
 wallMat = O.materials.append(
-    CohFrictMat(young=E, poisson=v, frictionAngle=ctrMu, density=density_wall, isCohesive=False,
+    CohFrictMat(young=E, poisson=v, frictionAngle=ctrMu, density=rho, isCohesive=False,
                 momentRotationLaw=False, label='walls'))
 
 # create rectangular box from facets
@@ -74,16 +76,21 @@ bottom_wall = O.bodies.append(wall((0,0,0), axis=1, sense=1, material=wallMat))
 
 # create empty sphere packing
 sp = pack.SpherePack()
-# generate randomly spheres with uniform radius distribution
-sp.makeCloud((mn[0], mn[1], (mn+mx)[2]), (mx[0], mx[1], (mn+mx)[2]), rMean=.01, rRelFuzz=.1, num=1000)
+if create_packing:
+    # generate randomly spheres with uniform radius distribution
+    sp.makeCloud((mn[0], mn[1], (mn+mx)[2]), (mx[0], mx[1], (mn+mx)[2]), rMean=.01, rRelFuzz=.1, num=1000)
+    # add the sphere pack to the simulation
+    sp.toSimulation(material=spMat)
+else:
+    sp.load(f"initial_packing_{ctrMu:.3f}.txt")
+    sp.toSimulation(material=spMat)
 
-# add the sphere pack to the simulation
-sp.toSimulation(material=spMat)
-
+# make it quasi-2D by blocking motion in z direction
 for b in O.bodies:
         if isinstance(b.shape, Sphere):
              b.state.blockedDOFs = 'zXY'  # make it quasi-2D
 
+#: Define the engines
 O.engines = [
         ForceResetter(),
         InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_Facet_Aabb(), Bo1_Wall_Aabb()]),
@@ -96,11 +103,12 @@ O.engines = [
                         useIncrementalForm=True),
                 Law2_ScGeom_FrictPhys_CundallStrack()],
         ),
-        GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.8),
+        # GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.8),
         NewtonIntegrator(damping=damp, gravity=Vector3(0, -9.81, 0), label='newton'),
         PyRunner(command="check_unbalanced_before_collapse()",
                 iterPeriod=1000,
                 dead=False,
+                firstIterRun=10000,
                 label='check_unbalanced'),
         PyRunner(command="measure_run_out_distance()",
                 iterPeriod=1000,
@@ -113,8 +121,16 @@ O.dt = 0.5 * PWaveTimeStep()
 
 def check_unbalanced_before_collapse():
     if unbalancedForce() < stabilityRatio:
+        # Save the particle configuration before the collapse
+        if not create_packing:
+            sp.fromSimulation()
+            sp.save(f"initial_packing_{ctrMu:.3f}.txt")
         # Remove the wall at x=max (right wall) to start the flow
         O.bodies.erase(right_wall)
+        # Set higher friction for the rest of the simulation
+        setContactFriction(mu)
+        O.bodies[left_wall].material.frictionAngle = mu
+        O.bodies[bottom_wall].material.frictionAngle = wallMu
         # Switch to another function to check when the collapse is finished
         check_unbalanced.command = 'check_unbalanced_after_collapse()'
         print('Right wall removed, column collapse started.')
@@ -124,7 +140,12 @@ def check_unbalanced_before_collapse():
 def check_unbalanced_after_collapse():
     # Check if the system has stabilized after the collapse
     if unbalancedForce() < stabilityRatio:
+    # if measure_run_out.nDone >= 500:
         print('Collapse finished, system is stable.')
+        # # save the coarse-grained fields into a npy file using simulation description
+        # np.save(f"column_collapse_{description}.npy", output)
+        # save plot data
+        plot.saveDataTxt(f"column_collapse_{description}.txt")
         O.pause()
 
 def measure_run_out_distance():
@@ -146,9 +167,10 @@ def measure_run_out_distance():
                  com_x=com[0],
                  com_y=com[1])
     # Save VTK output
-    vtkExport.exportSpheres()
+    if export_VTK: vtkExport.exportSpheres()
     # Save coarse-grained fields into a diction with iteration number as key
-    output[O.iter] = write_particle_data()
+    # output[O.iter] = write_particle_data()
+    write_particle_data()
 
 def write_particle_data():
     sys.path.append("/home/jovyan")
@@ -156,7 +178,7 @@ def write_particle_data():
     from plotting import plot_scalars_2d, plot_vector_field_2d, plot_stress_2d
     from checks import check_mass_momentum_conservation
     d = 0.01
-    dx = 0.015
+    dx = 0.02
     dy = 0.01
     nx = ny = 100
     # write particle data into numpy arrays
@@ -204,12 +226,13 @@ def write_particle_data():
     #     cg_out=out,
     #     rtol_mass=1e-6, rtol_mom=1e-4
     # )
-    # save the coarse-grained fields into a npz file
-    np.savez(f"column_collapse_{O.iter}_fields.npz", **out)
+    # save the coarse-grained fields into a npy file
+    np.save(f"column_collapse_{description}_{O.iter}_fields.npy", out)
     return out
 
 # define a VTK recorder
 vtkExport = VTKExporter(f'column_collapse_{description}')
+export_VTK = False  # whether to export VTK files during the simulation
 
 # run in batch mode
 O.run()
