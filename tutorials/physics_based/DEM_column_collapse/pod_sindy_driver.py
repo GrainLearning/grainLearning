@@ -42,51 +42,54 @@ def main():
     tag = "POD-SINDY"
     print_error_metrics(X, X_pred, tag=tag)
 
-    # Visualize the 2D field over time (10 snapshots)
+    # Visualize the 2D field over time
     for i in range(0, len(t)):
-        visualize_2d_field_magnitude(X, X_pred, shape, time_index=i, channels=[1, 2], name=tag+'vel_field_magnitude')
-        visualize_2d_field(X, X_pred, shape, time_index=i, channel=0, name=tag+'rho_field')
+        visualize_2d_field_magnitude(X, X_pred, shape, time_index=i, channels=[1, 2], name='vel_field_magnitude', tag=tag)
+        visualize_2d_field(X, X_pred, shape, time_index=i, channel=0, name='rho_field', tag=tag)
     from rom_io import create_gif_from_pngs
-    create_gif_from_pngs(name=tag+'vel_field_magnitude')
-    create_gif_from_pngs(name=tag+'rho_field')
+    create_gif_from_pngs(name=f'{tag}_vel_field_magnitude')
+    create_gif_from_pngs(name=f'{tag}_rho_field')
 
+    tags = ['POD-GP_interpolate', 'POD-GP_extrapolate']
+    X_train_list = []
+    t_train_list = []
     # Select every nth snapshot for train/test split
-    # n = 5  # e.g., select every 5th snapshot
-    # X_train = X[:, ::n]
-    # t_train = t[::n]
+    n = 5  # e.g., select every 5th snapshot
+    X_train_list.append(X[:, ::n])
+    t_train_list.append(t[::n])
 
     # Select the first half for training
     mid = X.shape[1] // 2
-    X_train = X[:, :mid]
-    t_train = t[:mid]
+    X_train_list.append(X[:, :mid])
+    t_train_list.append(t[:mid])
 
-    # Center training data
-    Xc_train, xbar_train = center_snapshots(X_train)
-        
-    # POD on training set
-    U_r_train, A_train, Svals_train = pod(Xc_train, energy=0.99)
-    r_train = U_r_train.shape[1]
-    print(f"[POD] train: kept r = {r_train} modes (energy 99%)")
+    for i, (X_train, t_train, tag) in enumerate(zip(X_train_list, t_train_list, tags)):
+        # Center training data
+        Xc_train, xbar_train = center_snapshots(X_train)
+            
+        # POD on training set
+        U_r_train, A_train, Svals_train = pod(Xc_train, energy=0.99)
+        r_train = U_r_train.shape[1]
+        print(f"[POD] train: kept r = {r_train} modes (energy 99%)")
 
-    # Fit SINDy on training POD coefficients
-    num_modes_train = min(3, r_train)
-    model_train = fit_sindy_continuous(A_train[:, :num_modes_train], t_train, poly_degree=1, thresh=0.1, diff="smoothed")
-    model_train.print()
+        # Fit SINDy on training POD coefficients
+        num_modes_train = min(3, r_train)
+        model_train = fit_sindy_continuous(A_train[:, :num_modes_train], t_train, poly_degree=1, thresh=0.1, diff="smoothed")
+        model_train.print()
 
-    # Rollout on test set
-    A0_test = A_train[0, :num_modes_train]
-    X_test_pred = simulate_and_reconstruct(model_train, U_r_train[:, :num_modes_train], A0_test, t_eval=t, xbar=xbar_train)
+        # Rollout on test set
+        A0_test = A_train[0, :num_modes_train]
+        X_test_pred = simulate_and_reconstruct(model_train, U_r_train[:, :num_modes_train], A0_test, t_eval=t, xbar=xbar_train)
 
-    # Error metrics on test set
-    print_error_metrics(X, X_test_pred, tag="")
+        # Error metrics on test set
+        print_error_metrics(X, X_test_pred, tag="")
 
-    # Visualize the 2D field over time (10 snapshots)
-    for i in range(0, len(t)):
-        visualize_2d_field_magnitude(X, X_test_pred, shape, time_index=i, channels=[1, 2], name=tag+'test_vel_field_magnitude')
-        visualize_2d_field(X, X_test_pred, shape, time_index=i, channel=0, name=tag+'test_rho_field')
-    from rom_io import create_gif_from_pngs
-    create_gif_from_pngs(name=tag+'test_vel_field_magnitude')
-    create_gif_from_pngs(name=tag+'test_rho_field')
+        # Visualize the 2D field over time
+        for i in range(0, len(t)):
+            visualize_2d_field_magnitude(X, X_test_pred, shape, time_index=i, channels=[1, 2], name='test_vel_field_magnitude', tag=tag)
+            visualize_2d_field(X, X_test_pred, shape, time_index=i, channel=0, name='test_rho_field', tag=tag)
+        create_gif_from_pngs(name=f'{tag}_test_vel_field_magnitude')
+        create_gif_from_pngs(name=f'{tag}_test_rho_field')
 
 if __name__ == "__main__":
     main()

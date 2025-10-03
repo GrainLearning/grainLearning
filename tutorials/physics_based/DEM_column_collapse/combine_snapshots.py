@@ -42,3 +42,28 @@ def combine_data_per_sample(sampleID, step_interval=1000):
 for sampleID in range(num_samples):
     combined_data = combine_data_per_sample(sampleID)
     print(f"Combined data for sample {sampleID} saved.")
+
+# Plot all macroscopic trajectories
+import matplotlib.pyplot as plt
+
+# Pattern to match files
+pattern = os.path.join(__file__, "column_collapse_triax_Iter0_*.txt")
+
+# Find all matching files
+file_list = glob.glob(pattern)
+
+# Plot center of mass x- and y-coordinates over time for all samples, as well as the height and runout distance
+fig, axs = plt.subplots(2, 2, figsize=(10, 6))
+for i, fname in enumerate(file_list):
+    data = np.loadtxt(fname, skiprows=1)
+    label = f'SampleID_{i}'
+    axs[0, 0].plot(data[:, -1], data[:, 0], label=label)
+    axs[0, 1].plot(data[:, -1], data[:, 1], label=label)
+    axs[1, 0].plot(data[:, -1], data[:, 2], label=label)
+    axs[1, 1].plot(data[:, -1], data[:, 3], label=label)
+# add the right labels
+axs[0, 0].set_xlabel('time'); axs[0, 0].set_ylabel('com_x (m)')
+axs[0, 1].set_xlabel('time'); axs[0, 1].set_ylabel('com_y (m)')
+axs[1, 0].set_xlabel('time'); axs[1, 0].set_ylabel('height (m)')
+axs[1, 1].set_xlabel('time'); axs[1, 1].set_ylabel('runout (m)')
+plt.savefig(os.path.join(data_dir, "macro_measures.png"))

@@ -59,7 +59,7 @@ def unpack_2d_field(xvec, shape, channels):
         fields.append(xvec[c * nx * ny:(c + 1) * nx * ny].reshape(nx, ny))
     return fields
 
-def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], name='2d_field'):
+def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], name='2d_field', tag=""):
     """Save side-by-side magnitude plots (true, predicted, relative error) at a time index.
 
     - X, X_pred: (D, T) matrices (flattened stacked channels), same D and T.
@@ -78,18 +78,18 @@ def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], 
     sp_pred = np.hypot(fields_pred[0], fields_pred[1])
     # plot side-by-side true, pred, and relative error
     fig, axs = plt.subplots(1,3, figsize=(12,4), constrained_layout=True)
-    im0 = axs[0].imshow(sp_true.T, origin='lower'); axs[0].set_title('speed (true)')
-    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title('speed (GP)')
+    im0 = axs[0].imshow(sp_true.T, origin='lower'); axs[0].set_title(f'speed ({tag})')
+    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title(f'speed ({tag})')
     # error calculation should avoid elements where true is zero
     valid = np.where(sp_true.T > 0)
     error = np.zeros_like(sp_true.T)
     error[valid] = np.abs(sp_true.T[valid] - sp_pred.T[valid]) / sp_true.T[valid]
     im2 = axs[2].imshow(error, origin='lower', vmin=0, vmax=1); axs[2].set_title('relative error')
     fig.colorbar(im0, ax=axs[0], fraction=0.046); fig.colorbar(im1, ax=axs[1], fraction=0.046); fig.colorbar(im2, ax=axs[2], fraction=0.046)
-    plt.savefig(f"{name}_at_{time_index}.png")
+    plt.savefig(f"{tag}_{name}_at_{time_index}.png")
     plt.close()
 
-def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field'):
+def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field', tag=""):
     """Save side-by-side scalar field plots (true, predicted, relative error) for one channel.
 
     Parameters mirror visualize_2d_field_magnitude, but for a single channel index.
@@ -99,15 +99,15 @@ def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field')
     fields_pred = unpack_2d_field(X_pred[:, time_index], shape, [channel])
     # plot side-by-side true, pred, and relative error
     fig, axs = plt.subplots(1,3, figsize=(12,4), constrained_layout=True)
-    im0 = axs[0].imshow(fields[0].T, origin='lower'); axs[0].set_title('field (true)')
-    im1 = axs[1].imshow(fields_pred[0].T, origin='lower'); axs[1].set_title('field (GP)')
+    im0 = axs[0].imshow(fields[0].T, origin='lower'); axs[0].set_title(f'field ({tag})')
+    im1 = axs[1].imshow(fields_pred[0].T, origin='lower'); axs[1].set_title(f'field ({tag})')
     # error calculation should avoid elements where true is zero
     valid = np.where(fields[0].T > 0)
     error = np.zeros_like(fields[0].T)
     error[valid] = np.abs(fields[0].T[valid] - fields_pred[0].T[valid]) / fields[0].T[valid]
     im2 = axs[2].imshow(error, origin='lower', vmin=0, vmax=1); axs[2].set_title('relative error')
     fig.colorbar(im0, ax=axs[0], fraction=0.046); fig.colorbar(im1, ax=axs[1], fraction=0.046); fig.colorbar(im2, ax=axs[2], fraction=0.046)
-    plt.savefig(f"{name}_at_{time_index}.png")
+    plt.savefig(f"{tag}_{name}_at_{time_index}.png")
     plt.close()
 
 def natural_sort_key(s):
