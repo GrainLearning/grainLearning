@@ -7,25 +7,7 @@ from torch.utils.data import DataLoader, TensorDataset
 # ------------------------------
 # 1) Build snapshot matrix and build POD projection or Auto-econder/decoder
 # ------------------------------
-def build_snapshots(Ux, Uy):
-    """Stack two channels [Ux, Uy] into a (D, T) snapshot matrix and return shape.
-
-    Parameters
-    - Ux, Uy: arrays of shape (T, nx, ny)
-
-    Returns
-    - X: (D, T) snapshot matrix with D = 2*nx*ny, columns are flattened [Ux_k, Uy_k]
-    - shape: (nx, ny)
-    """
-    T, nx, ny = Ux.shape
-    D = 2 * nx * ny
-    X = np.empty((D, T))
-    for k in range(T):
-        xk = np.concatenate([Ux[k].ravel(), Uy[k].ravel()])
-        X[:, k] = xk
-    return X, (nx, ny)
-
-def build_snapshots_from_list(U_list):
+def build_snapshots_from_list(U_list, normalization=True):
     """Stack an arbitrary list of channels into a (D, T) snapshot matrix and return shape.
 
     Parameters
@@ -34,6 +16,7 @@ def build_snapshots_from_list(U_list):
     Returns
     - X: (D, T) uncentered snapshot matrix with D = C*nx*ny where C=len(U_list)
     - shape: (nx, ny)
+    - channel_bounds: (C, 2) min/max per channel if normalization else None
     """
     n_channels = len(U_list)
     assert len(U_list) >= 1
@@ -45,7 +28,55 @@ def build_snapshots_from_list(U_list):
     for k in range(T):
         xk = np.concatenate([u[k].ravel() for u in U_list])
         X[:, k] = xk
-    return X, (nx, ny)
+    channel_bounds = np.zeros((n_channels, 2))
+    for c in range(n_channels):
+        # Extract channel slice for all time steps
+        channel_data = X[c*nx*ny:(c+1)*nx*ny, :]
+        channel_bounds[c, 0] = channel_data.min()
+        channel_bounds[c, 1] = channel_data.max()
+    if normalization:
+        X = transform(X, channel_bounds)
+    return X, (nx, ny), channel_bounds
+
+def transform(X, channel_bounds):
+    """Apply min-max normalization to X using channel_bounds.
+    - X: (D, T) snapshot matrix to normalize
+    - channel_bounds: (C, 2) min/max per channel
+    """
+    C = channel_bounds.shape[0]
+    D, T = X.shape
+    channel_size = D // C
+    for c in range(C):
+        idx_start = c * channel_size
+        idx_end = (c + 1) * channel_size
+        a = X[idx_start:idx_end, :] - channel_bounds[c, 0]
+        b = channel_bounds[c, 1] - channel_bounds[c, 0] + 1e-12
+        X[idx_start:idx_end, :] = a / b
+    return X
+
+def inverse_transform(X, channel_bounds):
+    """Apply inverse min-max normalization to X using channel_bounds.
+    
+    - X: (D, T) snapshot matrix to unnormalize
+    - channel_bounds: (C, 2) min/max per channel
+    """
+    # X: (D, T), channel_bounds: (C, 2)
+    C = channel_bounds.shape[0]
+    D, T = X.shape
+    # Compute per-channel indices
+    channel_size = D // C
+    X_inv = np.zeros_like(X)
+    for c in range(C):
+        idx_start = c * channel_size
+        idx_end = (c + 1) * channel_size
+        min_c = channel_bounds[c, 0]  # (T,)
+        max_c = channel_bounds[c, 1]  # (T,)
+        # Broadcast min/max to shape (channel_size, T)
+        min_c_b = np.broadcast_to(min_c, (channel_size, T))
+        max_c_b = np.broadcast_to(max_c, (channel_size, T))
+        # Inverse min-max normalization
+        X_inv[idx_start:idx_end, :] = X[idx_start:idx_end, :] * (max_c_b - min_c_b) + min_c_b
+    return X_inv
 
 def center_snapshots(X):
     xbar = X.mean(axis=1, keepdims=True)
@@ -79,54 +110,73 @@ def project_data_to_modal_derivative(U_r, Vx, Vy):
     Returns
     - A_dot: (T, r) modal time derivatives
     """
-    V, _ = build_snapshots(Vx, Vy)
+    V, _ = build_snapshots_from_list([Vx, Vy])
     A_dot = V.T @ U_r
     return A_dot
 
-def build_master_snapshots(files, channels="disp", t_max=-1):
+def build_master_snapshots(files, channels="disp", t_max=-1, normalization=True):
     """Build a global snapshot matrix from multiple runs.
 
     Parameters
     - files: list of .npy file paths
     - channels: which channels to load (see rom_io.load_2d_trajectory_from_file)
     - t_max: optional cap on time steps per run
+    - normalization: True or False for channel-wise [0,1] scaling
 
     Returns
     - X: (D, T_total) concatenated snapshot matrix from all runs
     - shapes: list of (nx, ny) shapes per run
+    - X_all: list of (D, T_i) per-run snapshot matrices
+    - channel_bounds: (C, 2) min/max per channel if normalization else None
     """
     from rom_io import load_2d_trajectory_from_file  # local import to avoid circular deps
     X_all = []
     shapes = []
+    channel_bounds = []
     for f in files:
-        X, shape = load_2d_trajectory_from_file(f, channels=channels, t_max=t_max)
+        U_list = load_2d_trajectory_from_file(f, channels=channels, t_max=t_max)
+        X, shape, bounds = build_snapshots_from_list(U_list, normalization=False)
         X_all.append(X)
         shapes.append(shape)
+        channel_bounds.append(bounds)
     X_concat = np.concatenate(X_all, axis=1)
-    return X_concat, shapes, X_all
 
-def build_master_pod(files, channels="disp", energy=0.99, t_max=-1):
+    # Compute global channel bounds
+    channel_bounds = np.array(channel_bounds)  # shape: (n_runs, n_channels, 2)
+    _, n_channels, _ = channel_bounds.shape
+
+    # look for global min/max per channel across all runs
+    global_channel_bounds = np.zeros((n_channels, 2))
+    global_channel_bounds[:, 0] = channel_bounds[:, :, 0].min(axis=0)  # min over runs
+    global_channel_bounds[:, 1] = channel_bounds[:, :, 1].max(axis=0)  # max over runs
+    channel_bounds = global_channel_bounds
+
+    if normalization:
+        X_all_norm = []
+        for Xi, shape in zip(X_all, shapes):
+            Xi = transform(Xi, channel_bounds)
+            X_all_norm.append(Xi)
+        X_concat = np.concatenate(X_all_norm, axis=1)
+    return X_concat, shapes, X_all, channel_bounds
+
+def build_master_pod(X_concat, X_all, energy=0.99):
     """Build a global POD basis from multiple runs and return per-run coefficients.
 
     Parameters
-    - files: list of .npy file paths
-    - channels: which channels to load (see rom_io.load_2d_trajectory_from_file)
+    - X_concat: concatenated snapshot matrix from all runs
+    - X_all: list of (D, T_i) per-run snapshot matrices
     - energy: cumulative energy fraction for basis truncation
-    - t_max: optional cap on time steps per run
 
     Returns
     - U_r: (D, r) common basis, r chosen by energy
     - A_list: list of (T_i, r) POD coefficients per run
-    - traj_X: list of (D, T_i) per-run snapshot matrices
-    - shapes: list of (nx, ny) per run
     """
-    X_concat, shapes, X_all = build_master_snapshots(files, channels=channels, t_max=t_max)
     U_r, A_concat, Svals = pod(X_concat, energy=energy)
     A_list = []
     for X in X_all:
         A_i = (X.T @ U_r)
         A_list.append(A_i)
-    return U_r, A_list, X_all, shapes
+    return U_r, A_list
 
 # --- Autoencoder definition ---
 class Encoder(nn.Module):

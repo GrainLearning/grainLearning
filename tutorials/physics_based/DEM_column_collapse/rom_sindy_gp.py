@@ -87,11 +87,14 @@ def fit_predict_gp_sklearn(t_train, y_train, t_query):
     The kernel form is RBF + WhiteKernel; its hyperparameters are optimized via
     scikit-learn's GaussianProcessRegressor (with restarts).
     """
-    kernel = C(1.0, (1e-3, 1e3)) * RBF(length_scale=0.2*np.ptp(t_train)+1e-12,
-                                       length_scale_bounds=(1e-6, 1e6)) \
-             + WhiteKernel(noise_level=1e-10, noise_level_bounds=(1e-12, 1e-3))
+    # The hyperparameters (kernel parameters) are automatically optimized by GaussianProcessRegressor during fitting.
+    # You can access the optimized parameters via gp.kernel_ after fitting.
+    kernel = C(1.0, (1e-4, 1e4)) * RBF(length_scale=0.2*np.ptp(t_train)+1e-12,
+                                       length_scale_bounds=(1e-8, 1e8)) \
+             + WhiteKernel(noise_level=1e-10, noise_level_bounds=(1e-12, 1e-1))
     gp = GaussianProcessRegressor(kernel=kernel, normalize_y=True, n_restarts_optimizer=3, alpha=0.0)
     gp.fit(t_train.reshape(-1,1), y_train)
+    # Optimized kernel parameters are in gp.kernel_
     y_pred, _ = gp.predict(t_query.reshape(-1,1), return_std=True)
     return y_pred
 

@@ -6,41 +6,40 @@ from PIL import Image
 # ----------------------------------------
 # 0) Helper functions for input and output
 # ----------------------------------------
-def load_2d_trajectory_from_file(npy_path, channels="disp", t_max=-1):
-    """Load a 2D trajectory and stack requested channels into a snapshot matrix.
+def load_2d_trajectory_from_file(npy_path, channels=["rho"], t_max=-1):
+    """Load a 2D trajectory and stack requested channels into a list.
 
     Parameters
     - npy_path: Path to a .npy file produced by the CG pipeline (dict keyed by time step index).
-    - channels: Which data to read, one of {'disp','vel','scalar_rho_phi'}.
-      'disp'/'vel' read 2D vector fields; 'scalar_rho_phi' reads two scalar fields.
+    - channels: Which data to read, one or a combination of 
+      ['disp_x', 'disp_y', 'vel_x', 'vel_y', 'rho', 'occ'].
+      ['disp_x', 'vel_y'] read a 2D vector field; ['rho', 'occ'] reads two scalar fields.
     - t_max: Optional cap on number of time steps to load (useful for quick tests).
 
     Returns
-    - X: (D, T) snapshot matrix, with column k being flattened fields at time k.
-    - shape: (nx, ny) spatial grid shape for unpacking/plotting later.
-
-    Notes
-    - Uses rom_pod_ae.build_snapshots to construct X; mean-centering is not applied here.
-    - The order of channels is preserved as listed by 'channels' mapping above.
+    - U_list: list of arrays, each of shape (T, nx, ny), all with identical shapes
     """
-    from rom_pod_ae import build_snapshots  # local import to avoid circular deps
     print(f"[load_2d_trajectory_from_file] Loading {npy_path} with channels={channels} until t_max={t_max}")
     out = np.load(npy_path, allow_pickle=True).item()
     time_steps = list(out.keys())
     time_steps = time_steps[:t_max]
-    if channels == "disp":
-        Ux = np.array([out[k].item()['vectors']['disp'][0] for k in time_steps])
-        Uy = np.array([out[k].item()['vectors']['disp'][1] for k in time_steps])
-    elif channels == "vel":
-        Ux = np.array([out[k].item()['vectors']['vel'][0]  for k in time_steps])
-        Uy = np.array([out[k].item()['vectors']['vel'][1]  for k in time_steps])
-    elif channels == "scalar_rho_phi":
-        Ux = np.array([out[k].item()['scalars']['rho'] for k in time_steps])
-        Uy = np.array([out[k].item()['scalars']['phi'] for k in time_steps])
-    else:
-        raise ValueError("Unsupported channels")
-    X, shape = build_snapshots(Ux, Uy)
-    return X, shape
+    U_list = []
+    for ch in channels:
+        if ch == "disp_x":
+            U_list.append(np.array([out[k].item()['vectors']['disp'][0] for k in time_steps]))
+        elif ch == "disp_y":
+            U_list.append(np.array([out[k].item()['vectors']['disp'][1] for k in time_steps]))
+        elif ch == "vel_x":
+            U_list.append(np.array([out[k].item()['vectors']['vel'][0]  for k in time_steps]))
+        elif ch == "vel_y":
+            U_list.append(np.array([out[k].item()['vectors']['vel'][1]  for k in time_steps]))
+        elif ch == "rho":
+            U_list.append(np.array([out[k].item()['scalars']['rho'] for k in time_steps]))
+        elif ch == "occ":
+            U_list.append(np.array([out[k].item()['scalars']['occ'] for k in time_steps]))
+        else:
+            raise ValueError(f"Unsupported channel {ch}")
+    return U_list
 
 def unpack_2d_field(xvec, shape, channels):
     """Slice flattened multi-channel vector into selected channel 2D arrays.
@@ -134,18 +133,21 @@ def print_error_metrics(X, X_pred, tag=""):
 
     - tag: optional prefix to label the evaluation block (e.g., '[test]').
     """
-    print_global_error(X, X_pred, tag=tag)
+    global_error = print_global_error(X, X_pred, tag=tag)
+    errors = []
     for k in range(X.shape[1]):
         num = np.linalg.norm(X[:, k] - X_pred[:, k])
         den = np.linalg.norm(X[:, k]) + 1e-12
         relk = num / den
         print(f"  step {k:4d} relative error: {relk:.4f}")
+        errors.append(relk)
+    return global_error, errors
 
 def print_global_error(X, X_pred, tag=""):
     """Compute and print global relative error ||X-X_pred|| / ||X|| with small epsilon."""
-    rel = np.linalg.norm(X - X_pred) / (np.linalg.norm(X) + 1e-12)
-    print(f"{tag} Global relative error: {rel:.4f}")
-    return rel
+    global_error = np.linalg.norm(X - X_pred) / (np.linalg.norm(X) + 1e-12)
+    print(f"{tag} Global relative error: {global_error:.4f}")
+    return global_error
 
 def plot_ae_history(history, savepath="ae_loss_curve.png"):
     """Plot train vs val loss from history returned by train_autoencoder.
