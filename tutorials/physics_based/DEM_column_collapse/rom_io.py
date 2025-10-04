@@ -170,3 +170,14 @@ def plot_ae_history(history, savepath="ae_loss_curve.png"):
     plt.savefig(savepath, dpi=150)
     plt.close()
     print(f"[plot_ae_history] Saved to {savepath}")
+
+
+def check_errors(tag, errors):
+    # Check if error metrics file exists, and if yes, check whether they match
+    if os.path.exists(f"{tag}_errors.txt"):
+        if np.allclose(errors, np.loadtxt(f"{tag}_errors.txt")):
+            print(f"[INFO] Error metrics for {tag} match the saved file.")
+        else:
+            raise ValueError(f"[ERROR] Error metrics for {tag} do not match the saved file.")
+    else:
+        np.savetxt(f"{tag}_errors.txt", errors)

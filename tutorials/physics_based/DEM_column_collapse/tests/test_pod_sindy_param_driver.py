@@ -1,7 +1,7 @@
 import numpy as np
 from rom_pod_ae import build_master_pod, build_master_snapshots, inverse_transform, transform
 from rom_sindy_gp import fit_sindycp_continuous, simulate_and_reconstruct_cp, multivariate_GP
-from rom_io import create_gif_from_pngs, print_global_error
+from rom_io import create_gif_from_pngs, print_global_error, check_errors
 
 def POD_SINDy_parametric_time(file_list, u_list, t_list, channels="disp", energy=0.99, num_modes=10, t_max=-1, normalization=None):
     """
@@ -92,8 +92,13 @@ def ROM_parametric_time():
     # Extract time steps from the first file
     output0 = np.load(file_list[0], allow_pickle=True).item()
     dt = 1e3 * 1.97e-5
-    t_max = 200
 
+    # Cut to a manageable size for testing
+    t_max = 200
+    file_list = file_list[:16]
+    u_list = u_list[:16]
+
+    # Define time history
     t_list = (np.array(list(output0.keys())) + 1e4) * dt
     t_list = t_list[:t_max]
     # Prepare lists for trajectories
@@ -107,7 +112,7 @@ def ROM_parametric_time():
         file_list, u_list, t_list, channels=channels, energy=energy, num_modes=num_modes, t_max=t_max, normalization=True)
     A0_list = [A[0] for A in A_list]
     errors = evaluate_parametric_rom(model, U_use, A0_list, X_list, shapes, u_list, t_list, channels=channels, channel_bounds=channel_bounds, tag=tag)
-    np.savetxt(f"{tag}_errors.txt", errors)
+    check_errors(tag, errors)
 
     # Split data into train/test runs and evaluate
     mid = len(file_list) // 2
@@ -131,13 +136,14 @@ def ROM_parametric_time():
     # Evaluate on test runs
     print("\nEvaluating parametric ROM on training runs:")
     tag_train = tag + "_Train"
-    train_errors = evaluate_parametric_rom(model_train, U_use_train, A0_train, X_list_train, shapes_train, u_list_train, t_list, channels=channels, create_visual=True, every=5, channel_bounds=channel_bounds_train, tag=tag_train)
-    np.savetxt(f"{tag_train}_errors.txt", train_errors)
+    train_errors = evaluate_parametric_rom(model_train, U_use_train, A0_train, X_list_train, shapes_train, u_list_train, t_list, channels=channels, channel_bounds=channel_bounds_train, tag=tag_train)
+    check_errors(tag_train, train_errors)
 
     print("\nEvaluating parametric ROM on test runs:")
     tag_test = tag + "_Test"
-    test_errors = evaluate_parametric_rom(model_train, U_use_train, A0_test, X_list_test, shapes_test, u_list_test, t_list, channels=channels, create_visual=True, every=5, channel_bounds=channel_bounds_train, tag=tag_test)
-    np.savetxt(f"{tag_test}_errors.txt", test_errors)
+    test_errors = evaluate_parametric_rom(model_train, U_use_train, A0_test, X_list_test, shapes_test, u_list_test, t_list, channels=channels, channel_bounds=channel_bounds_train, tag=tag_test)
+    check_errors(tag_test, test_errors)
 
 if __name__ == "__main__":
+    np.random.seed(36)
     ROM_parametric_time()
