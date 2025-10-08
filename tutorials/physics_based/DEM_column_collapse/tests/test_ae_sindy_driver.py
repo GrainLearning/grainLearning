@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from rom_pod_ae import build_snapshots_from_list, train_autoencoder
 from rom_sindy_gp import fit_sindy_continuous, simulate_and_reconstruct_autoencoder
 from rom_io import print_error_metrics, check_errors
@@ -77,4 +78,5 @@ def main():
 
 if __name__ == "__main__":
     np.random.seed(36)
+    torch.manual_seed(0)
     main()

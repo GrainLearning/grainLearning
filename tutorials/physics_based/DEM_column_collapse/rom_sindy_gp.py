@@ -228,7 +228,7 @@ def simulate_and_reconstruct_autoencoder(model, dec, A0, t_eval, xbar=None, inte
         X_pred += xbar[:, None]
     return X_pred
 
-def simulate_and_reconstruct_cp(model, U_r, A0, u, t_eval, xbar=None):
+def simulate_and_reconstruct_cp(model, U_r, A0, t_eval, u, xbar=None):
     """Simulate SINDy-CP with constant or time-varying parameters u and reconstruct X."""
     if np.ndim(u) == 1:
         def u_fun(tau, u_const=u):

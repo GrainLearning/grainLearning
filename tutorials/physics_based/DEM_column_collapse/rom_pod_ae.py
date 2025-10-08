@@ -114,13 +114,13 @@ def project_data_to_modal_derivative(U_r, Vx, Vy):
     A_dot = V.T @ U_r
     return A_dot
 
-def build_master_snapshots(files, channels="disp", t_max=-1, normalization=True):
+def build_master_snapshots(files, channels="disp", t_max=None, normalization=True):
     """Build a global snapshot matrix from multiple runs.
 
     Parameters
     - files: list of .npy file paths
     - channels: which channels to load (see rom_io.load_2d_trajectory_from_file)
-    - t_max: optional cap on time steps per run
+    - t_max: optional cap on time steps per run (None means use all)
     - normalization: True or False for channel-wise [0,1] scaling
 
     Returns

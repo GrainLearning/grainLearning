@@ -6,7 +6,7 @@ from PIL import Image
 # ----------------------------------------
 # 0) Helper functions for input and output
 # ----------------------------------------
-def load_2d_trajectory_from_file(npy_path, channels=["rho"], t_max=-1):
+def load_2d_trajectory_from_file(npy_path, channels=["rho"], t_max=None):
     """Load a 2D trajectory and stack requested channels into a list.
 
     Parameters
