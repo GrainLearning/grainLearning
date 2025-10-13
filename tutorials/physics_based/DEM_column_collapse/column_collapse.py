@@ -26,14 +26,16 @@ import numpy as np
 from yade.params import table
 from yade import pack, plot
 from yade.export import VTKExporter
-#from grainlearning.tools import get_keys_and_data, write_dict_to_file
+import sys
+sys.path.append('/home/jovyan/GL/GrainLearning')
+from grainlearning.tools import get_keys_and_data, write_dict_to_file
 
 # check if run in batch mode
 isBatch = runningInBatch()
 if isBatch:
     description = O.tags['description']
 else:
-    description = 'collapse_DEM_test_run'
+    description = 'column_collapse_DEM_test_run'
 
 # Domain size
 width = 0.7
@@ -119,6 +121,9 @@ O.engines = [
 # default time step
 O.dt = 0.5 * PWaveTimeStep()
 
+# target number of measurement points to ensure consistent sequence length across runs
+target_num_points = 200
+
 def check_unbalanced_before_collapse():
     if unbalancedForce() < stabilityRatio:
         # Save the particle configuration before the collapse
@@ -133,6 +138,7 @@ def check_unbalanced_before_collapse():
         O.bodies[bottom_wall].material.frictionAngle = wallMu
         # Switch to another function to check when the collapse is finished
         check_unbalanced.command = 'check_unbalanced_after_collapse()'
+        check_unbalanced.dead = True
         print('Right wall removed, column collapse started.')
         # Activate the measurement of run-out distance
         measure_run_out.dead = False
@@ -140,12 +146,7 @@ def check_unbalanced_before_collapse():
 def check_unbalanced_after_collapse():
     # Check if the system has stabilized after the collapse
     if unbalancedForce() < stabilityRatio:
-    # if measure_run_out.nDone >= 500:
-        print('Collapse finished, system is stable.')
-        # # save the coarse-grained fields into a npy file using simulation description
-        # np.save(f"column_collapse_{description}.npy", output)
-        # save plot data
-        plot.saveDataTxt(f"column_collapse_{description}.txt")
+        print(f'Collapse finished, system is stable.')
         O.pause()
 
 def measure_run_out_distance():
@@ -167,12 +168,29 @@ def measure_run_out_distance():
                  com_x=com[0],
                  com_y=com[1])
     # Save VTK output
-    if export_VTK: vtkExport.exportSpheres()
-    # Save coarse-grained fields into a diction with iteration number as key
-    # output[O.iter] = write_particle_data()
-    write_particle_data()
+    if export_VTK:
+        vtkExport.exportSpheres()
+    # Optionally compute coarse-grained fields if dependencies are available
+    if export_CG:
+        write_particle_data()
+
+    # finalize when we have collected the target number of points
+    if measure_run_out.nDone == target_num_points:
+        print('Target number of measurement points reached; finalizing output files...')
+        # write simulation and parameter data in calibration-friendly format
+        data_file_name = f"{description}_sim.txt"
+        data_param_name = f"{description}_param.txt"
+        # initialize parameter dictionary from YADE table
+        param_data = {}
+        for name in table.__all__:
+            param_data[name] = eval('table.' + name)
+        # write out simulation time series and parameters
+        write_dict_to_file(plot.data, data_file_name)
+        write_dict_to_file(param_data, data_param_name)
+        O.pause()
 
 def write_particle_data():
+    import sys
     sys.path.append("/home/jovyan")
     from CG import UniformGrid, coarse_grain_weinhart
     from plotting import plot_scalars_2d, plot_vector_field_2d, plot_stress_2d
@@ -233,6 +251,7 @@ def write_particle_data():
 # define a VTK recorder
 vtkExport = VTKExporter(f'column_collapse_{description}')
 export_VTK = False  # whether to export VTK files during the simulation
+export_CG = False   # whether to export coarse-grained fields during the simulation
 
 # run in batch mode
 O.run()
