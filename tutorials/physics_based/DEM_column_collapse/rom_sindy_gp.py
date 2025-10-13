@@ -1,5 +1,4 @@
 import numpy as np
-import pysindy as ps
 from sklearn.preprocessing import StandardScaler
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKernel
@@ -14,6 +13,12 @@ def fit_sindy_continuous(A, t, poly_degree=3, thresh=0.5, diff="finite"):
     - t: (T,) time vector.
     - poly_degree, thresh, diff: library/optimizer and differentiation options.
     """
+    try:
+        import importlib
+        ps = importlib.import_module('pysindy')
+    except Exception as e:
+        raise ImportError("pysindy is required for SINDy-based ROMs. Install with `pip install pysindy`.") from e
+
     if diff == "finite":
         diff_method = ps.FiniteDifference()
     elif diff == "smoothed":
@@ -31,6 +36,12 @@ def fit_sindy_continuous(A, t, poly_degree=3, thresh=0.5, diff="finite"):
     return model
 
 def fit_sindy_with_derivative(A, A_dot, t, poly_degree=3, thresh=0.5):
+    try:
+        import importlib
+        ps = importlib.import_module('pysindy')
+    except Exception as e:
+        raise ImportError("pysindy is required for SINDy-based ROMs. Install with `pip install pysindy`.") from e
+
     lib = ps.PolynomialLibrary(degree=poly_degree, include_interaction=True, include_bias=True)
     opt = ps.STLSQ(threshold=thresh, alpha=1e-6, normalize_columns=True)
 
@@ -48,6 +59,12 @@ def fit_sindycp_continuous(A_list, t_list, u_list, poly_deg_state=2, poly_deg_pa
     - t_list: list/array of times (uniform assumed by PySINDy when given scalars).
     - u_list: list of parameters per trajectory (vector or time series).
     """
+    try:
+        import importlib
+        ps = importlib.import_module('pysindy')
+    except Exception as e:
+        raise ImportError("pysindy is required for SINDy-based ROMs. Install with `pip install pysindy`.") from e
+
     if diff == "finite":
         diff_method = ps.FiniteDifference()
     elif diff == "smoothed":
@@ -216,7 +233,11 @@ def simulate_and_reconstruct_gp(U_r, A, t_train, t_query, xbar=None):
 
 def simulate_and_reconstruct_autoencoder(model, dec, A0, t_eval, xbar=None, integrator="solve_ivp", device="cpu"):
     """Roll out SINDy in AE latent space and decode to full field using 'dec'."""
-    import torch
+    try:
+        import importlib
+        torch = importlib.import_module('torch')
+    except Exception as e:
+        raise ImportError("PyTorch is required for AE-SINDy functions. Install PyTorch to use this feature.") from e
     A_pred = model.simulate(A0, t_eval,
                             integrator=integrator,
                             integrator_kws=dict(rtol=1e-8, atol=1e-10)

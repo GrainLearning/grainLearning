@@ -1,8 +1,4 @@
 import numpy as np
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset
 
 # ------------------------------
 # 1) Build snapshot matrix and build POD projection or Auto-econder/decoder
@@ -178,33 +174,6 @@ def build_master_pod(X_concat, X_all, energy=0.99):
         A_list.append(A_i)
     return U_r, A_list
 
-# --- Autoencoder definition ---
-class Encoder(nn.Module):
-    """Simple MLP encoder mapping from full state (D) to latent (latent_dim)."""
-    def __init__(self, in_dim, latent_dim=8):
-        super().__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(in_dim, 256), nn.ReLU(),
-            nn.Linear(256, 128), nn.ReLU(),
-            nn.Linear(128, latent_dim)
-        )
-
-    def forward(self, x):
-        return self.fc(x)
-
-class Decoder(nn.Module):
-    """Simple MLP decoder mapping from latent (latent_dim) back to full state (D)."""
-    def __init__(self, latent_dim=8, out_dim=0):
-        super().__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(latent_dim, 128), nn.ReLU(),
-            nn.Linear(128, 256), nn.ReLU(),
-            nn.Linear(256, out_dim)
-        )
-
-    def forward(self, z):
-        return self.fc(z)
-
 def train_autoencoder(
     X_snapshots,
     latent_dim=8,
@@ -218,6 +187,42 @@ def train_autoencoder(
     seed=0
 ):
     """Train an autoencoder on snapshots, return enc/dec/latent A/history."""
+    try:
+        import importlib
+        torch = importlib.import_module('torch')
+        nn = importlib.import_module('torch.nn')
+        optim = importlib.import_module('torch.optim')
+        data_utils = importlib.import_module('torch.utils.data')
+        DataLoader, TensorDataset = data_utils.DataLoader, data_utils.TensorDataset
+    except Exception as e:
+        raise ImportError("PyTorch is required for the autoencoder. Install PyTorch to use AE-SINDy features.") from e
+
+    # Define AE models locally to avoid torch dependency at import time
+    class Encoder(nn.Module):
+        """Simple MLP encoder mapping from full state (D) to latent (latent_dim)."""
+        def __init__(self, in_dim, latent_dim=8):
+            super().__init__()
+            self.fc = nn.Sequential(
+                nn.Linear(in_dim, 256), nn.ReLU(),
+                nn.Linear(256, 128), nn.ReLU(),
+                nn.Linear(128, latent_dim)
+            )
+
+        def forward(self, x):
+            return self.fc(x)
+
+    class Decoder(nn.Module):
+        """Simple MLP decoder mapping from latent (latent_dim) back to full state (D)."""
+        def __init__(self, latent_dim=8, out_dim=0):
+            super().__init__()
+            self.fc = nn.Sequential(
+                nn.Linear(latent_dim, 128), nn.ReLU(),
+                nn.Linear(128, 256), nn.ReLU(),
+                nn.Linear(256, out_dim)
+            )
+
+        def forward(self, z):
+            return self.fc(z)
     import math
     rng = np.random.RandomState(seed)
 

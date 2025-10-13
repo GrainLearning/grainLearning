@@ -67,10 +67,10 @@ class BaseROM(ABC):
     def predict(self, *args, **kwargs):
         """Generate predictions from the fitted ROM."""
         pass
-        
-    def _prepare_training_snapshots(self) -> Tuple[np.ndarray, Tuple[int, int]]:
+
+    def _prepare_training_snapshots(self, channel_list: List[np.ndarray]) -> Tuple[np.ndarray, Tuple[int, int]]:
         """Build snapshots for training: computes and stores channel_bounds when normalize=True."""
-        X, shape, bounds = build_snapshots_from_list(self.channel_list, normalization=self.normalization)
+        X, shape, bounds = build_snapshots_from_list(channel_list, normalization=self.normalization)
         self.channel_bounds = bounds
         return X, shape
         
@@ -107,6 +107,17 @@ class BaseROM(ABC):
         self.A_train = A[:, :self.num_modes]        
         print(f"[POD] kept r = {r_full} modes (energy {self.energy*100:.0f}%)")
 
+    def parse_data_or_file(self, data_or_file: Union[str, List[np.ndarray]], channels: List[str], vec_field_ids: Optional[List[int]] = None, t_max: Optional[int] = None) -> List[np.ndarray]:
+        if isinstance(data_or_file, str):
+            self.initialize_from_file(data_or_file, channels=channels, vec_field_ids=vec_field_ids, t_max=t_max)
+            return
+        else:
+            self.tmax = t_max
+            self.channels = channels
+            self.channel_list = data_or_file
+            self.vec_field_ids = vec_field_ids
+            return
+
     def evaluate(self, data_or_file: Union[str, List[np.ndarray]], t: np.ndarray, create_visual: bool = False, every: int = 10):
         """
         Evaluate ROM accuracy on test data.
@@ -119,12 +130,8 @@ class BaseROM(ABC):
         if not self.is_fitted:
             raise RuntimeError("ROM must be fitted before evaluation.")
         # Accept either a file path or a preloaded list
-        if isinstance(data_or_file, str):
-            t_max = t.shape[0]
-            channel_list = load_2d_trajectory_from_file(data_or_file, channels=self.channels, t_max=t_max)
-        else:
-            channel_list = data_or_file
-        self.X_test = self._prepare_testing_snapshots(channel_list)
+        self.parse_data_or_file(data_or_file, channels=self.channels, vec_field_ids=self.vec_field_ids, t_max=t.shape[0])
+        self.X_test = self._prepare_testing_snapshots(self.channel_list)
 
         T = self.X_test.shape[1]
         if len(t) != T:
@@ -189,14 +196,14 @@ class PodGpROM(BaseROM):
         self.num_modes = num_modes
         self.t_train = None
         self.tag = tag
-        
-    def fit(self, file: str, channels: List[str], dt: float, t_max: Optional[int] = None,
+
+    def fit(self, data_or_file: Union[str, List[np.ndarray]], channels: List[str], dt: float, t_max: Optional[int] = None,
         vec_field_ids: Optional[List[int]] = None) -> 'PodGpROM':
         """
         Fit a POD-GP ROM
         
         Parameters:
-        - file: .npy file path
+        - file: .npy file path or preloaded list of channel arrays
         - channels: List of channel names to load
         - dt: Time step size
         - t_max: Maximum time index for loading data, Default: None (load all)
@@ -206,8 +213,8 @@ class PodGpROM(BaseROM):
         - self (for method chaining)
         """
         # Load data
-        self.initialize_from_file(file, channels, vec_field_ids, t_max)
-        X, self.shape = self._prepare_training_snapshots()
+        self.parse_data_or_file(data_or_file, channels=channels, vec_field_ids=vec_field_ids, t_max=t_max)
+        X, self.shape = self._prepare_training_snapshots(self.channel_list)
         
         # Build POD
         self._build_pod(X)
@@ -262,12 +269,12 @@ class PodSindyROM(BaseROM):
         self.model = None
         self.tag = tag
         
-    def fit(self, file: str, channels: List[str], dt: float, t_max: Optional[int] = None,
+    def fit(self, data_or_file: Union[str, List[np.ndarray]], channels: List[str], dt: float, t_max: Optional[int] = None,
              vec_field_ids: Optional[List[int]] = None) -> 'PodSindyROM':
         """Fit a POD-SINDy ROM
 
         Parameters:
-        - file: .npy file path
+        - data_or_file: .npy file path or preloaded list of channel arrays
         - channels: List of channel names to load
         - dt: Time step size
         - t_max: Maximum time index for loading data, Default: None (load all)
@@ -277,8 +284,8 @@ class PodSindyROM(BaseROM):
         - self (for method chaining)
         """
         # Load data
-        self.initialize_from_file(file, channels, vec_field_ids, t_max)
-        X, self.shape = self._prepare_training_snapshots()
+        self.parse_data_or_file(data_or_file, channels=channels, vec_field_ids=vec_field_ids, t_max=t_max)
+        X, self.shape = self._prepare_training_snapshots(self.channel_list)
         
         # Build POD
         self._build_pod(X)
@@ -325,9 +332,10 @@ class AutoencoderSindyROM(BaseROM):
     def __init__(self, normalization: bool = True, latent_dim: int = 3, 
                  poly_degree: int = 2, thresh: float = 1.0, diff: str = "smoothed",
                  epochs: int = 1000, batch_size: int = 64, val_split: float = 0.2,
-                 patience: int = 200, print_every: int = 50, device: str = "cuda",
+                 lr: float = 1e-4, patience: int = 200, print_every: int = 50, device: str = "cuda",
                  tag: str = "AE-SINDY"):
-        super().__init__(normalization, energy=1.0)  # AE doesn't use POD energy
+        # AE doesn't use POD energy
+        super().__init__(normalization, energy=1.0)
         self.latent_dim = latent_dim
         self.poly_degree = poly_degree
         self.thresh = thresh
@@ -335,6 +343,7 @@ class AutoencoderSindyROM(BaseROM):
         self.epochs = epochs
         self.batch_size = batch_size
         self.val_split = val_split
+        self.lr = lr
         self.patience = patience
         self.print_every = print_every
         self.device = device
@@ -344,13 +353,13 @@ class AutoencoderSindyROM(BaseROM):
         self.model = None
         self.A0 = None
         self.tag = tag
-        
-    def fit(self, file: str, channels: List[str], dt: float, t_max: Optional[int] = None,
+
+    def fit(self, data_or_file: Union[str, List[np.ndarray]], channels: List[str], dt: float, t_max: Optional[int] = None,
              vec_field_ids: Optional[List[int]] = None) -> 'AutoencoderSindyROM':
         """Fit a Autoencoder-SINDy ROM
 
         Parameters:
-        - file: .npy file path
+        - data_or_file: .npy file path or preloaded list of channel arrays
         - channels: List of channel names to load
         - dt: Time step size
         - t_max: Maximum time index for loading data, Default: None (load all)
@@ -360,13 +369,13 @@ class AutoencoderSindyROM(BaseROM):
         - self (for method chaining)
         """
         # Load data
-        self.initialize_from_file(file, channels, vec_field_ids, t_max)
-        X, self.shape = self._prepare_training_snapshots()
+        self.parse_data_or_file(data_or_file, channels=channels, vec_field_ids=vec_field_ids, t_max=t_max)
+        X, self.shape = self._prepare_training_snapshots(self.channel_list)
 
         # Train autoencoder
         self.encoder, self.decoder, self.A_train, history = train_autoencoder(
-            X, latent_dim=self.latent_dim, epochs=self.epochs, batch_size=64, lr=1e-4,
-            device=self.device, val_split=0.2, patience=200, print_every=50
+            X, latent_dim=self.latent_dim, epochs=self.epochs, batch_size=self.batch_size, lr=self.lr,
+            device=self.device, val_split=self.val_split, patience=self.patience, print_every=self.print_every
         )
 
         # Save training history plot
@@ -507,9 +516,11 @@ class ParametricPodSindyROM(PodSindyROM):
         A0_pred = self.gp_initial.predict(u_list_new)
 
         # Rollout with SINDy-CP
-        X_list_pred = simulate_and_reconstruct_cp(
-            self.model, self.U_r_train, A0_pred, t_eval=t_eval, u=u_list_new
-        )
+        X_list_pred = []
+        for A0, u in zip(A0_pred, u_list_new):
+            X_list_pred.append(simulate_and_reconstruct_cp(
+                self.model, self.U_r_train, A0, t_eval=t_eval, u=u
+            ))
         return X_list_pred
         
     def evaluate_parametric(self, file_list: List[str], u_list_new: List[np.ndarray], t: np.ndarray,
@@ -544,7 +555,7 @@ class ParametricPodSindyROM(PodSindyROM):
         # Evaluate error (and create visualization) for each run
         avg_error = 0.0
         errors = []
-        for i, (X_new, X_pred) in enumerate(zip(X_list_new, X_list_pred, u_list_new)):
+        for i, (X_new, X_pred) in enumerate(zip(X_list_new, X_list_pred)):
             error = print_global_error(X_new, X_pred, tag=f'{self.tag} [Sample_{i:<02d}]')
             errors.append(error)
             avg_error += error
@@ -572,160 +583,3 @@ def create_autoencoder_sindy_rom(**kwargs) -> AutoencoderSindyROM:
 def create_parametric_sindy_rom(**kwargs) -> ParametricPodSindyROM:
     """Create a Parametric POD+SINDy ROM with sensible defaults."""
     return ParametricPodSindyROM(**kwargs)
-
-
-# ------------------------------
-# Unified, task-oriented API
-# ------------------------------
-def run_rom_pipeline(
-    tag: str,
-    task: str,
-    # Single-run data
-    file: Optional[str] = None,
-    channels: Optional[List[str]] = None,
-    t: Optional[np.ndarray] = None,
-    # Parametric data (multi-run)
-    file_list: Optional[List[str]] = None,
-    u_list: Optional[List[np.ndarray]] = None,
-    # Optional parametric test set
-    file_list_test: Optional[List[str]] = None,
-    u_list_test: Optional[List[np.ndarray]] = None,
-    # Common options
-    create_visual: bool = False,
-    normalization: bool = True,
-    # POD/GP/SINDy params
-    energy: float = 0.99,
-    num_modes: int = 10,
-    poly_degree: int = 1,
-    thresh: float = 0.1,
-    diff: str = "smoothed",
-    # AE params
-    latent_dim: int = 2,
-    ae_epochs: int = 5000,
-    device: str = "cuda",
-    # data params
-    t_max: Optional[int] = None,
-    train_ratio: float = 0.8,
-) -> Dict[str, Any]:
-    """
-    Unified driver that selects a ROM by tag and performs the requested task.
-
-    tag: 'POD-GP' | 'POD-SINDY' | 'AE-SINDY' | 'POD-SINDY-Param'
-    task: 'reconstruction' | 'training' | 'testing'
-    """
-    tag_upper = tag.upper()
-
-    # Instantiate the selected model
-    if tag_upper == "POD-GP":
-        rom = PodGpROM(normalization=normalization, energy=energy, num_modes=num_modes, tag=tag_upper)
-    elif tag_upper == "POD-SINDY":
-        rom = PodSindyROM(normalization=normalization, energy=energy, num_modes=num_modes,
-                          poly_degree=poly_degree, thresh=thresh, diff=diff, tag=tag_upper)
-    elif tag_upper == "AE-SINDY":
-        rom = AutoencoderSindyROM(normalization=normalization, latent_dim=latent_dim,
-                                  poly_degree=poly_degree, thresh=thresh, diff=diff,
-                                  epochs=ae_epochs, device=device, tag=tag_upper)
-    elif tag_upper == "POD-SINDY-PARAM":
-        rom = ParametricPodSindyROM(normalization=normalization, energy=energy, num_modes=num_modes,
-                                    poly_deg_state=poly_degree, poly_deg_param=poly_degree,
-                                    thresh=thresh, diff=diff, tag=tag_upper)
-    else:
-        raise ValueError("tag must be one of: 'POD-GP', 'POD-SINDY', 'AE-SINDY', 'POD-SINDY-Param'")
-
-    results: Dict[str, Any] = {"rom": rom}
-
-    # Non-parametric branches: validate single-run inputs
-    if tag_upper in {"POD-GP", "POD-SINDY", "AE-SINDY"}:
-        if file is None or channels is None or t is None:
-            raise ValueError("For non-parametric models, 'file', 'channels', and 't' must be provided.")
-        # Load for sizing/splitting only
-        U_list = load_2d_trajectory_from_file(file, channels=channels, t_max=t_max)
-        T_total = U_list[0].shape[0]
-        if len(t) != T_total:
-            raise ValueError("Length of provided t does not match loaded data T.")
-        t_full = np.asarray(t)
-        # Compute dt (require uniform spacing)
-        if len(t_full) < 2:
-            raise ValueError("Time array 't' must have at least 2 points to compute dt.")
-        diffs = np.diff(t_full)
-        if not np.allclose(diffs, diffs[0], rtol=1e-6, atol=1e-9):
-            raise ValueError(f"{tag_upper} requires uniform time spacing to compute dt from t.")
-        dt = float(diffs[0])
-
-        # Tasks
-        if task == "reconstruction":
-            rom.fit(file=file, channels=channels, dt=dt, t_max=t_max)
-            X_rec = rom.reconstruct_training()
-            results["reconstruction"] = X_rec
-            return results
-
-        elif task == "training":
-            rom.fit(file=file, channels=channels, dt=dt, t_max=t_max)
-            results["status"] = "trained"
-            return results
-
-        elif task == "testing":
-            split_idx = int(T_total * train_ratio)
-            # Test split
-            U_test = [u[split_idx:] for u in U_list]
-            t_train = t_full[:split_idx]
-            t_test = t_full[split_idx:]
-            # Fit on train portion by limiting t_max
-            rom.fit(file=file, channels=channels, dt=dt, t_max=split_idx)
-            # Evaluate on test portion (normalized metrics, original-scale visuals if enabled)
-            rom.tag = f"[test] {tag_upper}"
-            rom.evaluate(U_test, t_test, create_visual=create_visual)
-            results["metrics"] = {
-                "global_error": rom.global_error,
-                "per_channel_errors": rom.errors,
-            }
-            return results
-        else:
-            raise ValueError("task must be one of: 'reconstruction', 'training', 'testing'")
-
-    # Parametric branch
-    else:
-        if file_list is None or u_list is None or channels is None or t is None:
-            raise ValueError("For 'POD-SINDY-Param', provide 'file_list', 'u_list', 'channels', and 't'.")
-        t_full = np.asarray(t)
-        if len(t_full) < 2:
-            raise ValueError("Time array 't' must have at least 2 points to compute dt.")
-        diffs = np.diff(t_full)
-        if not np.allclose(diffs, diffs[0], rtol=1e-6, atol=1e-9):
-            raise ValueError("POD-SINDY-Param requires uniform time spacing to compute dt from t.")
-        dt = float(diffs[0])
-
-        if task == "reconstruction":
-            # Fit and return reconstructions of training runs
-            rom.fit(file_list=file_list, u_list=u_list, channels=channels, dt=dt, t_max=t_max)
-            # Reconstruct each training run from stored A_list_train
-            X_rec_list = []
-            for A in rom.A_list_train:
-                Xn = rom.U_r_train @ A.T
-                if rom.xbar_train is not None:
-                    Xn = Xn + rom.xbar_train[:, None]
-                X_rec_list.append(rom._unnormalize_predictions(Xn))
-            results["reconstruction"] = X_rec_list
-            return results
-
-        elif task == "training":
-            rom.fit(file_list=file_list, u_list=u_list, channels=channels, dt=dt, t_max=t_max)
-            results["status"] = "trained"
-            return results
-
-        elif task == "testing":
-            if file_list_test is None or u_list_test is None:
-                raise ValueError("Provide 'file_list_test' and 'u_list_test' for parametric testing.")
-            # Fit on training runs
-            rom.fit(file_list=file_list, u_list=u_list, channels=channels, dt=dt, t_max=t_max)
-            # Evaluate on separate test runs
-            per_run_errors = rom.evaluate_parametric(file_list=file_list_test, u_list_new=u_list_test, t=t_full,
-                                                    create_visual=create_visual)
-            # Store for convenience
-            rom.errors = per_run_errors
-            results["metrics"] = {
-                "per_run_errors": per_run_errors
-            }
-            return results
-        else:
-            raise ValueError("task must be one of: 'reconstruction', 'training', 'testing'")

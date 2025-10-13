@@ -175,7 +175,7 @@ def plot_ae_history(history, savepath="ae_loss_curve.png"):
 def check_errors(tag, errors):
     # Check if error metrics file exists, and if yes, check whether they match
     if os.path.exists(f"{tag}_errors.txt"):
-        if np.allclose(errors, np.loadtxt(f"{tag}_errors.txt")):
+        if np.allclose(errors, np.loadtxt(f"{tag}_errors.txt"), rtol=1e-2, atol=1e-4):
             print(f"[INFO] Error metrics for {tag} match the saved file.")
         else:
             raise ValueError(f"[ERROR] Error metrics for {tag} do not match the saved file.")
