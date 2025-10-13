@@ -187,6 +187,8 @@ def measure_run_out_distance():
         # write out simulation time series and parameters
         write_dict_to_file(plot.data, data_file_name)
         write_dict_to_file(param_data, data_param_name)
+        # Combine Eulerian snapshots into per-sample time series using known description and snapshot count
+        simple_combine(description)
         O.pause()
 
 def write_particle_data():
@@ -245,8 +247,40 @@ def write_particle_data():
     #     rtol_mass=1e-6, rtol_mom=1e-4
     # )
     # save the coarse-grained fields into a npy file
-    np.save(f"column_collapse_{description}_{O.iter}_fields.npy", out)
+    np.save(f"{description}_{O.iter}_CG_fields.npy", out)
     return out
+
+def simple_combine(description: str, data_dir: str | None = None):
+    """Simplest possible combiner: given description and number of snapshots, just
+    sort matching files by step index and pack the first n_steps into a dict.
+
+    Saves to {description}_CG_fields.npy in data_dir.
+    """
+    import os, glob
+    if data_dir is None:
+        data_dir = os.getcwd()
+
+    pattern = os.path.join(data_dir, f"{description}_*_CG_fields.npy")
+    files = glob.glob(pattern)
+    if not files:
+        print(f"No snapshot files found for description={description}")
+        return {}
+
+    def _iter_key(p):
+        import re
+        m = re.match(rf"^{re.escape(description)}_(\d+)_fields\\.npy$", os.path.basename(p))
+        return int(m.group(1)) if m else 0
+
+    files.sort(key=_iter_key)
+    combined = {}
+    for idx, f in enumerate(files):
+        arr = np.load(f, allow_pickle=True)
+        combined[idx] = arr
+        os.remove(f)
+
+    out_path = os.path.join(data_dir, f"{description}_CG_fields.npy")
+    np.save(out_path, combined)
+    return combined
 
 # define a VTK recorder
 vtkExport = VTKExporter(f'column_collapse_{description}')
