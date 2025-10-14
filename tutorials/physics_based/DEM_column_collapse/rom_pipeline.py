@@ -139,7 +139,11 @@ class BaseROM(ABC):
         t_query = np.asarray(t)
         self.X_pred = self.predict(t_query)
         
-        self.global_error, self.errors = print_error_metrics(self.X_test, self.X_pred, tag=self.tag)
+        self.global_error, self.errors = print_error_metrics(
+            inverse_transform(self.X_test, self.channel_bounds),
+            inverse_transform(self.X_pred, self.channel_bounds),
+            tag=self.tag
+        )
         if create_visual:
             self.visualize(t, tag=self.tag, every=every)
 
@@ -174,7 +178,7 @@ class BaseROM(ABC):
                 visualize_2d_field_magnitude(
                     inverse_transform(self.X_test, self.channel_bounds),
                     inverse_transform(self.X_pred, self.channel_bounds),
-                    self.shape, time_index=i, channel=self.vec_field_ids,
+                    self.shape, time_index=i, channels=self.vec_field_ids,
                     name=name, tag=tag)
         # Create GIFs
         for c in self.channels:
@@ -564,7 +568,10 @@ class ParametricPodSindyROM(PodSindyROM):
         avg_error = 0.0
         errors = []
         for i, (X_new, X_pred) in enumerate(zip(X_list_new, X_list_pred)):
-            error = print_global_error(X_new, X_pred, tag=f'{self.tag} [Sample_{i:<02d}]')
+            error = print_global_error(
+                inverse_transform(X_new, self.channel_bounds),
+                inverse_transform(X_pred, self.channel_bounds),
+                tag=f'{self.tag} [Sample_{i:02d}]')
             errors.append(error)
             avg_error += error
             # Save evolution of the 2D field into a GIF

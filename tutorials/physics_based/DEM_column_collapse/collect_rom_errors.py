@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from rom_pipeline import PodGpROM, PodSindyROM, AutoencoderSindyROM
+import matplotlib as mpl
 
 
 def get_data_info():
@@ -138,67 +139,73 @@ def run_ae_sindy(file, dt, T, t, channels, device: str):
 
 def plot_errors(curves, t, outfile="rom_errors_over_time.png", group_key=None,
                 size=(9.6, 5.4), dpi=150, legend_cols=2, save_pdf=False):
-    """Plot multiple error curves vs time, slide-friendly (16:9).
-
-    - curves: dict[label -> 1D np.ndarray of per-step errors]
-    - t: time vector aligned with errors length
-    - outfile: path to save the combined plot
-    - group_key: optional string to prefix the title/filename
-    - size: figure size in inches (width, height), default 12.8x7.2 for 1280x720 at 100-120 dpi
-    - dpi: figure DPI when saving
-    - legend_cols: columns for the legend layout
+    """
+    Plot multiple error curves vs time, slide-friendly (16:9), with consistent colors per ROM.
+    Interpolation lines for each ROM use the same base color, with decreasing intensity as n increases.
+    Extrapolation uses the same color as the first interpolation for each ROM.
     """
 
-    # Assign a color for each ROM type
+    # Define ROM base colors
     rom_colors = {
         "POD-GP": "#1f77b4",      # blue
-        "POD-SINDY": "#ff7f0e",   # orange
-        "AE-SINDY": "#2ca02c",    # green
+        "POD-SINDY": "#2ca02c",   # green
+        "AE-SINDY": "#d62728",    # red
     }
-    # Assign line styles for each test type
-    test_linestyles = {
-        "recon": "solid",
-        "interp n=5": "dashed",
-        "interp n=10": "dashdot",
-        "interp n=20": (0, (3, 1, 1, 1)),  # custom dash
-        "extrap": "dotted",
-    }
+    # For each ROM, define interpolation n values (must match code above)
+    interp_ns = [5, 10, 20]
 
-    def parse_label(label):
-        # Extract ROM type and test type from label
-        if "POD-GP" in label:
-            rom = "POD-GP"
-        elif "POD-SINDY" in label:
-            rom = "POD-SINDY"
-        elif "AE-SINDY" in label:
-            rom = "AE-SINDY"
-        else:
-            rom = "Other"
+    # Helper to extract ROM name from label
+    def get_rom_name(label):
+        for rom in rom_colors:
+            if label.startswith(rom):
+                return rom
+        # fallback: try to match by substring
+        for rom in rom_colors:
+            if rom in label:
+                return rom
+        return None
 
-        if "(recon)" in label:
-            test = "recon"
-        elif "(interp n=5)" in label:
-            test = "interp n=5"
-        elif "(interp n=10)" in label:
-            test = "interp n=10"
-        elif "(interp n=20)" in label:
-            test = "interp n=20"
-        elif "(extrap)" in label:
-            test = "extrap"
-        else:
-            test = "other"
-        return rom, test
+    # For each ROM, collect all relevant curve keys
+    rom_curve_keys = {rom: [] for rom in rom_colors}
+    for k in curves:
+        rom = get_rom_name(k)
+        if rom:
+            rom_curve_keys[rom].append(k)
+
+    # For each ROM, assign colors for interpolation/extrapolation
+    color_map = {}
+    for rom, base_color in rom_colors.items():
+        # Use a colormap to generate lighter shades for higher n
+        cmap = mpl.colormaps.get_cmap("Blues" if rom == "POD-GP" else
+                                      "Greens" if rom == "POD-SINDY" else
+                                      "Reds")
+        # Assign colors for interpolation n=5,10,20 (darker to lighter)
+        interp_colors = [cmap(0.7), cmap(0.5), cmap(0.3)]
+        # Map keys to colors
+        for i, n in enumerate(interp_ns):
+            for k in rom_curve_keys[rom]:
+                if f"(interp n={n})" in k or f"_interpolate_n{n}" in k or (n == 5 and "_interpolate" in k and "n" not in k):
+                    color_map[k] = interp_colors[i]
+        # Extrapolation: use color of n=5
+        for k in rom_curve_keys[rom]:
+            if "(extrap)" in k or "_extrapolate" in k:
+                color_map[k] = interp_colors[0]
+        # Recon: use base color
+        for k in rom_curve_keys[rom]:
+            if "(recon)" in k:
+                color_map[k] = base_color
 
     plt.figure(figsize=size)
     for label, err in curves.items():
-        rom, test = parse_label(label)
-        color = rom_colors.get(rom, None)
-        linestyle = test_linestyles.get(test, "solid")
         if len(err) != len(t):
             m = min(len(err), len(t))
-            plt.plot(t[:m], err[:m], label=label, lw=1.6, color=color, linestyle=linestyle)
+            x = t[:m]
+            y = err[:m]
         else:
-            plt.plot(t, err, label=label, lw=1.6, color=color, linestyle=linestyle)
+            x = t
+            y = err
+        color = color_map.get(label, None)
+        plt.plot(x, y, label=label, lw=1.6, color=color)
     plt.xlabel("time")
     plt.ylabel("relative error")
     if group_key:
