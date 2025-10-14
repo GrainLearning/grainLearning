@@ -166,7 +166,6 @@ class BaseROM(ABC):
                     inverse_transform(self.X_pred, self.channel_bounds),
                     self.shape, time_index=i, channel=j,
                     name=name, tag=tag)
-                create_gif_from_pngs(name=f'{tag}_{name}')
             if self.vec_field_ids is not None and len(self.vec_field_ids) == 2:
                 # extract vector field name
                 vec_field_name = self.channels[self.vec_field_ids[0]]
@@ -177,6 +176,15 @@ class BaseROM(ABC):
                     inverse_transform(self.X_pred, self.channel_bounds),
                     self.shape, time_index=i, channel=self.vec_field_ids,
                     name=name, tag=tag)
+        # Create GIFs
+        for c in self.channels:
+            name = f'{c}_field'
+            create_gif_from_pngs(name=f'{tag}_{name}')
+        if self.vec_field_ids is not None and len(self.vec_field_ids) == 2:
+            vec_field_name = self.channels[self.vec_field_ids[0]]
+            vec_field_name = vec_field_name.split('_')[0]  # e.g., 'vel' from 'vel_x'
+            name = f'{vec_field_name}_field_magnitude'
+            create_gif_from_pngs(name=f'{tag}_{name}')
 
     @abstractmethod
     def reconstruct_training(self) -> np.ndarray:

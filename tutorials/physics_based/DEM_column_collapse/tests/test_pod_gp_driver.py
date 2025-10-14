@@ -41,6 +41,7 @@ def main():
     dt_list = [n * dt, dt]
 
     for dt, X_train, tag in zip(dt_list, X_train_list, tags):
+        rom.tag = tag
         rom.fit(X_train, channels=channels, dt=dt)
         rom.evaluate(file, t, create_visual=False)
         # Check errors metric against baseline data
@@ -49,4 +50,4 @@ def main():
 
 if __name__ == "__main__":
     np.random.seed(36)
-    main()    
+    main()

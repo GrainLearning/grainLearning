@@ -13,7 +13,7 @@ def load_2d_trajectory_from_file(npy_path, channels=["rho"], t_max=None):
     - npy_path: Path to a .npy file produced by the CG pipeline (dict keyed by time step index).
     - channels: Which data to read, one or a combination of 
       ['disp_x', 'disp_y', 'vel_x', 'vel_y', 'rho', 'occ'].
-      ['disp_x', 'vel_y'] read a 2D vector field; ['rho', 'occ'] reads two scalar fields.
+      ['disp_x', 'disp_y'] read a 2D vector field; ['rho', 'occ'] reads two scalar fields.
     - t_max: Optional cap on number of time steps to load (useful for quick tests).
 
     Returns
@@ -77,10 +77,10 @@ def visualize_2d_field_magnitude(X, X_pred, shape, time_index, channels=[0, 1], 
     sp_pred = np.hypot(fields_pred[0], fields_pred[1])
     # plot side-by-side true, pred, and relative error
     fig, axs = plt.subplots(1,3, figsize=(12,4), constrained_layout=True)
-    im0 = axs[0].imshow(sp_true.T, origin='lower'); axs[0].set_title(f'speed ({tag})')
-    im1 = axs[1].imshow(sp_pred.T, origin='lower'); axs[1].set_title(f'speed ({tag})')
+    im0 = axs[0].imshow(sp_true.T, origin='lower'); axs[0].set_title(f'field mag. ({tag})')
+    im1 = axs[1].imshow(sp_pred.T, origin='lower', vmin=im0.get_clim()[0], vmax=im0.get_clim()[1]); axs[1].set_title(f'field mag. ({tag})')
     # error calculation should avoid elements where true is zero
-    valid = np.where(sp_true.T > 0)
+    valid = np.where(sp_true.T != 0)
     error = np.zeros_like(sp_true.T)
     error[valid] = np.abs(sp_true.T[valid] - sp_pred.T[valid]) / sp_true.T[valid]
     im2 = axs[2].imshow(error, origin='lower', vmin=0, vmax=1); axs[2].set_title('relative error')
@@ -99,9 +99,9 @@ def visualize_2d_field(X, X_pred, shape, time_index, channel=0, name='2d_field',
     # plot side-by-side true, pred, and relative error
     fig, axs = plt.subplots(1,3, figsize=(12,4), constrained_layout=True)
     im0 = axs[0].imshow(fields[0].T, origin='lower'); axs[0].set_title(f'field ({tag})')
-    im1 = axs[1].imshow(fields_pred[0].T, origin='lower'); axs[1].set_title(f'field ({tag})')
+    im1 = axs[1].imshow(fields_pred[0].T, origin='lower', vmin=im0.get_clim()[0], vmax=im0.get_clim()[1]); axs[1].set_title(f'field ({tag})')
     # error calculation should avoid elements where true is zero
-    valid = np.where(fields[0].T > 0)
+    valid = np.where(fields[0].T != 0)
     error = np.zeros_like(fields[0].T)
     error[valid] = np.abs(fields[0].T[valid] - fields_pred[0].T[valid]) / fields[0].T[valid]
     im2 = axs[2].imshow(error, origin='lower', vmin=0, vmax=1); axs[2].set_title('relative error')
@@ -136,8 +136,9 @@ def print_error_metrics(X, X_pred, tag=""):
     global_error = print_global_error(X, X_pred, tag=tag)
     errors = []
     for k in range(X.shape[1]):
-        num = np.linalg.norm(X[:, k] - X_pred[:, k])
-        den = np.linalg.norm(X[:, k]) + 1e-12
+        mask = np.abs(X[:, k]) > 1e-6
+        num = np.linalg.norm(X[mask, k] - X_pred[mask, k])
+        den = np.linalg.norm(X[mask, k])
         relk = num / den
         print(f"  step {k:4d} relative error: {relk:.4f}")
         errors.append(relk)
@@ -145,7 +146,8 @@ def print_error_metrics(X, X_pred, tag=""):
 
 def print_global_error(X, X_pred, tag=""):
     """Compute and print global relative error ||X-X_pred|| / ||X|| with small epsilon."""
-    global_error = np.linalg.norm(X - X_pred) / (np.linalg.norm(X) + 1e-12)
+    mask = np.abs(X) > 1e-6
+    global_error = np.linalg.norm(X[mask] - X_pred[mask]) / (np.linalg.norm(X[mask]))
     print(f"{tag} Global relative error: {global_error:.4f}")
     return global_error
 
