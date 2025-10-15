@@ -25,7 +25,7 @@ from rom_io import load_2d_trajectory_from_file, print_error_metrics, plot_ae_hi
 class BaseROM(ABC):
     """Abstract base class for all ROM pipelines."""
     
-    def __init__(self, normalization: bool = True, energy: float = 0.99, tmax = None):
+    def __init__(self, normalization: bool = True, energy: float = 0.99, tmax = None, centered: bool = True):
         """
         Parameters:
         - normalization: Whether to apply channel-wise min-max normalization [0,1]
@@ -39,6 +39,7 @@ class BaseROM(ABC):
         self.channel_bounds = None  # set after fitting on training data
         self.is_fitted = False
         self.tag = "ROM"
+        self.centered = centered  # whether to center snapshots
         
         # Internal state (set during fit)
         self.A_train = None
@@ -96,8 +97,13 @@ class BaseROM(ABC):
         return unpack_2d_field(X, self.shape, list(range(num_channels)))
     
     def _build_pod(self, X):
-        # Center and POD
-        Xc, self.xbar_train = center_snapshots(X)
+        # Centering
+        if self.centered:
+            Xc, self.xbar_train = center_snapshots(X)
+        else:
+            Xc = X
+            self.xbar_train = np.zeros(X.shape[0])
+        # POD
         U_r, A, _ = pod(Xc, energy=self.energy)
         
         # Truncate modes
@@ -203,8 +209,8 @@ class PodGpROM(BaseROM):
     """POD + Gaussian Process ROM pipeline."""
     
     def __init__(self, normalization: bool = True, energy: float = 0.99, num_modes: int = 10,
-                 tag: str = "POD-GP"):
-        super().__init__(normalization, energy)
+                 tag: str = "POD-GP", centered: bool = True):
+        super().__init__(normalization=normalization, energy=energy, centered=centered)
         self.num_modes = num_modes
         self.t_train = None
         self.tag = tag
@@ -272,8 +278,8 @@ class PodSindyROM(BaseROM):
     
     def __init__(self, normalization: bool = True, energy: float = 0.99, num_modes: int = 3, 
                  poly_degree: int = 2, thresh: float = 0.1, diff: str = "smoothed",
-                 tag: str = "POD-SINDY"):
-        super().__init__(normalization, energy)
+                 tag: str = "POD-SINDY", centered: bool = True):
+        super().__init__(normalization=normalization, energy=energy, centered=centered)
         self.num_modes = num_modes
         self.poly_degree = poly_degree
         self.thresh = thresh
@@ -347,7 +353,7 @@ class AutoencoderSindyROM(BaseROM):
                  lr: float = 1e-4, patience: int = 200, print_every: int = 50, device: str = "cuda",
                  tag: str = "AE-SINDY"):
         # AE doesn't use POD energy
-        super().__init__(normalization, energy=1.0)
+        super().__init__(normalization=normalization, energy=1.0)
         self.latent_dim = latent_dim
         self.poly_degree = poly_degree
         self.thresh = thresh
@@ -442,10 +448,10 @@ class ParametricPodSindyROM(PodSindyROM):
 
     def __init__(self, normalization: bool = True, energy: float = 0.99, num_modes: int = 3,
                  poly_deg_state: int = 1, poly_deg_param: int = 1, thresh: float = 0.1,
-                 diff: str = "smoothed", tag: str = "POD-SINDy_Param"):
+                 diff: str = "smoothed", tag: str = "POD-SINDy_Param", centered: bool = False):
         # Initialize like a POD-SINDY model; poly_degree here mirrors state degree
         super().__init__(normalization=normalization, energy=energy, num_modes=num_modes,
-                         poly_degree=poly_deg_state, thresh=thresh, diff=diff, tag=tag)
+                         poly_degree=poly_deg_state, thresh=thresh, diff=diff, tag=tag, centered=centered)
         # Parametric-specific settings
         self.poly_deg_state = poly_deg_state
         self.poly_deg_param = poly_deg_param
@@ -568,15 +574,19 @@ class ParametricPodSindyROM(PodSindyROM):
         avg_error = 0.0
         errors = []
         for i, (X_new, X_pred) in enumerate(zip(X_list_new, X_list_pred)):
+            self.X_pred = X_pred
+            self.X_test = X_new
+            tag = f'{self.tag}_Sample_{i:02d}'
             error = print_global_error(
-                inverse_transform(X_new, self.channel_bounds),
-                inverse_transform(X_pred, self.channel_bounds),
-                tag=f'{self.tag} [Sample_{i:02d}]')
+                inverse_transform(self.X_test, self.channel_bounds),
+                inverse_transform(self.X_pred, self.channel_bounds),
+                tag=tag
+            )
             errors.append(error)
             avg_error += error
             # Save evolution of the 2D field into a GIF
             if create_visual:
-                self.visualize(t, tag=self.tag, every=every)
+                self.visualize(t, tag=tag, every=every)
         avg_error = sum(errors) / len(errors)
         print(f"{self.tag} Average training error: {avg_error:.4f}")
         return errors

@@ -33,6 +33,24 @@ def load_2d_trajectory_from_file(npy_path, channels=["rho"], t_max=None):
             U_list.append(np.array([out[k].item()['vectors']['vel'][0]  for k in time_steps]))
         elif ch == "vel_y":
             U_list.append(np.array([out[k].item()['vectors']['vel'][1]  for k in time_steps]))
+        elif ch == "rho_vel_x":
+            U_list.append(np.array([out[k].item()['vectors']['vel'][0] *
+                                    out[k].item()['scalars']['rho'] for k in time_steps]))
+        elif ch == "rho_vel_y":
+            U_list.append(np.array([out[k].item()['vectors']['vel'][1] *
+                                    out[k].item()['scalars']['rho'] for k in time_steps]))
+        elif ch == "rho_disp_x":
+            U_list.append(np.array([out[k].item()['vectors']['disp'][0] *
+                                    out[k].item()['scalars']['rho'] for k in time_steps]))
+        elif ch == "rho_disp_y":
+            U_list.append(np.array([out[k].item()['vectors']['disp'][1] *
+                                    out[k].item()['scalars']['rho'] for k in time_steps]))
+        elif ch == "stress_xx":
+            U_list.append(np.array([out[k].item()['tensors']['stress'][0][0] for k in time_steps]))
+        elif ch == "stress_xy":
+            U_list.append(np.array([out[k].item()['tensors']['stress'][0][1] for k in time_steps]))
+        elif ch == "stress_yy":
+            U_list.append(np.array([out[k].item()['tensors']['stress'][1][1] for k in time_steps]))
         elif ch == "rho":
             U_list.append(np.array([out[k].item()['scalars']['rho'] for k in time_steps]))
         elif ch == "occ":
