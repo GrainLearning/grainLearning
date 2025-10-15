@@ -46,9 +46,10 @@ calibration = BayesianCalibration.from_dict(
             "sim_data_file_ext": '.txt',
         },
         "inference": {
-            "Bayes_filter": {"scale_cov_with_max": True},
+            "Bayes_filter": {"scale_cov_with_max": True,
+                             "ess_target": 0.3},
             "sampling": {
-                "max_num_components": 5,
+                "max_num_components": 3,
                 "slice_sampling": True,
             },
         },

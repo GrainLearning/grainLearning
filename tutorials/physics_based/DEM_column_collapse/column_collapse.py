@@ -285,7 +285,7 @@ def simple_combine(description: str, data_dir: str | None = None):
 # define a VTK recorder
 vtkExport = VTKExporter(f'column_collapse_{description}')
 export_VTK = False  # whether to export VTK files during the simulation
-export_CG = False   # whether to export coarse-grained fields during the simulation
+export_CG = True   # whether to export coarse-grained fields during the simulation
 
 # run in batch mode
 O.run()
