@@ -48,14 +48,14 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8, table_ids=Non
     """
 
     # Computation of decimal number for unique key
-    if table_name is not None:
-        table_file_name = f'{os.getcwd()}/{sim_name}_Iter{curr_iter}_Samples.txt'
+    if table_name is None:
+        table_name = f'{os.getcwd()}/{sim_name}_Iter{curr_iter}_Samples.txt'
     num, dim = table.shape
     # If table_ids is not given, use the full table
     if table_ids is None:
         table_ids = np.arange(num)
 
-    with open(table_file_name, 'w') as f_out:
+    with open(table_name, 'w') as f_out:
         mag = math.floor(math.log(num, 10)) + 1
         f_out.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
         for j in table_ids:
@@ -63,7 +63,7 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8, table_ids=Non
             f_out.write(' '.join(
                 [f'{threads:2d}'] + [description] +
                 [f'{j:9d}'] + [f'{table[j][i]:20.10e}' for i in range(dim)] + ['\n']))
-    return table_file_name
+    return table_name
 
 
 def get_keys_and_data(file_name: str, delimiters=None):
