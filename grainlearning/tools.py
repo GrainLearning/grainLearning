@@ -34,7 +34,7 @@ def run_yade_from_shell(table_file_name, model_script, path_to_shell=None, platf
         exit()
 
 
-def write_to_table(sim_name, table, names, curr_iter=0, threads=8, table_ids=None):
+def write_to_table(sim_name, table, names, curr_iter=0, threads=8, table_ids=None, table_name=None):
     """
     write parameter samples into a text file
 
@@ -48,7 +48,8 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8, table_ids=Non
     """
 
     # Computation of decimal number for unique key
-    table_file_name = f'{os.getcwd()}/{sim_name}_Iter{curr_iter}_Samples.txt'
+    if table_name is not None:
+        table_file_name = f'{os.getcwd()}/{sim_name}_Iter{curr_iter}_Samples.txt'
     num, dim = table.shape
     # If table_ids is not given, use the full table
     if table_ids is None:
