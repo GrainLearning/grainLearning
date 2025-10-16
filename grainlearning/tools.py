@@ -480,43 +480,37 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     :param save_fig: bool defaults to False
     """
     import matplotlib.pylab as plt
-    ensemble_mean = np.einsum('ijk, ki->jk', sim_data, posteriors)
-    ensemble_std = np.einsum('ijk, ki->jk', (sim_data - ensemble_mean) ** 2, posteriors)
-    ensemble_std = np.sqrt(ensemble_std)
+    ensemble_mean = np.einsum('ijk,ki->jk', sim_data, posteriors)
+    ensemble_std = np.sqrt(np.einsum('ijk,ki->jk', (sim_data - ensemble_mean) ** 2, posteriors))
     num = len(obs_names)
     ncols = int(np.ceil(num / 2)) if num > 1 else 1
-    plt.figure('Model prediction versus observation')
+    fig, axes = plt.subplots(2, ncols, figsize=(5 * ncols, 8))
+    axes = axes.flatten() if num > 1 else [axes]
     for i in range(num):
-        plt.subplot(2, ncols, i + 1)
-
-        plt.fill_between(
+        ax = axes[i]
+        ax.fill_between(
             ctrl_data,
             ensemble_mean[i, :] - 2 * ensemble_std[i, :],
             ensemble_mean[i, :] + 2 * ensemble_std[i, :],
             color='darkred',
+            alpha=0.3,
             label='ensemble prediction'
         )
-
         for j in (-posteriors[-1, :]).argsort()[:3]:
-            plt.plot(ctrl_data, sim_data[j, i, :], label=f'sim No. {j:d}')
-
-        markevery = int(np.ceil(len(ctrl_data) / 100))
-
-        plt.plot(ctrl_data,
-                 obs_data[i, :], 'ok',
-                 label='obs.',
-                 markevery=markevery
-                 )
-
-        plt.xlabel(ctrl_name)
-        plt.ylabel(obs_names[i])
-        # Show legend in the first sub-plot
+            ax.plot(ctrl_data, sim_data[j, i, :], label=f'sim No. {j:d}')
+        markevery = max(1, int(np.ceil(len(ctrl_data) / 100)))
+        ax.plot(ctrl_data, obs_data[i, :], 'ok', label='obs.', markevery=markevery)
+        ax.set_xlabel(ctrl_name)
+        ax.set_ylabel(obs_names[i])
         if i == 0:
-            plt.legend()
-        plt.grid(True)
-
+            ax.legend()
+        ax.grid(True)
+    # Hide unused subplots
+    for k in range(num, len(axes)):
+        fig.delaxes(axes[k])
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     if save_fig:
-        plt.savefig(f'{fig_name}_obs_and_sim.png')
+        fig.savefig(f'{fig_name}_obs_and_sim.png')
 
 
 def plot_pdf(fig_name, param_names, samples, save_fig=0, true_params=None):

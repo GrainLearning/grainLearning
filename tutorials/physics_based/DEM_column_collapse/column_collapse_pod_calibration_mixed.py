@@ -26,7 +26,8 @@ yade_script = f'{PATH}/column_collapse.py'
 # Configuration and global ROM
 # -----------------------------
 ROM_CONFIG = {
-    'surrogate_fraction': 0.5,              # fraction of samples evaluated via ROM at iter>0
+    'surrogate_fraction': 1.0,              # fraction of samples evaluated via ROM (less than 1.0 when ROM and DEM are used together)
+    'alternate_DEM_ROM': True,              # alternate DEM- and ROM-only iterations (requires surrogate_fraction = 1.0)
     'channels': ['rho', 'disp_x', 'disp_y'],# channels used to build the POD basis
     'num_modes': 3,                         # number of POD modes for calibration
     'energy': 0.999,                        # POD energy threshold
@@ -76,16 +77,14 @@ def run_sim(calib):
 
     # 1) Split into origin/surrogate subsets
     num_total = calib.system.num_samples
-    if iter_id == 0:
+    if iter_id == 0 or (iter_id % 2 == 0 and ROM_CONFIG.get('alternate_DEM_ROM', False)):
         ids_origin = np.arange(num_total)
         ids_surrogate = np.array([], dtype=int)
     else:
         rng = np.random.default_rng()
         perm = rng.permutation(num_total)
         frac = float(ROM_CONFIG.get('surrogate_fraction', 0.5))
-        frac = min(max(frac, 0.0), 0.95)
         n_sur = int(round(num_total * frac))
-        n_sur = min(max(n_sur, 1), num_total - 1)
         ids_surrogate = perm[:n_sur]
         ids_origin = perm[n_sur:]
     calib.ids_origin, calib.ids_surrogate = ids_origin, ids_surrogate
