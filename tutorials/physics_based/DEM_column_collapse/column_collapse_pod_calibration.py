@@ -120,7 +120,7 @@ calibration = BayesianCalibration.from_dict(
             "Bayes_filter": {"scale_cov_with_max": True,
                              "ess_target": 0.3},
             "sampling": {
-                "max_num_components": 3,
+                "max_num_components": 1,
                 "slice_sampling": True,
             },
         },

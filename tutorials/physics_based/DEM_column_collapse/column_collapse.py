@@ -129,7 +129,6 @@ def check_unbalanced_before_collapse():
         # Save the particle configuration before the collapse
         if not create_packing:
             sp.fromSimulation()
-            sp.save(f"initial_packing_{ctrMu:.3f}.txt")
         # Remove the wall at x=max (right wall) to start the flow
         O.bodies.erase(right_wall)
         # Set higher friction for the rest of the simulation

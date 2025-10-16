@@ -34,7 +34,7 @@ def run_yade_from_shell(table_file_name, model_script, path_to_shell=None, platf
         exit()
 
 
-def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
+def write_to_table(sim_name, table, names, curr_iter=0, threads=8, table_ids=None):
     """
     write parameter samples into a text file
 
@@ -43,17 +43,21 @@ def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
     :param names: list of strings
     :param curr_iter: int
     :param threads: int
+    :param table_ids: list of int, default=None
     :return: string
     """
 
     # Computation of decimal number for unique key
     table_file_name = f'{os.getcwd()}/{sim_name}_Iter{curr_iter}_Samples.txt'
+    num, dim = table.shape
+    # If table_ids is not given, use the full table
+    if table_ids is None:
+        table_ids = np.arange(num)
 
     with open(table_file_name, 'w') as f_out:
-        num, dim = table.shape
         mag = math.floor(math.log(num, 10)) + 1
         f_out.write(' '.join(['!OMP_NUM_THREADS', 'description', 'key'] + names + ['\n']))
-        for j in range(num):
+        for j in table_ids:
             description = f'{sim_name}_Iter' + str(curr_iter) + '_Sample' + str(j).zfill(mag)
             f_out.write(' '.join(
                 [f'{threads:2d}'] + [description] +
