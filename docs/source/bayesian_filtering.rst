@@ -178,7 +178,7 @@ You can choose one of the sampling methods when initializing a :class:`.Iterativ
 
    ibf_cls = IterativeBayesianFilter.from_dict(
        {
-           "inference":{
+           "Bayes_filter":{
                "ess_target": 0.3,
            },
            "sampling":{

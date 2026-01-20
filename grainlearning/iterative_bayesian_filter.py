@@ -45,7 +45,7 @@ class IterativeBayesianFilter:
 
         ibf_cls = IterativeBayesianFilter.from_dict(
             {
-                "inference":{
+                "Bayes_filter":{
                     "ess_target": 0.3,
                     "scale_cov_with_max": True
                 },
@@ -62,12 +62,12 @@ class IterativeBayesianFilter:
     .. highlight:: python
     .. code-block:: python
 
-        system_cls = IterativeBayesianFilter(
-                inference = SMC(...),
+        ibf_cls = IterativeBayesianFilter(
+                Bayes_filter = SMC(...),
                 sampling = GaussianMixtureModel(...)
         )
 
-    :param inference: Sequential Monte Carlo class (SMC)
+    :param Bayes_filter: A Bayesian filtering algorithm. Currently, only the sequential Monte Carlo class (SMC) is available
     :param sampling: Gaussian Mixture Model class (GMM)
     :param initial_sampling: The initial sampling method, defaults to Halton
     :param ess_tol: Tolerance for the target effective sample size to converge, defaults to 1.0e-2
@@ -80,7 +80,7 @@ class IterativeBayesianFilter:
 
     def __init__(
         self,
-        inference: Type["SMC"] = None,
+        Bayes_filter: Type["SMC"] = None,
         sampling: Type["GaussianMixtureModel"] = None,
         ess_tol: float = 1.0e-2,
         initial_sampling: str = 'halton',
@@ -89,7 +89,7 @@ class IterativeBayesianFilter:
     ):
         """Initialize the Iterative Bayesian Filter."""
 
-        self.inference = inference
+        self.Bayes_filter = Bayes_filter
 
         self.initial_sampling = initial_sampling
 
@@ -115,7 +115,7 @@ class IterativeBayesianFilter:
         :return: an iBF object
         """
         return cls(
-            inference=SMC.from_dict(obj["inference"]),
+            Bayes_filter=SMC.from_dict(obj["Bayes_filter"]),
             sampling=GaussianMixtureModel.from_dict(obj["sampling"]),
             ess_tol=obj.get("ess_tol", 1.0e-2),
             initial_sampling=obj.get("initial_sampling", "halton"),
@@ -141,25 +141,25 @@ class IterativeBayesianFilter:
             self.load_proposal_from_file(system)
 
         result = optimize.minimize_scalar(
-            self.inference.data_assimilation_loop,
+            self.Bayes_filter.data_assimilation_loop,
             args=(system, self.proposal),
             method="bounded",
-            # tol=self.ess_tol,
-            bounds=(system.sigma_min, system.sigma_max),
+            options={"xatol": 0.01},
+            bounds=(system.sigma_lower_bound, system.sigma_max),
         )
         system.sigma_max = result.x
 
         # use the optimized sigma value to compute the posterior distribution
         if system.sigma_max > system.sigma_tol:
-            self.inference.data_assimilation_loop(system.sigma_max, system, self.proposal)
+            self.Bayes_filter.data_assimilation_loop(system.sigma_max, system, self.proposal)
         else:
-            self.inference.data_assimilation_loop(system.sigma_tol, system, self.proposal)
+            self.Bayes_filter.data_assimilation_loop(system.sigma_tol, system, self.proposal)
 
         # get the posterior distribution at the last time step
-        self.posterior = self.inference.get_posterior_at_time(-1)
+        self.posterior = self.Bayes_filter.get_posterior_at_time(-1)
 
         # compute the estimated means and coefficient of variation from the posterior distribution
-        system.compute_estimated_params(self.inference.posteriors)
+        system.compute_estimated_params(self.Bayes_filter.posteriors)
 
     def run_sampling(self, system: Type["DynamicSystem"]):
         """Generate new samples from a proposal density.
@@ -204,16 +204,23 @@ class IterativeBayesianFilter:
         self.sampling.load_gmm_from_file(f'{system.sim_data_dir}/iter{system.curr_iter-1}/{self.proposal_data_file}')
 
         samples = np.copy(system.param_data)
-        samples /= self.sampling.max_params
 
-        proposal = np.exp(self.sampling.gmm.score_samples(samples))
-        proposal *= voronoi_vols(samples)
-        # assign the maximum vol to open regions (use a uniform proposal distribution if Voronoi fails)
-        if (proposal < 0.0).all():
-            self.proposal = np.ones(proposal.shape) / system.num_samples
-        else:
-            proposal[np.where(proposal < 0.0)] = min(proposal[np.where(proposal > 0.0)])
-            self.proposal = proposal / sum(proposal)
+        # normalize the parameter samples
+        samples_normalized = self.sampling.normalize(samples)
+
+        self.proposal = np.exp(self.sampling.gmm.score_samples(samples_normalized))
+
+        self.proposal /= self.proposal.sum()
+
+        ## turn off the proposal density to probability mass correction because quasi-random sampling is used by default
+        # proposal *= voronoi_vols(samples)
+
+        # # assign the maximum vol to open regions (use a uniform proposal distribution if Voronoi fails)
+        # if (proposal < 0.0).all():
+        #     self.proposal = np.ones(proposal.shape) / system.num_samples
+        # else:
+        #     proposal[np.where(proposal < 0.0)] = min(proposal[np.where(proposal > 0.0)])
+        #     self.proposal = proposal / sum(proposal)
 
     def save_proposal_to_file(self, system: Type["IODynamicSystem"]):
         """Save the proposal density to a file.

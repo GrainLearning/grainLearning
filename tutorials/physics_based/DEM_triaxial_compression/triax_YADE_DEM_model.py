@@ -5,15 +5,15 @@ readParamsFromTable(
     # no. of your simulation
     key=0,
     # Young's modulus
-    E_m=8.8328129646e+00,
+    E_m=9,
     # Poisson's ratio
-    v=1.1768868293e-01,
+    v=0.1,
     # rolling/bending stiffness
-    kr=1.0968388788e-01,
+    kr=0.1,
     # rolling/bending plastic limit
-    eta=7.3928627878e-01,
+    eta=0.7,
     # final friction coefficient
-    mu=2.9648597170e+01,
+    mu=30,
     # number of particles
     num=1000,
     # initial confining pressure
@@ -23,8 +23,10 @@ readParamsFromTable(
 
 import numpy as np
 from yade.params import table
-from yade import pack
+from yade import pack, plot
 from grainlearning.tools import get_keys_and_data, write_dict_to_file
+
+PATH = '/home/hcheng/GrainLearning/grainLearning/tutorials/physics_based/DEM_triaxial_compression'
 
 # check if run in batch mode
 isBatch = runningInBatch()
@@ -37,8 +39,9 @@ else:
 num = table.num  # number of soil particles
 dScaling = 1e3  # density scaling
 e = 0.68  # initial void ratio
+conf_init = 1e3  # very small initial confining pressure
 conf = table.conf  # confining pressure
-rate = 0.1  # strain rate (decrease this for serious calculations)
+rate = 1.0  # strain rate (decrease this for serious calculations)
 damp = 0.2  # damping coefficient
 stabilityRatio = 1.e-3  # threshold for quasi-static condition (decrease this for serious calculations)
 stressTolRatio = 1.e-3  # tolerance for stress goal
@@ -49,9 +52,7 @@ highDamp = 0.9
 debug = False
 
 #: load strain/stress data for quasi-static loading
-obs_file_name = "triax_data_DEM.dat"
-obs_data = get_keys_and_data(obs_file_name)
-obs_ctrl_data = list(0.01 * obs_data[obsCtrl])
+obs_ctrl_data = np.linspace(0.01, 0.3, 59).tolist()
 obs_ctrl_data.reverse()
 
 #: Soil sphere parameters
@@ -59,25 +60,22 @@ E = pow(10, table.E_m)  # micro Young's modulus
 v = table.v  # micro Poisson's ratio
 kr = table.kr  # rolling/bending stiffness
 eta = table.eta  # rolling/bending plastic limit
-mu = table.mu  # contact friction during shear
-ctrMu = table.mu  # use small mu to prepare dense packing?
+mu = radians(table.mu)  # contact friction during shear
+ctrMu = radians(table.mu)  # use small mu to prepare dense packing?
 rho = 2650 * dScaling  # soil density
 
 #: create materials
 spMat = O.materials.append(
-    CohFrictMat(young=E, poisson=v, frictionAngle=radians(ctrMu), density=rho, isCohesive=False,
+    CohFrictMat(young=E, poisson=v, frictionAngle=ctrMu, density=rho, isCohesive=False,
                 alphaKr=kr, alphaKtw=kr, momentRotationLaw=True, etaRoll=eta, etaTwist=eta))
 
 # create dictionary to store simulation data
-sim_data = {}
-sim_data['e_z'] = []
-sim_data['e_v'] = []
-sim_data['s33_over_s11'] = []
+plot.plots={'e_z': ('e', 'e_v', 's33_over_s11')}
 
 #: define the periodic box where a certain configuration of particles is loaded
 O.periodic = True
 sp = pack.SpherePack()
-cfg_file = 'PeriSp_' + str(num) + f'_{e}.txt'
+cfg_file = f'{PATH}/PeriSp_' + str(num) + f'_{e}.txt'
 with open(cfg_file, 'r') as f:
     first_line = f.readline()
     sizes = first_line.split()[1:]
@@ -105,6 +103,7 @@ O.engines = [
                         # whether they are strains or stresses
                         stressMask=7,
                         # confining stress
+                        # goal=(-conf_init, -conf_init, -conf_init),
                         goal=(-conf, -conf, -conf),
                         # strain rate
                         maxStrainRate=(10. * rate, 10. * rate, 10. * rate),
@@ -115,10 +114,30 @@ O.engines = [
                         # turn on checkVoidRatio after finishing initial compression
                         relStressTol=stressTolRatio,
                         # function to call after the goal is reached
-                        doneHook='compactionFinished()',
+                        # doneHook='init_porosity_checker.dead = False',
+                        doneHook='compactionFinished()',                        
                         ),
     NewtonIntegrator(damping=damp, label='newton'),
+    # PyRunner(command="check_init_porosity()", iterPeriod=1000, dead=True, label='init_porosity_checker'),
 ]
+
+
+# Check if the initial void ratio is reached at a low initial confining pressure (turned off because this takes too long)
+def check_init_porosity():
+    global ctrMu
+    n = porosity()
+    # reduce inter-particle friction if e is still big
+    if n/(1.-n) > e:
+        ctrMu *= 0.9
+        print('Frcition coefficient reduces to: ', tan(ctrMu), 'Void ratio: ', n/(1.-n))
+        setContactFriction(ctrMu)
+        init_porosity_checker.dead = True
+    else:
+        # now start isotropic compression
+        triax.goal = (-conf,-conf,-conf)
+        triax.doneHook = "compactionFinished()"
+        # set inter-particle friction to correct level
+        setContactFriction(mu)
 
 
 def compactionFinished():
@@ -168,9 +187,12 @@ def addPlotData():
     e_v = e_x + e_y + e_z
     n = porosity()
     print("Triax goal is: ", triax.goal, "dt=", O.dt, "numIter=", O.iter, "real time=", O.realtime)  # e = n/(1.-n)
-    sim_data['e_z'].append(100 * e_z)
-    sim_data['e_v'].append(100 * e_v)
-    sim_data['s33_over_s11'].append(s33_over_s11)
+    plot.addData(
+        e=porosity()/ (1. - porosity()),
+        e_z=100 * e_z,
+        e_v=100 * e_v,
+        s33_over_s11=s33_over_s11
+    )
     if len(obs_ctrl_data) != 0:
         startLoading()
     else:
@@ -182,7 +204,7 @@ def addPlotData():
         for name in table.__all__:
             param_data[name] = eval('table.' + name)
         # write simulation data into a text file
-        write_dict_to_file(sim_data, data_file_name)
+        write_dict_to_file(plot.data, data_file_name)
         write_dict_to_file(param_data, data_param_name)
         O.pause()
 

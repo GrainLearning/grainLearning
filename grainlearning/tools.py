@@ -11,39 +11,27 @@ from sklearn.mixture import BayesianGaussianMixture
 from scipy.spatial import Voronoi, ConvexHull
 
 
-# def startSimulations(platform, software, tableName, fileName):
-#     # platform desktop, aws or rcg    # software so far only yade
-#     argument = tableName + " " + fileName
-#     if platform == 'desktop':
-#         # Definition where shell script can be found
-#         path_to_shell = os.getcwd() + '/platform_shells/desktop'
-#         if software == 'yade':
-#             command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
-#             subprocess.call(command, shell=True)
-#         else:
-#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-#             sys.exit
-#
-#     elif platform == 'aws':
-#         path_to_shell = os.getcwd() + '/platform_shells/aws'
-#         if software == 'yade':
-#             command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
-#             subprocess.call(command, shell=True)
-#         else:
-#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-#             sys.exit
-#
-#     elif platform == 'rcg':
-#         path_to_shell = os.getcwd() + '/platform_shells/rcg'
-#         if software == 'yade':
-#             command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
-#             subprocess.call(command, shell=True)
-#         else:
-#             print(Fore.RED + "Chosen 'software' has not been implemented yet. Check 'startSimulations()' in 'tools.py'")
-#             sys.exit
-#     else:
-#         print('Exit code. Hardware for yade simulations not properly defined')
-#         quit()
+def run_yade_from_shell(table_file_name, model_script, path_to_shell=None, platform='desktop'):
+    # platform desktop, aws or rcg    # software so far only yade
+    if not path_to_shell:
+        path_to_shell = os.getcwd()
+    argument = table_file_name + " " + model_script
+    if platform == 'desktop':
+        # Definition where shell script can be found
+        command = 'sh ' + path_to_shell + '/yadeDesktop.sh' + " " + argument
+        subprocess.call(command, shell=True)
+
+    elif platform == 'aws':
+        command = 'sh ' + path_to_shell + '/yadeAWS.sh' + " " + argument
+        subprocess.call(command, shell=True)
+
+    elif platform == 'rcg':
+        command = 'sh ' + path_to_shell + '/yadeRCG.sh' + " " + argument
+        subprocess.call(command, shell=True)
+    else:
+        RuntimeError(
+            "Chosen 'platform' has not been implemented yet. Check 'run_yade_from_shell()' in 'tools.py'")
+        exit()
 
 
 def write_to_table(sim_name, table, names, curr_iter=0, threads=8):
@@ -324,7 +312,7 @@ def stratified_resample(weights, expand_num=10):
 def systematic_resample(weights, expand_num=10):
     """ Performs the systemic resampling algorithm used by particle filters.
     This algorithm separates the sample space into N divisions. A single random
-    offset is used to to choose where to sample from for all divisions. This
+    offset is used to choose where to sample from for all divisions. This
     guarantees that every sample is exactly 1/N apart.
     Parameters
     ----------
@@ -411,7 +399,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.xlabel("'Time' step")
         plt.ylabel(f'Mean of {param_names[i]}')
         plt.grid(True)
-    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_means.png')
 
@@ -422,7 +409,6 @@ def plot_param_stats(fig_name, param_names, means, covs, save_fig=0):
         plt.xlabel("'Time' step")
         plt.ylabel(f'Coefficient of variation of {param_names[i]}')
         plt.grid(True)
-    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_covs.png')
 
@@ -451,7 +437,6 @@ def plot_posterior(fig_name, param_names, param_data, posterior, save_fig=0):
             plt.xlabel(r'$' + name + '$')
             plt.ylabel('Posterior probability mass')
             plt.grid(True)
-        plt.tight_layout()
         if save_fig:
             plt.savefig(f'{fig_name}_posterior_{name}.png')
 
@@ -473,8 +458,6 @@ def plot_param_data(fig_name, param_names, param_data_list, save_fig=0):
             plt.xlabel(r'$' + param_names[j] + '$')
             plt.ylabel(r'$' + param_names[j + 1] + '$')
             plt.legend()
-        plt.legend()
-        plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_param_space.png')
 
@@ -488,7 +471,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
     :param ctrl_data: ndarray
     :param obs_data: ndarray
     :param sim_data: ndarray
-    :param posterior: ndarray
+    :param posteriors: ndarray
     :param save_fig: bool defaults to False
     """
     import matplotlib.pylab as plt
@@ -512,10 +495,7 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
         for j in (-posteriors[-1, :]).argsort()[:3]:
             plt.plot(ctrl_data, sim_data[j, i, :], label=f'sim No. {j:d}')
 
-        if len(ctrl_data) < 20:
-            markevery = 1
-        else:
-            markevery = int(len(ctrl_data) / 10.)
+        markevery = int(np.ceil(len(ctrl_data) / 100))
 
         plt.plot(ctrl_data,
                  obs_data[i, :], 'ok',
@@ -525,15 +505,16 @@ def plot_obs_and_sim(fig_name, ctrl_name, obs_names, ctrl_data, obs_data, sim_da
 
         plt.xlabel(ctrl_name)
         plt.ylabel(obs_names[i])
-        plt.legend()
+        # Show legend in the first sub-plot
+        if i == 0:
+            plt.legend()
         plt.grid(True)
 
-    plt.tight_layout()
     if save_fig:
         plt.savefig(f'{fig_name}_obs_and_sim.png')
 
 
-def plot_pdf(fig_name, param_names, samples, save_fig=0):
+def plot_pdf(fig_name, param_names, samples, save_fig=0, true_params=None):
     """
     Plot the posterior density function of the parameter distribution
     :param fig_name: string
@@ -541,6 +522,7 @@ def plot_pdf(fig_name, param_names, samples, save_fig=0):
     :param param_names: list of strings containing parameter names
     :param samples: list of ndarray of shape (num_samples, self.num_params)
     :param save_fig: bool defaults to False
+    :param true_params: list of true parameter values, default=None
     """
     import seaborn as sns
     import pandas as pd
@@ -569,6 +551,14 @@ def plot_pdf(fig_name, param_names, samples, save_fig=0):
     fig.map_diag(sns.kdeplot, lw=2)
     fig.add_legend(loc='upper right')
     fig.fig.canvas.manager.set_window_title('Estimated posterior probability density function')
+    if true_params is not None:
+        for i in range(len(param_names)):
+            for j in range(len(param_names)):
+                # plot the true parameter values as a yellow start
+                if i != j:
+                    # keep the marker on top of other plots
+                    fig.axes[i, j].scatter(true_params[j], true_params[i], color='gold', edgecolors='k', marker='*',
+                                           s=200, zorder=10)
 
     fig.tight_layout()
     if save_fig:

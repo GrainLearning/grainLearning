@@ -28,6 +28,8 @@ def linear(x, params):
 calibration = BayesianCalibration.from_dict(
     {
         "num_iter": 10,
+#        "error_tol": 0.01,
+#        "gl_error_tol": 0.01,
         "callback": run_sim,
         "system": {
             "param_min": [0.001, 0.001],
@@ -41,8 +43,8 @@ calibration = BayesianCalibration.from_dict(
             "sim_name": 'linear',
             "sigma_tol": 0.01,
         },
-        "calibration": {
-            "inference": {"ess_target": 0.3},
+        "inference": {
+            "Bayes_filter": {"ess_target": 0.3},
             "sampling": {
                 "max_num_components": 1,
                 "n_init": 1,

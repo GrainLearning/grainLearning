@@ -4,52 +4,103 @@
 """
 import os
 from math import floor, log
-from grainlearning import BayesianCalibration
-from grainlearning.dynamic_systems import IODynamicSystem
+from grainlearning import BayesianCalibration, IODynamicSystem, IterativeBayesianFilter, SMC, GaussianMixtureModel
+# from grainlearning.tools import run_yade_from_shell
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 executable = 'yade-batch'
 yade_script = f'{PATH}/Collision.py'
 
-
+# define the callback function which GrainLearning uses to run YADE simulations
 def run_sim(calib):
     """
     Run the external executable and passes the parameter sample to generate the output file.
     """
     print("*** Running external software YADE ... ***\n")
+    # alternatively, you can use shell scripts to run YADE (in /scripts_tools/platform_shells/) through the `run_yade_from_shell` function
+    # os.system('cp ../../../scripts_tools/platform_shells/desktop/yadeDesktop.sh .')
+    # run_yade_from_shell(calib.system.param_data_file, yade_script)
     os.system(' '.join([executable, calib.system.param_data_file, yade_script]))
 
+param_names = ['E_m', 'nu']
+num_samples = int(6 * len(param_names) * log(len(param_names)))
 
+# define the Bayesian Calibration object
 calibration = BayesianCalibration.from_dict(
     {
-        "num_iter": 4,
+        # maximum number of GL iterations
+        "num_iter": 5,
+        # error tolerance to stop the calibration
+        "error_tol": 0.1,
+        # call back function to run YADE
         "callback": run_sim,
+        # DEM model as a dynamic system
         "system": {
             "system_type": IODynamicSystem,
             "param_min": [7, 0.0],
             "param_max": [11, 0.5],
-            "param_names": ['E_m', 'nu'],
-            "num_samples": 10,
-            "obs_data_file": PATH + '/collision_obs.dat',
+            "param_names": param_names,
+            "num_samples": num_samples,
+            "obs_data_file": PATH + '/collision_obs.txt',
             "obs_names": ['f'],
             "ctrl_name": 'u',
             "sim_name": 'collision',
             "sim_data_dir": PATH + '/sim_data/',
             "sim_data_file_ext": '.txt',
-            "sigma_tol": 0.01,
         },
-        "calibration": {
-            "inference": {"ess_target": 0.3},
+        "inference": {
+            "Bayes_filter": {
+                # scale the covariance matrix with the maximum observation data or not
+                "scale_cov_with_max": True,
+            },
             "sampling": {
-                "max_num_components": 2,
-                "n_init": 1,
+                # maximum number of distribution components
+                "max_num_components": 1,
+                # fix the seed for reproducibility
                 "random_state": 0,
+                # type of covariance matrix
                 "covariance_type": "full",
+                # use slice sampling (set to False if faster convergence is designed. However, the results could be biased)
+                "slice_sampling": True,
             }
         },
+        # flag to save the figures (-1: no, 0: yes but only show the figures , 1: yes)
         "save_fig": 0,
+        # number of threads to be used per simulation
+        "threads": 1,
     }
 )
+
+# calibration = BayesianCalibration(
+#     num_iter=5,
+#     error_tol=0.1,
+#     callback=run_sim,
+#     save_fig=0,
+#     threads=1,
+#     system=IODynamicSystem(
+#         param_min=[7, 0.0],
+#         param_max=[11, 0.5],
+#         param_names=param_names,
+#         num_samples=num_samples,
+#         obs_data_file=PATH + '/collision_obs.txt',
+#         obs_names=['f'],
+#         ctrl_name='u',
+#         sim_name='collision',
+#         sim_data_dir=PATH + '/sim_data/',
+#         sim_data_file_ext='.txt',
+#     ),
+#     inference=IterativeBayesianFilter(
+#         SMC(
+#             scale_cov_with_max=True,
+#         ),
+#         GaussianMixtureModel(
+#             max_num_components=1,
+#             random_state=0,
+#             covariance_type="full",
+#             slice_sampling=True,
+#         ),
+#     ),
+# )
 
 calibration.run()
 

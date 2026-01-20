@@ -100,7 +100,7 @@ class DynamicSystem:
     :param sigma_max: Maximum uncertainty, defaults to 1.0e6, optional
     :param sigma_tol: Tolerance of the estimated uncertainty, defaults to 1.0e-3, optional
     :param sim_name: Name of the simulation, defaults to 'sim', optional
-    :param sigma_min: Minimum uncertainty, defaults to 1.0e-6, optional
+    :param sigma_lower_bound: Minimum uncertainty, defaults to 1.0e-6, optional
     :param _inv_normalized_sigma:  Calculated normalized sigma to weigh the covariance matrix
     :param estimated_params: Estimated parameter as the first moment of the distribution (:math:`x_\mu = \sum_i w_i * x_i`), defaults to None, optional
     :param estimated_params_cv: Estimated parameter coefficient of variation as the second moment of the distribution (:math:`x_\sigma = \sqrt{\sum_i w_i * (x_i - x_\mu)^2} / x_\mu`), defaults to None, optional
@@ -121,7 +121,8 @@ class DynamicSystem:
         param_data: np.ndarray = None,
         param_names: List[str] = None,
         sigma_max: float = 1.0e6,
-        sigma_tol: float = 1.0e-3
+        sigma_tol: float = 1.0e-3,
+        sigma_lower_bound: float = 1.0e-6
     ):
         """Initialize the dynamic system class"""
         #### Observations ####
@@ -139,6 +140,8 @@ class DynamicSystem:
 
         self.num_ctrl, _ = self.obs_data.shape
 
+        self.normalization_factor = np.ones(self.num_steps)
+
         if inv_obs_weight is None:
             self.inv_obs_weight = list(np.ones(self.num_obs))
         else:
@@ -147,6 +150,8 @@ class DynamicSystem:
         #### Simulations ####
 
         self.num_samples = num_samples
+
+        self.num_samples_max = num_samples
 
         self.sim_name = sim_name
 
@@ -171,7 +176,7 @@ class DynamicSystem:
 
         #### Uncertainty ####
 
-        self.sigma_min =  1.0e-6
+        self.sigma_lower_bound = sigma_lower_bound
 
         self.sigma_max = sigma_max
 
@@ -211,7 +216,9 @@ class DynamicSystem:
             sim_data=obj.get("sim_data", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
-            sigma_tol=obj.get("sigma_tol", 0.001),
+            sigma_tol=obj.get("sigma_tol", 1.0e-3),
+            sigma_max=obj.get("sigma_max", 1.0e6),
+            sigma_lower_bound=obj.get("sigma_lower_bound", 1.0e-6),
         )
 
     def set_sim_data(self, data: list):
@@ -288,8 +295,11 @@ class DynamicSystem:
         """Virtual function to load simulation data"""
 
     @classmethod
-    def write_params_to_table(cls: Type["DynamicSystem"]):
-        """Write the parameter data into a text file"""
+    def write_params_to_table(cls: Type["DynamicSystem"], threads: int):
+        """Write the parameter data into a text file
+        
+        :param threads: Number of threads to use
+        """
 
     @classmethod
     def backup_sim_data(cls: Type["DynamicSystem"]):
@@ -301,6 +311,10 @@ class DynamicSystem:
     @classmethod
     def move_data_to_sim_dir(cls: Type["DynamicSystem"]):
         """Virtual function to move data into simulation directory"""
+
+    @classmethod
+    def set_normalization_factor(cls: Type["DynamicSystem"]):
+        """Virtual method to normalize the simulation and observation data"""
 
 
 class IODynamicSystem(DynamicSystem):
@@ -388,6 +402,9 @@ class IODynamicSystem(DynamicSystem):
         param_data_file: str = '',
         param_data: np.ndarray = None,
         param_names: List[str] = None,
+        sigma_max=1.0e6,
+        sigma_tol=1.0e-3,
+        sigma_lower_bound=1.0e-6
     ):
         """Initialize the IO dynamic system class"""
 
@@ -406,7 +423,10 @@ class IODynamicSystem(DynamicSystem):
             sim_data,
             curr_iter,
             param_data,
-            param_names
+            param_names,
+            sigma_max,
+            sigma_tol,
+            sigma_lower_bound
         )
         # TODO: reuse initialization from base class
 
@@ -468,7 +488,7 @@ class IODynamicSystem(DynamicSystem):
             ctrl_name=obj["ctrl_name"],
             param_data_file=obj.get("param_data_file", ''),
             obs_data=obj.get("obs_data", None),
-            num_samples=obj.get("num_samples", None),
+            num_samples=obj.get("num_samples"),
             param_min=obj.get("param_min", None),
             param_max=obj.get("param_max", None),
             ctrl_data=obj.get("ctrl_data", None),
@@ -476,6 +496,9 @@ class IODynamicSystem(DynamicSystem):
             sim_data=obj.get("sim_data", None),
             param_data=obj.get("param_data", None),
             param_names=obj.get("param_names", None),
+            sigma_tol=obj.get("sigma_tol", 0.001),
+            sigma_max=obj.get("sigma_max", 1.0e6),
+            sigma_lower_bound=obj.get("sigma_lower_bound", 1.0e-6),
         )
 
     def get_obs_data(self):
@@ -497,15 +520,20 @@ class IODynamicSystem(DynamicSystem):
             self.obs_data = np.zeros([self.num_obs, self.num_steps])
             for i, key in enumerate(self.obs_names):
                 self.obs_data[i, :] = keys_and_data[key]
+            # set normalization factor to default (ones)
+            self.normalization_factor = np.ones(self.num_steps)
+            self.set_normalization_factor()
         else:
             self.obs_data = np.genfromtxt(self.obs_data_file)
             # if only one observation data vector exists, reshape it with (1, num_steps)
             if len(self.obs_data) == 1:
                 self.obs_data = self.obs_data.reshape([1, self.obs_data.shape[0]])
 
-    def get_sim_data_files(self):
+    def get_sim_data_files(self, length: int=None):
         """
         Get the simulation data files from the simulation data directory.
+
+        :param length: Number of simulation data files to load
         """
         if self.sim_data_file_ext == '.txt':
             files =  glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_sim*{self.sim_data_file_ext}')
@@ -520,20 +548,34 @@ class IODynamicSystem(DynamicSystem):
         if len(self.sim_data_files) != self.num_samples:
             raise RuntimeError(f'Number of simulation data files found ({len(self.sim_data_files)}) does not match the expected number of samples ({self.num_samples})')
 
-    def load_sim_data(self):
+    def load_sim_data(self, length: int=None, ids_origin: np.ndarray=None):
         """Load the simulation data from the simulation data files.
 
         The function does the following:
         1. Load simulation data into an IO dynamic system object
         2. Check if parameter values read from the table matches those used to creat the simulation data
+        
+        :param length: Number of simulation data files to load
+        :param ids_origin: Indices of the selected parameter data
         """
-        self.sim_data = np.zeros([self.num_samples, self.num_obs, self.num_steps])
+        # if length is not given, load all simulation data files
+        if length is None:
+            length = self.num_samples
+
+        # if ids_origin is given, select part of the param_data corresponding to the ids_origin
+        if ids_origin is not None:
+            param_data = self.param_data[ids_origin]
+        else:
+            param_data = self.param_data
+
+        self.sim_data = np.zeros([length, self.num_obs, self.num_steps])
+
         for i, sim_data_file in enumerate(self.sim_data_files):
             if self.sim_data_file_ext != '.npy':
                 data = get_keys_and_data(sim_data_file)
-                param_data = get_keys_and_data(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
+                param_data_per_sample = get_keys_and_data(sim_data_file.split('_sim')[0] + f'_param{self.sim_data_file_ext}')
                 for key in self.param_names:
-                    data[key] = param_data[key][0]
+                    data[key] = param_data_per_sample[key][0]
             else:
                 data = np.load(sim_data_file, allow_pickle=True).item()
 
@@ -541,7 +583,7 @@ class IODynamicSystem(DynamicSystem):
                 self.sim_data[i, j, :] = data[key]
 
             params = np.array([data[key] for key in self.param_names])
-            np.testing.assert_allclose(params, self.param_data[i, :], rtol=1e-5)
+            np.testing.assert_allclose(params, param_data[i, :], rtol=1e-5)
 
     def load_param_data(self):
         """
@@ -573,8 +615,9 @@ class IODynamicSystem(DynamicSystem):
                     self.param_data[i, :] = params
             else:
                 raise RuntimeError(f'No data found for iteration {self.curr_iter}')
+        self.num_samples_max = self.num_samples
 
-    def set_up_sim_dir(self):
+    def set_up_sim_dir(self, threads: int):
         """
         Create a directory to store simulation data and write the parameter data into a text file
         """
@@ -585,7 +628,7 @@ class IODynamicSystem(DynamicSystem):
         os.makedirs(sim_data_sub_dir)
 
         # write the parameter data into a text file
-        self.write_params_to_table()
+        self.write_params_to_table(threads)
 
     def move_data_to_sim_dir(self):
         """
@@ -600,7 +643,7 @@ class IODynamicSystem(DynamicSystem):
         # redefine the parameter data file since its location is changed
         self.param_data_file = f'{self.sim_data_sub_dir}/' + os.path.relpath(self.param_data_file, os.getcwd())
 
-    def write_params_to_table(self):
+    def write_params_to_table(self, threads: int):
         """Write the parameter data into a text file.
 
         :return param_data_file: The name of the parameter data file
@@ -609,7 +652,9 @@ class IODynamicSystem(DynamicSystem):
             self.sim_name,
             self.param_data,
             self.param_names,
-            self.curr_iter)
+            self.curr_iter,
+            threads=threads,
+        )
 
     def backup_sim_data(self):
         """Backup simulation data files to a backup directory."""

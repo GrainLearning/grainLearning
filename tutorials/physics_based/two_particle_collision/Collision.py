@@ -6,8 +6,8 @@ readParamsFromTable(
     key=0,
     # Density
     rho=2450,
-    # Young's modulus
-    E_m=8,
+    # Exponent of Young's modulus
+    E_m=9.3,
     # Poisson's ratio
     nu=0.2,
     # final friction coefficient
@@ -18,7 +18,10 @@ readParamsFromTable(
 
 # import modules
 import numpy as np
+
 from yade.params import table
+from yade import plot
+
 from grainlearning.tools import write_dict_to_file
 
 # check if run in batch mode
@@ -40,11 +43,9 @@ def add_sim_data():
     inter = O.interactions[0, 1]
     # get penetration depth
     u = inter.geom.penetrationDepth
-    # check current penetration depth against the target value
-    if u > obs_ctrl_data[-1]:
-        sim_data['u'].append(u)
-        sim_data['f'].append(inter.phys.normalForce.norm())
-        obs_ctrl_data.pop()
+    plot.addData(u=u, f=inter.phys.normalForce.norm())
+    # move particle 1
+    O.bodies[1].state.pos = O.bodies[1].state.refPos + Vector3(0, 0, -obs_ctrl_data.pop())
     if not obs_ctrl_data:
         data_file_name = f'{description}_sim.txt'
         data_param_name = f'{description}_param.txt'
@@ -53,22 +54,19 @@ def add_sim_data():
         for name in table.__all__:
             param_data[name] = eval('table.' + name)
         # write simulation data into a text file
-        write_dict_to_file(sim_data, data_file_name)
+        write_dict_to_file(plot.data, data_file_name)
         write_dict_to_file(param_data, data_param_name)
         O.pause()
 
 
-obs_file = "collision_obs.dat"
-# get data for simulation control
-obs_ctrl_data = np.loadtxt(obs_file)[:, 0].tolist()
+obs_file = "collision_obs.txt"
 
-# reverse the ctrl data to pop the last element
+# define a load sequence
+obs_ctrl_data = np.linspace(0.002, 0.01, 81).tolist()
 obs_ctrl_data.reverse()
 
 # create dictionary to store simulation data
-sim_data = {}
-sim_data['u'] = []
-sim_data['f'] = []
+plot.plots={'u':'f'}
 
 # create materials
 O.materials.append(
@@ -95,7 +93,7 @@ O.engines = [
 # set initial timestep
 O.dt = table.safe * PWaveTimeStep()
 # move particle 1
-O.bodies[1].state.vel = Vector3(0, 0, -0.01)
+O.bodies[1].state.pos = O.bodies[1].state.refPos+ Vector3(0, 0, -obs_ctrl_data.pop())
 
 # run DEM simulation
 O.run()
