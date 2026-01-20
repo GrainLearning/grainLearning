@@ -47,8 +47,8 @@ def test_lenreg_IO_load():
                 "sim_data_file_ext": '.txt',
                 "sigma_tol": 0.01,
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "covariance_type": "full",
@@ -93,8 +93,8 @@ def test_lenreg_IO_load():
                 "sim_data_file_ext": ".txt",
                 "param_names": ['a', 'b'],
             },
-            "calibration": {
-                "inference": {"ess_target": 0.3},
+            "inference": {
+                "Bayes_filter": {"ess_target": 0.3},
                 "sampling": {
                     "max_num_components": 1,
                     "covariance_type": "full",
@@ -107,17 +107,9 @@ def test_lenreg_IO_load():
     calibration_continued.run()
         #: Check if the figures are saved
     assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_param_means.png'), "Figure is not saved"
-    assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_param_covs.png'), "Figure is not saved"
-    assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_posterior_a.png'), "Figure is not saved"
-    assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_posterior_b.png'), "Figure is not saved"
-    assert os.path.isfile(
-        PATH + '/sim_data/iter0/linear_param_space.png'), "Figure is not saved"
-    assert os.path.isfile(
         PATH + '/sim_data/iter0/linear_obs_and_sim.png'), "Figure is not saved"
+    assert os.path.isfile(
+        PATH + '/sim_data/iter0/linear_scatterplot.png'), "Figure is not saved"
 
     # Remove the generated files in the folders that have been created
     os.system(f'rm -rf {PATH}/sim_data*')
