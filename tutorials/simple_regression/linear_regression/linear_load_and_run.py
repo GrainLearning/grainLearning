@@ -32,7 +32,7 @@ def linear(executable, params, sim_name, description):
 
 calibration = BayesianCalibration.from_dict(
     {
-        "num_iter": 3,
+        "num_iter": 1,
         "callback": run_sim,
         "system": {
             "system_type": IODynamicSystem,

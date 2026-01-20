@@ -507,23 +507,18 @@ class IODynamicSystem(DynamicSystem):
         """
         Get the simulation data files from the simulation data directory.
         """
-        mag = floor(log(self.num_samples, 10)) + 1
-        self.sim_data_files = []
+        if self.sim_data_file_ext == '.txt':
+            files =  glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_sim*{self.sim_data_file_ext}')
+            # Sort sim_data_files
+            self.sim_data_files = sorted(files, key=lambda x: int(x.split('_Sample')[-1].split('_sim')[0]))
 
-        for i in range(self.num_samples):
-            if self.sim_data_file_ext != '.npy':
-                sim_data_file_ext = '_sim' + self.sim_data_file_ext
-            else:
-                sim_data_file_ext = self.sim_data_file_ext
-            file_name = self.sim_data_dir.rstrip('/') + f'/iter{self.curr_iter}/{self.sim_name}*Iter{self.curr_iter}*' \
-                        + str(i).zfill(mag) + '*' + sim_data_file_ext
-            files = glob(file_name)
+        elif self.sim_data_file_ext == '.npy':
+            files =  glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_Sample*{self.sim_data_file_ext}')
+            # Sort sim_data_files
+            self.sim_data_files = sorted(files, key=lambda x: int(x.split('_Sample')[-1].split(self.sim_data_file_ext)[0]))
 
-            if not files:
-                raise RuntimeError("No data files with name " + file_name + ' found')
-            if len(files) > 1:
-                raise RuntimeError("Found more than one files with the name " + file_name)
-            self.sim_data_files.append(files[0])
+        if len(self.sim_data_files) != self.num_samples:
+            raise RuntimeError(f'Number of simulation data files found ({len(self.sim_data_files)}) does not match the expected number of samples ({self.num_samples})')
 
     def load_sim_data(self):
         """Load the simulation data from the simulation data files.
@@ -552,17 +547,22 @@ class IODynamicSystem(DynamicSystem):
         """
         Load parameter data from a table written in a text file.
         """
+        # get parameter data files
+        if self.sim_data_file_ext == '.txt':
+            files = glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_Sample*_param*{self.sim_data_file_ext}')
+        elif self.sim_data_file_ext == '.npy':
+            files = glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_Sample*{self.sim_data_file_ext}')
         if os.path.exists(self.param_data_file):
             # we assume parameter data are always in the last columns.
             self.param_data = np.genfromtxt(self.param_data_file, comments='!')[:, -self.num_params:]
             self.num_samples = self.param_data.shape[0]
-        else:
-            # if param_data_file does not exit, get parameter data from text files
-            files = glob(self.sim_data_dir + f'/iter{self.curr_iter}/{self.sim_name}*_param*{self.sim_data_file_ext}')
+
+        # if param_data_file does not exit or the number of files found does not match num_samples, recover parameter data from text files
+        if os.path.exists(self.param_data_file) is False or len(files) != self.num_samples:
             self.num_samples = len(files)
             # if the number of files found is non-zero
             if self.num_samples != 0:
-                self.sim_data_files = sorted(files)
+                self.sim_data_files = sorted(files, key=lambda x: int(x.split('_Sample')[-1].split('_param')[0]))
                 self.param_data = np.zeros([self.num_samples, self.num_params])
                 for i, sim_data_file in enumerate(self.sim_data_files):
                     if self.sim_data_file_ext == '.npy':
