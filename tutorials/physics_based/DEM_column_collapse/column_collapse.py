@@ -191,11 +191,9 @@ def measure_run_out_distance():
         O.pause()
 
 def write_particle_data():
-    import sys
-    sys.path.append("/home/jovyan")
-    from CG import UniformGrid, coarse_grain_weinhart
-    from plotting import plot_scalars_2d, plot_vector_field_2d, plot_stress_2d
-    from checks import check_mass_momentum_conservation
+    from grainlearning.coarse_graining.CG import UniformGrid, coarse_grain
+    from grainlearning.coarse_graining.plotting import plot_scalars_2d, plot_vector_field_2d, plot_stress_2d
+    from grainlearning.coarse_graining.checks import check_mass_momentum_conservation
     d = 0.01
     dx = 0.02
     dy = 0.01
@@ -221,7 +219,7 @@ def write_particle_data():
     contact_forces = np.array(contact_forces)
     
     grid = UniformGrid(origin=(0,0), spacing=(dx,dy), shape=(nx,ny))
-    out = coarse_grain_weinhart(
+    out = coarse_grain(
         grid,
         ids=ids, pos=position, mass=mass, vel=velocity, pos_ref=pos_ref, radii=radii,
         contacts_i=contacts_i, contacts_j=contacts_j, contact_forces=contact_forces,
