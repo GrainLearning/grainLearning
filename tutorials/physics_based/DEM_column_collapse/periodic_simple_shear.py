@@ -51,6 +51,8 @@ num = table.num  # number of soil particles
 e = 0.5  # initial void ratio
 damp = 0.2  # damping coefficient
 stabilityRatio = 1.e-3  # threshold for quasi-static condition (decrease this for serious calculations)
+output_period = 5000   # output data every n steps
+target_num_points = 500   # target number of snapshots
 debug = False
 
 #: Soil sphere parameters
@@ -124,17 +126,15 @@ O.engines = [
                         doneHook="triax.dead=True; add_walls_and_shift_particles()",
                         ),
         PyRunner(command="check_pressure_on_top_wall()",
-                iterPeriod=1000,
+                iterPeriod=output_period,
                 dead=True,
                 label='check_pressure'),
         PyRunner(command="measure_stress_strain()",
-                iterPeriod=1000,
+                iterPeriod=output_period,
                 dead=True,
                 label='measure')
 ]
 
-# target number of measurement points to ensure consistent sequence length across runs
-target_num_points = 500
 
 # add two parallel walls to the top and bottom of the domain, and shift particles to the middle to create a simple shear setup
 def add_walls_and_shift_particles():
@@ -236,6 +236,7 @@ def write_particle_data():
     # sys.path.append("/home/jovyan")
     from grainlearning.coarse_graining.CG import coarse_grain, UniformGrid
     from grainlearning.coarse_graining.plotting import plot_scalars_2d, plot_vector_field_2d, plot_stress_2d
+    from grainlearning.coarse_graining.checks import check_mass_momentum_conservation
     d = 0.01
     # get lower left corner of the domain for reference
     min_pos, max_pos = aabbExtrema()
@@ -245,7 +246,7 @@ def write_particle_data():
 
     # write particle data into numpy arrays
     ids = np.array([b.id for b in O.bodies if isinstance(b.shape, Sphere)])
-    position = np.array([b.state.pos.xy() for b in O.bodies if isinstance(b.shape, Sphere)])
+    position = np.array([O.cell.wrap(b.state.pos).xy() for b in O.bodies if isinstance(b.shape, Sphere)])
     mass = np.array([b.state.mass for b in O.bodies if isinstance(b.shape, Sphere)])
     radii = np.array([b.shape.radius for b in O.bodies if isinstance(b.shape, Sphere)])
     velocity = np.array([b.state.vel.xy() for b in O.bodies if isinstance(b.shape, Sphere)])
@@ -271,6 +272,23 @@ def write_particle_data():
         w_len=(1.5*d, 1.5*d), cutoff_c=3.0, periodic=[True, False],
         compute_scalars=True, compute_vectors=True, compute_stress=True, stress_quad=3
     )
+    # # save rho and phi as PNGs in ./figures/
+    # plot_scalars_2d(grid, out["scalars"], keys=["rho","phi","occ"], save="figs/scalars")
+    # plot_vector_field_2d(grid, out["vectors"]["vel"], component=None, save="figs/vectors/vel_norm")
+    # plot_vector_field_2d(grid, out["vectors"]["vel"], component=0, save="figs/vectors/vel_x")
+    # plot_vector_field_2d(grid, out["vectors"]["vel"], component=1, save="figs/vectors/vel_y")
+    # plot_stress_2d(grid, out["tensors"], key="xy", save="figs/tensors/stress_xy")
+    # plot_stress_2d(grid, out["tensors"], key="xx", save="figs/tensors/stress_xx")
+    # plot_stress_2d(grid, out["tensors"], key="yy", save="figs/tensors/stress_yy")
+    # plot_stress_2d(grid, out["tensors"], key="mean", save="figs/tensors/stress_mean")
+    # plot_stress_2d(grid, out["tensors"], key="deviatoric", save="figs/tensors/stress_deviatoric")
+    # # sanity check on conservation
+    # report = check_mass_momentum_conservation(
+    #     grid,
+    #     pos=position, mass=mass, vel=velocity,
+    #     cg_out=out,
+    #     rtol_mass=1e-6, rtol_mom=1e-4
+    # )
     # save the coarse-grained fields into a npy file
     np.save(f"{description}_{O.iter}_CG_fields.npy", out)
     return out
